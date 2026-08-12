@@ -1,0 +1,6 @@
+packages:
+  - apps/*
+  - packages/*
+  - ai/**
+allowBuilds:
+  sharp: true

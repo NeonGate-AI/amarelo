@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+# sim — project-scoped CLI for Sim. company
+# Add this directory to PATH to run without a prefix:
+#   export PATH="$PWD/bin:$PATH"
+set -euo pipefail
+BIN_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+exec bash "$BIN_DIR/cli.sh" "$@"

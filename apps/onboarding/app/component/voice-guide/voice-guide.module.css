@@ -1,0 +1,75 @@
+.guide {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .75rem 1rem;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.compact {
+  justify-content: flex-start;
+}
+
+.status {
+  display: inline-flex;
+  gap: .5rem;
+  align-items: center;
+  color: var(--muted-foreground);
+  font-size: .75rem;
+  font-weight: 650;
+}
+
+.statusDot {
+  width: .48rem;
+  height: .48rem;
+  background: var(--muted-foreground);
+  border-radius: 50%;
+}
+
+.loading,
+.speaking {
+  background: var(--primary);
+  box-shadow: 0 0 0 .25rem color-mix(in srgb, var(--primary) 15%, transparent);
+}
+
+.speaking {
+  animation: voice-pulse 1.1s ease-in-out infinite;
+}
+
+.actions {
+  display: flex;
+  gap: .45rem;
+  align-items: center;
+}
+
+.listenButton {
+  min-height: 2.4rem;
+  padding-inline: .85rem;
+  color: var(--foreground);
+  border-color: var(--border);
+}
+
+.muteButton {
+  display: grid;
+  width: 2.4rem;
+  height: 2.4rem;
+  padding: 0;
+  color: var(--muted-foreground);
+  cursor: pointer;
+  background: var(--secondary);
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  place-items: center;
+}
+
+.muteButton:hover {
+  color: var(--foreground);
+  border-color: color-mix(in srgb, var(--foreground) 28%, var(--border));
+}
+
+@keyframes voice-pulse {
+  50% {
+    opacity: .55;
+    transform: scale(.8);
+  }
+}

@@ -1,0 +1,112 @@
+.shell {
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  min-height: 100dvh;
+  overflow: hidden;
+}
+
+.shell::before {
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  content: '';
+  background-image:
+    linear-gradient(rgb(18 18 17 / 2%) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(18 18 17 / 2%) 1px, transparent 1px);
+  background-size: 4rem 4rem;
+  mask-image: linear-gradient(to bottom, black, transparent 78%);
+}
+
+:global(.dark) .shell::before {
+  background-image:
+    linear-gradient(rgb(255 255 255 / 2%) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(255 255 255 / 2%) 1px, transparent 1px);
+}
+
+.glow {
+  position: fixed;
+  z-index: -1;
+  width: min(36rem, 70vw);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: rgb(250 215 21 / 12%);
+  filter: blur(8rem);
+  pointer-events: none;
+}
+
+.glowOne {
+  top: -20rem;
+  right: -8rem;
+}
+
+.glowTwo {
+  bottom: -26rem;
+  left: -10rem;
+  opacity: .7;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: min(100% - 2rem, 92rem);
+  min-height: 5.5rem;
+  margin-inline: auto;
+}
+
+.brand {
+  color: var(--foreground);
+  font-family: var(--app-font-heading);
+  font-size: 1.55rem;
+  font-weight: 800;
+  letter-spacing: -.055em;
+  text-decoration: none;
+}
+
+.brand span {
+  color: var(--primary);
+}
+
+.main {
+  display: grid;
+  align-items: center;
+  width: min(100% - 2rem, 92rem);
+  padding-block: 2rem 4rem;
+  margin-inline: auto;
+}
+
+.centered {
+  justify-items: center;
+}
+
+.footer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: .5rem;
+  min-height: 4.5rem;
+  padding: 1rem;
+  color: var(--muted-foreground);
+  font-size: .78rem;
+}
+
+.footer svg {
+  color: var(--success);
+}
+
+@media (max-width: 40rem) {
+  .header {
+    min-height: 4.75rem;
+  }
+
+  .main {
+    align-items: start;
+    padding-block: 1.25rem 2.5rem;
+  }
+
+  .footer {
+    min-height: 3.75rem;
+  }
+}

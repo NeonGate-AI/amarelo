@@ -1,0 +1,624 @@
+.hero {
+  position: relative;
+  isolation: isolate;
+  min-height: 100svh;
+  overflow: hidden;
+  background: var(--background);
+  color: var(--foreground);
+}
+
+.ambient {
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.ambientOne,
+.ambientTwo,
+.ambientGrid {
+  position: absolute;
+  display: block;
+}
+
+.ambientOne {
+  top: -22rem;
+  right: -16rem;
+  width: 58rem;
+  height: 58rem;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgb(250 215 21 / 25%), transparent 66%);
+  filter: blur(1.25rem);
+}
+
+.ambientTwo {
+  bottom: -25rem;
+  left: -18rem;
+  width: 52rem;
+  height: 52rem;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgb(125 178 207 / 13%), transparent 68%);
+  filter: blur(2rem);
+}
+
+.ambientGrid {
+  inset: 0;
+  background-image:
+    linear-gradient(var(--border) 1px, transparent 1px),
+    linear-gradient(90deg, var(--border) 1px, transparent 1px);
+  background-size: 4rem 4rem;
+  mask-image: linear-gradient(to bottom, rgb(0 0 0 / 45%), transparent 82%);
+  opacity: .3;
+}
+
+.header {
+  display: flex;
+  width: min(100% - 2rem, 80rem);
+  min-height: 5.25rem;
+  margin-inline: auto;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  border-bottom: 1px solid color-mix(in srgb, var(--border) 76%, transparent);
+}
+
+.logo {
+  display: inline-flex;
+  min-height: 2.75rem;
+  align-items: center;
+  font-family: var(--font-heading);
+  font-size: 1.65rem;
+  font-weight: 820;
+  letter-spacing: -.055em;
+  text-decoration: none;
+}
+
+.logo span {
+  color: var(--primary);
+}
+
+.navigation {
+  display: flex;
+  align-items: center;
+  gap: clamp(1rem, 2.5vw, 2rem);
+}
+
+.navigation a {
+  display: inline-flex;
+  min-height: 2.75rem;
+  align-items: center;
+  color: var(--muted-foreground);
+  font-size: .875rem;
+  font-weight: 560;
+  text-decoration: none;
+  transition: color 160ms ease;
+}
+
+.navigation a:hover {
+  color: var(--foreground);
+}
+
+.headerActions {
+  display: flex;
+  align-items: center;
+  gap: .625rem;
+}
+
+.themeToggle {
+  display: inline-grid;
+  width: 2.75rem;
+  height: 2.75rem;
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  place-items: center;
+  background: color-mix(in srgb, var(--card) 78%, transparent);
+  color: var(--foreground);
+  cursor: pointer;
+  transition: background-color 160ms ease, border-color 160ms ease;
+}
+
+.themeToggle:hover {
+  border-color: var(--ring);
+  background: var(--card);
+}
+
+.headerCta {
+  min-width: 6.75rem;
+  color: var(--primary-foreground);
+}
+
+.heroMain {
+  display: grid;
+  width: min(100% - 2rem, 80rem);
+  margin-inline: auto;
+  padding-block: clamp(3.75rem, 9vw, 7.5rem) clamp(3.5rem, 8vw, 6rem);
+  align-items: start;
+  grid-template-areas:
+    'intro agent'
+    'details agent';
+  grid-template-columns: minmax(0, .94fr) minmax(25rem, 1.06fr);
+  column-gap: clamp(2.5rem, 6vw, 6.5rem);
+}
+
+.heroIntro,
+.heroDetails {
+  max-width: 41rem;
+}
+
+.heroIntro {
+  align-self: end;
+  grid-area: intro;
+}
+
+.heroDetails {
+  align-self: start;
+  grid-area: details;
+}
+
+.eyebrow {
+  display: inline-flex;
+  margin: 0 0 1.25rem;
+  align-items: center;
+  gap: .5rem;
+  color: var(--elo-color-fg-brand);
+  font-size: .75rem;
+  font-weight: 720;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+}
+
+.title {
+  max-width: 11ch;
+  margin: 0;
+  font-family: var(--font-heading);
+  font-size: clamp(3.5rem, 6.5vw, 6.75rem);
+  font-weight: 760;
+  letter-spacing: -.075em;
+  line-height: .9;
+  text-wrap: balance;
+}
+
+.titleAccent {
+  color: var(--elo-color-fg-brand);
+}
+
+.kinetic {
+  min-height: 1.75rem;
+  margin-top: 1.6rem;
+  flex-wrap: wrap;
+  color: var(--foreground);
+  font-size: clamp(1rem, 1.8vw, 1.25rem);
+  font-weight: 650;
+  letter-spacing: -.02em;
+}
+
+.description {
+  max-width: 55ch;
+  margin: 1rem 0 0;
+  color: var(--muted-foreground);
+  font-size: clamp(1rem, 1.5vw, 1.125rem);
+  line-height: 1.7;
+}
+
+.heroActions {
+  display: flex;
+  margin-top: 2rem;
+  flex-wrap: wrap;
+  gap: .75rem;
+}
+
+.primaryAction,
+.secondaryAction {
+  min-height: 3.25rem;
+}
+
+.primaryAction {
+  color: var(--primary-foreground);
+  box-shadow: 0 1rem 2.5rem rgb(250 215 21 / 20%);
+}
+
+.secondaryAction {
+  border-color: var(--border);
+}
+
+.heroLimit {
+  display: flex;
+  max-width: 38rem;
+  margin: 1.5rem 0 0;
+  align-items: flex-start;
+  gap: .6rem;
+  color: var(--muted-foreground);
+  font-size: .75rem;
+  line-height: 1.55;
+}
+
+.heroLimit svg {
+  margin-top: .08rem;
+  flex: 0 0 auto;
+}
+
+.agentPanel {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--border) 82%, transparent);
+  border-radius: 1.75rem;
+  background: color-mix(in srgb, var(--card) 86%, transparent);
+  box-shadow: 0 2rem 5rem var(--elo-color-shadow);
+  padding: clamp(1rem, 2.4vw, 1.5rem);
+  backdrop-filter: blur(1.5rem);
+  grid-area: agent;
+  align-self: center;
+}
+
+.agentPanel::before {
+  position: absolute;
+  top: -7rem;
+  right: -6rem;
+  width: 18rem;
+  height: 18rem;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgb(250 215 21 / 16%), transparent 68%);
+  content: '';
+  pointer-events: none;
+}
+
+.agentPanelHeader {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.agentPanelEyebrow {
+  margin: 0 0 .35rem;
+  color: var(--muted-foreground);
+  font-size: .67rem;
+  font-weight: 720;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+}
+
+.agentPanelHeader h2 {
+  margin: 0;
+  font-size: clamp(1.25rem, 2vw, 1.55rem);
+  font-weight: 680;
+  letter-spacing: -.035em;
+}
+
+.prototypeBadge {
+  display: inline-flex;
+  min-height: 1.75rem;
+  padding-inline: .65rem;
+  align-items: center;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  color: var(--muted-foreground);
+  font-size: .625rem;
+  font-weight: 650;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.agentTransition {
+  min-height: 15.5rem;
+  margin-top: 1.25rem;
+  border: 1px solid color-mix(in srgb, var(--border) 72%, transparent);
+  border-radius: 1.25rem;
+  background: color-mix(in srgb, var(--background) 72%, transparent);
+}
+
+.selectedAgent {
+  display: grid;
+  min-height: 15.5rem;
+  padding: 1.25rem;
+  align-items: center;
+  grid-template-columns: 12.5rem minmax(0, 1fr);
+  gap: 1rem;
+}
+
+.mainOrb {
+  display: grid;
+  min-height: 12rem;
+  place-items: center;
+}
+
+.selectedAgentCopy {
+  min-width: 0;
+}
+
+.privateStatus {
+  display: inline-flex;
+  align-items: center;
+  gap: .4rem;
+  color: var(--elo-color-success-fg);
+  font-size: .68rem;
+  font-weight: 700;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+}
+
+.selectedAgentName {
+  margin: .55rem 0 0;
+  font-size: clamp(2.1rem, 4vw, 3.25rem);
+  font-weight: 760;
+  letter-spacing: -.06em;
+  line-height: .95;
+}
+
+.selectedAgentContext {
+  margin: .65rem 0 0;
+  font-size: .92rem;
+  font-weight: 620;
+  line-height: 1.35;
+}
+
+.selectedAgentDescription {
+  margin: .6rem 0 0;
+  color: var(--muted-foreground);
+  font-size: .78rem;
+  line-height: 1.55;
+}
+
+.agentList {
+  display: grid;
+  margin: .75rem 0 0;
+  padding: 0;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: .55rem;
+  border: 0;
+}
+
+.agentButton {
+  position: relative;
+  display: grid;
+  min-width: 0;
+  min-height: 4.25rem;
+  padding: .65rem;
+  align-items: center;
+  grid-template-columns: 2.625rem minmax(0, 1fr);
+  gap: .55rem;
+  border: 1px solid var(--border);
+  border-radius: 1rem;
+  background: color-mix(in srgb, var(--card) 78%, transparent);
+  color: var(--foreground);
+  cursor: pointer;
+  text-align: left;
+  transition: border-color 160ms ease, background-color 160ms ease, transform 160ms ease;
+}
+
+.agentButton:hover {
+  border-color: var(--ring);
+  transform: translateY(-.1rem);
+}
+
+.agentButton[aria-pressed='true'] {
+  border-color: var(--elo-color-selection-border);
+  background: var(--elo-color-selection-bg);
+}
+
+.agentButtonCopy {
+  min-width: 0;
+}
+
+.agentButtonCopy span,
+.agentButtonCopy small {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.agentButtonCopy span {
+  font-size: .82rem;
+  font-weight: 680;
+}
+
+.agentButtonCopy small {
+  margin-top: .12rem;
+  color: var(--muted-foreground);
+  font-size: .64rem;
+}
+
+.selectedCheck {
+  position: absolute;
+  top: .45rem;
+  right: .45rem;
+  color: var(--elo-color-fg-brand);
+}
+
+.agentFootnote {
+  margin: .9rem .2rem .05rem;
+  color: var(--muted-foreground);
+  font-size: .68rem;
+  line-height: 1.5;
+  text-align: center;
+}
+
+.trustStrip {
+  border-block: 1px solid var(--border);
+  background: color-mix(in srgb, var(--card) 72%, transparent);
+  backdrop-filter: blur(1rem);
+}
+
+.trustStrip ul {
+  display: grid;
+  width: min(100% - 2rem, 80rem);
+  min-height: 4.75rem;
+  margin: 0 auto;
+  padding: 0;
+  align-items: center;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  list-style: none;
+}
+
+.trustStrip li {
+  display: flex;
+  min-height: 2.75rem;
+  padding-inline: 1rem;
+  align-items: center;
+  justify-content: center;
+  gap: .55rem;
+  border-right: 1px solid var(--border);
+  color: var(--muted-foreground);
+  font-size: .75rem;
+  font-weight: 590;
+  text-align: center;
+}
+
+.trustStrip li:first-child {
+  border-left: 1px solid var(--border);
+}
+
+.trustStrip svg {
+  color: var(--elo-color-fg-brand);
+  flex: 0 0 auto;
+}
+
+@media (max-width: 64rem) {
+  .heroMain {
+    grid-template-areas:
+      'intro'
+      'agent'
+      'details';
+    grid-template-columns: minmax(0, 1fr);
+    row-gap: 2.5rem;
+  }
+
+  .heroIntro,
+  .heroDetails {
+    max-width: 48rem;
+  }
+
+  .title {
+    max-width: 12ch;
+  }
+
+  .agentPanel {
+    width: min(100%, 44rem);
+  }
+}
+
+@media (max-width: 48rem) {
+  .header {
+    min-height: 4.5rem;
+  }
+
+  .navigation {
+    display: none;
+  }
+
+  .heroMain {
+    padding-block: 3.25rem 3.75rem;
+    row-gap: 2rem;
+  }
+
+  .title {
+    font-size: clamp(3rem, 14vw, 4.8rem);
+  }
+
+  .selectedAgent {
+    grid-template-columns: minmax(8.5rem, 11rem) minmax(0, 1fr);
+  }
+
+  .mainOrb {
+    transform: scale(.82);
+  }
+
+  .trustStrip ul {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .trustStrip li:nth-child(2) {
+    border-right: 0;
+  }
+
+  .trustStrip li:nth-child(-n + 2) {
+    border-bottom: 1px solid var(--border);
+  }
+}
+
+@media (max-width: 34rem) {
+  .headerCta {
+    display: none;
+  }
+
+  .heroActions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .primaryAction,
+  .secondaryAction {
+    width: 100%;
+  }
+
+  .agentPanel {
+    border-radius: 1.35rem;
+  }
+
+  .agentPanelHeader h2 {
+    font-size: 1.2rem;
+  }
+
+  .selectedAgent {
+    padding: .85rem;
+    grid-template-columns: 1fr;
+    text-align: center;
+  }
+
+  .agentTransition,
+  .selectedAgent {
+    min-height: 24rem;
+  }
+
+  .mainOrb {
+    min-height: 10.5rem;
+  }
+
+  .privateStatus {
+    justify-content: center;
+  }
+
+  .selectedAgentDescription {
+    max-width: 35ch;
+    margin-inline: auto;
+  }
+
+  .agentButton {
+    min-height: 4.65rem;
+    padding: .55rem .35rem;
+    justify-items: center;
+    grid-template-columns: 1fr;
+    gap: .28rem;
+    text-align: center;
+  }
+
+  .agentButtonCopy small {
+    display: none;
+  }
+
+  .selectedCheck {
+    top: .35rem;
+    right: .35rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .agentButton,
+  .navigation a,
+  .themeToggle {
+    transition: none;
+  }
+
+  .agentButton:hover {
+    transform: none;
+  }
+
+  .mainOrb {
+    transform: none;
+  }
+}

@@ -1,0 +1,65 @@
+:root {
+  --background: var(--elo-neutral-50);
+  --foreground: var(--elo-neutral-900);
+  --card: var(--elo-neutral-25);
+  --card-foreground: var(--elo-neutral-900);
+  --popover: var(--elo-neutral-0);
+  --popover-foreground: var(--elo-neutral-900);
+  --primary: var(--elo-yellow-500);
+  --primary-foreground: var(--elo-neutral-950);
+  --primary-emphasis: var(--elo-yellow-800);
+  --primary-hover: var(--elo-yellow-600);
+  --secondary: var(--elo-neutral-100);
+  --secondary-foreground: var(--elo-neutral-900);
+  --muted: var(--elo-neutral-200);
+  --muted-foreground: var(--elo-neutral-600);
+  --accent: var(--elo-yellow-100);
+  --accent-foreground: var(--elo-neutral-900);
+  --border: var(--elo-neutral-200);
+  --input: var(--elo-neutral-500);
+  --ring: var(--elo-yellow-800);
+  --sidebar: var(--elo-neutral-25);
+  --sidebar-foreground: var(--elo-neutral-700);
+  --sidebar-accent: var(--elo-yellow-100);
+  --sidebar-border: var(--elo-neutral-200);
+  --success: var(--elo-green-700);
+  --danger: var(--elo-red-700);
+  --chart-1: var(--elo-yellow-600);
+  --chart-2: #4F765C;
+  --chart-grid: var(--elo-neutral-200);
+  --shadow-soft: 0 1rem 3rem rgb(43 34 0 / 12%);
+  --shadow-card: 0 .5rem 1.5rem rgb(43 34 0 / 12%);
+}
+
+[data-theme='dark'] {
+  --background: var(--elo-neutral-950);
+  --foreground: var(--elo-neutral-50);
+  --card: var(--elo-neutral-900);
+  --card-foreground: var(--elo-neutral-50);
+  --popover: var(--elo-neutral-850);
+  --popover-foreground: var(--elo-neutral-50);
+  --primary: var(--elo-yellow-500);
+  --primary-foreground: var(--elo-neutral-950);
+  --primary-emphasis: var(--elo-yellow-400);
+  --primary-hover: var(--elo-yellow-400);
+  --secondary: var(--elo-neutral-800);
+  --secondary-foreground: var(--elo-neutral-50);
+  --muted: var(--elo-neutral-750);
+  --muted-foreground: var(--elo-neutral-400);
+  --accent: #3C3615;
+  --accent-foreground: var(--elo-neutral-50);
+  --border: var(--elo-neutral-850);
+  --input: var(--elo-neutral-500);
+  --ring: var(--elo-yellow-400);
+  --sidebar: var(--elo-neutral-900);
+  --sidebar-foreground: var(--elo-neutral-300);
+  --sidebar-accent: #3C3615;
+  --sidebar-border: var(--elo-neutral-850);
+  --success: #4ADE80;
+  --danger: #FF6B6B;
+  --chart-1: var(--elo-yellow-400);
+  --chart-2: #72C596;
+  --chart-grid: var(--elo-neutral-750);
+  --shadow-soft: 0 1rem 3rem rgb(0 0 0 / 48%);
+  --shadow-card: 0 .5rem 1.5rem rgb(0 0 0 / 48%);
+}

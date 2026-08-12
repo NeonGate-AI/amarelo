@@ -1,0 +1,21 @@
+{
+  "expo": {
+    "name": "Amarelo",
+    "slug": "amarelo-mobile",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "platforms": ["ios", "android"],
+    "userInterfaceStyle": "automatic",
+    "plugins": [
+      [
+        "expo-audio",
+        {
+          "microphonePermission": "Permita que o Amarelo use o microfone durante a conversa.",
+          "recordAudioAndroid": true,
+          "enableBackgroundRecording": false,
+          "enableBackgroundPlayback": false
+        }
+      ]
+    ]
+  }
+}

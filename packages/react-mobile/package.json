@@ -1,0 +1,37 @@
+{
+  "name": "@repo/react-mobile",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "sideEffects": false,
+  "imports": {
+    "#utilities": "./src/utilities/index.ts"
+  },
+  "exports": {
+    "./ui": "./src/vendors/react-native-reusables/components/ui/index.ts",
+    "./utilities": "./src/utilities/index.ts"
+  },
+  "scripts": {
+    "build": "tsc --noEmit",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "tailwind-merge": "^3.6.0"
+  },
+  "peerDependencies": {
+    "lucide-react-native": ">=1",
+    "nativewind": ">=4",
+    "react": ">=19",
+    "react-native": ">=0.86"
+  },
+  "devDependencies": {
+    "@types/react": "~19.2.0",
+    "lucide-react-native": "^1.21.0",
+    "nativewind": "^4.2.1",
+    "react": "19.2.3",
+    "react-native": "0.86.2",
+    "typescript": "5.9.2"
+  }
+}

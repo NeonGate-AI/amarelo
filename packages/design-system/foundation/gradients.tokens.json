@@ -1,0 +1,79 @@
+{
+  "gradient": {
+    "$type": "gradient",
+    "brand": {
+      "$value": [
+        { "color": "{yellow.600}", "position": 0 },
+        { "color": "{yellow.500}", "position": 0.52 },
+        {
+          "color": {
+            "colorSpace": "srgb",
+            "components": [0.9569, 0.9608, 0.0078],
+            "hex": "#F4F502"
+          },
+          "position": 1
+        }
+      ],
+      "$extensions": {
+        "health.amarelo.css": {
+          "function": "linear-gradient",
+          "preamble": "110deg"
+        }
+      }
+    },
+    "brand-vertical": {
+      "$value": [
+        {
+          "color": {
+            "colorSpace": "srgb",
+            "components": [0.9569, 0.9608, 0.0078],
+            "hex": "#F4F502"
+          },
+          "position": 0
+        },
+        { "color": "{yellow.500}", "position": 0.54 },
+        { "color": "{yellow.600}", "position": 1 }
+      ],
+      "$extensions": {
+        "health.amarelo.css": {
+          "function": "linear-gradient",
+          "preamble": "180deg"
+        }
+      }
+    },
+    "brand-glow": {
+      "$value": [
+        {
+          "color": {
+            "colorSpace": "srgb",
+            "components": [0.9569, 0.9608, 0.0078],
+            "alpha": 0.72
+          },
+          "position": 0
+        },
+        {
+          "color": {
+            "colorSpace": "srgb",
+            "components": [0.9804, 0.8431, 0.0824],
+            "alpha": 0.42
+          },
+          "position": 0.44
+        },
+        {
+          "color": {
+            "colorSpace": "srgb",
+            "components": [0.9569, 0.8275, 0],
+            "alpha": 0
+          },
+          "position": 0.76
+        }
+      ],
+      "$extensions": {
+        "health.amarelo.css": {
+          "function": "radial-gradient",
+          "preamble": "circle at 72% 35%"
+        }
+      }
+    }
+  }
+}

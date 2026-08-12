@@ -1,0 +1,58 @@
+{
+  "name": "@repo/react-web",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "tsc --noEmit",
+    "typecheck": "tsc --noEmit"
+  },
+  "sideEffects": [
+    "**/*.css"
+  ],
+  "imports": {
+    "#components/*": "./src/ui/*/*.tsx",
+    "#hooks/*": "./src/hooks/*.ts",
+    "#shadcn/*": "./src/vendors/shadcn/*/*.tsx",
+    "#smoothui": "./src/vendors/smoothui/index.ts",
+    "#smoothui/*": "./src/vendors/smoothui/*/*.tsx",
+    "#smoothui/lib/*": "./src/vendors/smoothui/lib/*.ts",
+    "#utilities": "./src/utilities/index.ts",
+    "#utilities/*": "./src/utilities/*.ts"
+  },
+  "exports": {
+    "./formatters": "./src/formatters/index.ts",
+    "./next/fonts": "./src/next/fonts/index.ts",
+    "./styles.css": "./src/styles.css",
+    "./ui/agent-orb": "./src/ui/agent-orb/agent-orb.tsx",
+    "./ui/agent-orb/palettes": "./src/ui/agent-orb/palettes.ts",
+    "./ui/banner-section": "./src/ui/banner-section/banner-section.tsx",
+    "./utilities": "./src/utilities/index.ts",
+    "./vendors/shadcn/*": "./src/vendors/shadcn/*/*.tsx",
+    "./vendors/smoothui": "./src/vendors/smoothui/index.ts"
+  },
+  "dependencies": {
+    "@phosphor-icons/react": "^2.1.10",
+    "@radix-ui/react-dialog": "^1.1.15",
+    "@radix-ui/react-slot": "^1.2.4",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "motion": "^12.42.2",
+    "recharts": "3.10.1",
+    "tailwind-merge": "^3.6.0"
+  },
+  "peerDependencies": {
+    "next": ">=16",
+    "react": ">=19",
+    "react-dom": ">=19"
+  },
+  "devDependencies": {
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "next": "16.2.11",
+    "react": "19.2.4",
+    "react-dom": "19.2.4",
+    "typescript": "^5"
+  }
+}

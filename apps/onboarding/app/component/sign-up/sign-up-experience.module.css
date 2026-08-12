@@ -1,0 +1,414 @@
+.experience {
+  width: min(100%, 76rem);
+  margin-inline: auto;
+}
+
+.hero {
+  max-width: 48rem;
+  margin-inline: auto;
+  text-align: center;
+}
+
+.eyebrow,
+.voiceEyebrow {
+  margin: 0 0 .6rem;
+  color: color-mix(in srgb, var(--foreground) 62%, transparent);
+  font-size: .7rem;
+  font-weight: 800;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+}
+
+.title {
+  margin: 0;
+  font-size: clamp(2.3rem, 6vw, 4.6rem);
+  font-weight: 650;
+  letter-spacing: -.065em;
+  line-height: .95;
+}
+
+.subtitle {
+  max-width: 39rem;
+  margin: 1.15rem auto 0;
+  color: var(--muted-foreground);
+  font-size: clamp(.95rem, 1.6vw, 1.08rem);
+  line-height: 1.6;
+}
+
+.progress {
+  display: grid;
+  grid-template-columns: auto minmax(2rem, 7rem) auto;
+  gap: .7rem;
+  align-items: center;
+  justify-content: center;
+  margin-block: 2.2rem 1.4rem;
+  color: var(--muted-foreground);
+  font-size: .78rem;
+  font-weight: 700;
+}
+
+.progress span {
+  display: inline-flex;
+  gap: .45rem;
+  align-items: center;
+}
+
+.progress b {
+  display: grid;
+  width: 1.7rem;
+  height: 1.7rem;
+  font-size: .7rem;
+  background: var(--secondary);
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  place-items: center;
+}
+
+.progress i {
+  height: 1px;
+  background: var(--border);
+}
+
+.progress .currentStep {
+  color: var(--foreground);
+}
+
+.currentStep b {
+  color: var(--primary-foreground);
+  background: var(--primary);
+  border-color: var(--primary);
+}
+
+.transition {
+  position: relative;
+  min-height: 28rem;
+}
+
+.plansStep,
+.accountGrid {
+  padding: clamp(1rem, 3vw, 1.5rem);
+  background: color-mix(in srgb, var(--card) 94%, transparent);
+  border: 1px solid var(--border);
+  border-radius: 1.7rem;
+  box-shadow: var(--shadow-auth);
+  backdrop-filter: blur(1.5rem);
+}
+
+.planGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: .85rem;
+}
+
+.planCard {
+  display: flex;
+  flex-direction: column;
+  min-height: 23rem;
+  padding: 1.35rem;
+  color: var(--foreground);
+  text-align: left;
+  cursor: pointer;
+  background: color-mix(in srgb, var(--background) 62%, transparent);
+  border: 1px solid var(--border);
+  border-radius: 1.25rem;
+  transition: transform 180ms ease, border-color 180ms ease, box-shadow 180ms ease;
+}
+
+.planCard:not(:disabled):hover {
+  border-color: color-mix(in srgb, var(--primary) 65%, var(--border));
+  box-shadow: var(--shadow-card);
+  transform: translateY(-.2rem);
+}
+
+.planCard:disabled {
+  cursor: not-allowed;
+  opacity: .58;
+}
+
+.planCard.selected {
+  background: color-mix(in srgb, var(--accent) 56%, var(--card));
+  border-color: var(--primary);
+  box-shadow: inset 0 0 0 1px var(--primary);
+}
+
+.planTopline {
+  display: flex;
+  gap: .5rem;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.3rem;
+  font-size: .95rem;
+  font-weight: 800;
+}
+
+.planTopline em {
+  padding: .3rem .55rem;
+  color: var(--primary-foreground);
+  font-size: .62rem;
+  font-style: normal;
+  background: var(--primary);
+  border-radius: 99rem;
+}
+
+.planCard strong {
+  font-size: clamp(1.7rem, 3vw, 2.5rem);
+  letter-spacing: -.055em;
+  line-height: 1;
+}
+
+.planCard small {
+  margin-top: .3rem;
+  color: var(--muted-foreground);
+  font-size: .72rem;
+}
+
+.planCard p {
+  min-height: 3.7rem;
+  margin: 1.25rem 0;
+  color: var(--muted-foreground);
+  font-size: .84rem;
+  line-height: 1.5;
+}
+
+.planCard ul {
+  display: grid;
+  gap: .65rem;
+  padding: 0;
+  margin: 0 0 1.4rem;
+  list-style: none;
+}
+
+.planCard li {
+  display: grid;
+  grid-template-columns: 1rem 1fr;
+  gap: .45rem;
+  color: var(--foreground);
+  font-size: .75rem;
+  line-height: 1.4;
+}
+
+.planCard li svg {
+  margin-top: .05rem;
+  color: var(--success);
+}
+
+.planChoice {
+  display: grid;
+  min-height: 2.55rem;
+  padding-inline: .75rem;
+  margin-top: auto;
+  color: var(--foreground);
+  font-size: .76rem;
+  font-weight: 750;
+  background: var(--secondary);
+  border-radius: .75rem;
+  place-items: center;
+}
+
+.selected .planChoice {
+  color: var(--primary-foreground);
+  background: var(--primary);
+}
+
+.planFooter {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.2rem .25rem .1rem;
+}
+
+.planFooter div {
+  display: grid;
+  gap: .2rem;
+  color: var(--foreground);
+  font-size: .78rem;
+}
+
+.planFooter span {
+  color: var(--muted-foreground);
+}
+
+.accountGrid {
+  display: grid;
+  grid-template-columns: minmax(17rem, .9fr) minmax(20rem, 1.1fr);
+  gap: clamp(1rem, 3vw, 2rem);
+}
+
+.voiceCard {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: 34rem;
+  padding: clamp(1.25rem, 4vw, 2.4rem);
+  overflow: hidden;
+  color: var(--elo-neutral-950);
+  background:
+    radial-gradient(circle at 85% 15%, rgb(255 255 255 / 80%), transparent 35%),
+    linear-gradient(145deg, var(--elo-yellow-100), var(--elo-yellow-400));
+  border-radius: 1.25rem;
+}
+
+.orbStage {
+  display: grid;
+  min-height: 14rem;
+  margin-bottom: 1rem;
+  place-items: center;
+}
+
+.voiceCard h2,
+.formCard h2 {
+  margin: 0;
+  font-size: clamp(1.6rem, 3vw, 2.25rem);
+  letter-spacing: -.045em;
+  line-height: 1.05;
+}
+
+.voiceCard > p:not(.voiceEyebrow) {
+  margin: .85rem 0 1.2rem;
+  color: rgb(18 18 17 / 67%);
+  font-size: .9rem;
+  line-height: 1.55;
+}
+
+.formCard {
+  padding: clamp(1rem, 3vw, 2rem);
+}
+
+.backButton {
+  display: inline-flex;
+  gap: .4rem;
+  align-items: center;
+  padding: .4rem 0;
+  margin-bottom: 1.5rem;
+  color: var(--muted-foreground);
+  font-size: .75rem;
+  font-weight: 700;
+  cursor: pointer;
+  background: none;
+  border: 0;
+}
+
+.backButton:hover {
+  color: var(--foreground);
+}
+
+.selectedPlan {
+  display: inline-flex;
+  gap: .6rem;
+  align-items: center;
+  padding: .4rem .65rem;
+  margin-bottom: 1rem;
+  font-size: .72rem;
+  background: var(--accent);
+  border: 1px solid color-mix(in srgb, var(--primary) 40%, var(--border));
+  border-radius: 99rem;
+}
+
+.selectedPlan b {
+  color: var(--muted-foreground);
+}
+
+.formIntro {
+  margin: .55rem 0 1.5rem;
+  color: var(--muted-foreground);
+  font-size: .86rem;
+  line-height: 1.5;
+}
+
+.fieldHelp {
+  margin: -.15rem 0 0;
+  color: var(--muted-foreground);
+  font-size: .72rem;
+}
+
+.workosNote {
+  display: flex;
+  gap: .45rem;
+  align-items: flex-start;
+  margin: 1.25rem 0 0;
+  color: var(--muted-foreground);
+  font-size: .68rem;
+  line-height: 1.45;
+}
+
+.workosNote svg {
+  flex: 0 0 auto;
+  margin-top: .1rem;
+  color: var(--success);
+}
+
+.signInLink {
+  margin: 1.4rem 0 0;
+  color: var(--muted-foreground);
+  font-size: .82rem;
+  text-align: center;
+}
+
+.signInLink a {
+  color: var(--foreground);
+  font-weight: 750;
+  text-underline-offset: .18rem;
+}
+
+@media (max-width: 60rem) {
+  .planGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .planCard {
+    min-height: auto;
+  }
+
+  .planCard p {
+    min-height: 0;
+  }
+
+  .accountGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .voiceCard {
+    display: grid;
+    grid-template-columns: minmax(9rem, .6fr) 1fr;
+    min-height: auto;
+  }
+
+  .orbStage {
+    grid-row: 1 / 5;
+    min-height: 12rem;
+    margin: 0 1.5rem 0 0;
+  }
+}
+
+@media (max-width: 42rem) {
+  .title {
+    font-size: clamp(2.2rem, 13vw, 3.5rem);
+  }
+
+  .plansStep,
+  .accountGrid {
+    padding: .75rem;
+    border-radius: 1.25rem;
+  }
+
+  .planFooter {
+    align-items: stretch;
+    flex-direction: column;
+    padding-inline: .25rem;
+  }
+
+  .voiceCard {
+    display: flex;
+    padding: 1.25rem;
+  }
+
+  .orbStage {
+    min-height: 11rem;
+    margin: 0 0 .5rem;
+  }
+
+  .formCard {
+    padding: 1.15rem .7rem;
+  }
+}

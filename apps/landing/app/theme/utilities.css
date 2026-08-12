@@ -1,0 +1,22 @@
+@utility h-landing {
+  min-height: calc(100dvh - var(--landing-h-offset));
+}
+
+@utility section {
+  @apply px-4 sm:px-6;
+}
+
+@layer utilities {
+  .skip-link {
+    @apply fixed top-3 left-3 z-100 min-h-11 -translate-y-[200%] bg-foreground px-4 py-3 font-bold text-background no-underline;
+  }
+
+  .skip-link:focus-visible {
+    @apply translate-y-0 outline-4 outline-offset-2 outline-ring;
+  }
+
+  .sr-only {
+    @apply absolute -m-px h-px w-px overflow-hidden border-0 p-0 whitespace-nowrap;
+    clip: rect(0, 0, 0, 0);
+  }
+}

@@ -1,0 +1,56 @@
+.toggle {
+  display: grid;
+  width: 2.75rem;
+  height: 2.75rem;
+  padding: 0;
+  color: var(--foreground);
+  cursor: pointer;
+  background: color-mix(in srgb, var(--card) 88%, transparent);
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  box-shadow: 0 .4rem 1.2rem rgb(0 0 0 / 8%);
+  place-items: center;
+  transition:
+    transform 180ms ease,
+    border-color 180ms ease,
+    background 180ms ease;
+}
+
+.toggle:hover {
+  background: var(--card);
+  border-color: var(--primary);
+  transform: translateY(-.1rem);
+}
+
+.toggle:focus-visible {
+  outline: .2rem solid var(--ring);
+  outline-offset: .2rem;
+}
+
+.sun,
+.moon {
+  grid-area: 1 / 1;
+  transition:
+    opacity 180ms ease,
+    transform 240ms ease;
+}
+
+.sun {
+  opacity: 0;
+  transform: rotate(-40deg) scale(.72);
+}
+
+.moon {
+  opacity: 1;
+  transform: rotate(0) scale(1);
+}
+
+:global(.dark) .sun {
+  opacity: 1;
+  transform: rotate(0) scale(1);
+}
+
+:global(.dark) .moon {
+  opacity: 0;
+  transform: rotate(40deg) scale(.72);
+}

@@ -1,0 +1,40 @@
+/* biome-ignore lint/suspicious/noUnknownAtRules: NativeWind compiles this directive. */
+@tailwind base;
+/* biome-ignore lint/suspicious/noUnknownAtRules: NativeWind compiles this directive. */
+@tailwind components;
+/* biome-ignore lint/suspicious/noUnknownAtRules: NativeWind compiles this directive. */
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 48 33.3% 97.1%;
+    --foreground: 40 5.5% 10.8%;
+    --card: 45 22.2% 92.9%;
+    --card-foreground: 40 5.5% 10.8%;
+    --primary: 50.8 95.8% 53.1%;
+    --primary-foreground: 60 2.9% 6.9%;
+    --secondary: 40 9.7% 87.8%;
+    --secondary-foreground: 40 5.5% 10.8%;
+    --muted: 40 9.7% 87.8%;
+    --muted-foreground: 36 4.5% 43.5%;
+    --destructive: 0 84.2% 60.2%;
+    --border: 36 7.5% 79.2%;
+    --ring: 50.8 95.8% 53.1%;
+  }
+
+  .dark:root {
+    --background: 60 2.9% 6.9%;
+    --foreground: 48 33.3% 97.1%;
+    --card: 60 2% 11.6%;
+    --card-foreground: 48 33.3% 97.1%;
+    --primary: 50.8 95.8% 53.1%;
+    --primary-foreground: 60 2.9% 6.9%;
+    --secondary: 48 4.5% 21.8%;
+    --secondary-foreground: 48 33.3% 97.1%;
+    --muted: 48 4.5% 21.8%;
+    --muted-foreground: 40 5.2% 66.1%;
+    --destructive: 0 72.2% 50.6%;
+    --border: 48 4.5% 21.8%;
+    --ring: 50.8 95.8% 53.1%;
+  }
+}
