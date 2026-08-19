@@ -175,7 +175,7 @@ export function VoiceOnboarding(props: VoiceOnboardingProps) {
 
   const prompt = getPrompt(step)
   const canContinue = getCanContinue(step, answers)
-  const orbState = getOrbState(isListening, playbackState, step)
+  const orbState = getOrbState(isListening, playbackState)
 
   function handleStart() {
     setStarted(true)
@@ -284,11 +284,7 @@ export function VoiceOnboarding(props: VoiceOnboardingProps) {
           <div className={styles.conversation}>
             <aside className={styles.agentPanel}>
               <div className={styles.orbStage}>
-                <AgentOrb
-                  amplitude={isListening ? 0.62 : 0.16}
-                  size="clamp(11rem, 22vw, 17rem)"
-                  state={orbState}
-                />
+                <AgentOrb size="clamp(11rem, 22vw, 17rem)" state={orbState} />
               </div>
               <div aria-live="polite" className={styles.voiceStatus}>
                 <span aria-hidden="true" />
@@ -664,8 +660,7 @@ function getCanContinue(step: number, answers: OnboardingAnswers): boolean {
 
 function getOrbState(
   isListening: boolean,
-  playbackState: 'idle' | 'loading' | 'speaking',
-  step: number
+  playbackState: 'idle' | 'loading' | 'speaking'
 ): AgentOrbState {
   if (isListening) {
     return 'listening'
@@ -674,10 +669,7 @@ function getOrbState(
     return 'thinking'
   }
   if (playbackState === 'speaking') {
-    return 'streaming'
-  }
-  if (step === TOTAL_STEPS - 1) {
-    return 'done'
+    return 'speaking'
   }
   return 'idle'
 }

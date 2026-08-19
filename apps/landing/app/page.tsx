@@ -1,5 +1,4 @@
 import { FaqSection } from '@section/faq/faq'
-import { FinalCtaSection } from '@section/final-cta/final-cta'
 import { Footer } from '@section/footer/footer'
 import { HeroSection } from '@section/hero/hero'
 import { ProductStorySection } from '@section/product-story/product-story'
@@ -14,7 +13,6 @@ export default function LandingPage() {
         <HeroSection />
         <ProductStorySection />
         <FaqSection />
-        <FinalCtaSection />
       </main>
       <Footer />
     </>

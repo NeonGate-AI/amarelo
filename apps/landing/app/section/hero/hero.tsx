@@ -17,6 +17,7 @@ import {
 import { AgentShowcase } from './agent-showcase'
 import styles from './hero.module.css'
 import { ThemeToggle } from './theme-toggle'
+import Link from 'next/link'
 
 const kineticPhrases = [
   'Complementa seu acompanhamento.',
@@ -52,7 +53,7 @@ export function HeroSection() {
         </nav>
 
         <div className={styles.headerActions}>
-          <ThemeToggle />
+          <Link className="font-semibold" href="https://sso.amarelo.life">Entrar</Link>
           <SmoothButton
             asChild
             className={styles.headerCta}
@@ -61,8 +62,9 @@ export function HeroSection() {
             size="sm"
             variant="solid"
           >
-            <a href="#participar">Participar</a>
+            <Link href="https://sso.amarelo.life/sign-up">Criar conta</Link>
           </SmoothButton>
+          <ThemeToggle />
         </div>
       </header>
 

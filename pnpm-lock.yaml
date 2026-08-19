@@ -286,6 +286,9 @@ importers:
 
   packages/react-web:
     dependencies:
+      '@neongate-ai/orbz':
+        specifier: 0.1.0
+        version: 0.1.0(react@19.2.4)
       '@phosphor-icons/react':
         specifier: ^2.1.10
         version: 2.1.10(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
@@ -1226,6 +1229,15 @@ packages:
 
   '@jridgewell/trace-mapping@0.3.31':
     resolution: {integrity: sha512-zzNR+SdQSDJzc8joaeP8QQoCQr8NuYx2dIIytl1QeBEZHJ9uW6hebsrYgbz8hJwUQao3TWCMtmfV8Nu1twOLAw==}
+
+  '@neongate-ai/orbz@0.1.0':
+    resolution: {integrity: sha512-43pfYa/r15e3Sc+YkxgFHUclGBurKToK6aKEGXedlFArGiPNdlpNuRlcDox5tTnVlO2R0kuxdzAy7l4pZ/WIbw==}
+    engines: {node: ^22.22.3 || ^24.15.0 || >=26.0.0}
+    peerDependencies:
+      react: ^18.2.0 || ^19.0.0
+    peerDependenciesMeta:
+      react:
+        optional: true
 
   '@next/env@16.2.11':
     resolution: {integrity: sha512-0do5A3BJ2gxWr0ZCMcD6BhW+e595jyxdTl3rXTS6lOtD8ektMiW6CO+EPwt1Eca1DBnm90r/7GdiKWBKxH++DA==}
@@ -5434,6 +5446,10 @@ snapshots:
     dependencies:
       '@jridgewell/resolve-uri': 3.1.2
       '@jridgewell/sourcemap-codec': 1.5.5
+
+  '@neongate-ai/orbz@0.1.0(react@19.2.4)':
+    optionalDependencies:
+      react: 19.2.4
 
   '@next/env@16.2.11': {}
 
