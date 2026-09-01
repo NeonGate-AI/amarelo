@@ -169,6 +169,11 @@
   }
 }
 
+/* Chroma supplies the transition canvas; signup owns the visible card surface. */
+[aria-labelledby='sign-up-title'] > [data-transitioning] {
+  background: transparent;
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

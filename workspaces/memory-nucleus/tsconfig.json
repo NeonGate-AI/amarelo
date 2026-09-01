@@ -2,6 +2,7 @@
   "compilerOptions": {
     "allowJs": false,
     "allowImportingTsExtensions": true,
+    "baseUrl": ".",
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "lib": ["ES2022"],
@@ -9,6 +10,12 @@
     "moduleResolution": "Bundler",
     "noEmit": true,
     "noUncheckedIndexedAccess": true,
+    "paths": {
+      "@application/*": ["src/application/*"],
+      "@assurance/*": ["src/assurance/*"],
+      "@domain/*": ["src/domain/*"],
+      "@infrastructure/*": ["src/infrastructure/*"]
+    },
     "skipLibCheck": true,
     "strict": true,
     "target": "ES2022",

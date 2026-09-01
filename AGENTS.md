@@ -24,4 +24,6 @@ Start from `.agents/context/workspaces/<area>/` when an area manifest exists. Fo
 - Product AI agents live under `workspaces/ai/agents/`; `.agents/` is the engineering harness.
 - Memory Nucleus remains a single workspace with semantic Clean Architecture dependency direction.
 - AI consumers access Memory Nucleus through its approved public boundary, not workspace internals.
+- First-party absolute aliases use `@`, never `#`; source imports stop at directory barrels rather than final semantic files.
+- Every code-bearing leaf directory exposes an `index.ts` exporting all project-created semantic modules in that leaf.
 - Complex architectural changes update durable harness artifacts and mechanical checks in the same cycle.

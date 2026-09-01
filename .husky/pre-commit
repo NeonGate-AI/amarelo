@@ -1,2 +1,2 @@
 #!/usr/bin/env sh
-exec ./elo git pre-commit "$@"
+exec ./cli/elo git pre-commit "$@"

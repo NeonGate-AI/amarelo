@@ -26,10 +26,5 @@
     "tsx": "4.23.12",
     "typescript": "5.9.2",
     "@repo/evaluation": "workspace:*"
-  },
-  "imports": {
-    "#domain/*": "./src/domain/*.ts",
-    "#application/*": "./src/application/*.ts",
-    "#infrastructure/*": "./src/infrastructure/*.ts"
   }
 }
