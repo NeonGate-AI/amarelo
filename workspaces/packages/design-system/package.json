@@ -19,7 +19,7 @@
     "dist"
   ],
   "scripts": {
-    "build": "node scripts/build-tokens.mjs",
-    "dev": "node --watch scripts/build-tokens.mjs"
+    "build": "node src/scripts/build-tokens.mjs",
+    "dev": "node --watch src/scripts/build-tokens.mjs"
   }
 }

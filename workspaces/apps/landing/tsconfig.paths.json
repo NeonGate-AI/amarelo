@@ -2,7 +2,7 @@
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
-      "@section/*": ["./app/section/*"]
+      "@section/*": ["./src/app/section/*"]
     }
   }
 }

@@ -8,7 +8,7 @@
   "scripts": {
     "build": "tsc --noEmit",
     "typecheck": "tsc --noEmit",
-    "eval": "node --import tsx evals/memory-sdk.eval.ts"
+    "eval": "node --import tsx src/assurance/evals/memory-sdk.eval.ts"
   },
   "dependencies": { "zod": "4.4.3" },
   "devDependencies": {

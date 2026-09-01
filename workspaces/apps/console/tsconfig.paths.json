@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "paths": {
-      "@dashboard/*": ["./app/(dashboard)/*"]
+      "@dashboard/*": ["./src/app/(dashboard)/*"]
     }
   }
 }

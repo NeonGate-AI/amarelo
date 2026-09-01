@@ -2,8 +2,8 @@ import { mkdir, readFile, writeFile } from 'node:fs/promises'
 import { dirname, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
-const packageDirectory = resolve(dirname(fileURLToPath(import.meta.url)), '..')
-const foundationDirectory = resolve(packageDirectory, 'foundation')
+const packageDirectory = resolve(dirname(fileURLToPath(import.meta.url)), '../..')
+const foundationDirectory = resolve(packageDirectory, 'src/foundation')
 const outputDirectory = resolve(packageDirectory, 'dist')
 const sourceFiles = [
   'colors.tokens.json',
@@ -28,7 +28,7 @@ const declarations = flattenedTokens.map(({ path, token, type }) => {
   return `  --elo-${path.join('-')}: ${serializeValue(value, type, token)};`
 })
 const css = [
-  '/* Generated from foundation/*.tokens.json. Do not edit directly. */',
+  '/* Generated from src/foundation/*.tokens.json. Do not edit directly. */',
   '',
   ':root {',
   ...declarations,

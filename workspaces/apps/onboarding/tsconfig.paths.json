@@ -2,10 +2,10 @@
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
-      "@action/*": ["./app/api/action/*"],
-      "@component/*": ["./app/lib/ui/*"],
-      "@data/*": ["./app/lib/data/*"],
-      "@lib/*": ["./app/api/*"]
+      "@action/*": ["./src/app/api/action/*"],
+      "@component/*": ["./src/app/lib/ui/*"],
+      "@data/*": ["./src/app/lib/data/*"],
+      "@lib/*": ["./src/app/api/*"]
     }
   }
 }
