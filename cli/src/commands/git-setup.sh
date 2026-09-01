@@ -16,11 +16,11 @@ fi
 mkdir -p "$ELO_PROJECT_ROOT/.husky"
 cat > "$ELO_PROJECT_ROOT/.husky/pre-commit" <<'EOF'
 #!/usr/bin/env sh
-exec ./elo git pre-commit "$@"
+exec ./cli/elo git pre-commit "$@"
 EOF
 cat > "$ELO_PROJECT_ROOT/.husky/commit-msg" <<'EOF'
 #!/usr/bin/env sh
-exec ./elo git commit-msg "$@"
+exec ./cli/elo git commit-msg "$@"
 EOF
 chmod +x "$ELO_PROJECT_ROOT/.husky/pre-commit" "$ELO_PROJECT_ROOT/.husky/commit-msg"
 
