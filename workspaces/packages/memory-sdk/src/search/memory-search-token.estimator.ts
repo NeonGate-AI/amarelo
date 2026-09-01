@@ -152,11 +152,7 @@ function utf8ByteLength(value: string): number {
       continue
     }
 
-    if (
-      codeUnit >= 0xd800 &&
-      codeUnit <= 0xdbff &&
-      index + 1 < value.length
-    ) {
+    if (codeUnit >= 0xd800 && codeUnit <= 0xdbff && index + 1 < value.length) {
       const lowSurrogate = value.charCodeAt(index + 1)
       if (lowSurrogate >= 0xdc00 && lowSurrogate <= 0xdfff) {
         byteLength += 4
