@@ -1,11 +1,12 @@
 import assert from 'node:assert/strict'
+
 import {
   MAX_MEMORY_SEARCH_TOKENS,
   MemorySearchInputSchema,
   createMemorySearchContextProjection,
-  estimateMemorySearchContextTokens
-} from '../src/index.ts'
-import type { MemoryRecord } from '../src/index.ts'
+  estimateMemorySearchContextTokens,
+  type MemoryRecord
+} from '#memory-sdk'
 
 const input = MemorySearchInputSchema.parse({
   asOf: '2026-09-01T00:00:00.000Z',
