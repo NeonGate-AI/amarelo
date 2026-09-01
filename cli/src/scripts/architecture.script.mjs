@@ -1,5 +1,5 @@
 import { readFile, readdir, stat } from 'node:fs/promises'
-import { extname, join, relative, sep } from 'node:path'
+import { dirname, extname, join, relative, resolve, sep } from 'node:path'
 
 const SOURCE_EXTENSIONS = new Set([
   '.ts',
@@ -274,6 +274,20 @@ export async function runArchitectureCheck({
 
   for (const path of files) {
     const r = rel(path)
+    if (extname(path) === '.css') {
+      const css = await readFile(path, 'utf8').catch(() => '')
+      for (const match of css.matchAll(/@source\s+["']([^"']+)["']/gu)) {
+        const source = match[1]
+        if (!source.startsWith('.')) continue
+        if (!(await exists(resolve(dirname(path), source))))
+          fail(
+            'tailwind-source',
+            r,
+            `${source} does not resolve from this stylesheet`,
+            'repair the relative @source path after source-root moves'
+          )
+      }
+    }
     if (r.endsWith('.value-object.ts'))
       fail(
         'vo-suffix',
