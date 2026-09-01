@@ -17,8 +17,8 @@ import {
   DURATION_INSTANT,
   SPRING_DEFAULT,
   SPRING_SNAPPY
-} from '#smoothui/lib/animation'
-import { cn } from '#utilities/cn'
+} from '@smoothui/lib'
+import { cn } from '@utilities'
 
 // ---------------------------------------------------------------------------
 // Constants

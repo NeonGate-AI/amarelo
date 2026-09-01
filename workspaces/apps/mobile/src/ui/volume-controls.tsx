@@ -14,7 +14,7 @@ import {
   speakerMutedAtom,
   toggleConversationAudioAtom,
   volumeAtom
-} from '../state/conversation-atoms'
+} from '../state'
 
 interface ControlButtonProps {
   children: ReactNode

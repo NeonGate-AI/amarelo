@@ -1,13 +1,13 @@
 import { useAtomValue, useSetAtom } from 'jotai'
 import { useEffect } from 'react'
 
-import { ConversationScreen } from './ui/conversation-screen'
-import { PwaLifecycle } from './ui/pwa-lifecycle'
+import { ConversationScreen } from './ui'
+import { PwaLifecycle } from './ui'
 import {
   type ColorTheme,
   resolvedThemeAtom,
   setSystemThemeAtom
-} from './state/conversation-atoms'
+} from './state'
 
 function useThemeBridge() {
   const resolvedTheme = useAtomValue(resolvedThemeAtom)

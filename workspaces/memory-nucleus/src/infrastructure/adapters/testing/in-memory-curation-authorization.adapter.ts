@@ -1,7 +1,7 @@
 import type {
   MemoryCurationAuthorizationDecision,
   MemoryCurationAuthorizationDecisionResolver
-} from '#application/contracts/memory-curation-authorization.contract'
+} from '@application/contracts/memory-curation-authorization.contract'
 
 /** Offline/reference resolver. Production uses a deterministic policy store. */
 export class InMemoryMemoryCurationAuthorizationResolver

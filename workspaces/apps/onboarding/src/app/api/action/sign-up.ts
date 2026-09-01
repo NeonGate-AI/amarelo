@@ -3,13 +3,13 @@
 import { AuthenticationException } from '@workos-inc/node'
 import { redirect } from 'next/navigation'
 
-import type { AuthActionState } from '@lib/auth/auth-state'
-import { getAuthConfiguration, getWorkOSClient } from '@lib/auth/configuration'
-import { getAuthErrorMessage } from '@lib/auth/error-message'
-import { savePendingAuth } from '@lib/auth/pending-auth'
-import { getRequestContext } from '@lib/auth/request-context'
-import { persistSession } from '@lib/auth/session'
-import { parseSignUpInput } from '@lib/auth/validation'
+import type { AuthActionState } from '@lib/auth'
+import { getAuthConfiguration, getWorkOSClient } from '@lib/auth'
+import { getAuthErrorMessage } from '@lib/auth'
+import { savePendingAuth } from '@lib/auth'
+import { getRequestContext } from '@lib/auth'
+import { persistSession } from '@lib/auth'
+import { parseSignUpInput } from '@lib/auth'
 
 export async function signUpAction(
   _previousState: AuthActionState,

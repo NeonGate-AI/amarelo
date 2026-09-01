@@ -1,12 +1,12 @@
 import assert from 'node:assert/strict'
 
-import { retrieveAuthorizedMemory } from '#application/use-cases/retrieve-memory.use-case'
+import { retrieveAuthorizedMemory } from '@application/use-cases/retrieve-memory.use-case'
 import type {
   RepositoryMemoryRecord,
   ScopedMemoryRepository
-} from '#application/ports/memory-repository.port'
-import type { AuthorizedMemoryRetrievalResult } from '#application/contracts/memory-retrieval.contract'
-import { MemoryRepositoryScopeError } from '#application/contracts/memory-retrieval.error'
+} from '@application/ports/memory-repository.port'
+import type { AuthorizedMemoryRetrievalResult } from '@application/contracts/memory-retrieval.contract'
+import { MemoryRepositoryScopeError } from '@application/contracts/memory-retrieval.error'
 import type { MemoryRetrievalEvalCase } from './memory-retrieval.contract.ts'
 import {
   authorizedMemoryQuery,

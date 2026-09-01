@@ -1,20 +1,20 @@
 import assert from 'node:assert/strict'
 
-import type { ExtractedMemoryCandidate } from '#domain/entities/memory-candidate.entity'
+import type { ExtractedMemoryCandidate } from '@domain/entities/memory-candidate.entity'
 import type {
   MemoryCurationAuthorizationDecision,
   MemoryCurationAuthorizationDecisionResolver
-} from '#application/contracts/memory-curation-authorization.contract'
-import { InMemoryMemoryCurationAuthorizationResolver } from '#infrastructure/adapters/testing/in-memory-curation-authorization.adapter'
-import type { MemoryCurationRequest } from '#application/contracts/memory-curation.contract'
-import { createMemoryCurationHandler } from '#application/use-cases/memory-curation.handler'
-import type { MemoryCurationPolicy } from '#application/use-cases/memory-formation.policy'
+} from '@application/contracts/memory-curation-authorization.contract'
+import { InMemoryMemoryCurationAuthorizationResolver } from '@infrastructure/adapters/testing/in-memory-curation-authorization.adapter'
+import type { MemoryCurationRequest } from '@application/contracts/memory-curation.contract'
+import { createMemoryCurationHandler } from '@application/use-cases/memory-curation.handler'
+import type { MemoryCurationPolicy } from '@application/use-cases/memory-formation.policy'
 import {
   MemoryExtractor,
   type MemoryExtractionResult
-} from '#application/ports/memory-extractor.port'
-import { MemoryPersistenceClient } from '#application/ports/memory-curation-persistence.port'
-import { normalizeUnicodeText } from '#infrastructure/formatters/unicode-text.fmt'
+} from '@application/ports/memory-extractor.port'
+import { MemoryPersistenceClient } from '@application/ports/memory-curation-persistence.port'
+import { normalizeUnicodeText } from '@infrastructure/formatters/unicode-text.fmt'
 
 export const FIXED_NOW = new Date('2026-08-27T12:00:00.000Z')
 export const HASH_PATTERN = /^[a-f0-9]{64}$/

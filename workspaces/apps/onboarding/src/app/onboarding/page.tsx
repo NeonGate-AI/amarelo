@@ -1,10 +1,10 @@
 import type { Metadata } from 'next'
 import { redirect } from 'next/navigation'
 
-import { AuthShell } from '@component/auth-shell/auth-shell'
-import { VoiceOnboarding } from '@component/onboarding/voice-onboarding'
-import { isPlanId } from '@data/plans'
-import { isAuthConfigured } from '@lib/auth/configuration'
+import { AuthShell } from '@component/auth-shell'
+import { VoiceOnboarding } from '@component/onboarding'
+import { isPlanId } from '@data'
+import { isAuthConfigured } from '@lib/auth'
 
 interface OnboardingPageProps {
   searchParams: Promise<{ plan?: string | string[] }>

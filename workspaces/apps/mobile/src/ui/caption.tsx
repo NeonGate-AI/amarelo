@@ -1,6 +1,6 @@
 import { ScrollRevealParagraph } from '@repo/react/ui/scroll-reveal-paragraph'
 
-import type { CaptionContent } from '../state/conversation-atoms'
+import type { CaptionContent } from '../state'
 
 interface CaptionProps {
   caption: CaptionContent

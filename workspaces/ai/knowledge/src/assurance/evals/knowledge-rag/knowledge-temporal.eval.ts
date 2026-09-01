@@ -5,7 +5,7 @@ import {
   InvalidKnowledgeRetrievalQueryError,
   retrieveKnowledge,
   type KnowledgeRetrievalResult
-} from '#knowledge'
+} from '@knowledge'
 import type { KnowledgeEvalCase } from './knowledge-evaluation.contract.ts'
 import { knowledgeQuery } from './knowledge.fixtures.ts'
 import { TEMPORAL_CORPUS } from './knowledge-temporal.fixtures.ts'

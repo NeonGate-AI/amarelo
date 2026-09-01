@@ -4,7 +4,7 @@ import {
   MemoryCurationIdentifierSchema,
   type PurposeCode,
   PurposeCodeSchema
-} from '#application/contracts/memory-curation.contract'
+} from '@application/contracts/memory-curation.contract'
 
 export const MemoryCurationAuthorizationDecisionStatusSchema = z.enum([
   'active',

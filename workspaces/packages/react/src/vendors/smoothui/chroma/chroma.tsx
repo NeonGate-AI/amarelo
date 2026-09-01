@@ -3,7 +3,7 @@
 import { useReducedMotion } from 'motion/react'
 import { type ReactNode, useEffect, useRef, useState } from 'react'
 
-import { cn } from '#utilities/cn'
+import { cn } from '@utilities'
 
 export interface ChromaProps {
   children: ReactNode

@@ -15,7 +15,7 @@ import {
   restartConversationAtom,
   statusLabelAtom,
   toggleThemeAtom
-} from '../state/conversation-atoms'
+} from '../state'
 import { Caption } from './caption'
 import { VolumeControls } from './volume-controls'
 

@@ -4,10 +4,10 @@ import { EnvelopeSimple, WarningCircle } from '@phosphor-icons/react'
 import { AgentOrb } from '@repo/react/ui/agent-orb'
 import { useActionState } from 'react'
 
-import { verifyEmailAction } from '@action/verify-email'
-import { SubmitButton } from '@component/auth-form/submit-button'
-import { VoiceGuide } from '@component/voice-guide/voice-guide'
-import { INITIAL_AUTH_STATE } from '@lib/auth/auth-state'
+import { verifyEmailAction } from '@action'
+import { SubmitButton } from '@component/auth-form'
+import { VoiceGuide } from '@component/voice-guide'
+import { INITIAL_AUTH_STATE } from '@lib/auth'
 
 const VERIFICATION_PROMPT =
   'Enviamos um código de seis números para o seu e-mail. Digite esse código aqui. Depois da verificação, seu Elo acompanha você no onboarding.'

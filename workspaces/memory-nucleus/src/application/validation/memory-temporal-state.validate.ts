@@ -1,5 +1,5 @@
-import { InvalidAuthorizedMemoryQueryError } from '#application/contracts/memory-retrieval.error'
-import type { RepositoryMemoryRecord } from '#application/ports/memory-repository.port'
+import { InvalidAuthorizedMemoryQueryError } from '@application/contracts/memory-retrieval.error'
+import type { RepositoryMemoryRecord } from '@application/ports/memory-repository.port'
 
 const INEXACT_TEMPORAL_PRECISIONS = new Set([
   'approximate',

@@ -1,4 +1,4 @@
-import type { RepositoryMemoryRecord } from '#application/ports/memory-repository.port'
+import type { RepositoryMemoryRecord } from '@application/ports/memory-repository.port'
 import { syntheticDirectReportMemoryRecord } from './memory-retrieval.fixtures.ts'
 
 export const TOKEN_BUDGET_CORPUS: readonly RepositoryMemoryRecord[] = [

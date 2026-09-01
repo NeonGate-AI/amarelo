@@ -4,15 +4,15 @@ import {
   type SaveCurationRunResult,
   type SourceClaimRequest,
   type SourceClaimResult
-} from '#application/ports/memory-curation-persistence.port'
+} from '@application/ports/memory-curation-persistence.port'
 import {
   SaveCurationRunRequestSchema,
   SourceClaimRequestSchema
-} from '#application/ports/memory-curation-persistence.port'
+} from '@application/ports/memory-curation-persistence.port'
 import type {
   PostgresExecutor,
   PostgresTransactionExecutor
-} from '#infrastructure/database/postgres-executor'
+} from '@infrastructure/database'
 
 const DEFAULT_CLAIM_TTL_SECONDS = 300
 

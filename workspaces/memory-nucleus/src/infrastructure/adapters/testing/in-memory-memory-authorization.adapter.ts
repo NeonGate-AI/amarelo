@@ -1,7 +1,7 @@
 import {
   MemoryAuthorizationDecisionResolver,
   type MemoryAuthorizationDecision
-} from '#application/ports/memory-authorization.port'
+} from '@application/ports/memory-authorization.port'
 
 /** Offline/reference resolver. Production uses a deterministic policy store. */
 export class InMemoryMemoryAuthorizationResolver extends MemoryAuthorizationDecisionResolver {

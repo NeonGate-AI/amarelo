@@ -1,4 +1,4 @@
-import type { RepositoryKnowledgeChunk } from '#knowledge'
+import type { RepositoryKnowledgeChunk } from '@knowledge'
 import { syntheticChunk } from './knowledge.fixtures.ts'
 
 /** Lexical score, then recency, then stable chunk ID determine the order. */

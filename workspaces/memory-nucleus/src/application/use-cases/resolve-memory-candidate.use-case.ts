@@ -1,5 +1,5 @@
-import type { CandidateResolutionPort } from '#application/ports/candidate-resolution.port'
-import { MemoryJudgment } from '#domain/value-objects/memory-judgment.vo'
+import type { CandidateResolutionPort } from '@application/ports/candidate-resolution.port'
+import { MemoryJudgment } from '@domain/value-objects/memory-judgment.vo'
 
 export interface ResolveMemoryCandidateCommand {
   readonly candidateId: string

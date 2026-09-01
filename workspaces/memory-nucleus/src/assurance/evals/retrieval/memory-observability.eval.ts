@@ -1,9 +1,9 @@
 import assert from 'node:assert/strict'
 
-import type { MemoryRetrievalTrace } from '#application/ports/memory-retrieval-observer.port'
-import { retrieveAuthorizedMemory } from '#application/use-cases/retrieve-memory.use-case'
-import { InMemoryScopedMemoryRepository } from '#infrastructure/adapters/testing/in-memory-memory.repository.adapter'
-import { MEMORY_RETRIEVAL_TOKEN_ESTIMATOR_VERSION } from '#application/use-cases/memory-projection'
+import type { MemoryRetrievalTrace } from '@application/ports/memory-retrieval-observer.port'
+import { retrieveAuthorizedMemory } from '@application/use-cases/retrieve-memory.use-case'
+import { InMemoryScopedMemoryRepository } from '@infrastructure/adapters/testing/in-memory-memory.repository.adapter'
+import { MEMORY_RETRIEVAL_TOKEN_ESTIMATOR_VERSION } from '@application/use-cases'
 import type { MemoryRetrievalEvalCase } from './memory-retrieval.contract.ts'
 import {
   authorizedMemoryQuery,

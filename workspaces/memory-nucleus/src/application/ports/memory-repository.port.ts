@@ -3,8 +3,8 @@ import type {
   MemoryLifecycle,
   MemoryProvenance,
   MemoryTimeWindow
-} from '#application/contracts/memory-retrieval.contract'
-import type { MemoryTemporalPrecision } from '#domain/entities/memory-candidate.entity'
+} from '@application/contracts/memory-retrieval.contract'
+import type { MemoryTemporalPrecision } from '@domain/entities/memory-candidate.entity'
 
 /**
  * Storage-facing record. Optional provenance permits defensive rejection of a

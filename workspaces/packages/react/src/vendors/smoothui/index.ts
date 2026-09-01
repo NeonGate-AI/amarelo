@@ -1,23 +1,23 @@
 'use client'
 
 export * from './shared'
-export { KineticText, type KineticTextProps } from './kinetic-text/kinetic-text'
-export { Chroma } from './chroma/chroma'
-export { CallToActionCentered } from './call-to-action/call-to-action'
-export { LogoCloud, type LogoCloudProps } from './logo-cloud/logo-cloud'
+export { KineticText, type KineticTextProps } from './kinetic-text'
+export { Chroma } from './chroma'
+export { CallToActionCentered } from './call-to-action'
+export { LogoCloud, type LogoCloudProps } from './logo-cloud'
 export {
   ShimmerSweep,
   type ShimmerSweepProps
-} from './shimmer-sweep/shimmer-sweep'
+} from './shimmer-sweep'
 export {
   SmoothButton,
   smoothButtonVariants,
   type SmoothButtonProps
-} from './smooth-button/smooth-button'
+} from './smooth-button'
 export {
   ScrollRevealParagraph,
   type ScrollRevealParagraphProps
-} from './scroll-reveal-paragraph/scroll-reveal-paragraph'
+} from './scroll-reveal-paragraph'
 export type {
   FormErrors,
   FormProps,
@@ -25,7 +25,7 @@ export type {
   FormLabelProps,
   FormMessageProps,
   FormDescriptionProps
-} from './form/form'
+} from './form'
 export {
   FormControl,
   Form,
@@ -33,7 +33,7 @@ export {
   FormLabel,
   FormDescription,
   FormMessage
-} from './form/form'
+} from './form'
 
 export type {
   GlowHoverTheme,
@@ -42,14 +42,14 @@ export type {
   GlowHoverCardTheme,
   GlowHoverCardItem,
   GlowHoverCardsProps
-} from './glow-hover-card/glow-hover-card'
+} from './glow-hover-card'
 export {
   GlowHover,
   GlowHoverCards
-} from './glow-hover-card/glow-hover-card'
-export type { Stargazer, GitHubStarsProps } from './github-stars/github-stars'
-export { GitHubStars } from './github-stars/github-stars'
-export { FaqSearchable, type FaqSearchableProps } from './faq/faq'
+} from './glow-hover-card'
+export type { Stargazer, GitHubStarsProps } from './github-stars'
+export { GitHubStars } from './github-stars'
+export { FaqSearchable, type FaqSearchableProps } from './faq'
 
 export {
   DURATION_INSTANT,
@@ -58,5 +58,5 @@ export {
   SPRING_DEFAULT,
   EASE_OUT,
   EASE_IN_OUT
-} from './lib/animation'
-export type { SpringConfig, EasingCurve } from './lib/animation'
+} from './lib'
+export type { SpringConfig, EasingCurve } from './lib'

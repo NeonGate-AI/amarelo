@@ -1,17 +1,17 @@
-import { ScopedMemoryRepository } from '#application/ports/memory-repository.port'
+import { ScopedMemoryRepository } from '@application/ports/memory-repository.port'
 import type {
   AuthorizedRepositorySearch,
   RepositoryMemoryRecord,
   RepositorySearchResult
-} from '#application/ports/memory-repository.port'
-import { MemoryRepositoryScopeError } from '#application/contracts/memory-retrieval.error'
+} from '@application/ports/memory-repository.port'
+import { MemoryRepositoryScopeError } from '@application/contracts/memory-retrieval.error'
 import {
   compareRankedMemoryRecords,
   hasExactSemanticKeyMatch,
   lexicalMemoryOverlapScore,
   lexicalMemoryTokens,
   normalizedSemanticMemoryKeySet
-} from '#application/use-cases/memory-ranking'
+} from '@application/use-cases'
 import {
   hasValidMemoryProvenance,
   hasBoundedSerializedSize,
@@ -19,14 +19,14 @@ import {
   isNonEmptyString,
   isStringArray,
   MAX_CATEGORIES
-} from '#application/validation/memory-record-shape.validate'
+} from '@application/validation/memory-record-shape.validate'
 import {
   hasValidMemoryTemporalSemantics,
   isMemoryEligibleForTimeWindow,
   parseOptionalTimestamp,
   parseStoredTimestamp,
   resolveMemoryTemporalSortEpoch
-} from '#application/validation/memory-temporal-state.validate'
+} from '@application/validation/memory-temporal-state.validate'
 
 export class InMemoryScopedMemoryRepository extends ScopedMemoryRepository {
   readonly #records: readonly RepositoryMemoryRecord[]

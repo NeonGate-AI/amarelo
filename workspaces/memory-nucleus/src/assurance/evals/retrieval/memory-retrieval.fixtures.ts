@@ -1,21 +1,21 @@
-import { InMemoryMemoryAuthorizationResolver } from '#infrastructure/adapters/testing/in-memory-memory-authorization.adapter'
-import { InMemoryScopedMemoryRepository } from '#infrastructure/adapters/testing/in-memory-memory.repository.adapter'
+import { InMemoryMemoryAuthorizationResolver } from '@infrastructure/adapters/testing/in-memory-memory-authorization.adapter'
+import { InMemoryScopedMemoryRepository } from '@infrastructure/adapters/testing/in-memory-memory.repository.adapter'
 import type {
   AuthorizedMemoryRetrievalDependencies,
   MemoryAuthorizationDecision
-} from '#application/ports/memory-authorization.port'
-import type { RepositoryMemoryRecord } from '#application/ports/memory-repository.port'
+} from '@application/ports/memory-authorization.port'
+import type { RepositoryMemoryRecord } from '@application/ports/memory-repository.port'
 import type {
   AuthorizedMemoryQuery,
   AuthorizedMemoryRetrievalResult,
   MemoryAuthorType,
   MemoryLifecycle,
   MemoryProvenance
-} from '#application/contracts/memory-retrieval.contract'
+} from '@application/contracts/memory-retrieval.contract'
 import type {
   MemoryKind,
   MemoryTemporalPrecision
-} from '#domain/entities/memory-candidate.entity'
+} from '@domain/entities/memory-candidate.entity'
 
 export const TENANT_ID = 'tenant-atlas'
 export const SUBJECT_ID = 'subject-lumen'

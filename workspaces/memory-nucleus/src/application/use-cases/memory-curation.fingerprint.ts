@@ -1,11 +1,11 @@
 import { createHash } from 'node:crypto'
 
-import type { ExtractedMemoryCandidate } from '#domain/entities/memory-candidate.entity'
+import type { ExtractedMemoryCandidate } from '@domain/entities/memory-candidate.entity'
 import type {
   MemoryCurationRequest,
   PreparedConversationTurn
-} from '#application/contracts/memory-curation.contract'
-import type { MemoryTextNormalizerPort } from '#application/ports/memory-text-normalizer.port'
+} from '@application/contracts/memory-curation.contract'
+import type { MemoryTextNormalizerPort } from '@application/ports/memory-text-normalizer.port'
 
 const sha256 = (value: string): string =>
   createHash('sha256').update(value, 'utf8').digest('hex')

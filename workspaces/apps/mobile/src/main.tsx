@@ -6,7 +6,7 @@ import { App } from './app'
 import {
   applyPreviewStateAtom,
   type PreviewState
-} from './state/conversation-atoms'
+} from './state'
 import './styles.css'
 
 function isPreviewState(value: string | null): value is PreviewState {

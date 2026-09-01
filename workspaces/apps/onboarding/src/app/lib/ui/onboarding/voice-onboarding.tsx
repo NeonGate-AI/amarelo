@@ -19,11 +19,11 @@ import {
 import { useActionState, useEffect, useRef, useState } from 'react'
 import { useFormStatus } from 'react-dom'
 
-import { completeOnboardingAction } from '@action/complete-onboarding'
-import { useVoiceGuide } from '@component/voice-guide/use-voice-guide'
-import { eloOptions, isEloId, type EloId } from '@data/elos'
-import { planOptions, type PlanId } from '@data/plans'
-import { INITIAL_ONBOARDING_STATE } from '@lib/auth/auth-state'
+import { completeOnboardingAction } from '@action'
+import { useVoiceGuide } from '@component/voice-guide'
+import { eloOptions, isEloId, type EloId } from '@data'
+import { planOptions, type PlanId } from '@data'
+import { INITIAL_ONBOARDING_STATE } from '@lib/auth'
 
 interface VoiceOnboardingProps {
   plan: PlanId

@@ -1,4 +1,4 @@
-import { isPlanId, type PlanId } from '@data/plans'
+import { isPlanId, type PlanId } from '@data'
 import type { AuthFieldErrors } from '@lib/auth/auth-state'
 
 export interface SignInInput {

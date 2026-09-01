@@ -10,7 +10,7 @@ import {
   setPwaOfflineReadyAtom,
   setPwaUpdateAvailableAtom,
   setStandaloneAtom
-} from '../state/conversation-atoms'
+} from '../state'
 
 export function PwaLifecycle() {
   const offlineReady = useAtomValue(pwaOfflineReadyAtom)

@@ -3,13 +3,13 @@ import { z } from 'zod'
 import {
   MEMORY_CANDIDATE_SCHEMA_VERSION,
   MemoryCandidateSchema
-} from '#domain/entities/memory-candidate.entity'
-import { createMemoryCandidates } from '#application/use-cases/memory-candidate.factory'
-import { type MemoryCurationAuthorizationDecisionResolver } from '#application/contracts/memory-curation-authorization.contract'
+} from '@domain/entities/memory-candidate.entity'
+import { createMemoryCandidates } from '@application/use-cases/memory-candidate.factory'
+import { type MemoryCurationAuthorizationDecisionResolver } from '@application/contracts/memory-curation-authorization.contract'
 import {
   MemoryCurationAuthorizationError,
   resolveMemoryCurationAuthorization
-} from '#application/use-cases/resolve-curation-authorization'
+} from '@application/use-cases/resolve-curation-authorization'
 import {
   type MemoryCurationRequest,
   MemoryCurationRequestSchema,
@@ -17,31 +17,31 @@ import {
   MemoryCurationResultSchema,
   type MemoryCurationUsage,
   type PreparedMemorySource
-} from '#application/contracts/memory-curation.contract'
-import { createCurationIdempotencyKey } from '#application/use-cases/memory-curation.fingerprint'
+} from '@application/contracts/memory-curation.contract'
+import { createCurationIdempotencyKey } from '@application/use-cases/memory-curation.fingerprint'
 import {
   DEFAULT_MEMORY_CURATION_POLICY,
   type MemoryCurationPolicy,
   MemoryCurationPolicySchema,
   prepareMemoryCuration
-} from '#application/use-cases/memory-formation.policy'
-import { createMemoryCurationUsage } from '#application/use-cases/memory-curation.usage'
+} from '@application/use-cases/memory-formation.policy'
+import { createMemoryCurationUsage } from '@application/use-cases/memory-curation.usage'
 import {
   MemoryExtractionDeadlineError,
   MemoryExtractionSchema,
   type MemoryExtractor,
   type MemoryModelUsage,
   MemoryModelUsageSchema
-} from '#application/ports/memory-extractor.port'
+} from '@application/ports/memory-extractor.port'
 import {
   type MemoryPersistenceClient,
   SaveCurationRunRequestSchema,
   SaveCurationRunResultSchema,
   SourceClaimRequestSchema,
   SourceClaimResultSchema
-} from '#application/ports/memory-curation-persistence.port'
-import { MEMORY_EXTRACTION_INPUT_ESTIMATOR_VERSION } from '#application/contracts/memory-extraction.contract'
-import type { MemoryTextNormalizerPort } from '#application/ports/memory-text-normalizer.port'
+} from '@application/ports/memory-curation-persistence.port'
+import { MEMORY_EXTRACTION_INPUT_ESTIMATOR_VERSION } from '@application/contracts/memory-extraction.contract'
+import type { MemoryTextNormalizerPort } from '@application/ports/memory-text-normalizer.port'
 
 const ExtractorIdentitySchema = z
   .object({

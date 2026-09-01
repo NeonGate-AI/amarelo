@@ -3,7 +3,7 @@ import type { ReactNode } from 'react'
 
 import { satoshi } from '@repo/react/next/fonts'
 
-import { ThemeScript } from '@component/theme/theme-script'
+import { ThemeScript } from '@component/theme'
 
 import './globals.css'
 

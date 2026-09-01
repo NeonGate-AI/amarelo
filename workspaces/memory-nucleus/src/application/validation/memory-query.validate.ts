@@ -2,17 +2,17 @@ import type {
   AuthorizedMemoryQuery,
   EffectiveMemoryRetrievalBudgets,
   MemoryRetrievalBudgets
-} from '#application/contracts/memory-retrieval.contract'
-import { DEFAULT_MEMORY_RETRIEVAL_BUDGETS } from '#application/contracts/memory-retrieval.contract'
-import { InvalidAuthorizedMemoryQueryError } from '#application/contracts/memory-retrieval.error'
+} from '@application/contracts/memory-retrieval.contract'
+import { DEFAULT_MEMORY_RETRIEVAL_BUDGETS } from '@application/contracts/memory-retrieval.contract'
+import { InvalidAuthorizedMemoryQueryError } from '@application/contracts/memory-retrieval.error'
 import {
   isBoundedNonEmptyString,
   isNonEmptyString,
   isStringArray,
   MAX_CATEGORIES,
   MAX_IDENTIFIER_CHARACTERS
-} from '#application/validation/memory-record-shape.validate'
-import { parseOptionalTimestamp } from '#application/validation/memory-temporal-state.validate'
+} from '@application/validation/memory-record-shape.validate'
+import { parseOptionalTimestamp } from '@application/validation/memory-temporal-state.validate'
 
 const MAX_QUERY_CHARACTERS = 4_000
 const MAX_SEMANTIC_KEYS = 64

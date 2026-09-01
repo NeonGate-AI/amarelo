@@ -7,7 +7,7 @@ import {
   retrieveKnowledge,
   type KnowledgeRetrievalResult,
   type RepositoryKnowledgeChunk
-} from '#knowledge'
+} from '@knowledge'
 import type {
   KnowledgeEvalCase,
   KnowledgeEvalResult

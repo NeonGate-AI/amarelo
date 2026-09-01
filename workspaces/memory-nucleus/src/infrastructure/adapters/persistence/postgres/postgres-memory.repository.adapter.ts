@@ -1,10 +1,10 @@
-import { ScopedMemoryRepository } from '#application/ports/memory-repository.port'
-import type { PostgresExecutor } from '#infrastructure/database/postgres-executor'
+import { ScopedMemoryRepository } from '@application/ports/memory-repository.port'
+import type { PostgresExecutor } from '@infrastructure/database'
 import type {
   AuthorizedRepositorySearch,
   RepositoryMemoryRecord,
   RepositorySearchResult
-} from '#application/ports/memory-repository.port'
+} from '@application/ports/memory-repository.port'
 
 interface SearchRow {
   category: string

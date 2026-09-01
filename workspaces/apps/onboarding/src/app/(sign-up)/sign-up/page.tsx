@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 
-import { AuthShell } from '@component/auth-shell/auth-shell'
-import { SignUpExperience } from '@component/sign-up/sign-up-experience'
+import { AuthShell } from '@component/auth-shell'
+import { SignUpExperience } from '@component/sign-up'
 
 export const metadata: Metadata = {
   title: 'Criar conta'

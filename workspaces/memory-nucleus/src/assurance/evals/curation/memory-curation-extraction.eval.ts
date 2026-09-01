@@ -5,11 +5,11 @@ import {
   ExtractedMemoryCandidateSchema,
   MemoryKindSchema,
   MemoryTemporalPrecisionSchema
-} from '#domain/entities/memory-candidate.entity'
+} from '@domain/entities/memory-candidate.entity'
 import {
   MEMORY_EXTRACTION_PROMPT,
   MEMORY_EXTRACTION_PROMPT_VERSION
-} from '#application/prompts/memory-extraction.prompt'
+} from '@application/prompts/memory-extraction.prompt'
 import type { MemoryCurationEvalCase } from './memory-curation-eval.contract'
 import {
   assertCallCounts,

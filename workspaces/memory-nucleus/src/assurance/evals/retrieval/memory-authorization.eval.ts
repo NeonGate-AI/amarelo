@@ -1,17 +1,17 @@
 import assert from 'node:assert/strict'
 
-import { retrieveAuthorizedMemory } from '#application/use-cases/retrieve-memory.use-case'
-import { InMemoryMemoryAuthorizationResolver } from '#infrastructure/adapters/testing/in-memory-memory-authorization.adapter'
-import { InMemoryScopedMemoryRepository } from '#infrastructure/adapters/testing/in-memory-memory.repository.adapter'
+import { retrieveAuthorizedMemory } from '@application/use-cases/retrieve-memory.use-case'
+import { InMemoryMemoryAuthorizationResolver } from '@infrastructure/adapters/testing/in-memory-memory-authorization.adapter'
+import { InMemoryScopedMemoryRepository } from '@infrastructure/adapters/testing/in-memory-memory.repository.adapter'
 import type {
   AuthorizedRepositorySearch,
   ScopedMemoryRepository
-} from '#application/ports/memory-repository.port'
+} from '@application/ports/memory-repository.port'
 import {
   InvalidAuthorizedMemoryQueryError,
   MemoryAuthorizationDecisionError,
   type MemoryAuthorizationDecisionFailure
-} from '#application/contracts/memory-retrieval.error'
+} from '@application/contracts/memory-retrieval.error'
 import type { MemoryRetrievalEvalCase } from './memory-retrieval.contract.ts'
 import {
   authorizedMemoryQuery,

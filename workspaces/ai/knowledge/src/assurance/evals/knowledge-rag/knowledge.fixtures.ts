@@ -1,7 +1,7 @@
 import type {
   KnowledgeRetrievalQuery,
   RepositoryKnowledgeChunk
-} from '#knowledge'
+} from '@knowledge'
 
 export const PURPOSE_CODE = 'synthetic-evidence-brief'
 export const OTHER_PURPOSE_CODE = 'synthetic-export-preview'

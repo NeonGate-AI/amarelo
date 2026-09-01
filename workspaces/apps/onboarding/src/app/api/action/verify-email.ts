@@ -2,12 +2,12 @@
 
 import { redirect } from 'next/navigation'
 
-import type { AuthActionState } from '@lib/auth/auth-state'
-import { getAuthConfiguration, getWorkOSClient } from '@lib/auth/configuration'
-import { getAuthErrorMessage } from '@lib/auth/error-message'
-import { clearPendingAuth, readPendingAuth } from '@lib/auth/pending-auth'
-import { getRequestContext } from '@lib/auth/request-context'
-import { persistSession } from '@lib/auth/session'
+import type { AuthActionState } from '@lib/auth'
+import { getAuthConfiguration, getWorkOSClient } from '@lib/auth'
+import { getAuthErrorMessage } from '@lib/auth'
+import { clearPendingAuth, readPendingAuth } from '@lib/auth'
+import { getRequestContext } from '@lib/auth'
+import { persistSession } from '@lib/auth'
 
 const VERIFICATION_CODE_PATTERN = /^\d{6}$/
 

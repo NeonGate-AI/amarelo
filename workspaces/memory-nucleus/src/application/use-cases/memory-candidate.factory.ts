@@ -1,15 +1,15 @@
 import {
   type MemoryCandidate,
   MemoryCandidateSchema
-} from '#domain/entities/memory-candidate.entity'
-import type { MemoryCurationAuthorizationDecision } from '#application/contracts/memory-curation-authorization.contract'
-import { createCandidateFingerprint } from '#application/use-cases/memory-curation.fingerprint'
+} from '@domain/entities/memory-candidate.entity'
+import type { MemoryCurationAuthorizationDecision } from '@application/contracts/memory-curation-authorization.contract'
+import { createCandidateFingerprint } from '@application/use-cases/memory-curation.fingerprint'
 import type {
   MemoryCurationRequest,
   PreparedMemorySource
-} from '#application/contracts/memory-curation.contract'
-import type { MemoryExtraction } from '#application/ports/memory-extractor.port'
-import type { MemoryTextNormalizerPort } from '#application/ports/memory-text-normalizer.port'
+} from '@application/contracts/memory-curation.contract'
+import type { MemoryExtraction } from '@application/ports/memory-extractor.port'
+import type { MemoryTextNormalizerPort } from '@application/ports/memory-text-normalizer.port'
 
 export interface CreateMemoryCandidatesInput {
   authorization: MemoryCurationAuthorizationDecision

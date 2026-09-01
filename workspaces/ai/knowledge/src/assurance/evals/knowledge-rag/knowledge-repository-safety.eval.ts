@@ -7,7 +7,7 @@ import {
   type KnowledgeRetrievalResult,
   type RepositoryKnowledgeChunk,
   type ScopedKnowledgeRepository
-} from '#knowledge'
+} from '@knowledge'
 import type { KnowledgeEvalCase } from './knowledge-evaluation.contract.ts'
 import {
   EMPTY_REPOSITORY_RESULT,

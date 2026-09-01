@@ -3,7 +3,7 @@ import assert from 'node:assert/strict'
 import {
   InMemoryScopedKnowledgeRepository,
   retrieveKnowledge
-} from '#knowledge'
+} from '@knowledge'
 import type { KnowledgeEvalCase } from './knowledge-evaluation.contract.ts'
 import {
   FILTER_CORPUS,

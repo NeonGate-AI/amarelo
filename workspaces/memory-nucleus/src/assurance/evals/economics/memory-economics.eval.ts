@@ -3,7 +3,7 @@ import assert from 'node:assert/strict'
 import {
   calculateMemoryEconomics,
   type MemoryEconomicsInput
-} from '#domain/services/memory-economics.compute'
+} from '@domain/services/memory-economics.compute'
 
 const profitable = calculateMemoryEconomics({
   inputCostPerMillionTokens: 2,

@@ -1,14 +1,14 @@
 import { z } from 'zod'
 
-import { MEMORY_CANDIDATE_SCHEMA_VERSION } from '#domain/entities/memory-candidate.entity'
+import { MEMORY_CANDIDATE_SCHEMA_VERSION } from '@domain/entities/memory-candidate.entity'
 import {
   type MemoryExtractionInput,
   MemoryExtractionSchema
-} from '#application/ports/memory-extractor.port'
+} from '@application/ports/memory-extractor.port'
 import {
   MEMORY_EXTRACTION_PROMPT,
   MEMORY_EXTRACTION_PROMPT_VERSION
-} from '#application/prompts/memory-extraction.prompt'
+} from '@application/prompts/memory-extraction.prompt'
 
 export const MEMORY_EXTRACTION_STRUCTURED_OUTPUT_NAME =
   'amarelo_memory_candidates'

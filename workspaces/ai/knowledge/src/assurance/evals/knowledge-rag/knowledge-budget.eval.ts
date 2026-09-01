@@ -4,7 +4,7 @@ import {
   InMemoryScopedKnowledgeRepository,
   retrieveKnowledge,
   type KnowledgeRetrievalResult
-} from '#knowledge'
+} from '@knowledge'
 import type { KnowledgeEvalCase } from './knowledge-evaluation.contract.ts'
 import { FILTER_CORPUS } from './knowledge-filter.fixtures.ts'
 import { knowledgeQuery, syntheticChunk } from './knowledge.fixtures.ts'

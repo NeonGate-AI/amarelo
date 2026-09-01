@@ -1,8 +1,8 @@
-import type { PostgresTransactionExecutor } from '#infrastructure/database/postgres-executor'
+import type { PostgresTransactionExecutor } from '@infrastructure/database'
 import {
   ConsentLedgerPort,
   type AppendConsentEntryInput
-} from '#application/ports/consent-ledger.port'
+} from '@application/ports/consent-ledger.port'
 
 export class PostgresConsentLedgerRepository extends ConsentLedgerPort {
   constructor(private readonly database: PostgresTransactionExecutor) {

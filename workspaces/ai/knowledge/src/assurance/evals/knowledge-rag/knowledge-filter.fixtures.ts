@@ -1,4 +1,4 @@
-import type { RepositoryKnowledgeChunk } from '#knowledge'
+import type { RepositoryKnowledgeChunk } from '@knowledge'
 import {
   CORPUS_VERSION,
   OTHER_CORPUS_VERSION,

@@ -2,10 +2,10 @@
 
 import { redirect } from 'next/navigation'
 
-import { isPlanId } from '@data/plans'
-import { isEloId } from '@data/elos'
-import type { OnboardingActionState } from '@lib/auth/auth-state'
-import { getAuthConfiguration, getWorkOSClient } from '@lib/auth/configuration'
+import { isPlanId } from '@data'
+import { isEloId } from '@data'
+import type { OnboardingActionState } from '@lib/auth'
+import { getAuthConfiguration, getWorkOSClient } from '@lib/auth'
 
 export async function completeOnboardingAction(
   _previousState: OnboardingActionState,

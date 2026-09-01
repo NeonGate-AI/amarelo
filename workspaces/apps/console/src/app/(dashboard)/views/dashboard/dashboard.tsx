@@ -1,4 +1,4 @@
-import { ConsoleShell } from '@dashboard/ui/console-shell/console-shell'
+import { ConsoleShell } from '@dashboard/ui/console-shell'
 
 export function DashboardView() {
   return <ConsoleShell />

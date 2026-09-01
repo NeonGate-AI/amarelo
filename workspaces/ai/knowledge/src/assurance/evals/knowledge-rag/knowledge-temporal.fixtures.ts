@@ -1,4 +1,4 @@
-import type { RepositoryKnowledgeChunk } from '#knowledge'
+import type { RepositoryKnowledgeChunk } from '@knowledge'
 import { AS_OF, syntheticChunk } from './knowledge.fixtures.ts'
 
 export const TEMPORAL_CORPUS: readonly RepositoryKnowledgeChunk[] = [

@@ -6,7 +6,7 @@ import {
   createMemorySearchContextProjection,
   estimateMemorySearchContextTokens,
   type MemoryRecord
-} from '#memory-sdk'
+} from '@memory-sdk'
 
 const input = MemorySearchInputSchema.parse({
   asOf: '2026-09-01T00:00:00.000Z',

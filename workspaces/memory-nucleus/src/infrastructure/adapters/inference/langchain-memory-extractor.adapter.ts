@@ -17,12 +17,12 @@ import {
   type MemoryExtractionResult,
   MemoryExtractionSchema,
   MemoryExtractor
-} from '#application/ports/memory-extractor.port'
+} from '@application/ports/memory-extractor.port'
 import {
   createMemoryExtractionApplicationPayload,
   MEMORY_EXTRACTION_STRUCTURED_OUTPUT_NAME
-} from '#application/contracts/memory-extraction.contract'
-import { MEMORY_EXTRACTION_PROMPT_VERSION } from '#application/prompts/memory-extraction.prompt'
+} from '@application/contracts/memory-extraction.contract'
+import { MEMORY_EXTRACTION_PROMPT_VERSION } from '@application/prompts/memory-extraction.prompt'
 
 export interface LangChainMemoryExtractorOptions {
   deadlineMilliseconds: number

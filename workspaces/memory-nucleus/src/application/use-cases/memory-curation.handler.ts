@@ -3,12 +3,12 @@ import {
   MemoryCurationRequestSchema,
   type MemoryCurationResult,
   MemoryCurationResultSchema
-} from '#application/contracts/memory-curation.contract'
+} from '@application/contracts/memory-curation.contract'
 import {
   createMemoryCurationGraph,
   invokeMemoryCurationGraph,
   type MemoryCurationGraphDependencies
-} from '#application/use-cases/curate-memory.use-case'
+} from '@application/use-cases/curate-memory.use-case'
 
 export interface MemoryCurationHandler {
   invoke(request: MemoryCurationRequest): Promise<MemoryCurationResult>

@@ -1,10 +1,10 @@
-import type { ScopedMemoryRepository } from '#application/ports/memory-repository.port'
-import type { MemoryRetrievalObserver } from '#application/ports/memory-retrieval-observer.port'
+import type { ScopedMemoryRepository } from '@application/ports/memory-repository.port'
+import type { MemoryRetrievalObserver } from '@application/ports/memory-retrieval-observer.port'
 import type {
   AuthorizedMemoryQuery,
   MemoryKind,
   MemoryTimeWindow
-} from '#application/contracts/memory-retrieval.contract'
+} from '@application/contracts/memory-retrieval.contract'
 
 export type MemoryAuthorizationDecisionStatus = 'active' | 'revoked'
 export type MemorySensitivity = 'normal' | 'sensitive' | 'highly-sensitive'

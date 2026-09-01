@@ -4,7 +4,7 @@ import {
   MemoryIdentifierSchema,
   PurposeCodeSchema,
   type PurposeCode
-} from '#domain/schemas/memory-identifiers.schema'
+} from '@domain/schemas/memory-identifiers.schema'
 
 export const MemoryKindSchema = z.enum(['episodic', 'semantic'])
 export type MemoryKind = z.infer<typeof MemoryKindSchema>

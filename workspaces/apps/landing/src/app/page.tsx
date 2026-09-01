@@ -1,7 +1,7 @@
-import { FaqSection } from '@section/faq/faq'
-import { Footer } from '@section/footer/footer'
-import { HeroSection } from '@section/hero/hero'
-import { ProductStorySection } from '@section/product-story/product-story'
+import { FaqSection } from '@section/faq'
+import { Footer } from '@section/footer'
+import { HeroSection } from '@section/hero'
+import { ProductStorySection } from '@section/product-story'
 
 export default function LandingPage() {
   return (

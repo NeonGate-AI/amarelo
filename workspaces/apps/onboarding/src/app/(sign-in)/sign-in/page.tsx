@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 
-import { AuthShell } from '@component/auth-shell/auth-shell'
-import { SignInForm } from '@component/sign-in/sign-in-form'
+import { AuthShell } from '@component/auth-shell'
+import { SignInForm } from '@component/sign-in'
 
 export const metadata: Metadata = {
   title: 'Iniciar sessão'

@@ -1,11 +1,11 @@
-export { InMemoryScopedKnowledgeRepository } from './retrieval/in-memory-knowledge.repository.ts'
+export { InMemoryScopedKnowledgeRepository } from './retrieval'
 export type {
   KnowledgeRepositorySearch,
   KnowledgeRepositorySearchDiagnostics,
   KnowledgeRepositorySearchResult,
   RepositoryKnowledgeChunk,
   ScopedKnowledgeRepository
-} from './retrieval/knowledge-repository.contract.ts'
+} from './retrieval'
 export type {
   KnowledgeRetrievalDiagnostics,
   KnowledgeRetrievalQuery,
@@ -13,13 +13,13 @@ export type {
   KnowledgeSourceType,
   KnowledgeVerificationStatus,
   RetrievedKnowledgeData
-} from './retrieval/knowledge-retrieval.contract.ts'
+} from './retrieval'
 export {
   MAX_KNOWLEDGE_DOCS,
   MAX_KNOWLEDGE_TOKENS
-} from './retrieval/knowledge-retrieval.contract.ts'
+} from './retrieval'
 export {
   InvalidKnowledgeRetrievalQueryError,
   KnowledgeRepositoryScopeError
-} from './retrieval/knowledge-retrieval.error.ts'
-export { retrieveKnowledge } from './retrieval/knowledge.retrieval.ts'
+} from './retrieval'
+export { retrieveKnowledge } from './retrieval'

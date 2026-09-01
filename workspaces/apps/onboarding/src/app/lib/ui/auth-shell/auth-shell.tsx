@@ -1,7 +1,7 @@
 import { LockKey } from '@phosphor-icons/react/ssr'
 import type { ReactNode } from 'react'
 
-import { ThemeToggle } from '@component/theme/theme-toggle'
+import { ThemeToggle } from '@component/theme'
 
 interface AuthShellProps {
   centered?: boolean

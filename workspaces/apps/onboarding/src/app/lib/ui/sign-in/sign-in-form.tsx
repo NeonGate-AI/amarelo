@@ -3,9 +3,9 @@
 import { Eye, EyeSlash, LockKey, WarningCircle } from '@phosphor-icons/react'
 import { useActionState, useState } from 'react'
 
-import { signInAction } from '@action/sign-in'
-import { SubmitButton } from '@component/auth-form/submit-button'
-import { INITIAL_AUTH_STATE } from '@lib/auth/auth-state'
+import { signInAction } from '@action'
+import { SubmitButton } from '@component/auth-form'
+import { INITIAL_AUTH_STATE } from '@lib/auth'
 
 export function SignInForm() {
   const [state, formAction] = useActionState(signInAction, INITIAL_AUTH_STATE)

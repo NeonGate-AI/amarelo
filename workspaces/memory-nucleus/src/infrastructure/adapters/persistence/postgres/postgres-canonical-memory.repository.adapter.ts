@@ -1,10 +1,10 @@
-import type { PostgresTransactionExecutor } from '#infrastructure/database/postgres-executor'
+import type { PostgresTransactionExecutor } from '@infrastructure/database'
 
 import {
   CanonicalMemoryPort,
   type AcceptCandidateInput,
   type AcceptCandidateResult
-} from '#application/ports/canonical-memory.port'
+} from '@application/ports/canonical-memory.port'
 
 interface CandidateRow {
   candidate_id: string

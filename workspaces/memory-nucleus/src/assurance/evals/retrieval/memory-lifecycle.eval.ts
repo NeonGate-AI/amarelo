@@ -1,8 +1,8 @@
 import assert from 'node:assert/strict'
 
-import { retrieveAuthorizedMemory } from '#application/use-cases/retrieve-memory.use-case'
-import { InMemoryScopedMemoryRepository } from '#infrastructure/adapters/testing/in-memory-memory.repository.adapter'
-import type { MemoryAuthorType } from '#application/contracts/memory-retrieval.contract'
+import { retrieveAuthorizedMemory } from '@application/use-cases/retrieve-memory.use-case'
+import { InMemoryScopedMemoryRepository } from '@infrastructure/adapters/testing/in-memory-memory.repository.adapter'
+import type { MemoryAuthorType } from '@application/contracts/memory-retrieval.contract'
 import type { MemoryRetrievalEvalCase } from './memory-retrieval.contract.ts'
 import {
   authorizedMemoryQuery,

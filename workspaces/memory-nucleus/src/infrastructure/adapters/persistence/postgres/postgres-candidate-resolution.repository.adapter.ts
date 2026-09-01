@@ -1,8 +1,8 @@
-import type { PostgresTransactionExecutor } from '#infrastructure/database/postgres-executor'
+import type { PostgresTransactionExecutor } from '@infrastructure/database'
 import {
   CandidateResolutionPort,
   type ResolveNoncanonicalCandidateInput
-} from '#application/ports/candidate-resolution.port'
+} from '@application/ports/candidate-resolution.port'
 
 export class PostgresCandidateResolutionRepository extends CandidateResolutionPort {
   constructor(private readonly database: PostgresTransactionExecutor) {

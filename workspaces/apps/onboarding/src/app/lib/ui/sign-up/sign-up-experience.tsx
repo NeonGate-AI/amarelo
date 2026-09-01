@@ -16,10 +16,10 @@ import {
 } from '@repo/react/vendors/smoothui'
 import { useActionState, useState } from 'react'
 
-import { signUpAction } from '@action/sign-up'
-import { SubmitButton } from '@component/auth-form/submit-button'
-import { planOptions, type PlanId, type PlanOption } from '@data/plans'
-import { INITIAL_AUTH_STATE } from '@lib/auth/auth-state'
+import { signUpAction } from '@action'
+import { SubmitButton } from '@component/auth-form'
+import { planOptions, type PlanId, type PlanOption } from '@data'
+import { INITIAL_AUTH_STATE } from '@lib/auth'
 
 type SignUpStep = 'account' | 'plans'
 

@@ -1,5 +1,5 @@
-import type { RetrievedMemoryContext } from '#application/contracts/memory-retrieval.contract'
-import type { RankedMemoryRecord } from '#application/use-cases/memory-ranking'
+import type { RetrievedMemoryContext } from '@application/contracts/memory-retrieval.contract'
+import type { RankedMemoryRecord } from '@application/use-cases/memory-ranking'
 
 const ITEM_SERIALIZATION_TOKEN_OVERHEAD = 8
 const UTF_8_ENCODER = new TextEncoder()
