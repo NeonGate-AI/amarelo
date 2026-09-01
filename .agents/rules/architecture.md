@@ -1,3 +1,15 @@
+---
+version: 2
+name: Architecture
+description: Repository topology, dependency direction, workspace ownership, and import boundaries.
+alwaysApply: true
+priority: high
+tags:
+  - architecture
+  - boundaries
+  - workspaces
+---
+
 # Architecture rules
 
 - Canonical source root is `workspaces/`; references to the retired source-root name are forbidden in live implementation/configuration.

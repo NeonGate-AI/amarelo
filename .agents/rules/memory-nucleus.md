@@ -1,3 +1,15 @@
+---
+version: 2
+name: Memory Nucleus
+description: Canonical memory, retrieval, projection, authorization, economics, and MVP constraints.
+alwaysApply: true
+priority: high
+tags:
+  - memory
+  - nucleus
+  - ai
+---
+
 # Memory Nucleus rules
 
 - Transcript/history is evidence, not canonical memory.

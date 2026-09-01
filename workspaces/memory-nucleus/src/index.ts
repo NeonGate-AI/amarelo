@@ -3,10 +3,10 @@ export * from '#domain/entities/memory.entity'
 export * from '#domain/entities/memory-candidate.entity'
 export * from '#domain/entities/memory-evidence.entity'
 export * from '#domain/entities/memory-consent.entity'
-export * from '#domain/judgment/memory-judgment'
+export * from '#domain/value-objects/memory-judgment.vo'
 export * from '#domain/policies/memory-acceptance.policy'
-export * from '#domain/value-objects/memory-economics.value-object'
-export * from '#domain/value-objects/memory-identifiers.value-object'
+export * from '#domain/value-objects/memory-economics.vo'
+export * from '#domain/schemas/memory-identifiers.schema'
 
 // Application contracts and ports
 export * from '#application/contracts/memory-curation.contract'

@@ -1,3 +1,15 @@
+---
+version: 2
+name: Package Ownership
+description: Package namespace and shared-capability ownership constraints.
+alwaysApply: true
+priority: high
+tags:
+  - packages
+  - ownership
+  - boundaries
+---
+
 # Package ownership rules
 
 - `@ai/*` packages belong to the AI workspace.

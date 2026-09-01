@@ -1,3 +1,15 @@
+---
+version: 2
+name: Context Engineering
+description: Progressive harness loading and cognitive/context-budget constraints for AI runtime design.
+alwaysApply: true
+priority: high
+tags:
+  - context
+  - ai
+  - routing
+---
+
 # Context engineering rules
 
 - Load harness knowledge progressively from the relevant workspace manifest.
