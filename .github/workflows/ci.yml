@@ -5,11 +5,14 @@ on:
     branches:
       - main
       - develop
-
+      - refactor/**
   pull_request:
     branches:
       - main
       - develop
+
+permissions:
+  contents: read
 
 env:
   NODE_VERSION: 24
@@ -22,6 +25,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
@@ -35,17 +40,63 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Elo doctor
+        run: ./elo doctor --ci
+
+      - name: Check architecture
+        run: ./elo check architecture
+
+      - name: Check memory invariants
+        run: ./elo check memory
+
+      - name: Audit hygiene
+        shell: bash
+        run: |
+          tracked="$(git ls-files '.audit/**' | grep -v '^.audit/.gitkeep$' || true)"
+          if [ -n "$tracked" ]; then
+            echo 'Generated .audit evidence must not be committed:'
+            echo "$tracked"
+            exit 1
+          fi
+
+      - name: Commitlint
+        shell: bash
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          PR_BASE: ${{ github.event.pull_request.base.sha }}
+          PR_HEAD: ${{ github.event.pull_request.head.sha }}
+          PUSH_BEFORE: ${{ github.event.before }}
+          HEAD_SHA: ${{ github.sha }}
+        run: |
+          if [ "$EVENT_NAME" = "pull_request" ]; then
+            pnpm exec commitlint --from "$PR_BASE" --to "$PR_HEAD" --verbose
+          else
+            base="$PUSH_BEFORE"
+            if [ -z "$base" ] || [ "$base" = "0000000000000000000000000000000000000000" ]; then
+              base="$(git rev-list --max-parents=0 HEAD)"
+            fi
+            pnpm exec commitlint --from "$base" --to "$HEAD_SHA" --verbose
+          fi
+
       - name: Lint
         run: pnpm lint
 
-      - name: Check architecture
-        run: pnpm check:architecture
-
       - name: Typecheck
         run: pnpm typecheck
+
+      - name: Test
+        run: pnpm test
 
       - name: Evaluate AI
         run: pnpm eval:ai
 
       - name: Build
         run: pnpm build
+
+      - name: Git hook smoke tests
+        shell: bash
+        run: |
+          sh .husky/pre-commit
+          printf 'chore(ci): validate commit hook\n' > .audit/commit-message.txt
+          sh .husky/commit-msg .audit/commit-message.txt
+          rm -f .audit/commit-message.txt

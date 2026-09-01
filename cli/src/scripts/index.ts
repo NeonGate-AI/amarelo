@@ -1,1 +1,2 @@
-// Repository platform checks are implemented in this directory.
+export { runArchitectureCheck } from './architecture.script.mjs'
+export { runMemoryInvariantCheck } from './memory-invariants.script.mjs'

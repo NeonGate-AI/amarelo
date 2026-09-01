@@ -2,6 +2,9 @@
   "name": "amarelo",
   "private": true,
   "version": "0.1.0",
+  "engines": {
+    "node": ">=24 <25"
+  },
   "overrides": {
     "lightningcss": "1.30.1"
   },
@@ -9,6 +12,8 @@
     "lightningcss": "1.30.1"
   },
   "scripts": {
+    "prepare": "./elo git setup --prepare",
+    "elo": "./elo",
     "dev": "turbo dev --filter=landing --filter=console --filter=onboarding --filter=mobile",
     "runtime": "pnpm --filter @repo/runtime start",
     "start": "turbo start --filter=landing --filter=console --filter=onboarding --filter=mobile",
@@ -21,18 +26,19 @@
     "mobile-start": "turbo start --filter=mobile",
     "onboarding-start": "turbo start --filter=onboarding",
     "build": "turbo run build",
+    "typecheck": "turbo run typecheck",
+    "test": "turbo run test",
+    "lint": "biome check workspaces cli",
+    "format": "biome format --write --vcs-use-ignore-file=true workspaces cli",
     "eval:ai": "pnpm --filter @nucleus/memory --filter @repo/memory-sdk --filter @ai/knowledge run eval",
     "eval:memory": "pnpm --filter @nucleus/memory --filter @repo/memory-sdk run eval",
     "eval:memory-sdk": "pnpm --filter @repo/memory-sdk run eval",
     "eval:rag": "pnpm --filter @ai/knowledge run eval:rag",
-    "check:architecture": "node tooling/checks/architecture.mjs",
-    "typecheck": "pnpm -r --if-present run typecheck",
-    "lint": "biome check workspaces tooling",
-    "format": "biome format --write --vcs-use-ignore-file=true workspaces tooling",
+    "check:architecture": "./elo check architecture",
+    "check:memory-invariants": "./elo check memory",
     "commitlint": "commitlint --edit",
     "memory:test": "pnpm --filter @nucleus/memory run test",
-    "eval:memory:visible": "pnpm --filter @nucleus/memory --filter @repo/memory-sdk run eval",
-    "check:memory-invariants": "node tooling/checks/memory-invariants.mjs"
+    "eval:memory:visible": "pnpm --filter @nucleus/memory --filter @repo/memory-sdk run eval"
   },
   "devDependencies": {
     "@biomejs/biome": "2.3.15",
