@@ -12,7 +12,7 @@ on:
       - develop
 
 permissions:
-  contents: write
+  contents: read
 
 env:
   NODE_VERSION: 24
@@ -76,42 +76,6 @@ jobs:
               base="$(git rev-list --max-parents=0 HEAD)"
             fi
             pnpm exec commitlint --from "$base" --to "$HEAD_SHA" --verbose
-          fi
-
-      - name: Apply Biome formatting for Handoff 2
-        if: github.event_name == 'push' && github.ref == 'refs/heads/refactor/handoff-02-housekeeping'
-        shell: bash
-        run: |
-          python - <<'PY'
-          from pathlib import Path
-
-          architecture = Path('cli/src/scripts/architecture.script.mjs')
-          text = architecture.read_text()
-          text = text.replace(
-              "import { dirname, extname, join, relative, resolve, sep } from 'node:path'",
-              "import { extname, join, relative, sep } from 'node:path'",
-          )
-          architecture.write_text(text)
-
-          curation = Path('workspaces/memory-nucleus/src/application/use-cases/curate-memory.use-case.ts')
-          text = curation.read_text()
-          text = text.replace(
-              '    let authorization\n',
-              '    let authorization: Awaited<ReturnType<typeof resolveMemoryCurationAuthorization>>\n',
-          )
-          text = text.replace(
-              '    let extraction\n',
-              "    let extraction: Awaited<ReturnType<MemoryExtractor['extract']>>['extraction']\n",
-          )
-          curation.write_text(text)
-          PY
-          pnpm exec biome format --write workspaces cli
-          if ! git diff --quiet; then
-            git config user.name 'github-actions[bot]'
-            git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-            git add workspaces cli
-            git commit --no-verify -m 'chore(format): apply biome formatting'
-            git push
           fi
 
       - name: Lint
