@@ -1,5 +1,5 @@
 ---
-version: 3
+version: 4
 extends: code-style.md
 name: Source Organization
 description: Source roots, module boundaries, file naming, barrels, and architectural source ownership.
@@ -29,7 +29,7 @@ Allowed non-source-root examples include `package.json`, `tsconfig.json`, framew
 
 Next.js applications use `src/app/` when compatible with the current app. Vite/React applications use `src/`.
 
-The embedded Elo CLI is a repository development subsystem and uses `cli/src/`. Its implementation is POSIX shell. JavaScript/TypeScript implementation modules do not belong under `cli/src/`.
+The embedded Elo CLI is a repository development subsystem. Its executable binary is `cli/elo`; implementation lives under `cli/src/` and is POSIX shell. JavaScript/TypeScript implementation modules do not belong under `cli/src/`.
 
 Do not create generic root dumping grounds such as `helpers/`, `utils/`, `scripts/`, `common/`, `misc/`, or `tooling/` for project implementation code.
 
@@ -41,11 +41,11 @@ Use kebab-case for project-created source files and folders. Framework-reserved 
 
 Files under `cli/src/` are shell modules ending in `.sh`. Commands live under `cli/src/commands/`; reusable CLI primitives live under `cli/src/core/`. Keep one command/primary concern per shell module. The TypeScript semantic suffix table below does not apply to `.sh` files.
 
-The root `elo` file is a thin tool-required launcher and contains no substantive CLI behavior.
+`cli/elo` is a thin launcher and contains no substantive CLI behavior.
 
 ## 3. One primary artifact per module
 
-Each source module has one primary exported artifact or concern: one function, class, interface/type, schema, component, hook, command, adapter, port, or equivalent behavior.
+Each source module has one primary exported artifact or concern: one function, class, interface/type, schema, component, hook, command, adapter, port, agent, or equivalent behavior.
 
 Private helpers and internal types may remain colocated only when they exist exclusively to support that primary artifact.
 
@@ -58,6 +58,7 @@ Use only suffixes defined here for project-created semantic modules. Add a suffi
 | `.abstract` | Abstract runtime contract | `payment.abstract.ts` |
 | `.action` | React/server action | `sign-in.action.ts` |
 | `.adapter` | Protocol/interface adapter | `postgres.adapter.ts` |
+| `.agent` | Product AI agent definition/scaffold | `ana.agent.ts` |
 | `.atom` | State atom | `session.atom.ts` |
 | `.client` | External-system or React client | `http.client.ts` |
 | `.command` | Non-shell command module where required | `doctor.command.ts` |
@@ -112,7 +113,13 @@ A package-level `src/index.ts` remains a deliberate public API. Framework route 
 
 ## 7. Imports
 
-Prefer package aliases and local barrels. Avoid deep relative imports such as `../../../`. Do not import another workspace's internals; consume its public API.
+First-party absolute source aliases always begin with `@`; never define or use a project source alias beginning with `#`.
+
+Imports terminate at the owning directory barrel. Do not import a final semantic source file directly. For example, import `@application/ports`, not `@application/ports/memory-repository.port`, and import `@component/auth-shell`, not `@component/auth-shell/auth-shell`.
+
+Relative imports follow the same boundary: outside an `index.ts` barrel, import a directory API rather than another module file. An `index.ts` may directly reexport its own leaf modules because that is the barrel's purpose.
+
+Do not import another workspace's internals; consume its declared package API. Avoid deep relative imports such as `../../../`.
 
 ## 8. Validation ownership
 
@@ -158,7 +165,7 @@ Preserve framework-aware frontend architecture while normalizing source roots:
 
 Turborepo/root task scripts own `dev`, `start`, `build`, `typecheck`, tests and workspace task graphs.
 
-Elo owns monorepo platform operations: bootstrap/setup, doctor, cleanup, environment preparation/validation, Git/Husky/Commitlint/lint-staged setup and thin audit-check entrypoints.
+Elo owns monorepo platform operations: bootstrap/setup, doctor, cleanup, environment preparation/validation, Git/Husky/Commitlint/lint-staged setup and thin audit-check entrypoints. `pnpm elo` bootstraps the local Elo environment through `cli/elo`.
 
 The `.mjs` checkers themselves live in `.audit/`, never under `cli/src/`.
 
