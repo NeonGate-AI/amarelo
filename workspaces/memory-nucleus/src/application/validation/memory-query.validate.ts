@@ -10,9 +10,9 @@ import {
   isNonEmptyString,
   isStringArray,
   MAX_CATEGORIES,
-  MAX_IDENTIFIER_CHARACTERS,
-  parseOptionalTimestamp
-} from '#application/services/memory-record.validator'
+  MAX_IDENTIFIER_CHARACTERS
+} from '#application/validation/memory-record-shape.validate'
+import { parseOptionalTimestamp } from '#application/validation/memory-temporal-state.validate'
 
 const MAX_QUERY_CHARACTERS = 4_000
 const MAX_SEMANTIC_KEYS = 64

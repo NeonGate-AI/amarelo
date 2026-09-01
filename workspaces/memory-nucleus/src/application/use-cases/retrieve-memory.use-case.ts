@@ -23,12 +23,12 @@ import {
   estimateRetrievedMemoryRecordTokens,
   MEMORY_RETRIEVAL_TOKEN_ESTIMATOR_VERSION
 } from '#application/use-cases/memory-projection'
-import { parseOptionalTimestamp } from '#application/services/memory-record.validator'
+import { parseOptionalTimestamp } from '#application/validation/memory-temporal-state.validate'
 import {
   assertAuthorizedMemoryQuery,
   resolveEffectiveMemoryRetrievalBudgets,
   snapshotAuthorizedMemoryQuery
-} from '#application/services/memory-query.validator'
+} from '#application/validation/memory-query.validate'
 import {
   assertRepositoryCandidateLimits,
   assertRepositorySearchResult,
@@ -70,7 +70,6 @@ function removeDuplicateMemoryRecords(
       duplicateDecisions.push(createCandidateTrace(rankedRecord, 'duplicate'))
       continue
     }
-
     seenRecordIds.add(rankedRecord.record.id)
     records.push(rankedRecord)
   }
@@ -81,11 +80,6 @@ function removeDuplicateMemoryRecords(
   })
 }
 
-/**
- * Retrieves memory only after authorization. The second pass intentionally
- * repeats all scope and lifecycle checks so a faulty repository cannot widen
- * access. The result remains structured, untrusted data and creates no prompt.
- */
 export async function retrieveAuthorizedMemory(
   query: AuthorizedMemoryQuery,
   dependencies: AuthorizedMemoryRetrievalDependencies
@@ -104,9 +98,7 @@ export async function retrieveAuthorizedMemory(
     authorizationClock
   )
   const authorizedQuery = authorization.query
-  const budgets = resolveEffectiveMemoryRetrievalBudgets(
-    authorizedQuery.budgets
-  )
+  const budgets = resolveEffectiveMemoryRetrievalBudgets(authorizedQuery.budgets)
   const repositorySearch = createAuthorizedRepositorySearch(
     authorizedQuery,
     budgets,
@@ -132,13 +124,11 @@ export async function retrieveAuthorizedMemory(
     dependencies.authorizationResolver,
     authorizationClock
   )
-
   assertRepositorySearchResult(repositoryResult, repositorySearch)
 
   const repositoryRecords = [...repositoryResult.records]
   assertRepositoryCandidateLimits(repositoryRecords, repositorySearch)
   const selectionStartedAt = monotonicClock()
-
   if (!Number.isFinite(selectionStartedAt)) {
     throw new RangeError('monotonic clock returned an invalid start value')
   }
@@ -156,9 +146,7 @@ export async function retrieveAuthorizedMemory(
     )
     .filter((record): record is RankedMemoryRecord => record !== null)
     .sort(compareRankedMemoryRecords)
-  const deduplicated = removeDuplicateMemoryRecords(
-    rankedWithPossibleDuplicates
-  )
+  const deduplicated = removeDuplicateMemoryRecords(rankedWithPossibleDuplicates)
   const ranked = deduplicated.records
 
   const items: RetrievedMemoryData[] = []
@@ -171,10 +159,8 @@ export async function retrieveAuthorizedMemory(
 
   for (const rankedRecord of ranked) {
     const { record } = rankedRecord
-
     if (
-      (record.kind === 'semantic' &&
-        semanticItems >= budgets.maxSemanticItems) ||
+      (record.kind === 'semantic' && semanticItems >= budgets.maxSemanticItems) ||
       (record.kind === 'episodic' && episodicItems >= budgets.maxEpisodicItems)
     ) {
       candidateDecisions.push(createCandidateTrace(rankedRecord, 'item-limit'))
@@ -183,7 +169,6 @@ export async function retrieveAuthorizedMemory(
 
     const remainingTokens = budgets.maxTokens - totalEstimatedTokens
     const estimatedTokens = estimateRetrievedMemoryRecordTokens(rankedRecord)
-
     if (estimatedTokens > remainingTokens) {
       candidateDecisions.push(
         createCandidateTrace(rankedRecord, 'token-budget', estimatedTokens)
@@ -287,7 +272,6 @@ export async function retrieveAuthorizedMemory(
   })
 
   const finishedAt = monotonicClock()
-
   if (!Number.isFinite(finishedAt) || finishedAt < selectionStartedAt) {
     throw new RangeError('monotonic clock returned an invalid end value')
   }
@@ -297,7 +281,6 @@ export async function retrieveAuthorizedMemory(
     dependencies.authorizationResolver,
     authorizationClock
   )
-
   await recordRetrievalTrace(
     dependencies,
     Object.freeze({
@@ -314,7 +297,6 @@ export async function retrieveAuthorizedMemory(
     }),
     observerTimeoutMilliseconds
   )
-
   await resolveMemoryAuthorization(
     authorizedQuery,
     dependencies.authorizationResolver,
