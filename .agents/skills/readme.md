@@ -1,15 +1,39 @@
-# Skills
+# Agent Skills
 
-Reusable engineering procedures live here.
+Skills are durable, on-demand operational context. They live outside the always-applied rules so agents can load specialized guidance only when a task needs it.
 
-Skills explain **how to perform recurring engineering work**. They are distinct from context, rules, specs, and ADRs:
+## Loading
 
-- context explains the system;
-- rules define durable constraints;
-- specs define required behavior;
-- ADRs record consequential decisions;
-- skills provide reusable execution procedures.
+1. Start from `AGENTS.md` and apply every rule marked `alwaysApply: true`.
+2. Inspect this directory for a skill whose scope matches the current task.
+3. Read that skill's `SKILL.md` before implementing the specialized work.
+4. Follow repository rules and product/spec decisions over generic guidance inside a restored skill when they differ.
 
-A skill must be durable, procedural, and reusable across more than one execution cycle. Temporary audit notes, handoffs, migration reports, and completion summaries do not belong here.
+## Available skills
 
-When a skill becomes obsolete, update or delete it rather than keeping historical procedure alongside the current one.
+- accessibility
+- agent-memory-systems
+- best-practices
+- context-engineering
+- core-web-vitals
+- deep-agents-core
+- deep-agents-memory
+- deep-agents-orchestration
+- documentation-and-adrs
+- frontend-ui-engineering
+- langchain-architecture
+- langchain-fundamentals
+- langchain-middleware
+- langchain-rag
+- langchain-typescript-quickstart
+- langgraph-docs
+- langgraph-human-in-the-loop
+- langgraph-persistence
+- managed-deep-agents
+- performance
+- pwa-development
+- seo
+- spec-driven-development
+- web-quality-audit
+
+Restored skills retain their original supporting `references/` and `scripts/` files where applicable. Repository-specific rules remain authoritative.
