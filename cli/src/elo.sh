@@ -48,7 +48,10 @@ case "$command" in
   check)
     subcommand="${1:-}"
     case "$subcommand" in
-      architecture) exec node "$PROJECT_ROOT/.audit/architecture.script.mjs" ;;
+      architecture)
+        node "$PROJECT_ROOT/.audit/architecture.script.mjs"
+        exec node "$PROJECT_ROOT/.audit/elo-platform.script.mjs"
+        ;;
       memory) exec node "$PROJECT_ROOT/.audit/memory-invariants.script.mjs" ;;
       *) echo "Usage: ./elo check <architecture|memory>" >&2; exit 2 ;;
     esac

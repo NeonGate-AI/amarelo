@@ -52,7 +52,7 @@ jobs:
       - name: Audit hygiene
         shell: bash
         run: |
-          tracked="$(git ls-files '.audit/**' | grep -Ev '^\.audit/(\.gitkeep|architecture\.script\.mjs|memory-invariants\.script\.mjs)$' || true)"
+          tracked="$(git ls-files '.audit/**' | grep -Ev '^\.audit/(\.gitkeep|architecture\.script\.mjs|elo-platform\.script\.mjs|memory-invariants\.script\.mjs)$' || true)"
           if [ -n "$tracked" ]; then
             echo 'Unexpected tracked .audit evidence:'
             echo "$tracked"
