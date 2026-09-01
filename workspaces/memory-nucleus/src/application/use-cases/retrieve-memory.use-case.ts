@@ -98,7 +98,9 @@ export async function retrieveAuthorizedMemory(
     authorizationClock
   )
   const authorizedQuery = authorization.query
-  const budgets = resolveEffectiveMemoryRetrievalBudgets(authorizedQuery.budgets)
+  const budgets = resolveEffectiveMemoryRetrievalBudgets(
+    authorizedQuery.budgets
+  )
   const repositorySearch = createAuthorizedRepositorySearch(
     authorizedQuery,
     budgets,
@@ -146,7 +148,9 @@ export async function retrieveAuthorizedMemory(
     )
     .filter((record): record is RankedMemoryRecord => record !== null)
     .sort(compareRankedMemoryRecords)
-  const deduplicated = removeDuplicateMemoryRecords(rankedWithPossibleDuplicates)
+  const deduplicated = removeDuplicateMemoryRecords(
+    rankedWithPossibleDuplicates
+  )
   const ranked = deduplicated.records
 
   const items: RetrievedMemoryData[] = []
@@ -160,7 +164,8 @@ export async function retrieveAuthorizedMemory(
   for (const rankedRecord of ranked) {
     const { record } = rankedRecord
     if (
-      (record.kind === 'semantic' && semanticItems >= budgets.maxSemanticItems) ||
+      (record.kind === 'semantic' &&
+        semanticItems >= budgets.maxSemanticItems) ||
       (record.kind === 'episodic' && episodicItems >= budgets.maxEpisodicItems)
     ) {
       candidateDecisions.push(createCandidateTrace(rankedRecord, 'item-limit'))

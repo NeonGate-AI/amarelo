@@ -22,7 +22,38 @@ import {
 } from '#application/validation/memory-temporal-state.validate'
 
 const LEXICAL_STOP_WORDS = new Set([
-  'a','ao','aos','as','com','como','da','das','de','do','dos','e','ela','ele','em','eu','foi','me','meu','minha','na','nas','no','nos','o','os','para','por','que','se','um','uma'
+  'a',
+  'ao',
+  'aos',
+  'as',
+  'com',
+  'como',
+  'da',
+  'das',
+  'de',
+  'do',
+  'dos',
+  'e',
+  'ela',
+  'ele',
+  'em',
+  'eu',
+  'foi',
+  'me',
+  'meu',
+  'minha',
+  'na',
+  'nas',
+  'no',
+  'nos',
+  'o',
+  'os',
+  'para',
+  'por',
+  'que',
+  'se',
+  'um',
+  'uma'
 ])
 
 export interface RankComparableMemoryRecord {
@@ -33,18 +64,28 @@ export interface RankComparableMemoryRecord {
 }
 
 export interface RankedMemoryRecord extends RankComparableMemoryRecord {
-  readonly record: RepositoryMemoryRecord & { readonly provenance: MemoryProvenance }
+  readonly record: RepositoryMemoryRecord & {
+    readonly provenance: MemoryProvenance
+  }
   readonly match: MemoryMatchType
 }
 
 function normalizeSearchText(value: string): string {
-  return value.normalize('NFKD').replace(/\p{M}/gu, '').toLocaleLowerCase('pt-BR').trim()
+  return value
+    .normalize('NFKD')
+    .replace(/\p{M}/gu, '')
+    .toLocaleLowerCase('pt-BR')
+    .trim()
 }
 
 export function lexicalMemoryTokens(value: string): ReadonlySet<string> {
   const normalized = normalizeSearchText(value)
   const matches = normalized.match(/[\p{L}\p{N}]+/gu) ?? []
-  return new Set(matches.filter((token) => token.length > 1 && !LEXICAL_STOP_WORDS.has(token)))
+  return new Set(
+    matches.filter(
+      (token) => token.length > 1 && !LEXICAL_STOP_WORDS.has(token)
+    )
+  )
 }
 
 export function lexicalMemoryOverlapScore(
@@ -52,7 +93,9 @@ export function lexicalMemoryOverlapScore(
   record: RepositoryMemoryRecord
 ): number {
   if (queryTokens.size === 0) return 0
-  const recordTokens = lexicalMemoryTokens(`${record.semanticKey ?? ''} ${record.text}`)
+  const recordTokens = lexicalMemoryTokens(
+    `${record.semanticKey ?? ''} ${record.text}`
+  )
   let overlap = 0
   for (const token of queryTokens) if (recordTokens.has(token)) overlap += 1
   return overlap
@@ -78,8 +121,10 @@ export function compareRankedMemoryRecords(
   left: RankComparableMemoryRecord,
   right: RankComparableMemoryRecord
 ): number {
-  if (left.exactSemanticKey !== right.exactSemanticKey) return left.exactSemanticKey ? -1 : 1
-  if (left.lexicalScore !== right.lexicalScore) return right.lexicalScore - left.lexicalScore
+  if (left.exactSemanticKey !== right.exactSemanticKey)
+    return left.exactSemanticKey ? -1 : 1
+  if (left.lexicalScore !== right.lexicalScore)
+    return right.lexicalScore - left.lexicalScore
   if (left.temporalSortEpoch !== right.temporalSortEpoch) {
     if (left.temporalSortEpoch === null) return 1
     if (right.temporalSortEpoch === null) return -1
@@ -92,7 +137,9 @@ export function normalizedSemanticMemoryKeySet(
   semanticKeys: readonly string[]
 ): ReadonlySet<string> {
   return new Set(
-    semanticKeys.filter(isNonEmptyString).map((semanticKey) => normalizeSearchText(semanticKey))
+    semanticKeys
+      .filter(isNonEmptyString)
+      .map((semanticKey) => normalizeSearchText(semanticKey))
   )
 }
 
@@ -119,7 +166,9 @@ export function rankEligibleMemoryRecord(
     !query.kinds.includes(record.kind) ||
     !isBoundedNonEmptyString(record.category) ||
     !query.categories.includes(record.category) ||
-    (record.semanticKey !== null && record.semanticKey !== undefined && !isBoundedNonEmptyString(record.semanticKey)) ||
+    (record.semanticKey !== null &&
+      record.semanticKey !== undefined &&
+      !isBoundedNonEmptyString(record.semanticKey)) ||
     record.lifecycle !== 'accepted' ||
     (record.supersededById !== null && record.supersededById !== undefined) ||
     !isNonEmptyString(record.text) ||
@@ -127,15 +176,24 @@ export function rankEligibleMemoryRecord(
     !hasBoundedSerializedSize(record) ||
     !hasValidMemoryProvenance(record.provenance) ||
     !hasValidMemoryTemporalSemantics(record)
-  ) return null
+  )
+    return null
 
   const observedAtEpoch = parseStoredTimestamp(record.observedAt)
   if (
     observedAtEpoch === null ||
-    !isMemoryEligibleForTimeWindow(record, fromInclusiveEpoch, toExclusiveEpoch)
-  ) return null
+    !isMemoryEligibleForTimeWindow(
+      record,
+      fromInclusiveEpoch,
+      toExclusiveEpoch
+    )
+  )
+    return null
 
-  const exactSemanticKey = hasExactSemanticKeyMatch(record, normalizedSemanticKeys)
+  const exactSemanticKey = hasExactSemanticKeyMatch(
+    record,
+    normalizedSemanticKeys
+  )
   const lexicalScore = lexicalMemoryOverlapScore(queryTokens, record)
   if (!exactSemanticKey && lexicalScore === 0) return null
 
