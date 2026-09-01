@@ -11,11 +11,13 @@ import { MemoryAuthorizationDecisionError } from '#application/contracts/memory-
 import {
   isBoundedNonEmptyString,
   isStringArray,
-  MAX_CATEGORIES,
+  MAX_CATEGORIES
+} from '#application/validation/memory-record-shape.validate'
+import {
   parseOptionalTimestamp,
   parseStoredTimestamp
-} from '#application/services/memory-record.validator'
-import { snapshotAuthorizedMemoryQuery } from '#application/services/memory-query.validator'
+} from '#application/validation/memory-temporal-state.validate'
+import { snapshotAuthorizedMemoryQuery } from '#application/validation/memory-query.validate'
 
 function hasUniqueValues(values: readonly string[]): boolean {
   return new Set(values).size === values.length
