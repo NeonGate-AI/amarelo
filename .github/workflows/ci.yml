@@ -41,18 +41,24 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Elo doctor
-        run: ./elo doctor --ci
+        run: ./cli/elo doctor --ci
+
+      - name: Elo platform audit
+        run: ./cli/elo check platform
 
       - name: Architecture audit
-        run: ./elo check architecture
+        run: ./cli/elo check architecture
+
+      - name: Import boundaries audit
+        run: ./cli/elo check imports
 
       - name: Memory invariants audit
-        run: ./elo check memory
+        run: ./cli/elo check memory
 
       - name: Audit hygiene
         shell: bash
         run: |
-          tracked="$(git ls-files '.audit/**' | grep -Ev '^\.audit/(\.gitkeep|architecture\.script\.mjs|elo-platform\.script\.mjs|memory-invariants\.script\.mjs)$' || true)"
+          tracked="$(git ls-files '.audit/**' | grep -Ev '^\.audit/(\.gitkeep|architecture\.script\.mjs|elo-platform\.script\.mjs|import-boundaries\.script\.mjs|memory-invariants\.script\.mjs)$' || true)"
           if [ -n "$tracked" ]; then
             echo 'Unexpected tracked .audit evidence:'
             echo "$tracked"

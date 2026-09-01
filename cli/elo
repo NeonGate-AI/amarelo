@@ -1,0 +1,4 @@
+#!/usr/bin/env sh
+set -eu
+CLI_ROOT="$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)"
+exec "$CLI_ROOT/src/elo.sh" "$@"

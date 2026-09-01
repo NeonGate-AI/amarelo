@@ -4,14 +4,15 @@ cat <<'EOF'
 Elo — Amarelo monorepo platform CLI
 
 Usage:
-  ./elo bootstrap
-  ./elo doctor [--ci]
-  ./elo cleanup [--apply] [--dependencies]
-  ./elo changelog <product> [--path <file>] [--editor <command>]
-  ./elo env <setup|validate>
-  ./elo git <setup|doctor|pre-commit|commit-msg>
-  ./elo check <architecture|memory>
-  ./elo help
+  pnpm elo                         Bootstrap/install the local Elo environment
+  ./cli/elo bootstrap
+  ./cli/elo doctor [--ci]
+  ./cli/elo cleanup [--apply] [--dependencies]
+  ./cli/elo changelog <product> [--path <file>] [--editor <command>]
+  ./cli/elo env <setup|validate>
+  ./cli/elo git <setup|doctor|pre-commit|commit-msg>
+  ./cli/elo check <architecture|imports|memory|platform>
+  ./cli/elo help
 
 Ownership:
   Elo        bootstrap, doctor, cleanup, env, Git platform and audit-check entrypoints

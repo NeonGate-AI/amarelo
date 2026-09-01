@@ -1,6 +1,7 @@
 {
   "compilerOptions": {
     "allowJs": false,
+    "baseUrl": ".",
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "jsx": "preserve",
@@ -8,6 +9,15 @@
     "module": "ESNext",
     "moduleResolution": "Bundler",
     "noEmit": true,
+    "paths": {
+      "@components/*": ["src/ui/*"],
+      "@hooks/*": ["src/hooks/*"],
+      "@shadcn/*": ["src/vendors/shadcn/*"],
+      "@smoothui": ["src/vendors/smoothui/index.ts"],
+      "@smoothui/*": ["src/vendors/smoothui/*"],
+      "@utilities": ["src/utilities/index.ts"],
+      "@utilities/*": ["src/utilities/*"]
+    },
     "resolveJsonModule": true,
     "skipLibCheck": true,
     "strict": true,

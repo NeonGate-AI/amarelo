@@ -21,7 +21,14 @@ async function runEloPlatformAudit({ projectRoot = process.cwd() } = {}) {
   const fail = (file, detail) => failures.push({ file, detail })
   const rel = (path) => relative(projectRoot, path).split(sep).join('/')
   const cliRoot = join(projectRoot, 'cli', 'src')
+  const launcher = join(projectRoot, 'cli', 'elo')
 
+  if (await exists(join(projectRoot, 'elo'))) {
+    fail('elo', 'the Elo binary must live at cli/elo, not the repository root')
+  }
+  if (!(await exists(launcher))) {
+    fail('cli/elo', 'the repository-local Elo binary is missing')
+  }
   if (!(await exists(cliRoot))) {
     fail('cli/src', 'Elo source root is missing')
   } else {
@@ -60,6 +67,7 @@ async function runEloPlatformAudit({ projectRoot = process.cwd() } = {}) {
   const scripts = manifest.scripts ?? {}
   const allowedRootScripts = new Set([
     'prepare',
+    'elo',
     'dev',
     'start',
     'build',
@@ -70,16 +78,19 @@ async function runEloPlatformAudit({ projectRoot = process.cwd() } = {}) {
     if (!allowedRootScripts.has(name)) {
       fail(
         'package.json',
-        `root script ${name} is neither the repository prepare hook nor a canonical Turbo task`
+        `root script ${name} is not a canonical Elo/Turbo entrypoint`
       )
     }
   }
 
-  if (scripts.prepare !== './elo git setup --prepare') {
+  if (scripts.prepare !== './cli/elo git setup --prepare') {
     fail(
       'package.json',
-      'prepare must delegate repository-local Git platform setup to Elo'
+      'prepare must delegate repository-local Git platform setup to cli/elo'
     )
+  }
+  if (scripts.elo !== './cli/elo') {
+    fail('package.json', 'pnpm elo must execute the local cli/elo binary')
   }
   for (const name of ['dev', 'start', 'build', 'typecheck', 'test']) {
     if (typeof scripts[name] !== 'string' || !scripts[name].includes('turbo')) {
@@ -91,12 +102,12 @@ async function runEloPlatformAudit({ projectRoot = process.cwd() } = {}) {
   }
 
   for (const [path, marker] of [
-    ['.husky/pre-commit', 'elo git pre-commit'],
-    ['.husky/commit-msg', 'elo git commit-msg']
+    ['.husky/pre-commit', 'cli/elo git pre-commit'],
+    ['.husky/commit-msg', 'cli/elo git commit-msg']
   ]) {
     const text = await readFile(join(projectRoot, path), 'utf8').catch(() => '')
     if (!text.includes(marker)) {
-      fail(path, 'Husky adapter must remain a thin delegation to Elo')
+      fail(path, 'Husky adapter must remain a thin delegation to cli/elo')
     }
   }
 
@@ -109,6 +120,7 @@ async function runEloPlatformAudit({ projectRoot = process.cwd() } = {}) {
   }
 
   console.log('Elo platform audit PASS')
+  console.log('cli/elo binary placement: PASS')
   console.log('shell-only CLI: PASS')
   console.log('Turbo command boundary: PASS')
   console.log('minimal root scripts: PASS')
