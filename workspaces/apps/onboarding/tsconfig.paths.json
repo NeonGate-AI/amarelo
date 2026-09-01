@@ -2,8 +2,10 @@
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
+      "@action": ["./src/app/api/action/index.ts"],
       "@action/*": ["./src/app/api/action/*"],
       "@component/*": ["./src/app/lib/ui/*"],
+      "@data": ["./src/app/lib/data/index.ts"],
       "@data/*": ["./src/app/lib/data/*"],
       "@lib/*": ["./src/app/api/*"]
     }
