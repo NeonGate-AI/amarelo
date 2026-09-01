@@ -182,11 +182,7 @@ export function rankEligibleMemoryRecord(
   const observedAtEpoch = parseStoredTimestamp(record.observedAt)
   if (
     observedAtEpoch === null ||
-    !isMemoryEligibleForTimeWindow(
-      record,
-      fromInclusiveEpoch,
-      toExclusiveEpoch
-    )
+    !isMemoryEligibleForTimeWindow(record, fromInclusiveEpoch, toExclusiveEpoch)
   )
     return null
 
