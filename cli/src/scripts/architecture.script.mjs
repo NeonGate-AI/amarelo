@@ -11,6 +11,7 @@ const SOURCE_EXTENSIONS = new Set([
 ])
 const CONFIG_SOURCE_NAMES = new Set([
   'next.config.ts',
+  'next-env.d.ts',
   'vite.config.ts',
   'postcss.config.mjs',
   'tailwind.config.ts',
@@ -41,6 +42,35 @@ async function walk(dir, out = []) {
     else out.push(path)
   }
   return out
+}
+
+function exportTargets(value, out = []) {
+  if (typeof value === 'string') out.push(value)
+  else if (value && typeof value === 'object')
+    for (const nested of Object.values(value)) exportTargets(nested, out)
+  return out
+}
+
+function isFrameworkLeafExempt(workspaceRoot, directory, moduleFiles) {
+  if (!workspaceRoot.startsWith('workspaces/apps/')) return false
+  const local = relative(workspaceRoot, directory).split(sep).join('/')
+  if (
+    moduleFiles.every((entry) =>
+      [
+        'layout.tsx',
+        'page.tsx',
+        'route.ts',
+        'loading.tsx',
+        'error.tsx',
+        'not-found.tsx',
+        'template.tsx',
+        'default.tsx'
+      ].includes(entry.name)
+    )
+  )
+    return true
+
+  return !/(?:^|\/)(?:lib|section|state|ui|views)(?:\/|$)/u.test(local)
 }
 
 export async function runArchitectureCheck({
@@ -107,7 +137,40 @@ export async function runArchitectureCheck({
         'code-bearing workspace has no src/',
         'move first-party implementation under src/'
       )
+
+    for (const target of exportTargets(ws.manifest.exports)) {
+      if (!target.startsWith('./')) continue
+      const normalized = target.slice(2)
+      const prefix = normalized.includes('*')
+        ? normalized.slice(0, normalized.indexOf('*'))
+        : normalized
+      const resolves = await exists(join(projectRoot, ws.root, prefix))
+      const generatedByBuild =
+        normalized.startsWith('dist/') && Boolean(ws.manifest.scripts?.build)
+      if (!resolves && !generatedByBuild)
+        fail(
+          'package-export',
+          `${ws.root}/package.json`,
+          `${target} does not resolve to source or a declared build artifact`,
+          'repair the export target or package build contract'
+        )
+    }
   }
+
+  if (!(await exists(join(projectRoot, 'cli/src'))))
+    fail(
+      'source-root',
+      'cli',
+      'the Elo development subsystem has no cli/src/',
+      'restore the embedded CLI source root'
+    )
+  if (await exists(join(projectRoot, 'cli/package.json')))
+    fail(
+      'cli-ownership',
+      'cli/package.json',
+      'Elo must not be a nested package/workspace',
+      'keep CLI dependencies in the repository root'
+    )
 
   for (const forbidden of [
     'elos',
@@ -187,6 +250,16 @@ export async function runArchitectureCheck({
         'rule has invalid/missing frontmatter',
         'add valid YAML frontmatter'
       )
+    const frontmatter = text.startsWith('---\n')
+      ? text.slice(4, text.indexOf('\n---\n', 4))
+      : ''
+    if (!/^(?:name|title):\s*\S/mu.test(frontmatter))
+      fail(
+        'rule-frontmatter',
+        `.agents/rules/${name}`,
+        'rule frontmatter has no name/title',
+        'add a stable human-readable rule identity'
+      )
     if (
       /alwaysApply:\s*true/u.test(text) &&
       !agentEntry.includes('alwaysApply: true')
@@ -208,8 +281,41 @@ export async function runArchitectureCheck({
         'legacy .value-object.ts suffix remains',
         'rename to .vo.ts'
       )
+    if (r.endsWith('.vo.ts')) {
+      const valueObject = await readFile(path, 'utf8').catch(() => '')
+      if (!/export\s+(?:abstract\s+)?class\s+\w+/u.test(valueObject))
+        fail(
+          'vo-semantics',
+          r,
+          '.vo.ts must define an encapsulated Value Object class',
+          'use a semantic suffix such as .compute/.domain or implement a real Value Object'
+        )
+    }
     if (!SOURCE_EXTENSIONS.has(extname(path))) continue
     const text = await readFile(path, 'utf8').catch(() => '')
+    if (
+      r.startsWith('workspaces/memory-nucleus/src/domain/') &&
+      /from\s+['"]node:crypto['"]/u.test(text)
+    )
+      fail(
+        'domain-technology-dependency',
+        r,
+        'Domain imports node:crypto',
+        'move generic hashing to Infrastructure and keep only domain meaning here'
+      )
+    if (r !== 'cli/src/scripts/architecture.script.mjs')
+      for (const stale of [
+        '#domain/' + 'judgment/',
+        '#domain/services/' + 'memory-text.normalizer',
+        '.value' + '-object'
+      ])
+        if (text.includes(stale))
+          fail(
+            'obsolete-import',
+            r,
+            stale,
+            'use the normalized source path and canonical suffix'
+          )
     for (const match of text.matchAll(
       /(?:from\s*|import\s*\(\s*|require\s*\(\s*)['"]([^'"]+)['"]/g
     )) {
@@ -296,10 +402,7 @@ export async function runArchitectureCheck({
     }
   }
 
-  // Leaf barrels are enforced on non-app module workspaces. App/React folder conventions are handled in Handoff 3.
-  for (const ws of workspaces.filter(
-    (item) => !item.root.startsWith('workspaces/apps/')
-  )) {
+  for (const ws of workspaces) {
     const sourceRoot = join(projectRoot, ws.root, 'src')
     if (!(await exists(sourceRoot))) continue
     const dirs = []
@@ -313,7 +416,8 @@ export async function runArchitectureCheck({
         (entry) =>
           entry.isFile() &&
           SOURCE_EXTENSIONS.has(extname(entry.name)) &&
-          entry.name !== 'index.ts'
+          entry.name !== 'index.ts' &&
+          !entry.name.endsWith('.d.ts')
       )
       const childHasSource = await Promise.all(
         childDirs.map(async (child) =>
@@ -322,7 +426,11 @@ export async function runArchitectureCheck({
           )
         )
       )
-      if (moduleFiles.length && !childHasSource.some(Boolean))
+      if (
+        moduleFiles.length &&
+        !childHasSource.some(Boolean) &&
+        !isFrameworkLeafExempt(ws.root, dir, moduleFiles)
+      )
         dirs.push({ dir, moduleFiles })
     }
     await collect(sourceRoot)
@@ -335,7 +443,60 @@ export async function runArchitectureCheck({
           'code-bearing leaf has no index.ts',
           'add a barrel exporting every project-created module in the leaf'
         )
+      else {
+        const barrel = await readFile(indexPath, 'utf8')
+        for (const moduleFile of leaf.moduleFiles) {
+          const stem = moduleFile.name.replace(/\.[^.]+$/u, '')
+          if (!barrel.includes(`./${stem}`))
+            fail(
+              'leaf-barrel-export',
+              rel(indexPath),
+              `${moduleFile.name} is not exported`,
+              'export every project-created leaf module from index.ts'
+            )
+        }
+      }
     }
+  }
+
+  const rootManifest = JSON.parse(
+    await readFile(join(projectRoot, 'package.json'), 'utf8')
+  )
+  if (
+    rootManifest.dependencies?.['@neongate-ai/neon'] ||
+    rootManifest.devDependencies?.['@neongate-ai/neon']
+  )
+    fail(
+      'elo-ownership',
+      'package.json',
+      'external generic Neon CLI dependency remains after Elo cutover',
+      'remove @neongate-ai/neon and regenerate the lockfile'
+    )
+
+  const cliFiles = files.filter((path) => {
+    const r = rel(path)
+    return r === 'elo' || r.startsWith('cli/src/')
+  })
+  const hostMutationPattern =
+    /(?:process\.env\.HOME|homedir\s*\(|\/usr\/local|\.local\/bin|\.(?:bashrc|zshrc)|git\s+config\s+--global|(?:npm|pnpm)\s+[^\n]*(?:--global|-g\b))/u
+  const forbiddenEloCommandPattern =
+    /command\s*===\s*['"](?:build|dev|eval|format|lint|start|test|typecheck|verify)['"]/u
+  for (const path of cliFiles) {
+    const text = await readFile(path, 'utf8').catch(() => '')
+    if (hostMutationPattern.test(text))
+      fail(
+        'elo-host-mutation',
+        rel(path),
+        'Elo contains host/global mutation behavior',
+        'keep bootstrap, env and Git setup project-local'
+      )
+    if (forbiddenEloCommandPattern.test(text))
+      fail(
+        'elo-command-boundary',
+        rel(path),
+        'Elo exposes a task-runner command owned by root/Turborepo',
+        'remove the command from Elo and use the root package script'
+      )
   }
 
   const nucleus = workspaces.find(

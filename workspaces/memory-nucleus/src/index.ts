@@ -5,7 +5,7 @@ export * from '#domain/entities/memory-evidence.entity'
 export * from '#domain/entities/memory-consent.entity'
 export * from '#domain/value-objects/memory-judgment.vo'
 export * from '#domain/policies/memory-acceptance.policy'
-export * from '#domain/value-objects/memory-economics.vo'
+export * from '#domain/services/memory-economics.compute'
 export * from '#domain/schemas/memory-identifiers.schema'
 
 // Application contracts and ports

@@ -15,7 +15,8 @@ import {
   MemoryCurationRequestSchema,
   type MemoryCurationResult,
   MemoryCurationResultSchema,
-  type MemoryCurationUsage
+  type MemoryCurationUsage,
+  type PreparedMemorySource
 } from '#application/contracts/memory-curation.contract'
 import { createCurationIdempotencyKey } from '#application/use-cases/memory-curation.fingerprint'
 import {
@@ -27,12 +28,20 @@ import {
 import { createMemoryCurationUsage } from '#application/use-cases/memory-curation.usage'
 import {
   MemoryExtractionDeadlineError,
+  MemoryExtractionSchema,
   type MemoryExtractor,
   type MemoryModelUsage,
   MemoryModelUsageSchema
 } from '#application/ports/memory-extractor.port'
-import { type MemoryPersistenceClient } from '#application/ports/memory-curation-persistence.port'
+import {
+  type MemoryPersistenceClient,
+  SaveCurationRunRequestSchema,
+  SaveCurationRunResultSchema,
+  SourceClaimRequestSchema,
+  SourceClaimResultSchema
+} from '#application/ports/memory-curation-persistence.port'
 import { MEMORY_EXTRACTION_INPUT_ESTIMATOR_VERSION } from '#application/contracts/memory-extraction.contract'
+import type { MemoryTextNormalizerPort } from '#application/ports/memory-text-normalizer.port'
 
 const ExtractorIdentitySchema = z
   .object({
@@ -49,6 +58,7 @@ export interface MemoryCurationDependencies {
   readonly authorizationResolver: MemoryCurationAuthorizationDecisionResolver
   readonly extractor: MemoryExtractor
   readonly persistence: MemoryPersistenceClient
+  readonly textNormalizer: MemoryTextNormalizerPort
   readonly policy?: MemoryCurationPolicy
   readonly now?: () => Date
 }
@@ -86,6 +96,27 @@ function hasExecutionWindow(
   return Date.parse(expiresAt) > now.getTime() + durationMs
 }
 
+function authorizationFailureResult(
+  error: unknown,
+  usage: MemoryCurationUsage
+): MemoryCurationResult {
+  if (!(error instanceof MemoryCurationAuthorizationError)) throw error
+  if (error.reason === 'invalid-clock' || error.reason === 'invalid-decision')
+    throw error
+
+  return MemoryCurationResultSchema.parse({
+    candidateIds: [],
+    reason:
+      error.reason === 'expired-decision'
+        ? 'authorization-expired'
+        : 'authorization-not-permitted',
+    retryAt: null,
+    runId: null,
+    status: 'skipped',
+    usage
+  })
+}
+
 export class CurateMemoryUseCase {
   readonly #policy: MemoryCurationPolicy
   readonly #now: () => Date
@@ -114,7 +145,7 @@ export class CurateMemoryUseCase {
     rawRequest: MemoryCurationRequest
   ): Promise<MemoryCurationResult> {
     const request = MemoryCurationRequestSchema.parse(rawRequest)
-    const preparation = prepareMemoryCuration(request, this.#policy)
+    let source: PreparedMemorySource | null = null
 
     const usage = (
       candidateCount: number,
@@ -123,24 +154,29 @@ export class CurateMemoryUseCase {
     ): MemoryCurationUsage =>
       createMemoryCurationUsage({
         candidateCount,
-        estimatedInputTokens: preparation.source?.estimatedInputTokens ?? 0,
+        estimatedInputTokens: source?.estimatedInputTokens ?? 0,
         fallbackModelId: this.#identity.modelId,
         fallbackProviderId: this.#identity.providerId,
         inputEstimatorVersion:
-          preparation.source?.inputEstimatorVersion ??
+          source?.inputEstimatorVersion ??
           MEMORY_EXTRACTION_INPUT_ESTIMATOR_VERSION,
         modelCalls,
         modelUsage
       })
 
-    if (!preparation.decision.eligible || preparation.source === null) {
-      const reason = preparation.decision.reason ?? 'no-person-source'
+    if (request.formationSignal === 'none') {
+      const preparation = prepareMemoryCuration(
+        request,
+        this.#policy,
+        this.dependencies.textNormalizer
+      )
+      source = preparation.source
       return MemoryCurationResultSchema.parse({
         candidateIds: [],
-        reason,
+        reason: preparation.decision.reason,
         retryAt: null,
         runId: null,
-        status: reason === 'input-over-budget' ? 'deferred' : 'skipped',
+        status: 'skipped',
         usage: usage(0)
       })
     }
@@ -155,21 +191,42 @@ export class CurateMemoryUseCase {
         this.#now
       )
     } catch (error) {
-      if (!(error instanceof MemoryCurationAuthorizationError)) throw error
-      if (
-        error.reason === 'invalid-clock' ||
-        error.reason === 'invalid-decision'
-      )
-        throw error
+      return authorizationFailureResult(error, usage(0))
+    }
+
+    const preparation = prepareMemoryCuration(
+      request,
+      this.#policy,
+      this.dependencies.textNormalizer
+    )
+    source = preparation.source
+
+    if (!preparation.decision.eligible || preparation.source === null) {
+      const reason = preparation.decision.reason ?? 'no-person-source'
       return MemoryCurationResultSchema.parse({
         candidateIds: [],
-        reason:
-          error.reason === 'expired-decision'
-            ? 'authorization-expired'
-            : 'authorization-not-permitted',
+        reason,
         retryAt: null,
         runId: null,
-        status: 'skipped',
+        status: reason === 'input-over-budget' ? 'deferred' : 'skipped',
+        usage: usage(0)
+      })
+    }
+
+    const beforeClaim = this.#now()
+    if (
+      !hasExecutionWindow(
+        authorization.decision.expiresAt,
+        beforeClaim,
+        this.#identity.deadlineMilliseconds
+      )
+    ) {
+      return MemoryCurationResultSchema.parse({
+        candidateIds: [],
+        reason: 'authorization-window-too-short',
+        retryAt: null,
+        runId: null,
+        status: 'deferred',
         usage: usage(0)
       })
     }
@@ -186,7 +243,7 @@ export class CurateMemoryUseCase {
       tenantId: request.tenantId
     })
 
-    const claim = await this.dependencies.persistence.claimSource({
+    const claimRequest = SourceClaimRequestSchema.parse({
       actorId: authorization.decision.actorId,
       authorizationDecisionId: authorization.decision.id,
       conversationId: request.conversationId,
@@ -203,6 +260,9 @@ export class CurateMemoryUseCase {
       subjectId: authorization.decision.subjectId,
       tenantId: authorization.decision.tenantId
     })
+    const claim = SourceClaimResultSchema.parse(
+      await this.dependencies.persistence.claimSource(claimRequest)
+    )
 
     if (claim.status === 'duplicate') {
       return MemoryCurationResultSchema.parse({
@@ -216,27 +276,50 @@ export class CurateMemoryUseCase {
     }
 
     if (claim.status === 'in-progress') {
+      const expired = Date.parse(claim.claimExpiresAt) <= beforeClaim.getTime()
       return MemoryCurationResultSchema.parse({
         candidateIds: [],
-        reason: 'source-in-progress',
-        retryAt: claim.claimExpiresAt,
+        reason: expired ? 'source-claim-expired' : 'source-in-progress',
+        retryAt: expired ? null : claim.claimExpiresAt,
         runId: null,
         status: 'deferred',
         usage: usage(0)
       })
     }
 
-    const now = this.#now()
+    if (Date.parse(claim.claimExpiresAt) <= beforeClaim.getTime()) {
+      return MemoryCurationResultSchema.parse({
+        candidateIds: [],
+        reason: 'source-claim-expired',
+        retryAt: null,
+        runId: null,
+        status: 'deferred',
+        usage: usage(0)
+      })
+    }
+
+    let extractionAuthorization: typeof authorization
+    try {
+      extractionAuthorization = await resolveMemoryCurationAuthorization(
+        request,
+        this.dependencies.authorizationResolver,
+        this.#now
+      )
+    } catch (error) {
+      return authorizationFailureResult(error, usage(0))
+    }
+
+    const beforeExtraction = this.#now()
     if (
       !hasExecutionWindow(
-        authorization.decision.expiresAt,
-        now,
+        claim.claimExpiresAt,
+        beforeExtraction,
         this.#identity.deadlineMilliseconds
       )
     ) {
       return MemoryCurationResultSchema.parse({
         candidateIds: [],
-        reason: 'authorization-window-too-short',
+        reason: 'source-claim-window-too-short',
         retryAt: null,
         runId: null,
         status: 'deferred',
@@ -246,14 +329,14 @@ export class CurateMemoryUseCase {
 
     if (
       !hasExecutionWindow(
-        claim.claimExpiresAt,
-        now,
+        extractionAuthorization.decision.expiresAt,
+        beforeExtraction,
         this.#identity.deadlineMilliseconds
       )
     ) {
       return MemoryCurationResultSchema.parse({
         candidateIds: [],
-        reason: 'source-claim-window-too-short',
+        reason: 'authorization-window-too-short',
         retryAt: null,
         runId: null,
         status: 'deferred',
@@ -270,14 +353,13 @@ export class CurateMemoryUseCase {
         this.dependencies.extractor,
         {
           maxCandidates: this.#policy.maxCandidates,
-          purpose: authorization.decision.purpose,
+          purpose: extractionAuthorization.decision.purpose,
           turns: preparation.source.turns
         }
       )
       const parsedUsage: MemoryModelUsage = MemoryModelUsageSchema.parse(
         extracted.usage
       )
-      modelUsage = parsedUsage
       if (
         parsedUsage.modelId !== this.#identity.modelId ||
         parsedUsage.providerId !== this.#identity.providerId
@@ -286,7 +368,8 @@ export class CurateMemoryUseCase {
           'Memory extraction usage identity does not match configured extractor'
         )
       }
-      extraction = extracted.extraction
+      modelUsage = parsedUsage
+      extraction = MemoryExtractionSchema.parse(extracted.extraction)
     } catch (error) {
       return MemoryCurationResultSchema.parse({
         candidateIds: [],
@@ -301,23 +384,56 @@ export class CurateMemoryUseCase {
       })
     }
 
-    const candidates = createMemoryCandidates({
-      authorization: authorization.decision,
-      createdAt: new Date(authorization.resolvedAt),
-      extraction,
-      maxCandidates: this.#policy.maxCandidates,
-      request,
-      source: preparation.source
-    }).map((candidate) => MemoryCandidateSchema.parse(candidate))
+    const afterExtraction = this.#now()
+    if (Date.parse(claim.claimExpiresAt) <= afterExtraction.getTime()) {
+      return MemoryCurationResultSchema.parse({
+        candidateIds: [],
+        reason: 'source-claim-expired',
+        retryAt: null,
+        runId: null,
+        status: 'deferred',
+        usage: usage(0, 1, modelUsage)
+      })
+    }
 
-    // Re-resolve authority immediately before durable persistence.
-    const currentAuthorization = await resolveMemoryCurationAuthorization(
-      request,
-      this.dependencies.authorizationResolver,
-      this.#now
-    )
+    let currentAuthorization: typeof authorization
+    try {
+      currentAuthorization = await resolveMemoryCurationAuthorization(
+        request,
+        this.dependencies.authorizationResolver,
+        this.#now
+      )
+    } catch (error) {
+      return authorizationFailureResult(error, usage(0, 1, modelUsage))
+    }
 
-    const persisted = await this.dependencies.persistence.saveCurationRun({
+    if (
+      Date.parse(claim.claimExpiresAt) <=
+      Date.parse(currentAuthorization.resolvedAt)
+    ) {
+      return MemoryCurationResultSchema.parse({
+        candidateIds: [],
+        reason: 'source-claim-expired',
+        retryAt: null,
+        runId: null,
+        status: 'deferred',
+        usage: usage(0, 1, modelUsage)
+      })
+    }
+
+    const candidates = createMemoryCandidates(
+      {
+        authorization: currentAuthorization.decision,
+        createdAt: new Date(currentAuthorization.resolvedAt),
+        extraction,
+        maxCandidates: this.#policy.maxCandidates,
+        request,
+        source: preparation.source
+      },
+      this.dependencies.textNormalizer
+    ).map((candidate) => MemoryCandidateSchema.parse(candidate))
+
+    const saveRequest = SaveCurationRunRequestSchema.parse({
       actorId: currentAuthorization.decision.actorId,
       authorizationDecisionId: currentAuthorization.decision.id,
       candidates,
@@ -337,6 +453,9 @@ export class CurateMemoryUseCase {
       tenantId: currentAuthorization.decision.tenantId,
       usage: usage(candidates.length, 1, modelUsage)
     })
+    const persisted = SaveCurationRunResultSchema.parse(
+      await this.dependencies.persistence.saveCurationRun(saveRequest)
+    )
 
     if (persisted.status === 'claim-lost') {
       return MemoryCurationResultSchema.parse({
@@ -347,6 +466,12 @@ export class CurateMemoryUseCase {
         status: 'deferred',
         usage: usage(candidates.length, 1, modelUsage)
       })
+    }
+
+    if (persisted.candidateIds.length !== candidates.length) {
+      throw new Error(
+        'Persistence did not account for every candidate exactly once'
+      )
     }
 
     return MemoryCurationResultSchema.parse({

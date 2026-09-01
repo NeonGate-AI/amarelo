@@ -87,6 +87,9 @@ jobs:
       - name: Test
         run: pnpm test
 
+      - name: Validate Memory PostgreSQL
+        run: pnpm test:database
+
       - name: Evaluate AI
         run: pnpm eval:ai
 

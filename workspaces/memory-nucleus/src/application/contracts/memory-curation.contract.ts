@@ -6,7 +6,10 @@ import {
   type PurposeCode
 } from '#domain/schemas/memory-identifiers.schema'
 
-export { PurposeCodeSchema, type PurposeCode } from '#domain/schemas/memory-identifiers.schema'
+export {
+  PurposeCodeSchema,
+  type PurposeCode
+} from '#domain/schemas/memory-identifiers.schema'
 
 export const MemoryFormationSignalSchema = z.enum([
   'eligible-source-delta',

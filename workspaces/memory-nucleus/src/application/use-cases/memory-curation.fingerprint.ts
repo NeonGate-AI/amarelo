@@ -5,14 +5,15 @@ import type {
   MemoryCurationRequest,
   PreparedConversationTurn
 } from '#application/contracts/memory-curation.contract'
-import { normalizeMemoryText } from '#domain/services/memory-text.normalizer'
+import type { MemoryTextNormalizerPort } from '#application/ports/memory-text-normalizer.port'
 
 const sha256 = (value: string): string =>
   createHash('sha256').update(value, 'utf8').digest('hex')
 
 export const createSourceFingerprint = (
   request: MemoryCurationRequest,
-  turns: PreparedConversationTurn[]
+  turns: PreparedConversationTurn[],
+  textNormalizer: MemoryTextNormalizerPort
 ): string =>
   sha256(
     JSON.stringify({
@@ -23,7 +24,7 @@ export const createSourceFingerprint = (
       turns: turns.map((turn) => ({
         id: turn.id,
         observedAt: turn.observedAt,
-        text: normalizeMemoryText(turn.text)
+        text: textNormalizer.normalize(turn.text)
       }))
     })
   )
@@ -31,7 +32,8 @@ export const createSourceFingerprint = (
 export const createCandidateFingerprint = (
   tenantId: string,
   sourceFingerprint: string,
-  candidate: ExtractedMemoryCandidate
+  candidate: ExtractedMemoryCandidate,
+  textNormalizer: MemoryTextNormalizerPort
 ): string =>
   sha256(
     JSON.stringify({
@@ -39,9 +41,9 @@ export const createCandidateFingerprint = (
       sourceFingerprint,
       tenantId,
       sourceTurnIds: [...new Set(candidate.sourceTurnIds)].sort(),
-      statement: normalizeMemoryText(candidate.statement).toLocaleLowerCase(
-        'pt-BR'
-      )
+      statement: textNormalizer
+        .normalize(candidate.statement)
+        .toLocaleLowerCase('pt-BR')
     })
   )
 

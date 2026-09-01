@@ -1,1 +1,1 @@
-export * from './memory-text.fmt'
+export * from './unicode-text.fmt'

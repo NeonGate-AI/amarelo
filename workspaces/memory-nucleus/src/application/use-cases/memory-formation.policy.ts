@@ -12,7 +12,7 @@ import {
   type PreparedMemorySource,
   PreparedMemorySourceSchema
 } from '#application/contracts/memory-curation.contract'
-import { normalizeMemoryText } from '#domain/services/memory-text.normalizer'
+import type { MemoryTextNormalizerPort } from '#application/ports/memory-text-normalizer.port'
 
 export interface MemoryCurationPolicy {
   allowExpensiveFallback: false
@@ -70,7 +70,8 @@ const denied = (
 
 export const prepareMemoryCuration = (
   rawRequest: MemoryCurationRequest,
-  rawPolicy: MemoryCurationPolicy
+  rawPolicy: MemoryCurationPolicy,
+  textNormalizer: MemoryTextNormalizerPort
 ): MemoryCurationPreparation => {
   const request = MemoryCurationRequestSchema.parse(rawRequest)
   const policy = MemoryCurationPolicySchema.parse(rawPolicy)
@@ -84,7 +85,7 @@ export const prepareMemoryCuration = (
     .map((turn) => ({
       id: turn.id,
       observedAt: new Date(turn.observedAt).toISOString(),
-      text: normalizeMemoryText(turn.text)
+      text: textNormalizer.normalize(turn.text)
     }))
     .filter((turn) => turn.text.length > 0)
 
@@ -105,7 +106,11 @@ export const prepareMemoryCuration = (
     characterCount,
     estimatedInputTokens,
     inputEstimatorVersion: MEMORY_EXTRACTION_INPUT_ESTIMATOR_VERSION,
-    sourceFingerprint: createSourceFingerprint(request, personTurns),
+    sourceFingerprint: createSourceFingerprint(
+      request,
+      personTurns,
+      textNormalizer
+    ),
     truncated: false,
     turns: personTurns
   })

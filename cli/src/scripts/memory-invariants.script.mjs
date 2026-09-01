@@ -23,7 +23,7 @@ export async function runMemoryInvariantCheck({
     'infrastructure/database/schema.sql',
     'assurance/evals',
     'domain/value-objects/memory-judgment.vo.ts',
-    'domain/value-objects/memory-economics.vo.ts'
+    'domain/services/memory-economics.compute.ts'
   ])
     await need(path)
 

@@ -9,7 +9,7 @@ import type {
   PreparedMemorySource
 } from '#application/contracts/memory-curation.contract'
 import type { MemoryExtraction } from '#application/ports/memory-extractor.port'
-import { normalizeMemoryText } from '#domain/services/memory-text.normalizer'
+import type { MemoryTextNormalizerPort } from '#application/ports/memory-text-normalizer.port'
 
 export interface CreateMemoryCandidatesInput {
   authorization: MemoryCurationAuthorizationDecision
@@ -21,7 +21,8 @@ export interface CreateMemoryCandidatesInput {
 }
 
 export const createMemoryCandidates = (
-  input: CreateMemoryCandidatesInput
+  input: CreateMemoryCandidatesInput,
+  textNormalizer: MemoryTextNormalizerPort
 ): MemoryCandidate[] => {
   const sourceTurnIds = new Set(input.source.turns.map((turn) => turn.id))
   const fingerprints = new Set<string>()
@@ -44,11 +45,11 @@ export const createMemoryCandidates = (
       ...extracted,
       occurredAt: extracted.kind === 'episodic' ? extracted.occurredAt : null,
       sourceTurnIds: referencedTurnIds,
-      statement: normalizeMemoryText(extracted.statement),
+      statement: textNormalizer.normalize(extracted.statement),
       tags: [
         ...new Set(
           extracted.tags.map((tag) =>
-            normalizeMemoryText(tag).toLocaleLowerCase('pt-BR')
+            textNormalizer.normalize(tag).toLocaleLowerCase('pt-BR')
           )
         )
       ],
@@ -56,17 +57,18 @@ export const createMemoryCandidates = (
         extracted.kind === 'episodic' ? extracted.temporalPrecision : null,
       temporalReference:
         extracted.kind === 'episodic' && extracted.temporalReference
-          ? normalizeMemoryText(extracted.temporalReference)
+          ? textNormalizer.normalize(extracted.temporalReference)
           : null,
       uncertainty: extracted.uncertainty
-        ? normalizeMemoryText(extracted.uncertainty)
+        ? textNormalizer.normalize(extracted.uncertainty)
         : null,
       validFrom: extracted.kind === 'semantic' ? extracted.validFrom : null
     }
     const candidateFingerprint = createCandidateFingerprint(
       input.authorization.tenantId,
       input.source.sourceFingerprint,
-      normalized
+      normalized,
+      textNormalizer
     )
 
     if (fingerprints.has(candidateFingerprint)) {

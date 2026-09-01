@@ -10,6 +10,7 @@
     "build": "tsc --noEmit",
     "typecheck": "tsc --noEmit",
     "test": "node --import tsx src/assurance/evals/curation/memory-curation.eval.ts && node --import tsx src/assurance/evals/retrieval/memory-retrieval.eval.ts && node --import tsx src/assurance/evals/economics/memory-economics.eval.ts",
+    "test:database": "node --import tsx src/assurance/evals/database/postgres-memory.eval.ts",
     "eval": "pnpm run eval:curation && pnpm run eval:retrieval && pnpm run eval:economics",
     "eval:curation": "node --import tsx src/assurance/evals/curation/memory-curation.eval.ts",
     "eval:retrieval": "node --import tsx src/assurance/evals/retrieval/memory-retrieval.eval.ts",

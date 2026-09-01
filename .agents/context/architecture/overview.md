@@ -11,10 +11,11 @@ workspaces/
     knowledge/
     agents/
   memory-nucleus/
-    domain/
-    application/
-    infrastructure/
-    evals/
+    src/
+      domain/
+      application/
+      infrastructure/
+      assurance/evals/
   packages/
     memory-sdk/
     observability/
@@ -22,7 +23,7 @@ workspaces/
     ...
 
 .agents/
-  context/ rules/ specs/ adrs/
+  context/ rules/ specs/ adrs/ skills/
 ```
 
 Memory Nucleus is one workspace, not a nested mini-monorepo. Clean Architecture dependency direction is `infrastructure → application → domain`. AI consumes Memory Nucleus only through `@repo/memory-sdk`.

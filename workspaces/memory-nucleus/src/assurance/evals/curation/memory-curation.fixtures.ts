@@ -14,6 +14,7 @@ import {
   type MemoryExtractionResult
 } from '#application/ports/memory-extractor.port'
 import { MemoryPersistenceClient } from '#application/ports/memory-curation-persistence.port'
+import { normalizeUnicodeText } from '#infrastructure/formatters/unicode-text.fmt'
 
 export const FIXED_NOW = new Date('2026-08-27T12:00:00.000Z')
 export const HASH_PATTERN = /^[a-f0-9]{64}$/
@@ -296,7 +297,8 @@ export const createScenario = (options: ScenarioOptions = {}) => {
     extractor,
     now: options.now ?? (() => new Date(FIXED_NOW)),
     persistence,
-    policy: options.policy
+    policy: options.policy,
+    textNormalizer: { normalize: normalizeUnicodeText }
   })
 
   return { authorizationResolver, events, extractor, handler, persistence }

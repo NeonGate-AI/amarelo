@@ -1,7 +1,7 @@
 import {
   calculateMemoryEconomics,
   type MemoryEconomicsMetrics
-} from '#domain/value-objects/memory-economics.vo'
+} from '#domain/services/memory-economics.compute'
 import type { MemoryObservabilityPort } from '#application/ports/observability.port'
 import { Money } from '#domain/value-objects/money.vo'
 import type { ModelPricingPort } from '#application/ports/model-pricing.port'
