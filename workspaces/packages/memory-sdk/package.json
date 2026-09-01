@@ -7,9 +7,6 @@
   "exports": {
     ".": "./src/index.ts"
   },
-  "imports": {
-    "#memory-sdk": "./src/index.ts"
-  },
   "scripts": {
     "build": "tsc --noEmit",
     "typecheck": "tsc --noEmit",
