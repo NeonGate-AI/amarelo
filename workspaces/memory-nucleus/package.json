@@ -4,16 +4,16 @@
   "private": true,
   "type": "module",
   "exports": {
-    ".": "./index.ts"
+    ".": "./src/index.ts"
   },
   "scripts": {
     "build": "tsc --noEmit",
     "typecheck": "tsc --noEmit",
-    "test": "node --import tsx evals/curation/memory-curation.eval.ts && node --import tsx evals/retrieval/memory-retrieval.eval.ts && node --import tsx evals/economics/memory-economics.eval.ts",
+    "test": "node --import tsx src/assurance/evals/curation/memory-curation.eval.ts && node --import tsx src/assurance/evals/retrieval/memory-retrieval.eval.ts && node --import tsx src/assurance/evals/economics/memory-economics.eval.ts",
     "eval": "pnpm run eval:curation && pnpm run eval:retrieval && pnpm run eval:economics",
-    "eval:curation": "node --import tsx evals/curation/memory-curation.eval.ts",
-    "eval:retrieval": "node --import tsx evals/retrieval/memory-retrieval.eval.ts",
-    "eval:economics": "node --import tsx evals/economics/memory-economics.eval.ts"
+    "eval:curation": "node --import tsx src/assurance/evals/curation/memory-curation.eval.ts",
+    "eval:retrieval": "node --import tsx src/assurance/evals/retrieval/memory-retrieval.eval.ts",
+    "eval:economics": "node --import tsx src/assurance/evals/economics/memory-economics.eval.ts"
   },
   "dependencies": {
     "@langchain/core": "1.2.9",
@@ -27,8 +27,8 @@
     "@repo/evaluation": "workspace:*"
   },
   "imports": {
-    "#domain/*": "./domain/*.ts",
-    "#application/*": "./application/*.ts",
-    "#infrastructure/*": "./infrastructure/*.ts"
+    "#domain/*": "./src/domain/*.ts",
+    "#application/*": "./src/application/*.ts",
+    "#infrastructure/*": "./src/infrastructure/*.ts"
   }
 }
