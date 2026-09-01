@@ -82,7 +82,7 @@ jobs:
         if: github.event_name == 'push' && github.ref == 'refs/heads/refactor/handoff-02-housekeeping'
         shell: bash
         run: |
-          pnpm exec biome check --write workspaces cli
+          pnpm exec biome format --write workspaces cli
           if ! git diff --quiet; then
             git config user.name 'github-actions[bot]'
             git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
