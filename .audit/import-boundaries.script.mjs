@@ -52,13 +52,17 @@ async function loadJson(path) {
   return JSON.parse(await readFile(path, 'utf8'))
 }
 
-async function loadTsPaths(configPath) {
-  const config = await loadJson(configPath).catch(() => ({}))
+async function loadTsPaths(configPath, visited = new Set()) {
+  const normalized = resolve(configPath)
+  if (visited.has(normalized)) return {}
+  visited.add(normalized)
+
+  const config = await loadJson(normalized).catch(() => ({}))
   let inherited = {}
   if (typeof config.extends === 'string' && config.extends.startsWith('.')) {
-    const extendedPath = resolve(dirname(configPath), config.extends)
-    const extended = await loadJson(extendedPath).catch(() => ({}))
-    inherited = extended.compilerOptions?.paths ?? {}
+    let extendedPath = resolve(dirname(normalized), config.extends)
+    if (!extname(extendedPath)) extendedPath = `${extendedPath}.json`
+    inherited = await loadTsPaths(extendedPath, visited)
   }
   return {
     ...inherited,
@@ -100,6 +104,13 @@ function importSpecifiers(text) {
 
 function isSource(path) {
   return SOURCE_EXTENSIONS.includes(extname(path)) && !path.endsWith('.d.ts')
+}
+
+async function crossesIntoBarrel(importer, target) {
+  if (basename(target) === 'index.ts') return false
+  const targetDirectory = dirname(target)
+  if (targetDirectory === dirname(importer)) return false
+  return (await pathStat(join(targetDirectory, 'index.ts')))?.isFile() ?? false
 }
 
 export async function runImportBoundariesAudit({ projectRoot = process.cwd() } = {}) {
@@ -154,11 +165,11 @@ export async function runImportBoundariesAudit({ projectRoot = process.cwd() } =
         const candidate = resolve(dirname(path), specifier)
         if ((await pathStat(candidate))?.isDirectory()) continue
         const directFile = await sourceFile(candidate)
-        if (directFile) {
+        if (directFile && (await crossesIntoBarrel(path, directFile))) {
           fail(
             'barrel-import',
             rel(path),
-            `${specifier} resolves directly to ${rel(directFile)}; import the owning directory barrel instead`
+            `${specifier} crosses into ${rel(dirname(directFile))}; import that directory barrel instead`
           )
         }
         continue
@@ -166,11 +177,14 @@ export async function runImportBoundariesAudit({ projectRoot = process.cwd() } =
 
       if (specifier.startsWith('@') && config) {
         const resolution = await resolveAlias(specifier, config)
-        if (resolution?.kind === 'file' && basename(resolution.path) !== 'index.ts') {
+        if (
+          resolution?.kind === 'file' &&
+          (await crossesIntoBarrel(path, resolution.path))
+        ) {
           fail(
             'barrel-import',
             rel(path),
-            `${specifier} resolves directly to ${rel(resolution.path)}; import the owning directory barrel instead`
+            `${specifier} crosses into ${rel(dirname(resolution.path))}; import that directory barrel instead`
           )
         }
       }
@@ -223,7 +237,7 @@ export async function runImportBoundariesAudit({ projectRoot = process.cwd() } =
 
   console.log('Import boundaries PASS')
   console.log('@ absolute aliases: PASS')
-  console.log('directory-barrel imports: PASS')
+  console.log('cross-directory barrel imports: PASS')
   console.log('leaf index.ts coverage: PASS')
   return 0
 }
