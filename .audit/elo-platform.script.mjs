@@ -101,13 +101,22 @@ async function runEloPlatformAudit({ projectRoot = process.cwd() } = {}) {
     }
   }
 
-  for (const [path, marker] of [
-    ['.husky/pre-commit', 'cli/elo git pre-commit'],
-    ['.husky/commit-msg', 'cli/elo git commit-msg']
-  ]) {
-    const text = await readFile(join(projectRoot, path), 'utf8').catch(() => '')
-    if (!text.includes(marker)) {
-      fail(path, 'Husky adapter must remain a thin delegation to cli/elo')
+  const expectedHooks = new Map([
+    [
+      '.husky/pre-commit',
+      '#!/usr/bin/env sh\nexec ./cli/elo git pre-commit "$@"'
+    ],
+    [
+      '.husky/commit-msg',
+      '#!/usr/bin/env sh\nexec ./cli/elo git commit-msg "$@"'
+    ]
+  ])
+  for (const [hookPath, expected] of expectedHooks) {
+    const text = await readFile(join(projectRoot, hookPath), 'utf8').catch(
+      () => ''
+    )
+    if (text.trim() !== expected) {
+      fail(hookPath, 'Husky adapter must remain an exact thin delegation to cli/elo')
     }
   }
 
