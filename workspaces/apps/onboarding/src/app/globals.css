@@ -1,7 +1,7 @@
 @import 'tailwindcss';
 @import 'tw-animate-css';
 @import '@repo/ds';
-@source '../../../packages/react/src';
+@source '../../../../packages/react/src';
 
 @custom-variant dark (&:is(.dark *));
 
