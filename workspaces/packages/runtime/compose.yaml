@@ -1,0 +1,291 @@
+x-app-environment: &app-environment
+  AI_VOICE_MODEL: "${AI_VOICE_MODEL:-gpt-4o-mini-tts}"
+  AI_VOICE_NAME: "${AI_VOICE_NAME:-coral}"
+  CHOKIDAR_USEPOLLING: "${CHOKIDAR_USEPOLLING:-true}"
+  DATABASE_URL: "postgresql://${POSTGRES_USER:-amarelo}:${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required}@postgres:5432/${POSTGRES_DB:-amarelo}"
+  NEXT_PUBLIC_CONSOLE_URL: "http://localhost:${CONSOLE_PORT:-3001}"
+  NEXT_PUBLIC_ONBOARDING_URL: "http://localhost:${ONBOARDING_PORT:-3002}"
+  NEXT_PUBLIC_WORKOS_REDIRECT_URI: "http://localhost:${ONBOARDING_PORT:-3002}/callback"
+  NEXT_TELEMETRY_DISABLED: "1"
+  OPENAI_API_KEY: "${OPENAI_API_KEY:-}"
+  REDIS_URL: "redis://default:${REDIS_PASSWORD:?REDIS_PASSWORD is required}@redis:6379/0"
+  WATCHPACK_POLLING: "${WATCHPACK_POLLING:-true}"
+  WORKOS_API_KEY: "${WORKOS_API_KEY:-}"
+  WORKOS_CLIENT_ID: "${WORKOS_CLIENT_ID:-}"
+  WORKOS_COOKIE_DOMAIN: "${WORKOS_COOKIE_DOMAIN:-}"
+  WORKOS_COOKIE_MAX_AGE: "${WORKOS_COOKIE_MAX_AGE:-2592000}"
+  WORKOS_COOKIE_NAME: "${WORKOS_COOKIE_NAME:-wos-session}"
+  WORKOS_COOKIE_PASSWORD: "${WORKOS_COOKIE_PASSWORD:-}"
+  WORKOS_COOKIE_SAMESITE: "${WORKOS_COOKIE_SAMESITE:-lax}"
+
+x-app-volumes: &app-volumes
+  - type: bind
+    source: ../../..
+    target: /workspace
+  - type: volume
+    source: workspace-node-modules
+    target: /workspace/node_modules
+  - type: volume
+    source: ai-conversation-node-modules
+    target: /workspace/workspaces/ai/conversation/node_modules
+  - type: volume
+    source: ai-knowledge-node-modules
+    target: /workspace/workspaces/ai/knowledge/node_modules
+  - type: volume
+    source: memory-nucleus-node-modules
+    target: /workspace/workspaces/memory-nucleus/node_modules
+  - type: volume
+    source: console-node-modules
+    target: /workspace/workspaces/apps/console/node_modules
+  - type: volume
+    source: landing-node-modules
+    target: /workspace/workspaces/apps/landing/node_modules
+  - type: volume
+    source: mobile-node-modules
+    target: /workspace/workspaces/apps/mobile/node_modules
+  - type: volume
+    source: onboarding-node-modules
+    target: /workspace/workspaces/apps/onboarding/node_modules
+  - type: volume
+    source: design-system-node-modules
+    target: /workspace/workspaces/packages/design-system/node_modules
+  - type: volume
+    source: memory-sdk-node-modules
+    target: /workspace/workspaces/packages/memory-sdk/node_modules
+  - type: volume
+    source: evaluation-node-modules
+    target: /workspace/workspaces/packages/evaluation/node_modules
+  - type: volume
+    source: observability-node-modules
+    target: /workspace/workspaces/packages/observability/node_modules
+  - type: volume
+    source: react-node-modules
+    target: /workspace/workspaces/packages/react/node_modules
+  - type: volume
+    source: runtime-node-modules
+    target: /workspace/workspaces/packages/runtime/node_modules
+  - type: volume
+    source: design-system-dist
+    target: /workspace/workspaces/packages/design-system/dist
+  - type: volume
+    source: console-next
+    target: /workspace/workspaces/apps/console/.next
+  - type: volume
+    source: landing-next
+    target: /workspace/workspaces/apps/landing/.next
+  - type: volume
+    source: onboarding-next
+    target: /workspace/workspaces/apps/onboarding/.next
+  - type: volume
+    source: mobile-dist
+    target: /workspace/workspaces/apps/mobile/dist
+
+x-app: &app
+  build:
+    context: ../../..
+    dockerfile: workspaces/packages/runtime/Dockerfile.dev
+  image: amarelo-dev-workspace:local
+  init: true
+  user: node
+  working_dir: /workspace
+  environment: *app-environment
+  security_opt:
+    - no-new-privileges:true
+  stop_grace_period: 15s
+  volumes: *app-volumes
+
+services:
+  postgres:
+    image: postgres:17-alpine
+    init: true
+    user: postgres
+    environment:
+      POSTGRES_DB: "${POSTGRES_DB:-amarelo}"
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required}"
+      POSTGRES_USER: "${POSTGRES_USER:-amarelo}"
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready -U \"$$POSTGRES_USER\" -d \"$$POSTGRES_DB\" -h 127.0.0.1"
+        ]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+      start_period: 10s
+    ports:
+      - "127.0.0.1:${POSTGRES_PORT:-5432}:5432"
+    security_opt:
+      - no-new-privileges:true
+    stop_grace_period: 30s
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+
+  redis:
+    image: redis:8-alpine
+    init: true
+    user: redis
+    working_dir: /data
+    environment:
+      REDIS_PASSWORD: "${REDIS_PASSWORD:?REDIS_PASSWORD is required}"
+    command:
+      - sh
+      - -c
+      - exec redis-server --save '' --appendonly no --requirepass "$$REDIS_PASSWORD"
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "redis-cli --no-auth-warning -a \"$$REDIS_PASSWORD\" ping | grep -q PONG"
+        ]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+      start_period: 5s
+    ports:
+      - "127.0.0.1:${REDIS_PORT:-6379}:6379"
+    security_opt:
+      - no-new-privileges:true
+    stop_grace_period: 15s
+
+  workspace-prepare:
+    <<: *app
+    command:
+      - sh
+      - -c
+      - pnpm install --frozen-lockfile --offline && pnpm --filter @repo/ds build
+    restart: "no"
+
+  landing:
+    <<: *app
+    command: ["pnpm", "--filter", "landing", "dev"]
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      workspace-prepare:
+        condition: service_completed_successfully
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "node",
+          "-e",
+          "fetch('http://127.0.0.1:3000').then(r=>{if(!r.ok)process.exit(1)}).catch(()=>process.exit(1))"
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 30s
+    ports:
+      - "127.0.0.1:${LANDING_PORT:-3000}:3000"
+
+  console:
+    <<: *app
+    command: ["pnpm", "--filter", "console", "dev"]
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      workspace-prepare:
+        condition: service_completed_successfully
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "node",
+          "-e",
+          "fetch('http://127.0.0.1:3001').then(r=>{if(!r.ok)process.exit(1)}).catch(()=>process.exit(1))"
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 30s
+    ports:
+      - "127.0.0.1:${CONSOLE_PORT:-3001}:3001"
+
+  onboarding:
+    <<: *app
+    command: ["pnpm", "--filter", "onboarding", "dev"]
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      workspace-prepare:
+        condition: service_completed_successfully
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "node",
+          "-e",
+          "fetch('http://127.0.0.1:3002').then(r=>{if(!r.ok)process.exit(1)}).catch(()=>process.exit(1))"
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 30s
+    ports:
+      - "127.0.0.1:${ONBOARDING_PORT:-3002}:3002"
+
+  mobile:
+    <<: *app
+    command:
+      [
+        "pnpm",
+        "--filter",
+        "mobile",
+        "exec",
+        "vite",
+        "--host",
+        "0.0.0.0",
+        "--strictPort",
+        "--port",
+        "3003"
+      ]
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      workspace-prepare:
+        condition: service_completed_successfully
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "node",
+          "-e",
+          "fetch('http://127.0.0.1:3003').then(r=>{if(!r.ok)process.exit(1)}).catch(()=>process.exit(1))"
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 30s
+    ports:
+      - "127.0.0.1:${MOBILE_PORT:-3003}:3003"
+
+volumes:
+  ai-conversation-node-modules:
+  ai-knowledge-node-modules:
+  console-next:
+  console-node-modules:
+  design-system-dist:
+  design-system-node-modules:
+  landing-next:
+  landing-node-modules:
+  mobile-dist:
+  mobile-node-modules:
+  memory-nucleus-node-modules:
+  memory-sdk-node-modules:
+  onboarding-next:
+  onboarding-node-modules:
+  postgres-data:
+  evaluation-node-modules:
+  observability-node-modules:
+  react-node-modules:
+  runtime-node-modules:
+  workspace-node-modules:

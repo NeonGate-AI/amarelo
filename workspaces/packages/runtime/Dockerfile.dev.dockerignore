@@ -1,0 +1,12 @@
+.agents
+.git
+.github
+.turbo
+.vscode
+**/.env
+**/.env.*
+**/.next
+**/.turbo
+**/dist
+**/node_modules
+**/*.log

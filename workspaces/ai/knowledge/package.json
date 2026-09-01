@@ -1,0 +1,24 @@
+{
+  "name": "@ai/knowledge",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "build": "tsc --noEmit",
+    "eval": "pnpm run eval:rag",
+    "eval:rag": "node --import tsx evals/knowledge-rag/knowledge-rag.eval.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@types/node": "24.13.3",
+    "tsx": "4.23.12",
+    "typescript": "5.9.2",
+    "@repo/evaluation": "workspace:*"
+  },
+  "imports": {
+    "#knowledge": "./src/index.ts"
+  }
+}
