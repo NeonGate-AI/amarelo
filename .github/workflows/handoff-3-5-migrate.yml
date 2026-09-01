@@ -1,0 +1,43 @@
+name: Handoff 3.5 Import Migration
+
+on:
+  push:
+    branches:
+      - refactor/handoff-02-housekeeping
+
+permissions:
+  contents: write
+
+jobs:
+  migrate:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout branch
+        uses: actions/checkout@v4
+        with:
+          ref: refactor/handoff-02-housekeeping
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: Normalize imports
+        run: node .audit/handoff-3-5-imports.migrate.mjs
+
+      - name: Commit migration
+        shell: bash
+        run: |
+          if git diff --quiet; then
+            echo 'No migration changes.'
+            exit 0
+          fi
+          git diff --check
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add workspaces
+          git commit -m 'refactor(imports): normalize aliases and barrels'
+          git push origin HEAD:refactor/handoff-02-housekeeping
