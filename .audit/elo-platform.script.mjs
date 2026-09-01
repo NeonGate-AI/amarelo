@@ -2,7 +2,9 @@ import { readFile, readdir, stat } from 'node:fs/promises'
 import { dirname, extname, join, relative, resolve, sep } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
-const DEFAULT_PROJECT_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..')
+const DEFAULT_PROJECT_ROOT =
+  process.env.GITHUB_WORKSPACE ??
+  resolve(dirname(fileURLToPath(import.meta.url)), '..')
 
 async function exists(path) {
   return Boolean(await stat(path).catch(() => null))
@@ -118,7 +120,8 @@ async function runEloPlatformAudit({ projectRoot = DEFAULT_PROJECT_ROOT } = {}) 
     const text = await readFile(join(projectRoot, hookPath), 'utf8').catch(
       () => ''
     )
-    if (text.trim() !== expected) {
+    const normalized = text.replace(/\r\n?/gu, '\n').trim()
+    if (normalized !== expected) {
       fail(hookPath, 'Husky adapter must remain an exact thin delegation to cli/elo')
     }
   }
