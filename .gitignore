@@ -90,7 +90,8 @@ bin/local/
 .direnv/
 
 # -----------------------------------------------------------------------------
-# Generated Reports
+# Temporary audit evidence
 # -----------------------------------------------------------------------------
 
-bin/audit/reports/
+.audit/*
+!.audit/.gitkeep
