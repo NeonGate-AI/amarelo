@@ -1,6 +1,6 @@
 import { mkdir, readFile, writeFile } from 'node:fs/promises'
 import { dirname, resolve } from 'node:path'
-import { fileURLToPath } from 'node:url'
+import { fileURLToPath, pathToFileURL } from 'node:url'
 
 const packageDirectory = resolve(dirname(fileURLToPath(import.meta.url)), '../..')
 const foundationDirectory = resolve(packageDirectory, 'src/foundation')
@@ -11,39 +11,41 @@ const sourceFiles = [
   'gradients.tokens.json'
 ]
 
-const documents = await Promise.all(
-  sourceFiles.map(async (fileName) => {
-    const contents = await readFile(
-      resolve(foundationDirectory, fileName),
-      'utf8'
-    )
-    return JSON.parse(contents)
+export async function buildTokens() {
+  const documents = await Promise.all(
+    sourceFiles.map(async (fileName) => {
+      const contents = await readFile(
+        resolve(foundationDirectory, fileName),
+        'utf8'
+      )
+      return JSON.parse(contents)
+    })
+  )
+
+  const tokens = Object.assign({}, ...documents)
+  const flattenedTokens = flattenTokens(tokens)
+  const declarations = flattenedTokens.map(({ path, token, type }) => {
+    const value = resolveValue(token.$value, tokens, [path.join('.')])
+    return `  --elo-${path.join('-')}: ${serializeValue(value, type, token)};`
   })
-)
+  const css = [
+    '/* Generated from src/foundation/*.tokens.json. Do not edit directly. */',
+    '',
+    ':root {',
+    ...declarations,
+    '}',
+    ''
+  ].join('\n')
 
-const tokens = Object.assign({}, ...documents)
-const flattenedTokens = flattenTokens(tokens)
-const declarations = flattenedTokens.map(({ path, token, type }) => {
-  const value = resolveValue(token.$value, tokens, [path.join('.')])
-  return `  --elo-${path.join('-')}: ${serializeValue(value, type, token)};`
-})
-const css = [
-  '/* Generated from src/foundation/*.tokens.json. Do not edit directly. */',
-  '',
-  ':root {',
-  ...declarations,
-  '}',
-  ''
-].join('\n')
-
-await mkdir(outputDirectory, { recursive: true })
-await Promise.all([
-  writeFile(
-    resolve(outputDirectory, 'tokens.json'),
-    `${JSON.stringify(tokens, null, 2)}\n`
-  ),
-  writeFile(resolve(outputDirectory, 'index.css'), css)
-])
+  await mkdir(outputDirectory, { recursive: true })
+  await Promise.all([
+    writeFile(
+      resolve(outputDirectory, 'tokens.json'),
+      `${JSON.stringify(tokens, null, 2)}\n`
+    ),
+    writeFile(resolve(outputDirectory, 'index.css'), css)
+  ])
+}
 
 function flattenTokens(node, path = [], inheritedType) {
   const type = node.$type ?? inheritedType
@@ -176,4 +178,12 @@ function serializeGradient(value, token) {
 
 function formatPercentage(position) {
   return `${String(Number((position * 100).toFixed(4)))}%`
+}
+
+const isDirectExecution =
+  process.argv[1] !== undefined &&
+  pathToFileURL(resolve(process.argv[1])).href === import.meta.url
+
+if (isDirectExecution) {
+  await buildTokens()
 }
