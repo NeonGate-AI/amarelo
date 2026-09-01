@@ -1,5 +1,8 @@
 import { readFile, readdir, stat } from 'node:fs/promises'
-import { extname, join, relative, sep } from 'node:path'
+import { dirname, extname, join, relative, resolve, sep } from 'node:path'
+import { fileURLToPath } from 'node:url'
+
+const DEFAULT_PROJECT_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..')
 
 async function exists(path) {
   return Boolean(await stat(path).catch(() => null))
@@ -16,7 +19,7 @@ async function walk(directory, out = []) {
   return out
 }
 
-async function runEloPlatformAudit({ projectRoot = process.cwd() } = {}) {
+async function runEloPlatformAudit({ projectRoot = DEFAULT_PROJECT_ROOT } = {}) {
   const failures = []
   const fail = (file, detail) => failures.push({ file, detail })
   const rel = (path) => relative(projectRoot, path).split(sep).join('/')
