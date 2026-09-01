@@ -4,15 +4,17 @@ set -eu
 
 created=0
 templates="$(elo_find_env_templates)"
-old_ifs="$IFS"; IFS='\n'
-for template in $templates; do
-  [ -n "$template" ] || continue
-  target="$(dirname "$template")/.env"
-  if [ ! -f "$target" ]; then
-    cp "$template" "$target"
-    printf 'created %s\n' "$(elo_rel "$target")"
-    created=$((created + 1))
-  fi
-done
-IFS="$old_ifs"
+if [ -n "$templates" ]; then
+  while IFS= read -r template; do
+    [ -n "$template" ] || continue
+    target="$(dirname "$template")/.env"
+    if [ ! -f "$target" ]; then
+      cp "$template" "$target"
+      printf 'created %s\n' "$(elo_rel "$target")"
+      created=$((created + 1))
+    fi
+  done <<EOF
+$templates
+EOF
+fi
 printf 'Elo env setup complete (%s created).\n' "$created"

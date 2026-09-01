@@ -64,12 +64,13 @@ fi
 if [ "$ci" = false ]; then
   templates="$(elo_find_env_templates)"
   if [ -n "$templates" ]; then
-    old_ifs="$IFS"; IFS='\n'
-    for template in $templates; do
+    while IFS= read -r template; do
+      [ -n "$template" ] || continue
       target="$(dirname "$template")/.env"
       [ -f "$target" ] || printf 'WARN  env target missing — %s (run ./elo env setup)\n' "$(elo_rel "$template")"
-    done
-    IFS="$old_ifs"
+    done <<EOF
+$templates
+EOF
   fi
 fi
 
