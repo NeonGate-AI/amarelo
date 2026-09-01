@@ -243,5 +243,7 @@ export abstract class MemoryPersistenceClient {
    * The adapter must require the current unexpired claim and revalidate
    * authorization plus every run/candidate scope in one transaction.
    */
-  abstract saveCurationRun(input: SaveCurationRunRequest): Promise<SaveCurationRunResult>
+  abstract saveCurationRun(
+    input: SaveCurationRunRequest
+  ): Promise<SaveCurationRunResult>
 }

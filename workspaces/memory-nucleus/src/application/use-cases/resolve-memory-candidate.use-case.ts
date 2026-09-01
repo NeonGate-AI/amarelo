@@ -15,7 +15,9 @@ export class ResolveMemoryCandidateUseCase {
 
   execute(command: ResolveMemoryCandidateCommand): Promise<string> {
     if (command.judgment.decision === 'remember') {
-      throw new Error('remember judgments must use AcceptMemoryCandidateUseCase')
+      throw new Error(
+        'remember judgments must use AcceptMemoryCandidateUseCase'
+      )
     }
 
     return this.resolutions.resolve({

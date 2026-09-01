@@ -12,8 +12,14 @@ export type {
   ExplicitMemoryResult,
   MemoryTemporalPrecision
 } from './memory/explicit-memory.contract.js'
-export type { MemoryCorrectionInput, MemoryCorrectionResult } from './memory/memory-correction.contract.js'
-export type { MemoryDeletionReceipt, MemoryPurgeStatus } from './memory/memory-forget.contract.js'
+export type {
+  MemoryCorrectionInput,
+  MemoryCorrectionResult
+} from './memory/memory-correction.contract.js'
+export type {
+  MemoryDeletionReceipt,
+  MemoryPurgeStatus
+} from './memory/memory-forget.contract.js'
 export type {
   MemoryActorType,
   MemoryKind,
@@ -51,7 +57,13 @@ export type {
   MemorySearchScore,
   MemoryTokenBudget
 } from './search/memory-search.contract.js'
-export { ExplicitMemoryInputSchema, ExplicitMemoryResultSchema } from './memory/explicit-memory.contract.js'
+export {
+  ExplicitMemoryInputSchema,
+  ExplicitMemoryResultSchema
+} from './memory/explicit-memory.contract.js'
 export { MemoryCorrectionInputSchema } from './memory/memory-correction.contract.js'
 export { MemoryDeletionReceiptSchema } from './memory/memory-forget.contract.js'
-export { MemoryConsentStateSchema, UpdateMemoryConsentInputSchema } from './consent/memory-consent.contract.js'
+export {
+  MemoryConsentStateSchema,
+  UpdateMemoryConsentInputSchema
+} from './consent/memory-consent.contract.js'

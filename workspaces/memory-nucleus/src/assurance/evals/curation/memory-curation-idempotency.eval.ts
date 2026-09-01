@@ -108,7 +108,7 @@ export const memoryCurationIdempotencyEvalCases: readonly MemoryCurationEvalCase
           claimResult: {
             claimExpiresAt: '2026-08-27T12:00:00.000Z',
             claimId: 'claim-expired',
-                runId: null,
+            runId: null,
             status: 'claimed'
           }
         })
@@ -189,7 +189,7 @@ export const memoryCurationIdempotencyEvalCases: readonly MemoryCurationEvalCase
           claimResult: {
             claimExpiresAt: '2026-08-27T12:00:05.000Z',
             claimId: 'claim-too-short',
-                runId: null,
+            runId: null,
             status: 'claimed'
           },
           extractorDeadlineMilliseconds: 10_000

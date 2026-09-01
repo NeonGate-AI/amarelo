@@ -3,12 +3,7 @@
   "compilerOptions": {
     "allowImportingTsExtensions": true,
     "noEmit": true,
-    "types": [
-      "node"
-    ]
+    "types": ["node"]
   },
-  "include": [
-    "src/**/*.ts",
-    "evals/**/*.ts"
-  ]
+  "include": ["src/**/*.ts", "evals/**/*.ts"]
 }

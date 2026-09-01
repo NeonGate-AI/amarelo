@@ -1,13 +1,24 @@
 import type { PostgresTransactionExecutor } from '#infrastructure/database/postgres-executor'
 
-import { CanonicalMemoryPort, type AcceptCandidateInput, type AcceptCandidateResult } from '#application/ports/canonical-memory.port'
+import {
+  CanonicalMemoryPort,
+  type AcceptCandidateInput,
+  type AcceptCandidateResult
+} from '#application/ports/canonical-memory.port'
 
 interface CandidateRow {
   candidate_id: string
   kind: 'semantic' | 'episodic'
   observed_at: Date
   occurred_at: Date | null
-  temporal_precision: 'approximate' | 'day' | 'exact' | 'life-period' | 'month' | 'year' | null
+  temporal_precision:
+    | 'approximate'
+    | 'day'
+    | 'exact'
+    | 'life-period'
+    | 'month'
+    | 'year'
+    | null
   temporal_reference: string | null
   uncertainty: string | null
   purpose_ids: string[]
@@ -25,18 +36,28 @@ export class PostgresCanonicalMemoryRepository extends CanonicalMemoryPort {
     super()
   }
 
-  async acceptCandidate(input: AcceptCandidateInput): Promise<AcceptCandidateResult> {
+  async acceptCandidate(
+    input: AcceptCandidateInput
+  ): Promise<AcceptCandidateResult> {
     if (input.viewIds.length === 0 || input.viewIds.length > 16) {
       throw new RangeError('viewIds must contain between 1 and 16 entries')
     }
-    if (!Number.isFinite(input.confidence) || input.confidence < 0 || input.confidence > 1) {
+    if (
+      !Number.isFinite(input.confidence) ||
+      input.confidence < 0 ||
+      input.confidence > 1
+    ) {
       throw new RangeError('canonical confidence must be between 0 and 1')
     }
     if (!input.category || input.category.length > 120) {
-      throw new RangeError('canonical category must contain between 1 and 120 characters')
+      throw new RangeError(
+        'canonical category must contain between 1 and 120 characters'
+      )
     }
     if (!input.commandId || input.commandId.length > 200) {
-      throw new RangeError('commandId must contain between 1 and 200 characters')
+      throw new RangeError(
+        'commandId must contain between 1 and 200 characters'
+      )
     }
     if (!Number.isFinite(Date.parse(input.requestedAt))) {
       throw new TypeError('requestedAt must be a valid timestamp')
@@ -58,7 +79,10 @@ export class PostgresCanonicalMemoryRepository extends CanonicalMemoryPort {
       ).rows[0]
 
       if (existing) {
-        if (existing.candidate_id !== input.candidateId || existing.policy_version !== input.policyVersion) {
+        if (
+          existing.candidate_id !== input.candidateId ||
+          existing.policy_version !== input.policyVersion
+        ) {
           throw new Error('canonical resolution command id collision')
         }
         const version = (
@@ -68,7 +92,8 @@ export class PostgresCanonicalMemoryRepository extends CanonicalMemoryPort {
             [existing.target_memory_id, existing.target_version]
           )
         ).rows[0]
-        if (!version) throw new Error('canonical resolution points to a missing version')
+        if (!version)
+          throw new Error('canonical resolution points to a missing version')
         return Object.freeze({
           memoryId: existing.target_memory_id,
           version: existing.target_version,
@@ -90,20 +115,28 @@ export class PostgresCanonicalMemoryRepository extends CanonicalMemoryPort {
 
       if (!candidate) throw new Error('memory candidate does not exist')
       if (candidate.status !== 'candidate') {
-        throw new Error(`memory candidate is not eligible for acceptance: ${candidate.status}`)
+        throw new Error(
+          `memory candidate is not eligible for acceptance: ${candidate.status}`
+        )
       }
       if (candidate.kind === 'semantic' && !input.canonicalKey) {
         throw new Error('semantic canonical acceptance requires canonicalKey')
       }
 
-      const canonicalKey = input.canonicalKey ?? `episode:${candidate.candidate_id}`
+      const canonicalKey =
+        input.canonicalKey ?? `episode:${candidate.candidate_id}`
 
       let memoryId = (
         await tx.query<{ memory_id: string }>(
           `select memory_id from memory_nucleus.memories
            where tenant_id = $1::uuid and subject_id = $2::uuid and kind = $3 and canonical_key = $4
            for update`,
-          [candidate.tenant_id, candidate.subject_id, candidate.kind, canonicalKey]
+          [
+            candidate.tenant_id,
+            candidate.subject_id,
+            candidate.kind,
+            canonicalKey
+          ]
         )
       ).rows[0]?.memory_id
 
@@ -113,11 +146,17 @@ export class PostgresCanonicalMemoryRepository extends CanonicalMemoryPort {
             `insert into memory_nucleus.memories(tenant_id, subject_id, kind, canonical_key)
              values ($1::uuid, $2::uuid, $3, $4)
              returning memory_id`,
-            [candidate.tenant_id, candidate.subject_id, candidate.kind, canonicalKey]
+            [
+              candidate.tenant_id,
+              candidate.subject_id,
+              candidate.kind,
+              canonicalKey
+            ]
           )
         ).rows[0]?.memory_id
       }
-      if (!memoryId) throw new Error('canonical memory identity was not created')
+      if (!memoryId)
+        throw new Error('canonical memory identity was not created')
 
       const previous = (
         await tx.query<{ version_id: string; version: number }>(

@@ -74,7 +74,11 @@ export interface AuthorizedRepositorySearch {
   readonly viewId: string
   readonly kinds: readonly MemoryKind[]
   readonly categories: readonly string[]
-  readonly sensitivities: readonly ('normal' | 'sensitive' | 'highly-sensitive')[]
+  readonly sensitivities: readonly (
+    | 'normal'
+    | 'sensitive'
+    | 'highly-sensitive'
+  )[]
   readonly timeWindow: MemoryTimeWindow
   readonly queryText: string
   readonly semanticKeys: readonly string[]

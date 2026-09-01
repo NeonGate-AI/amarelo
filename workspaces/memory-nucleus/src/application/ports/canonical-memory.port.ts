@@ -24,6 +24,8 @@ export interface TombstoneMemoryInput {
 
 /** Application-owned port for canonical memory mutation. */
 export abstract class CanonicalMemoryPort {
-  abstract acceptCandidate(input: AcceptCandidateInput): Promise<AcceptCandidateResult>
+  abstract acceptCandidate(
+    input: AcceptCandidateInput
+  ): Promise<AcceptCandidateResult>
   abstract tombstoneMemory(input: TombstoneMemoryInput): Promise<boolean>
 }

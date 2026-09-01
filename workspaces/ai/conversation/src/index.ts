@@ -8,4 +8,8 @@ export {
 export { MemoryContextProvider } from './memory/memory-context.provider'
 export type { ConversationMemoryContext } from './memory/memory-context.provider'
 
-export type { ConversationLane, CognitiveBudget, ConversationRoutingDecision } from './routing/conversation-routing.contract'
+export type {
+  ConversationLane,
+  CognitiveBudget,
+  ConversationRoutingDecision
+} from './routing/conversation-routing.contract'

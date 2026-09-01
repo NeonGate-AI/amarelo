@@ -172,7 +172,9 @@ export function hasValidMemoryTemporalSemantics(
     const validFromEpoch =
       record.validFrom === null ? null : parseStoredTimestamp(record.validFrom)
     const validUntilEpoch =
-      record.validUntil === null ? null : parseStoredTimestamp(record.validUntil)
+      record.validUntil === null
+        ? null
+        : parseStoredTimestamp(record.validUntil)
 
     return (
       (record.validFrom === null || validFromEpoch !== null) &&

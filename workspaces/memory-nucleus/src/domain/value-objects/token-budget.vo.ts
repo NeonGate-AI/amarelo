@@ -10,11 +10,18 @@ export class TokenBudget {
   }
 
   accepts(current: number, next: number): boolean {
-    return Number.isSafeInteger(current) && Number.isSafeInteger(next) && current >= 0 && next >= 0 && current + next <= this.maximum
+    return (
+      Number.isSafeInteger(current) &&
+      Number.isSafeInteger(next) &&
+      current >= 0 &&
+      next >= 0 &&
+      current + next <= this.maximum
+    )
   }
 
   remaining(used: number): number {
-    if (!Number.isSafeInteger(used) || used < 0) throw new RangeError('used tokens must be a non-negative safe integer')
+    if (!Number.isSafeInteger(used) || used < 0)
+      throw new RangeError('used tokens must be a non-negative safe integer')
     return Math.max(0, this.maximum - used)
   }
 }

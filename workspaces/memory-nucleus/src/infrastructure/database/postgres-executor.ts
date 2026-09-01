@@ -11,5 +11,7 @@ export interface PostgresExecutor {
 }
 
 export interface PostgresTransactionExecutor extends PostgresExecutor {
-  transaction<T>(work: (transaction: PostgresExecutor) => Promise<T>): Promise<T>
+  transaction<T>(
+    work: (transaction: PostgresExecutor) => Promise<T>
+  ): Promise<T>
 }

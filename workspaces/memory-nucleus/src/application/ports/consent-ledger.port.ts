@@ -6,7 +6,12 @@ export interface AppendConsentEntryInput {
   readonly policyVersion: string
   readonly purpose: string
   readonly resourceScope: Readonly<Record<string, unknown>>
-  readonly source: 'user-ui' | 'user-voice' | 'contract' | 'admin' | 'system-policy'
+  readonly source:
+    | 'user-ui'
+    | 'user-voice'
+    | 'contract'
+    | 'admin'
+    | 'system-policy'
   readonly status: 'granted' | 'revoked'
   readonly subjectId: string
   readonly tenantId: string

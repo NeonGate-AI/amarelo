@@ -25,7 +25,9 @@ export class MeasureMemoryEconomicsUseCase {
     private readonly observability: MemoryObservabilityPort
   ) {}
 
-  async execute(input: MeasureMemoryEconomicsInput): Promise<MeasuredMemoryEconomics> {
+  async execute(
+    input: MeasureMemoryEconomicsInput
+  ): Promise<MeasuredMemoryEconomics> {
     const price = await this.pricing.inputPrice(input.modelId)
     const processingCost = Money.of(input.memoryProcessingCost, price.currency)
     const metrics = calculateMemoryEconomics({
@@ -39,7 +41,10 @@ export class MeasureMemoryEconomicsUseCase {
 
     const servingAvoided = Money.of(metrics.servingCostAvoided, price.currency)
     const netSaving = servingAvoided.minus(processingCost)
-    if (Math.abs(netSaving.amount - metrics.netMemorySaving) > Number.EPSILON * 16) {
+    if (
+      Math.abs(netSaving.amount - metrics.netMemorySaving) >
+      Number.EPSILON * 16
+    ) {
       throw new Error('domain economics calculation became inconsistent')
     }
 

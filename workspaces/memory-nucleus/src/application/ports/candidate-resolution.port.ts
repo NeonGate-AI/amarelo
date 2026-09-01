@@ -1,4 +1,7 @@
-export type NoncanonicalCandidateDecision = 'discard' | 'quarantine' | 'conflict'
+export type NoncanonicalCandidateDecision =
+  | 'discard'
+  | 'quarantine'
+  | 'conflict'
 
 export interface ResolveNoncanonicalCandidateInput {
   readonly candidateId: string

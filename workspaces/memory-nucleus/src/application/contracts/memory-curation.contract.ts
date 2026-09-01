@@ -1,8 +1,15 @@
 import { z } from 'zod'
 
-import { MemoryIdentifierSchema, PurposeCodeSchema, type PurposeCode } from '#domain/value-objects/memory-identifiers.value-object'
+import {
+  MemoryIdentifierSchema,
+  PurposeCodeSchema,
+  type PurposeCode
+} from '#domain/value-objects/memory-identifiers.value-object'
 
-export { PurposeCodeSchema, type PurposeCode } from '#domain/value-objects/memory-identifiers.value-object'
+export {
+  PurposeCodeSchema,
+  type PurposeCode
+} from '#domain/value-objects/memory-identifiers.value-object'
 
 export const MemoryFormationSignalSchema = z.enum([
   'eligible-source-delta',

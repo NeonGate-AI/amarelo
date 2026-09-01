@@ -3,7 +3,7 @@ import type { PostgresExecutor } from '#infrastructure/database/postgres-executo
 import type {
   AuthorizedRepositorySearch,
   RepositoryMemoryRecord,
-  RepositorySearchResult,
+  RepositorySearchResult
 } from '#application/ports/memory-repository.port'
 
 interface SearchRow {
@@ -16,7 +16,11 @@ interface SearchRow {
   provenance: {
     sourceArtifactIds?: string[]
     authorId?: string
-    authorType?: 'authorized-delegate' | 'imported-source' | 'service' | 'subject'
+    authorType?:
+      | 'authorized-delegate'
+      | 'imported-source'
+      | 'service'
+      | 'subject'
     createdAt?: string
     transformationId?: string | null
   }
@@ -44,7 +48,9 @@ function asIso(value: Date | null): string | null {
   return value?.toISOString() ?? null
 }
 
-function mapProvenance(row: SearchRow): NonNullable<RepositoryMemoryRecord['provenance']> {
+function mapProvenance(
+  row: SearchRow
+): NonNullable<RepositoryMemoryRecord['provenance']> {
   const provenance = row.provenance ?? {}
   return Object.freeze({
     sourceArtifactIds: Object.freeze([...(provenance.sourceArtifactIds ?? [])]),

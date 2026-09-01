@@ -87,16 +87,28 @@ export class MemoryEntity {
     return new MemoryEntity(CanonicalMemorySchema.parse(snapshot))
   }
 
-  get id(): string { return this.#snapshot.id }
-  get state(): CanonicalMemoryState { return this.#snapshot.state }
-  get version(): number { return this.#snapshot.version }
-  get snapshot(): CanonicalMemory { return this.#snapshot }
+  get id(): string {
+    return this.#snapshot.id
+  }
+  get state(): CanonicalMemoryState {
+    return this.#snapshot.state
+  }
+  get version(): number {
+    return this.#snapshot.version
+  }
+  get snapshot(): CanonicalMemory {
+    return this.#snapshot
+  }
 
   canBeRetrieved(at: Date): boolean {
     if (this.state !== 'active') return false
     const epoch = at.getTime()
-    const from = this.#snapshot.validFrom ? Date.parse(this.#snapshot.validFrom) : null
-    const until = this.#snapshot.validUntil ? Date.parse(this.#snapshot.validUntil) : null
+    const from = this.#snapshot.validFrom
+      ? Date.parse(this.#snapshot.validFrom)
+      : null
+    const until = this.#snapshot.validUntil
+      ? Date.parse(this.#snapshot.validUntil)
+      : null
     return (from === null || epoch >= from) && (until === null || epoch < until)
   }
 }

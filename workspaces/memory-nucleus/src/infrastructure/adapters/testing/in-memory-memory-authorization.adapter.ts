@@ -4,9 +4,7 @@ import {
 } from '#application/ports/memory-authorization.port'
 
 /** Offline/reference resolver. Production uses a deterministic policy store. */
-export class InMemoryMemoryAuthorizationResolver
-  extends MemoryAuthorizationDecisionResolver
-{
+export class InMemoryMemoryAuthorizationResolver extends MemoryAuthorizationDecisionResolver {
   readonly #decisions: ReadonlyMap<string, MemoryAuthorizationDecision>
   #resolveCalls = 0
 

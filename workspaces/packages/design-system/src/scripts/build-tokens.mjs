@@ -2,7 +2,10 @@ import { mkdir, readFile, writeFile } from 'node:fs/promises'
 import { dirname, resolve } from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
 
-const packageDirectory = resolve(dirname(fileURLToPath(import.meta.url)), '../..')
+const packageDirectory = resolve(
+  dirname(fileURLToPath(import.meta.url)),
+  '../..'
+)
 const foundationDirectory = resolve(packageDirectory, 'src/foundation')
 const outputDirectory = resolve(packageDirectory, 'dist')
 const sourceFiles = [

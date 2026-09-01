@@ -1,5 +1,8 @@
 import type { PostgresTransactionExecutor } from '#infrastructure/database/postgres-executor'
-import { CandidateResolutionPort, type ResolveNoncanonicalCandidateInput } from '#application/ports/candidate-resolution.port'
+import {
+  CandidateResolutionPort,
+  type ResolveNoncanonicalCandidateInput
+} from '#application/ports/candidate-resolution.port'
 
 export class PostgresCandidateResolutionRepository extends CandidateResolutionPort {
   constructor(private readonly database: PostgresTransactionExecutor) {
@@ -9,7 +12,11 @@ export class PostgresCandidateResolutionRepository extends CandidateResolutionPo
   async resolve(input: ResolveNoncanonicalCandidateInput): Promise<string> {
     return this.database.transaction(async (tx) => {
       const existing = (
-        await tx.query<{ resolution_id: string; candidate_id: string; decision: string }>(
+        await tx.query<{
+          resolution_id: string
+          candidate_id: string
+          decision: string
+        }>(
           `select resolution_id, candidate_id, decision
            from memory_nucleus.memory_candidate_resolutions
            where command_id = $1`,
@@ -17,17 +24,21 @@ export class PostgresCandidateResolutionRepository extends CandidateResolutionPo
         )
       ).rows[0]
       if (existing) {
-        if (existing.candidate_id !== input.candidateId || existing.decision !== input.decision) {
+        if (
+          existing.candidate_id !== input.candidateId ||
+          existing.decision !== input.decision
+        ) {
           throw new Error('candidate resolution command id collision')
         }
         return existing.resolution_id
       }
 
-      const status = input.decision === 'discard'
-        ? 'discarded'
-        : input.decision === 'quarantine'
-          ? 'quarantined'
-          : 'conflict'
+      const status =
+        input.decision === 'discard'
+          ? 'discarded'
+          : input.decision === 'quarantine'
+            ? 'quarantined'
+            : 'conflict'
 
       const updated = await tx.query(
         `update memory_nucleus.memory_candidates
@@ -36,7 +47,9 @@ export class PostgresCandidateResolutionRepository extends CandidateResolutionPo
         [input.candidateId, status]
       )
       if (updated.rowCount !== 1) {
-        throw new Error('memory candidate is not eligible for noncanonical resolution')
+        throw new Error(
+          'memory candidate is not eligible for noncanonical resolution'
+        )
       }
 
       const result = await tx.query<{ resolution_id: string }>(

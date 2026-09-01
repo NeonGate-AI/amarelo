@@ -1,13 +1,19 @@
 import { readFile, stat } from 'node:fs/promises'
 import { join } from 'node:path'
 
-async function exists(path) { return Boolean(await stat(path).catch(() => null)) }
+async function exists(path) {
+  return Boolean(await stat(path).catch(() => null))
+}
 
-export async function runMemoryInvariantCheck({ projectRoot = process.cwd() } = {}) {
+export async function runMemoryInvariantCheck({
+  projectRoot = process.cwd()
+} = {}) {
   const base = join(projectRoot, 'workspaces/memory-nucleus')
   const src = join(base, 'src')
   const errors = []
-  const need = async (path) => { if (!(await exists(join(src, path)))) errors.push(`missing src/${path}`) }
+  const need = async (path) => {
+    if (!(await exists(join(src, path)))) errors.push(`missing src/${path}`)
+  }
 
   for (const path of [
     'domain',
@@ -17,29 +23,67 @@ export async function runMemoryInvariantCheck({ projectRoot = process.cwd() } = 
     'infrastructure/database/schema.sql',
     'assurance/evals',
     'domain/value-objects/memory-judgment.vo.ts',
-    'domain/value-objects/memory-economics.vo.ts',
-  ]) await need(path)
+    'domain/value-objects/memory-economics.vo.ts'
+  ])
+    await need(path)
 
-  for (const path of ['apps', 'packages', 'scripts', 'docs', 'db/migrations']) if (await exists(join(base, path))) errors.push(`production/nested path must not exist: ${path}`)
+  for (const path of ['apps', 'packages', 'scripts', 'docs', 'db/migrations'])
+    if (await exists(join(base, path)))
+      errors.push(`production/nested path must not exist: ${path}`)
   const pkg = JSON.parse(await readFile(join(base, 'package.json'), 'utf8'))
-  if (pkg.name !== '@nucleus/memory') errors.push('Memory Nucleus package must be @nucleus/memory')
-  if (pkg.dependencies?.['@langchain/langgraph']) errors.push('LangGraph is not required by the MVP core')
+  if (pkg.name !== '@nucleus/memory')
+    errors.push('Memory Nucleus package must be @nucleus/memory')
+  if (pkg.dependencies?.['@langchain/langgraph'])
+    errors.push('LangGraph is not required by the MVP core')
 
-  const sql = await readFile(join(src, 'infrastructure/database/schema.sql'), 'utf8').catch(() => '')
-  for (const marker of ['memory_evidence', 'memory_candidates', 'memories', 'memory_versions', 'memory_search_projections', 'tsvector', 'memory_consent_ledger']) if (!sql.includes(marker)) errors.push(`schema missing ${marker}`)
-  for (const marker of ['memory_outbox', 'fencing_token', 'dead_letter', 'export_artifact', 'suppression_hmac']) if (sql.includes(marker)) errors.push(`production-only schema concept remains: ${marker}`)
+  const sql = await readFile(
+    join(src, 'infrastructure/database/schema.sql'),
+    'utf8'
+  ).catch(() => '')
+  for (const marker of [
+    'memory_evidence',
+    'memory_candidates',
+    'memories',
+    'memory_versions',
+    'memory_search_projections',
+    'tsvector',
+    'memory_consent_ledger'
+  ])
+    if (!sql.includes(marker)) errors.push(`schema missing ${marker}`)
+  for (const marker of [
+    'memory_outbox',
+    'fencing_token',
+    'dead_letter',
+    'export_artifact',
+    'suppression_hmac'
+  ])
+    if (sql.includes(marker))
+      errors.push(`production-only schema concept remains: ${marker}`)
 
-  const retrievalUseCase = await readFile(join(src, 'application/use-cases/retrieve-memory.use-case.ts'), 'utf8').catch(() => '')
-  const repositorySearch = await readFile(join(src, 'application/services/memory-repository-search.service.ts'), 'utf8').catch(() => '')
+  const retrievalUseCase = await readFile(
+    join(src, 'application/use-cases/retrieve-memory.use-case.ts'),
+    'utf8'
+  ).catch(() => '')
+  const repositorySearch = await readFile(
+    join(src, 'application/services/memory-repository-search.service.ts'),
+    'utf8'
+  ).catch(() => '')
   const queryValidationCandidates = [
     join(src, 'application/services/memory-query.validate.ts'),
-    join(src, 'application/services/memory-query.validator.ts'),
+    join(src, 'application/services/memory-query.validator.ts')
   ]
   let queryValidation = ''
-  for (const candidate of queryValidationCandidates) if (await exists(candidate)) queryValidation = await readFile(candidate, 'utf8')
+  for (const candidate of queryValidationCandidates)
+    if (await exists(candidate))
+      queryValidation = await readFile(candidate, 'utf8')
 
-  if (!repositorySearch.includes('vectorFallback: false')) errors.push('retrieval must keep vector fallback disabled in MVP baseline')
-  if (!retrievalUseCase.includes('maxTokens') && !queryValidation.includes('maxTokens')) errors.push('retrieval must enforce token budgeting')
+  if (!repositorySearch.includes('vectorFallback: false'))
+    errors.push('retrieval must keep vector fallback disabled in MVP baseline')
+  if (
+    !retrievalUseCase.includes('maxTokens') &&
+    !queryValidation.includes('maxTokens')
+  )
+    errors.push('retrieval must enforce token budgeting')
 
   if (errors.length) {
     console.error('Memory invariants FAIL')
@@ -54,4 +98,5 @@ export async function runMemoryInvariantCheck({ projectRoot = process.cwd() } = 
   return 0
 }
 
-if (import.meta.url === `file://${process.argv[1]}`) process.exitCode = await runMemoryInvariantCheck()
+if (import.meta.url === `file://${process.argv[1]}`)
+  process.exitCode = await runMemoryInvariantCheck()

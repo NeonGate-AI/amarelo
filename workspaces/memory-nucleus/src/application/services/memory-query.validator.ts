@@ -55,7 +55,9 @@ export function resolveEffectiveMemoryRetrievalBudgets(
   }
 }
 
-export function assertAuthorizedMemoryQuery(query: AuthorizedMemoryQuery): void {
+export function assertAuthorizedMemoryQuery(
+  query: AuthorizedMemoryQuery
+): void {
   const requiredStrings: ReadonlyArray<readonly [string, string]> = [
     ['authorizationDecisionId', query.authorizationDecisionId],
     ['traceId', query.traceId],
@@ -92,7 +94,9 @@ export function assertAuthorizedMemoryQuery(query: AuthorizedMemoryQuery): void 
   }
 
   if (new Set(query.kinds).size !== query.kinds.length) {
-    throw new InvalidAuthorizedMemoryQueryError('kinds must not contain duplicates')
+    throw new InvalidAuthorizedMemoryQueryError(
+      'kinds must not contain duplicates'
+    )
   }
 
   if (
@@ -167,7 +171,10 @@ export function assertAuthorizedMemoryQuery(query: AuthorizedMemoryQuery): void 
   }
 
   const semanticKeys = query.semanticKeys ?? []
-  if (!isNonEmptyString(query.queryText) && !semanticKeys.some(isNonEmptyString)) {
+  if (
+    !isNonEmptyString(query.queryText) &&
+    !semanticKeys.some(isNonEmptyString)
+  ) {
     throw new InvalidAuthorizedMemoryQueryError(
       'queryText or at least one semantic key is required'
     )

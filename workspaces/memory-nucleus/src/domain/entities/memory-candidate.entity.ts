@@ -1,6 +1,10 @@
 import { z } from 'zod'
 
-import { MemoryIdentifierSchema, PurposeCodeSchema, type PurposeCode } from '#domain/value-objects/memory-identifiers.value-object'
+import {
+  MemoryIdentifierSchema,
+  PurposeCodeSchema,
+  type PurposeCode
+} from '#domain/value-objects/memory-identifiers.value-object'
 
 export const MemoryKindSchema = z.enum(['episodic', 'semantic'])
 export type MemoryKind = z.infer<typeof MemoryKindSchema>
@@ -212,7 +216,13 @@ export class MemoryCandidateEntity {
     return new MemoryCandidateEntity(MemoryCandidateSchema.parse(snapshot))
   }
 
-  get snapshot(): MemoryCandidate { return this.#snapshot }
-  get kind(): MemoryKind { return this.#snapshot.kind }
-  get isCanonical(): false { return false }
+  get snapshot(): MemoryCandidate {
+    return this.#snapshot
+  }
+  get kind(): MemoryKind {
+    return this.#snapshot.kind
+  }
+  get isCanonical(): false {
+    return false
+  }
 }

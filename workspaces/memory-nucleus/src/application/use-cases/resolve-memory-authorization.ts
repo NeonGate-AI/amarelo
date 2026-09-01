@@ -15,9 +15,7 @@ import {
   parseOptionalTimestamp,
   parseStoredTimestamp
 } from '#application/services/memory-record.validator'
-import {
-  snapshotAuthorizedMemoryQuery
-} from '#application/services/memory-query.validator'
+import { snapshotAuthorizedMemoryQuery } from '#application/services/memory-query.validator'
 
 function hasUniqueValues(values: readonly string[]): boolean {
   return new Set(values).size === values.length
@@ -63,7 +61,10 @@ function isValidDecisionScope(
     decision.sensitivities.length > 0 &&
     decision.sensitivities.length <= 3 &&
     decision.sensitivities.every(
-      (value) => value === 'normal' || value === 'sensitive' || value === 'highly-sensitive'
+      (value) =>
+        value === 'normal' ||
+        value === 'sensitive' ||
+        value === 'highly-sensitive'
     ) &&
     hasUniqueValues(decision.sensitivities) &&
     'timeWindow' in decision &&

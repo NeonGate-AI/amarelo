@@ -17,7 +17,9 @@ export class MemoryContextProvider {
   async retrieve(input: MemorySearchInput): Promise<ConversationMemoryContext> {
     const result = await this.client.search(input)
     return Object.freeze({
-      projection: Object.freeze(result.items.map((item) => createMemorySearchContextProjection(item))),
+      projection: Object.freeze(
+        result.items.map((item) => createMemorySearchContextProjection(item))
+      ),
       requestId: result.requestId,
       tokenBudgetUsed: result.tokenBudget.usedTokens
     })

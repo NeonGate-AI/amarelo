@@ -86,7 +86,11 @@ export class PostgresMemoryCurationAdapter extends MemoryPersistenceClient {
     private readonly claimTtlSeconds = DEFAULT_CLAIM_TTL_SECONDS
   ) {
     super()
-    if (!Number.isSafeInteger(claimTtlSeconds) || claimTtlSeconds < 1 || claimTtlSeconds > 3600) {
+    if (
+      !Number.isSafeInteger(claimTtlSeconds) ||
+      claimTtlSeconds < 1 ||
+      claimTtlSeconds > 3600
+    ) {
       throw new RangeError('claimTtlSeconds must be between 1 and 3600')
     }
   }
@@ -119,7 +123,10 @@ export class PostgresMemoryCurationAdapter extends MemoryPersistenceClient {
         })
       }
 
-      if (existing?.status === 'claimed' && existing.expires_at.getTime() > Date.now()) {
+      if (
+        existing?.status === 'claimed' &&
+        existing.expires_at.getTime() > Date.now()
+      ) {
         return Object.freeze({
           claimExpiresAt: existing.expires_at.toISOString(),
           claimId: null,
@@ -173,7 +180,9 @@ export class PostgresMemoryCurationAdapter extends MemoryPersistenceClient {
     })
   }
 
-  async saveCurationRun(rawInput: SaveCurationRunRequest): Promise<SaveCurationRunResult> {
+  async saveCurationRun(
+    rawInput: SaveCurationRunRequest
+  ): Promise<SaveCurationRunResult> {
     const input = SaveCurationRunRequestSchema.parse(rawInput)
 
     return this.database.transaction(async (tx) => {
@@ -197,7 +206,11 @@ export class PostgresMemoryCurationAdapter extends MemoryPersistenceClient {
       ).rows[0]
 
       if (!claim) {
-        return Object.freeze({ candidateIds: [], runId: null, status: 'claim-lost' as const })
+        return Object.freeze({
+          candidateIds: [],
+          runId: null,
+          status: 'claim-lost' as const
+        })
       }
 
       if (claim.status === 'completed' && claim.completed_run_id) {
@@ -216,7 +229,11 @@ export class PostgresMemoryCurationAdapter extends MemoryPersistenceClient {
       }
 
       if (claim.expires_at.getTime() <= Date.now()) {
-        return Object.freeze({ candidateIds: [], runId: null, status: 'claim-lost' as const })
+        return Object.freeze({
+          candidateIds: [],
+          runId: null,
+          status: 'claim-lost' as const
+        })
       }
 
       const run = (
@@ -325,7 +342,11 @@ export class PostgresMemoryCurationAdapter extends MemoryPersistenceClient {
         [input.claimId, run.run_id]
       )
 
-      return Object.freeze({ candidateIds, runId: run.run_id, status: 'completed' as const })
+      return Object.freeze({
+        candidateIds,
+        runId: run.run_id,
+        status: 'completed' as const
+      })
     })
   }
 }

@@ -17,7 +17,9 @@ export class AcceptMemoryCandidateUseCase {
     private readonly policy = new MemoryAcceptancePolicy()
   ) {}
 
-  execute(command: AcceptMemoryCandidateCommand): Promise<AcceptCandidateResult> {
+  execute(
+    command: AcceptMemoryCandidateCommand
+  ): Promise<AcceptCandidateResult> {
     this.policy.assertAcceptable(
       {
         kind: command.kind,
