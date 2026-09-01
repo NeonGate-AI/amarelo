@@ -2,7 +2,12 @@
   "extends": "../tsconfig.json",
   "compilerOptions": {
     "allowImportingTsExtensions": true,
+    "baseUrl": ".",
     "noEmit": true,
+    "paths": {
+      "@knowledge": ["src/index.ts"],
+      "@knowledge/*": ["src/*"]
+    },
     "types": ["node"]
   },
   "include": ["src/**/*.ts", "evals/**/*.ts"]
