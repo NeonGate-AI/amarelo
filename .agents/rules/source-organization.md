@@ -1,5 +1,5 @@
 ---
-version: 2
+version: 3
 extends: code-style.md
 name: Source Organization
 description: Source roots, module boundaries, file naming, barrels, and architectural source ownership.
@@ -25,48 +25,33 @@ Every code-bearing application, package, workspace, agent, or development subsys
 
 If a directory has a `package.json`, ordinary first-party implementation code must live under its `src/` directory unless a framework/tool requires another location.
 
-Allowed non-source-root examples include:
+Allowed non-source-root examples include `package.json`, `tsconfig.json`, framework configs, `turbo.json`, Docker/Compose files, lockfiles, `public/`, and README entrypoints.
 
-```text
-package.json
-tsconfig.json
-vite.config.ts
-next.config.ts
-turbo.json
-Dockerfile
-compose files
-lockfiles
-public/
-readme.md
-```
+Next.js applications use `src/app/` when compatible with the current app. Vite/React applications use `src/`.
 
-Next.js applications should use `src/app/` when compatible with the current app. Vite/React applications should use `src/`.
-
-The embedded repository CLI is a development subsystem and uses:
-
-```text
-cli/src/
-```
+The embedded Elo CLI is a repository development subsystem and uses `cli/src/`. Its implementation is POSIX shell. JavaScript/TypeScript implementation modules do not belong under `cli/src/`.
 
 Do not create generic root dumping grounds such as `helpers/`, `utils/`, `scripts/`, `common/`, `misc/`, or `tooling/` for project implementation code.
 
 ## 2. File naming
 
-Use kebab-case for every project-created source file and folder.
+Use kebab-case for project-created source files and folders. Framework-reserved filenames are explicit exceptions.
 
-Framework-reserved filenames are explicit exceptions.
+### Shell CLI exception
+
+Files under `cli/src/` are shell modules ending in `.sh`. Commands live under `cli/src/commands/`; reusable CLI primitives live under `cli/src/core/`. Keep one command/primary concern per shell module. The TypeScript semantic suffix table below does not apply to `.sh` files.
+
+The root `elo` file is a thin tool-required launcher and contains no substantive CLI behavior.
 
 ## 3. One primary artifact per module
 
-Each source module has one primary exported artifact: one function, class, interface/type, schema, component, hook, command, adapter, port, or equivalent concern.
+Each source module has one primary exported artifact or concern: one function, class, interface/type, schema, component, hook, command, adapter, port, or equivalent behavior.
 
-Private helpers and internal types may remain colocated when they exist only to support that primary artifact.
+Private helpers and internal types may remain colocated only when they exist exclusively to support that primary artifact.
 
-Do not split tiny private expressions into separate files merely to satisfy the rule.
+## 4. Canonical TypeScript/JavaScript suffixes
 
-## 4. Canonical suffixes
-
-Use only suffixes defined here. Add a suffix to this rule before introducing it in project-created source.
+Use only suffixes defined here for project-created semantic modules. Add a suffix before introducing a new semantic module kind.
 
 | Suffix | Meaning | Example |
 | --- | --- | --- |
@@ -75,25 +60,35 @@ Use only suffixes defined here. Add a suffix to this rule before introducing it 
 | `.adapter` | Protocol/interface adapter | `postgres.adapter.ts` |
 | `.atom` | State atom | `session.atom.ts` |
 | `.client` | External-system or React client | `http.client.ts` |
-| `.command` | Elo/repository CLI command | `doctor.command.ts` |
+| `.command` | Non-shell command module where required | `doctor.command.ts` |
 | `.compute` | Pure derived computation | `score.compute.ts` |
+| `.contract` | Application/public contract | `memory-retrieval.contract.ts` |
 | `.data` | Related static application data | `thresholds.data.ts` |
-| `.domain` | Domain-specific model/type when not an Entity/VO | `memory.domain.ts` |
+| `.domain` | Domain model/type when not Entity/VO | `memory.domain.ts` |
 | `.entity` | Domain Entity with identity/lifecycle | `memory.entity.ts` |
+| `.error` | One error type/family | `memory-retrieval.error.ts` |
+| `.eval` | Executable evaluation | `memory-retrieval.eval.ts` |
 | `.event` | Event definition/payload | `memory-created.event.ts` |
+| `.factory` | Factory behavior | `memory-candidate.factory.ts` |
+| `.fingerprint` | Stable fingerprint derivation | `memory-curation.fingerprint.ts` |
+| `.fixtures` | Cohesive test/eval fixtures | `memory-retrieval.fixtures.ts` |
 | `.fmt` | Formatter/normalizer | `unicode-text.fmt.ts` |
 | `.guard` | Access/execution guard | `authorized.guard.ts` |
 | `.handler` | Event/request handler | `submit.handler.ts` |
 | `.hook` | React hook | `session.hook.ts` |
 | `.map` | Mapper | `memory.map.ts` |
 | `.mock` | Test/development mock | `repository.mock.ts` |
+| `.policy` | Domain/application policy | `memory-acceptance.policy.ts` |
 | `.port` | Application/architecture port | `memory-repository.port.ts` |
-| `.schema` | Runtime/schema validation | `memory.schema.ts` |
-| `.script` | Elo-owned repository script/check | `architecture.script.mjs` |
+| `.prompt` | Prompt artifact | `memory-extraction.prompt.ts` |
+| `.schema` | Runtime/schema definition | `memory.schema.ts` |
+| `.script` | Temporary executable audit/check script | `.audit/architecture.script.mjs` |
 | `.server` | React server component/module | `logo.server.tsx` |
 | `.service` | Cohesive service | `projection.service.ts` |
 | `.state` | Initial/default state | `session.state.ts` |
 | `.type` | One type/interface contract | `memory.type.ts` |
+| `.usage` | Usage/accounting derivation | `memory-curation.usage.ts` |
+| `.use-case` | Application use case | `retrieve-memory.use-case.ts` |
 | `.validate` | Validation behavior | `memory-provenance.validate.ts` |
 | `.view` | Page/primary UI section | `hero.view.tsx` |
 | `.vo` | Domain Value Object | `memory-judgment.vo.ts` |
@@ -102,98 +97,71 @@ Do not use `.value-object.ts`; use `.vo.ts`.
 
 ## 5. Entity vs Value Object
 
-Use the semantic distinction:
-
 ```text
-Entity
-= identity/lifecycle matters across state changes
-
-Value Object
-= value + invariants define meaning; independent identity does not matter
+Entity       = identity/lifecycle matters across state changes
+Value Object = value + invariants define meaning; independent identity does not matter
 ```
 
-A Value Object must be a real object/class or equivalent encapsulated domain value with meaningful invariants/behavior. A generic helper function is not a Value Object.
+A generic helper function is not a Value Object.
 
 ## 6. Leaf-directory barrels
 
-Every code-bearing leaf directory must contain an `index.ts` that reexports every project-created module in that leaf directory.
+Every code-bearing TypeScript/JavaScript leaf directory must contain an `index.ts` that reexports every project-created semantic module in that leaf directory.
 
-Example:
-
-```text
-application/ports/
-├── clock.port.ts
-├── inference.port.ts
-├── memory-repository.port.ts
-└── index.ts
-```
-
-Consumers outside that leaf should import through the leaf barrel instead of enumerating internal files.
-
-A package-level `src/index.ts` is different: it is a deliberate public API and must not expose private internals merely because leaf barrels exist.
-
-Framework route directories, generated code, assets, and other directories with no module API semantics are exempt.
+A package-level `src/index.ts` remains a deliberate public API. Framework route directories, generated code, assets, shell-command directories and other directories without TypeScript module API semantics are exempt.
 
 ## 7. Imports
 
-Prefer package aliases and local barrels. Avoid deep relative imports such as `../../../`.
-
-Do not import another workspace's internals. Cross-workspace consumption must use that workspace/package public API.
+Prefer package aliases and local barrels. Avoid deep relative imports such as `../../../`. Do not import another workspace's internals; consume its public API.
 
 ## 8. Validation ownership
 
-Classify validation by semantics:
-
 ```text
-Domain invariant
-→ Domain
-
-Application use-case/contract invariant
-→ Application
-
-External/adaptor payload defense
-→ Infrastructure
+Domain invariant                    → Domain
+Application use-case/contract rule → Application
+External/adaptor payload defense   → Infrastructure
 ```
 
-Do not create a generic DTO architecture when there is no controller/presentation boundary requiring DTO mapping.
+Do not create DTO ceremony without an actual presentation/controller boundary.
 
 ## 9. Utilities and infrastructure
 
-A generic technical helper may live under an owner's Infrastructure area when it represents implementation technology rather than domain meaning.
-
-Examples include generic Unicode/NFKC normalization and SHA-256 implementation.
-
-Do not move domain semantics to Infrastructure merely because the implementation is a function.
+Generic technology helpers such as Unicode/NFKC normalization and SHA-256 belong to the owning Infrastructure/technical area when they do not encode domain meaning.
 
 ## 10. Assurance
 
-AI-engineering assurance source belongs under the owning package's `src/assurance/` area when applicable.
+AI-engineering assurance source belongs under the owner's `src/assurance/` area when applicable. In Memory Nucleus the canonical location is `src/assurance/evals/`.
 
-For Memory Nucleus:
-
-```text
-src/assurance/evals/
-```
-
-`assurance` is cross-cutting engineering source, not a fourth Clean Architecture production layer. Domain/Application/Infrastructure must not depend on assurance/evals.
+`assurance` is cross-cutting engineering source, not a fourth production layer. Production Domain/Application/Infrastructure must not depend on it.
 
 ## 11. Audit evidence
 
-`.audit/` is outside `.agents/` and outside product source roots. It contains temporary execution evidence only.
+`.audit/` is outside `.agents/`, product source roots, and CLI source. It is the temporary evidence/checking plane.
 
-Audit artifacts are not canonical engineering context. Promote durable findings to `.agents/context`, `rules`, `specs`, `adrs`, or `skills` before deleting temporary audit contents.
+Generated evidence is ignored. During an active migration, narrowly scoped checker `.mjs` files may be committed in `.audit/` so CI and reviewers can reproduce the audit. They must be deleted once their invariant is promoted into a durable mechanism.
+
+Audit artifacts are not canonical engineering context. Promote durable conclusions into `.agents/context`, `rules`, `specs`, `adrs`, or `skills` before deleting them.
 
 ## 12. Frontend organization
 
-Frontend feature/route conventions remain framework-aware:
+Preserve framework-aware frontend architecture while normalizing source roots:
 
-- globally reusable UI belongs in the app/package `src` tree;
-- route-local implementation belongs under the route's source subtree;
-- framework-reserved `page.tsx`, `layout.tsx`, `route.ts`, metadata and similar files keep their required names;
-- globally reusable UI/library/state areas expose intentional public barrels;
-- route groups may organize feature-specific code without creating additional pages;
-- aliases should point at the normalized `src` locations after migration.
+- globally reusable UI lives in the owning app/package `src` tree;
+- route-local code remains colocated under the route source subtree;
+- `page.tsx`, `layout.tsx`, `route.ts`, metadata and other reserved files keep framework names;
+- reusable UI/library/state concerns expose intentional barrels;
+- route groups may organize feature-specific source without creating pages;
+- aliases must point at normalized `src` locations;
+- source-root migration must not be used as a React/design redesign.
 
-## 13. Mechanical enforcement
+## 13. Ownership of repository commands
 
-Elo repository checks must mechanically enforce every rule here that can be decided from the filesystem/import graph, including source-root placement, suffixes, leaf barrels, forbidden deep/cross-workspace imports, package export existence, assurance dependency direction, and obsolete root tooling paths.
+Turborepo/root task scripts own `dev`, `start`, `build`, `typecheck`, tests and workspace task graphs.
+
+Elo owns monorepo platform operations: bootstrap/setup, doctor, cleanup, environment preparation/validation, Git/Husky/Commitlint/lint-staged setup and thin audit-check entrypoints.
+
+The `.mjs` checkers themselves live in `.audit/`, never under `cli/src/`.
+
+## 14. Mechanical enforcement
+
+Temporary `.audit` checkers and durable CI/harness mechanisms enforce filesystem/import invariants. Elo may expose a shell entrypoint that invokes an active audit checker, but Elo does not own the checker implementation.

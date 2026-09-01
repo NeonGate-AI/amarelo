@@ -8,9 +8,12 @@ Amarelo is an AI-native, voice-first product organized as a monorepo with explic
 workspaces/apps/      user-facing products/runtimes
 workspaces/ai/        Conversation, Knowledge and future product Agents
 workspaces/memory-nucleus/
-                      longitudinal memory: Domain → Application → Infrastructure + Evals
+                      longitudinal memory: Domain → Application → Infrastructure
+                      with cross-cutting Assurance/Evals
 workspaces/packages/  cross-workspace contracts/capabilities
-.agents/              engineering/context harness
+cli/src/              local Elo monorepo-platform CLI (POSIX shell)
+.audit/               temporary executable checks/evidence
+.agents/              normative engineering/context harness
 ```
 
 ## Glossary
@@ -24,5 +27,6 @@ workspaces/packages/  cross-workspace contracts/capabilities
 - **Observability** — records and transports “what happened?”.
 - **Judgment** — semantic decisions that cannot be reduced to deterministic policy.
 - **Cognitive lane** — Reflex, Contextual or Deliberative routing for an interaction.
+- **Elo** — project-local platform CLI for bootstrap, doctor, cleanup, env and Git platform operations; it is not Turborepo.
 
-Engineering agents start at [`agents.md`](./agents.md).
+Engineering agents start at [`AGENTS.md`](./AGENTS.md).

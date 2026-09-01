@@ -43,18 +43,18 @@ jobs:
       - name: Elo doctor
         run: ./elo doctor --ci
 
-      - name: Check architecture
+      - name: Architecture audit
         run: ./elo check architecture
 
-      - name: Check memory invariants
+      - name: Memory invariants audit
         run: ./elo check memory
 
       - name: Audit hygiene
         shell: bash
         run: |
-          tracked="$(git ls-files '.audit/**' | grep -v '^.audit/.gitkeep$' || true)"
+          tracked="$(git ls-files '.audit/**' | grep -Ev '^\.audit/(\.gitkeep|architecture\.script\.mjs|memory-invariants\.script\.mjs)$' || true)"
           if [ -n "$tracked" ]; then
-            echo 'Generated .audit evidence must not be committed:'
+            echo 'Unexpected tracked .audit evidence:'
             echo "$tracked"
             exit 1
           fi
@@ -79,22 +79,22 @@ jobs:
           fi
 
       - name: Lint
-        run: pnpm lint
+        run: pnpm exec biome check workspaces cli
 
       - name: Typecheck
-        run: pnpm typecheck
+        run: pnpm exec turbo run typecheck
 
       - name: Test
-        run: pnpm test
+        run: pnpm exec turbo run test
 
       - name: Validate Memory PostgreSQL
-        run: pnpm test:database
+        run: pnpm --filter @nucleus/memory run test:database
 
       - name: Evaluate AI
-        run: pnpm eval:ai
+        run: pnpm --filter @nucleus/memory --filter @repo/memory-sdk --filter @ai/knowledge run eval
 
       - name: Build
-        run: pnpm build
+        run: pnpm exec turbo run build
 
       - name: Git hook smoke tests
         shell: bash
