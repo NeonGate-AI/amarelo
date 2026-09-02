@@ -2,7 +2,7 @@
 
 import { motion, useReducedMotion } from 'motion/react'
 
-import { SmoothButton } from '#smoothui/smooth-button'
+import { SmoothButton } from '@repo/react/ui/smooth-button'
 
 const SPRING = {
   type: 'spring' as const,

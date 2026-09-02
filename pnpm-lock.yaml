@@ -23,9 +23,6 @@ importers:
       '@commitlint/config-conventional':
         specifier: ^20.4.1
         version: 20.5.3
-      '@neongate-ai/neon':
-        specifier: ^0.2.0
-        version: 0.2.0
       husky:
         specifier: ^9.1.7
         version: 9.1.7
@@ -1724,13 +1721,6 @@ packages:
     - linux
     libc:
     - glibc
-  '@neongate-ai/neon@0.2.0':
-    resolution:
-      integrity: sha512-2yxWeUBjdKUTEpB7TOKHHF7du+MSuDNU3/IUxwlpUyBAO9a+G6EPQVO1JsEJ5zX4WLoJGxX4pdAeK3fFLPDtwQ==
-    engines:
-      node: '>=20.11.0'
-      pnpm: '>=9.0.0'
-    hasBin: true
   '@neongate-ai/orbz@0.3.1':
     resolution:
       integrity: sha512-HDMrNwFUsXAAM3PcBPqXiegKaPVQD2/4Bzi91VDccw6wM4W2PAjzHM1UfRdT4pTIjAoGHbX/H3BpBp6CGbwdcg==
@@ -5880,10 +5870,6 @@ snapshots:
   '@langchain/protocol@0.0.19': {}
   '@napi-rs/lzma-linux-x64-gnu@1.5.1':
     optional: true
-  '@neongate-ai/neon@0.2.0':
-    dependencies:
-      prettier: 3.9.6
-      semver: 7.8.5
   '@neongate-ai/orbz@0.3.1': {}
   '@next/env@16.2.11': {}
   '@next/swc-darwin-arm64@16.2.11':

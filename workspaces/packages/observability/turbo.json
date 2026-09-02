@@ -1,4 +1,4 @@
 {
   "extends": ["//"],
-  "tasks": {"build": {"outputs": []}}
+  "tasks": { "build": { "outputs": [] } }
 }

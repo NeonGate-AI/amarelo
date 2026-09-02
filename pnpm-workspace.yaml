@@ -2,6 +2,7 @@ packages:
   - workspaces/apps/*
   - workspaces/packages/*
   - workspaces/ai/*
+  - workspaces/ai/agents/*
   - workspaces/memory-nucleus
 overrides:
   lightningcss: 1.30.1

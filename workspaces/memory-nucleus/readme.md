@@ -12,10 +12,10 @@ application
    domain
 ```
 
-- `domain/` — entities, value objects, judgment, policies and memory economics.
-- `application/` — use cases, contracts and ports.
-- `infrastructure/` — PostgreSQL, inference and observability adapters.
-- `evals/` — deterministic and semantic quality evidence for the MVP thesis.
+- `src/domain/` — entities, value objects, judgment, policies and memory economics.
+- `src/application/` — use cases, contracts and ports.
+- `src/infrastructure/` — PostgreSQL, inference and observability adapters.
+- `src/assurance/evals/` — cross-cutting deterministic and semantic quality evidence for the MVP thesis.
 
 ## Memory flow
 

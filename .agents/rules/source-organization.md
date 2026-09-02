@@ -1,8 +1,8 @@
 ---
-version: 1
+version: 4
 extends: code-style.md
 name: Source Organization
-description: Source code organization, module boundaries, file naming, and folder conventions.
+description: Source roots, module boundaries, file naming, barrels, and architectural source ownership.
 alwaysApply: true
 priority: high
 tags:
@@ -15,430 +15,160 @@ tags:
 
 ## Purpose
 
-This document defines the mandatory standards for organizing source code.
+This document defines mandatory source-code organization for Amarelo. It applies repository-wide to project-created implementation code.
 
-It extends the rules defined in [`code-style.md`](./code-style.md).
+Framework-required files and configuration files may remain outside source roots only when the framework/tool requires or conventionally owns that location.
 
-## Scope
+## 1. Canonical source root
 
-These rules apply only to files and directories created inside the project's source code.
+Every code-bearing application, package, workspace, agent, or development subsystem must have one explicit `src/` source root.
 
-They do not apply to framework-defined conventions outside the source tree.
+If a directory has a `package.json`, ordinary first-party implementation code must live under its `src/` directory unless a framework/tool requires another location.
 
----
+Allowed non-source-root examples include `package.json`, `tsconfig.json`, framework configs, `turbo.json`, Docker/Compose files, lockfiles, `public/`, and README entrypoints.
 
-## Files
+Next.js applications use `src/app/` when compatible with the current app. Vite/React applications use `src/`.
 
-### Framework Conventions
+The embedded Elo CLI is a repository development subsystem. Its executable binary is `cli/elo`; implementation lives under `cli/src/` and is POSIX shell. JavaScript/TypeScript implementation modules do not belong under `cli/src/`.
 
-Some frameworks define reserved filenames that must be used exactly as specified.
+Do not create generic root dumping grounds such as `helpers/`, `utils/`, `scripts/`, `common/`, `misc/`, or `tooling/` for project implementation code.
 
-These filenames are exceptions to the rules in this document and must not be renamed or receive suffixes.
+## 2. File naming
 
-These rules apply only to files created by the project.
+Use kebab-case for project-created source files and folders. Framework-reserved filenames are explicit exceptions.
 
-### Suffixes
+### Shell CLI exception
 
-Use only the suffixes defined in this table.
+Files under `cli/src/` are shell modules ending in `.sh`. Commands live under `cli/src/commands/`; reusable CLI primitives live under `cli/src/core/`. Keep one command/primary concern per shell module. The TypeScript semantic suffix table below does not apply to `.sh` files.
 
-| Suffix | Applies To | Example | Description |
-|---------|------------|---------|-------------|
-| `.abstract` | Any | `payment.abstract.ts` | Declares an abstract contract intended to be implemented by another type. |
-| `.client` | Any | `http.client.ts` | Declares a client for communicating with an external system such as HTTP, gRPC, MCP, or an event bus. |
-| `.compute` | Any | `score.compute.ts` | Declares a function that computes or derives a value. |
-| `.data` | Any | `thresholds.data.ts` | Exports static application data that is not environment-specific. |
-| `.event` | Any | `user-created.event.ts` | Declares an event definition or event payload. |
-| `.fmt` | Any | `ms-to-time.fmt.ts` | Declares a function that formats a value. |
-| `.guard` | Any | `authenticated.guard.ts` | Declares a guard that validates access or execution conditions. |
-| `.handler` | Any | `submit.handler.ts` | Declares an event or request handler. |
-| `.map` | Any | `client.map.ts` | Declares a mapper that transforms one representation into another. |
-| `.mock` | Any | `client.mock.ts` | Declares a mock implementation for testing or development. |
-| `.schema` | Any | `client.schema.ts` | Declares a schema, such as a Zod schema. |
-| `.service` | Any | `payment.service.ts` | Declares a service that encapsulates related domain or infrastructure operations. |
-| `.state` | Any | `client.state.ts` | Declares the initial or default state for a feature or model. |
-| `.type` | Any | `client.type.ts` | Declares a single type or interface. |
-| `.validate` | Any | `client.validate.ts` | Declares validation logic for a model or input. |
-| `.adapter` | Architecture | `stripe.adapter.ts` | Adapts one interface or protocol to another. |
-| `.port` | Architecture | `payment.port.ts` | Declares a port in a Ports and Adapters architecture. |
-| `.domain` | Domain | `client.domain.ts` | Declares a domain model or domain-specific type. |
-| `.action` | React | `sign-in.action.ts` | Declares a React Server Action or server function invoked by the application. |
-| `.client` | React | `sign-in-form.client.tsx` | Marks a Client Component. |
-| `.hook` | React | `use-client.hook.ts` | Declares a custom React Hook. |
-| `.server` | React | `logo.server.tsx` | Marks a Server Component. |
-| `.atom` | State Management | `client-cpf.atom.ts` | Declares an atom for graph-based state management libraries such as Jotai or Recoil. |
-| `.view` | UI | `hero.view.tsx` | Declares a view representing a page or a primary application section. |
+`cli/elo` is a thin launcher and contains no substantive CLI behavior.
 
----
+## 3. One primary artifact per module
 
-## 1. File Suffixes
+Each source module has one primary exported artifact or concern: one function, class, interface/type, schema, component, hook, command, adapter, port, agent, or equivalent behavior.
 
-### Description
+Private helpers and internal types may remain colocated only when they exist exclusively to support that primary artifact.
 
-Use a standardized suffix for every source file.
+## 4. Canonical TypeScript/JavaScript suffixes
 
-Use only the suffixes defined in the **Suffixes** table.
+Use only suffixes defined here for project-created semantic modules. Add a suffix before introducing a new semantic module kind.
 
-Do not create new suffixes without adding them to this document.
+| Suffix | Meaning | Example |
+| --- | --- | --- |
+| `.abstract` | Abstract runtime contract | `payment.abstract.ts` |
+| `.action` | React/server action | `sign-in.action.ts` |
+| `.adapter` | Protocol/interface adapter | `postgres.adapter.ts` |
+| `.agent` | Product AI agent definition/scaffold | `ana.agent.ts` |
+| `.atom` | State atom | `session.atom.ts` |
+| `.client` | External-system or React client | `http.client.ts` |
+| `.command` | Non-shell command module where required | `doctor.command.ts` |
+| `.compute` | Pure derived computation | `score.compute.ts` |
+| `.contract` | Application/public contract | `memory-retrieval.contract.ts` |
+| `.data` | Related static application data | `thresholds.data.ts` |
+| `.domain` | Domain model/type when not Entity/VO | `memory.domain.ts` |
+| `.entity` | Domain Entity with identity/lifecycle | `memory.entity.ts` |
+| `.error` | One error type/family | `memory-retrieval.error.ts` |
+| `.eval` | Executable evaluation | `memory-retrieval.eval.ts` |
+| `.event` | Event definition/payload | `memory-created.event.ts` |
+| `.factory` | Factory behavior | `memory-candidate.factory.ts` |
+| `.fingerprint` | Stable fingerprint derivation | `memory-curation.fingerprint.ts` |
+| `.fixtures` | Cohesive test/eval fixtures | `memory-retrieval.fixtures.ts` |
+| `.fmt` | Formatter/normalizer | `unicode-text.fmt.ts` |
+| `.guard` | Access/execution guard | `authorized.guard.ts` |
+| `.handler` | Event/request handler | `submit.handler.ts` |
+| `.hook` | React hook | `session.hook.ts` |
+| `.map` | Mapper | `memory.map.ts` |
+| `.mock` | Test/development mock | `repository.mock.ts` |
+| `.policy` | Domain/application policy | `memory-acceptance.policy.ts` |
+| `.port` | Application/architecture port | `memory-repository.port.ts` |
+| `.prompt` | Prompt artifact | `memory-extraction.prompt.ts` |
+| `.schema` | Runtime/schema definition | `memory.schema.ts` |
+| `.script` | Temporary executable audit/check script | `.audit/architecture.script.mjs` |
+| `.server` | React server component/module | `logo.server.tsx` |
+| `.service` | Cohesive service | `projection.service.ts` |
+| `.state` | Initial/default state | `session.state.ts` |
+| `.type` | One type/interface contract | `memory.type.ts` |
+| `.usage` | Usage/accounting derivation | `memory-curation.usage.ts` |
+| `.use-case` | Application use case | `retrieve-memory.use-case.ts` |
+| `.validate` | Validation behavior | `memory-provenance.validate.ts` |
+| `.view` | Page/primary UI section | `hero.view.tsx` |
+| `.vo` | Domain Value Object | `memory-judgment.vo.ts` |
 
-Do not apply these rules to framework-defined filenames.
+Do not use `.value-object.ts`; use `.vo.ts`.
 
-### Incorrect
-
-```text
-user.helper.ts
-auth.misc.ts
-button.thing.tsx
-```
-
-### Correct
-
-```text
-auth.hook.ts
-date.map.ts
-banner-section.client.tsx
-```
-
----
-
-## 2. File Naming
-
-### Description
-
-Use kebab-case for every source file.
-
-This rule applies only to project-created source files.
-
-### Incorrect
+## 5. Entity vs Value Object
 
 ```text
-UserCard.tsx
-useAuth.ts
-DateUtil.ts
-buttonStyles.ts
+Entity       = identity/lifecycle matters across state changes
+Value Object = value + invariants define meaning; independent identity does not matter
 ```
 
-### Correct
+A generic helper function is not a Value Object.
+
+## 6. Leaf-directory barrels
+
+Every code-bearing TypeScript/JavaScript leaf directory must contain an `index.ts` that reexports every project-created semantic module in that leaf directory.
+
+A package-level `src/index.ts` remains a deliberate public API. Framework route directories, generated code, assets, shell-command directories and other directories without TypeScript module API semantics are exempt.
+
+## 7. Imports
+
+First-party absolute source aliases always begin with `@`; never define or use a project source alias beginning with `#`.
+
+Imports terminate at the owning directory barrel. Do not import a final semantic source file directly. For example, import `@application/ports`, not `@application/ports/memory-repository.port`, and import `@component/auth-shell`, not `@component/auth-shell/auth-shell`.
+
+Relative imports follow the same boundary: outside an `index.ts` barrel, import a directory API rather than another module file. An `index.ts` may directly reexport its own leaf modules because that is the barrel's purpose.
+
+Do not import another workspace's internals; consume its declared package API. Avoid deep relative imports such as `../../../`.
+
+## 8. Validation ownership
 
 ```text
-user-card.tsx
-auth.hook.ts
-date.map.ts
-banner-section.client.tsx
+Domain invariant                    → Domain
+Application use-case/contract rule → Application
+External/adaptor payload defense   → Infrastructure
 ```
 
----
+Do not create DTO ceremony without an actual presentation/controller boundary.
 
-## 3. Module Responsibility
+## 9. Utilities and infrastructure
 
-### Description
+Generic technology helpers such as Unicode/NFKC normalization and SHA-256 belong to the owning Infrastructure/technical area when they do not encode domain meaning.
 
-Use one primary artifact per module.
+## 10. Assurance
 
-Create one module for each function, type, interface, class, component, hook, schema, or other primary artifact.
+AI-engineering assurance source belongs under the owner's `src/assurance/` area when applicable. In Memory Nucleus the canonical location is `src/assurance/evals/`.
 
-Keep supporting constants, helper functions, and internal types in the same module only when they exist exclusively to support the primary artifact.
+`assurance` is cross-cutting engineering source, not a fourth production layer. Production Domain/Application/Infrastructure must not depend on it.
 
-Use colocation to keep related modules close to each other.
+## 11. Audit evidence
 
-The `.data` suffix is an exception to this rule. A `.data` module may export multiple related constants that belong to the same concern.
+`.audit/` is outside `.agents/`, product source roots, and CLI source. It is the temporary evidence/checking plane.
 
-### Incorrect
+Generated evidence is ignored. During an active migration, narrowly scoped checker `.mjs` files may be committed in `.audit/` so CI and reviewers can reproduce the audit. They must be deleted once their invariant is promoted into a durable mechanism.
 
-```ts
-// user.ts
+Audit artifacts are not canonical engineering context. Promote durable conclusions into `.agents/context`, `rules`, `specs`, `adrs`, or `skills` before deleting them.
 
-export interface User {}
+## 12. Frontend organization
 
-export interface UserAddress {}
+Preserve framework-aware frontend architecture while normalizing source roots:
 
-export function createUser() {}
+- globally reusable UI lives in the owning app/package `src` tree;
+- route-local code remains colocated under the route source subtree;
+- `page.tsx`, `layout.tsx`, `route.ts`, metadata and other reserved files keep framework names;
+- reusable UI/library/state concerns expose intentional barrels;
+- route groups may organize feature-specific source without creating pages;
+- aliases must point at normalized `src` locations;
+- source-root migration must not be used as a React/design redesign.
 
-export function deleteUser() {}
+## 13. Ownership of repository commands
 
-export const DEFAULT_NAME = 'Guest'
-```
+Turborepo/root task scripts own `dev`, `start`, `build`, `typecheck`, tests and workspace task graphs.
 
-### Correct
+Elo owns monorepo platform operations: bootstrap/setup, doctor, cleanup, environment preparation/validation, Git/Husky/Commitlint/lint-staged setup and thin audit-check entrypoints. `pnpm elo` bootstraps the local Elo environment through `cli/elo`.
 
-```md
-user/
-├── create-user.compute.ts
-├── delete-user.compute.ts
-├── user.type.ts
-├── user-address.type.ts
-└── user.data.ts
-```
+The `.mjs` checkers themselves live in `.audit/`, never under `cli/src/`.
 
----
+## 14. Mechanical enforcement
 
-## Folders
-
-### Folder Types
-
-## 4. Source Root
-
-### Description
-
-Create a single source root for every application, package, and agent.
-
-The source root is the directory where developers and AI agents create and maintain source code.
-
-The source root name depends on the framework.
-
-Examples include `app` and `src`.
-
----
-
-## 5. Folder Naming
-
-### Description
-
-Use kebab-case for every project-created folder.
-
-### Incorrect
-
-```text
-BannerSection/
-UserProfile/
-PaymentGateway/
-```
-
-### Correct
-
-```text
-banner-section/
-user-profile/
-payment-gateway/
-```
-
----
-
-## 6. UI Component Organization
-
-### Description
-
-Place globally reusable UI components inside the `ui` directory.
-
-Export the public API of the `ui` directory through `index.ts`.
-
-Create one directory for each UI component.
-
-Name the component directory after its primary component.
-
-Name the primary component file after its directory.
-
-### Correct
-
-```md
-app/
-└── ui/
-    ├── index.ts
-    └── banner-section/
-        ├── banner-section.client.tsx
-        ├── section-aside.client.tsx
-        ├── banner-section.feature
-        ├── banner-section.test.ts
-        └── banner-section.stories.tsx
-```
-
-```ts
-// app/ui/index.ts
-
-export { ... } from './banner-section/banner-section.client'
-export { ... } from './hero-section/hero-section.client'
-export { ... } from './footer/footer.client'
-export { ... } from './header/header.client'
-export { ... } from './button/button.client'
-```
-
-```tsx
-// app/(marketing)/page.tsx
-
-import {
-  BannerSection,
-  Button,
-  Footer,
-  Header,
-  HeroSection,
-} from '@ui'
-```
-
-### Folder Types
-
-Use only the folder types defined in these tables.
-
-#### Top-Level Folders
-
-| Folder | Applies To | Example | Description |
-|---------|------------|---------|-------------|
-| `ui` | Frontend | `app/ui/` | Declares globally reusable UI components. Exports its public API through `index.ts`. |
-| `lib` | Frontend | `app/lib/` | Declares globally reusable libraries organized by concern. Each concern exposes its public API through `index.ts`. |
-| `infra` | Frontend | `app/infra/` | Declares integrations with frameworks, third-party libraries, and external services. |
-| `atoms` | Frontend | `app/atoms/` | Declares globally shared state atoms. Exports its public API through `index.ts`. |
-| `brand` | Frontend | `app/brand/` | Declares branding resources. Contains `fonts`, `styles`, and `theme`. |
-| `api` | Next.js | `app/api/` | Declares API Route Handlers. |
-
-#### Route Folders
-
-Every route declares a single `lib` directory.
-
-The `lib` directory is the source root for the route.
-
-All project-created folders inside a route must be placed inside `lib`.
-
-| Folder | Applies To | Example | Description |
-|---------|------------|---------|-------------|
-| `lib` | Route | `app/(hero)/lib/` | Declares the source root for a route. Contains all route-specific source code. |
-| `ui` | Route | `app/(hero)/lib/ui/` | Declares UI components used only by the current route. Exports its public API through `index.ts`. |
-| `atoms` | Route | `app/(hero)/lib/atoms/` | Declares state atoms scoped to the current route. Exports its public API through `index.ts`. |
-| `infra` | Route | `app/(hero)/lib/infra/` | Declares route-specific integrations with frameworks, third-party libraries, and external services. |
-| `events` | Route | `app/(hero)/lib/events/` | Declares events used only by the current route. |
-| `formatters` | Route | `app/(hero)/lib/formatters/` | Declares formatting functions used only by the current route. |
-| `mappers` | Route | `app/(hero)/lib/mappers/` | Declares mapping functions used only by the current route. |
-| `actions` | Route | `app/(hero)/lib/actions/` | Declares route-specific actions. |
-
----
-
-### Import Conventions
-
-#### Global UI
-
-```tsx
-import {
-  BannerSection,
-  Button,
-  Footer,
-  Header,
-  HeroSection,
-} from '@ui'
-```
-
-#### Global Atoms
-
-```tsx
-import {
-  selectedMerchantAtom,
-  themeAtom,
-  userAtom,
-} from '@atoms'
-```
-
-#### Global Libraries
-
-```tsx
-import { formatCurrency } from '@lib-formatters'
-import { merchantMapper } from '@lib-mappers'
-import { validateCpf } from '@lib-validators'
-```
-
-#### Route Libraries
-
-```tsx
-import { buildHeroCards } from '@hero'
-import { createBannerAnimation } from '@banners'
-import { merchantFilters } from '@merchants'
-import { onboardingSteps } from '@onboarding'
-```
-
-```json
-// tsconfig.paths.json
-
-{
-  "compilerOptions": {
-    "paths": {
-      "@hero/*": ["./app/(hero)/lib/*"],
-      "@banners/*": ["./app/(banners)/lib/*"],
-      "@merchants/*": ["./app/(merchants)/lib/*"],
-      "@onboarding/*": ["./app/(onboarding)/lib/*"]
-    }
-  }
-}
-```
-
-#### Infrastructure
-
-```tsx
-import { SmoothCenter } from '@smoothui'
-```
-
----
-
-### Brand Organization
-
-```md
-brand/
-├── fonts/
-├── styles/
-└── theme/
-```
-
-- `fonts` declares the project's font resources.
-- `styles` declares the foundation styles used to compose themes.
-- `theme` declares the consolidated application theme.
-
----
-
-## 7. Feature Route Groups
-
-### Description
-
-Use route groups to organize source code by feature.
-
-Create one route group for each application feature.
-
-Use the feature name consistently across specifications, route groups, and import aliases.
-
-A route group may exist without a `page.tsx` file.
-
-Use route groups without pages to organize feature-specific source code and provide a meaningful import alias.
-
-### Incorrect
-
-```md
-app/
-├── hero/
-├── banners/
-├── onboarding/
-└── merchants/
-```
-
-```tsx
-import { createBannerAnimation } from '../../../banner/lib/animations'
-import { buildHeroCards } from '../../../hero/lib/cards'
-```
-
-### Correct
-
-```md
-app/
-├── (hero)/
-│   └── lib/
-├── (banners)/
-│   └── lib/
-├── (merchants)/
-│   └── lib/
-└── (onboarding)/
-    └── lib/
-```
-
-```json
-// tsconfig.paths.json
-
-{
-  "compilerOptions": {
-    "paths": {
-      "@hero/*": ["./app/(hero)/lib/*"],
-      "@banners/*": ["./app/(banners)/lib/*"],
-      "@merchants/*": ["./app/(merchants)/lib/*"],
-      "@onboarding/*": ["./app/(onboarding)/lib/*"]
-    }
-  }
-}
-```
-
-```tsx
-import { buildHeroCards } from '@hero/cards'
-import { createBannerAnimation } from '@banners/animations'
-import { merchantFilters } from '@merchants/filters'
-import { onboardingSteps } from '@onboarding/steps'
-```
+Temporary `.audit` checkers and durable CI/harness mechanisms enforce filesystem/import invariants. Elo may expose a shell entrypoint that invokes an active audit checker, but Elo does not own the checker implementation.

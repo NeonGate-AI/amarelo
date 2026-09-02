@@ -2,6 +2,9 @@
   "name": "amarelo",
   "private": true,
   "version": "0.1.0",
+  "engines": {
+    "node": ">=24 <25"
+  },
   "overrides": {
     "lightningcss": "1.30.1"
   },
@@ -9,36 +12,18 @@
     "lightningcss": "1.30.1"
   },
   "scripts": {
+    "prepare": "./cli/elo git setup --prepare",
+    "elo": "./cli/elo",
     "dev": "turbo dev --filter=landing --filter=console --filter=onboarding --filter=mobile",
-    "runtime": "pnpm --filter @repo/runtime start",
     "start": "turbo start --filter=landing --filter=console --filter=onboarding --filter=mobile",
-    "landing": "turbo dev --filter=landing",
-    "console": "turbo dev --filter=console",
-    "mobile": "turbo dev --filter=mobile",
-    "onboarding": "turbo dev --filter=onboarding",
-    "landing-start": "turbo start --filter=landing",
-    "console-start": "turbo start --filter=console",
-    "mobile-start": "turbo start --filter=mobile",
-    "onboarding-start": "turbo start --filter=onboarding",
     "build": "turbo run build",
-    "eval:ai": "pnpm --filter @nucleus/memory --filter @repo/memory-sdk --filter @ai/knowledge run eval",
-    "eval:memory": "pnpm --filter @nucleus/memory --filter @repo/memory-sdk run eval",
-    "eval:memory-sdk": "pnpm --filter @repo/memory-sdk run eval",
-    "eval:rag": "pnpm --filter @ai/knowledge run eval:rag",
-    "check:architecture": "node tooling/checks/architecture.mjs",
-    "typecheck": "pnpm -r --if-present run typecheck",
-    "lint": "biome check workspaces tooling",
-    "format": "biome format --write --vcs-use-ignore-file=true workspaces tooling",
-    "commitlint": "commitlint --edit",
-    "memory:test": "pnpm --filter @nucleus/memory run test",
-    "eval:memory:visible": "pnpm --filter @nucleus/memory --filter @repo/memory-sdk run eval",
-    "check:memory-invariants": "node tooling/checks/memory-invariants.mjs"
+    "typecheck": "turbo run typecheck",
+    "test": "turbo run test"
   },
   "devDependencies": {
     "@biomejs/biome": "2.3.15",
     "@commitlint/cli": "^20.4.1",
     "@commitlint/config-conventional": "^20.4.1",
-    "@neongate-ai/neon": "^0.2.0",
     "husky": "^9.1.7",
     "lint-staged": "^15.5.1",
     "turbo": "^2.8.16",

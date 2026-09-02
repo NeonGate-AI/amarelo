@@ -12,7 +12,7 @@ import {
   useRef
 } from 'react'
 
-import { cn } from '#utilities/cn'
+import { cn } from '@repo/react/utilities'
 
 export interface SmoothButtonProps
   extends VariantProps<typeof smoothButtonVariants> {

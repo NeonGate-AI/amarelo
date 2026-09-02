@@ -1,0 +1,234 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "@repo/ds";
+@source "../../../../packages/react/src";
+
+:root {
+  --background: var(--elo-neutral-50);
+  --foreground: var(--elo-neutral-900);
+  --card: var(--elo-neutral-25);
+  --card-foreground: var(--elo-neutral-900);
+  --popover: var(--elo-neutral-0);
+  --popover-foreground: var(--elo-neutral-900);
+  --primary: var(--elo-yellow-500);
+  --primary-hover: var(--elo-yellow-600);
+  --primary-foreground: var(--elo-neutral-950);
+  --secondary: var(--elo-neutral-100);
+  --secondary-foreground: var(--elo-neutral-900);
+  --accent: var(--elo-yellow-100);
+  --accent-foreground: var(--elo-neutral-900);
+  --muted: var(--elo-neutral-200);
+  --muted-foreground: var(--elo-neutral-600);
+  --border: var(--elo-neutral-200);
+  --input: var(--elo-neutral-500);
+  --ring: var(--elo-yellow-800);
+  --danger: var(--elo-red-700);
+  --destructive: var(--danger);
+  --success: var(--elo-green-700);
+  --warning: var(--elo-orange-700);
+  --info: var(--elo-blue-700);
+  --surface-raised: var(--elo-neutral-0);
+  --surface-inverse: var(--elo-neutral-950);
+  --surface-inverse-foreground: var(--elo-neutral-50);
+  --brand-gold: var(--elo-yellow-500);
+  --brand-black: var(--elo-neutral-950);
+  --brand-white: var(--elo-neutral-0);
+  --brand-silver: var(--elo-neutral-200);
+  --app-font-heading: var(--font-satoshi), var(--elo-font-family-sans);
+  --app-font-body: var(--font-satoshi), var(--elo-font-family-sans);
+  --app-font-mono: var(--elo-font-family-mono);
+  --shadow-soft: 0 1.5rem 4rem rgb(43 34 0 / 12%);
+  --shadow-card: 0 .75rem 2rem rgb(43 34 0 / 10%);
+  --elo-color-fg-brand: var(--elo-yellow-800);
+  --elo-color-success-fg: var(--elo-green-700);
+  --elo-color-selection-bg: var(--elo-yellow-100);
+  --elo-color-selection-border: var(--elo-yellow-600);
+  --elo-color-shadow: rgb(43 34 0 / 12%);
+  --landing-gradient-canvas:
+    radial-gradient(
+      circle at 72% 36%,
+      rgb(250 215 21 / 7%) 0%,
+      rgb(250 215 21 / 0%) 42%
+    ),
+    linear-gradient(180deg, #fffefa 0%, #faf9f5 100%);
+}
+
+.dark {
+  --background: var(--elo-neutral-950);
+  --foreground: var(--elo-neutral-50);
+  --card: var(--elo-neutral-900);
+  --card-foreground: var(--elo-neutral-50);
+  --popover: var(--elo-neutral-850);
+  --popover-foreground: var(--elo-neutral-50);
+  --primary: var(--elo-yellow-500);
+  --primary-hover: var(--elo-yellow-400);
+  --primary-foreground: var(--elo-neutral-950);
+  --secondary: var(--elo-neutral-800);
+  --secondary-foreground: var(--elo-neutral-50);
+  --accent: var(--elo-yellow-950);
+  --accent-foreground: var(--elo-neutral-50);
+  --muted: var(--elo-neutral-750);
+  --muted-foreground: var(--elo-neutral-400);
+  --border: var(--elo-neutral-850);
+  --input: var(--elo-neutral-500);
+  --ring: var(--elo-yellow-400);
+  --danger: var(--elo-red-300);
+  --destructive: var(--danger);
+  --success: var(--elo-green-300);
+  --warning: var(--elo-orange-300);
+  --info: var(--elo-blue-300);
+  --surface-raised: var(--elo-neutral-900);
+  --surface-inverse: var(--elo-neutral-50);
+  --surface-inverse-foreground: var(--elo-neutral-950);
+  --brand-silver: var(--elo-neutral-750);
+  --shadow-soft: 0 1.5rem 4rem rgb(0 0 0 / 48%);
+  --shadow-card: 0 .75rem 2rem rgb(0 0 0 / 42%);
+  --elo-color-fg-brand: var(--elo-yellow-400);
+  --elo-color-success-fg: #4ade80;
+  --elo-color-selection-bg: #3c3615;
+  --elo-color-selection-border: var(--elo-yellow-400);
+  --elo-color-shadow: rgb(0 0 0 / 48%);
+  --landing-gradient-canvas:
+    radial-gradient(
+      circle at 58% 42%,
+      rgb(250 215 21 / 5%) 0%,
+      rgb(250 215 21 / 0%) 44%
+    ),
+    linear-gradient(180deg, #1d1c1a 0%, #121211 100%);
+}
+
+@theme inline {
+  --font-sans: var(--app-font-body);
+  --font-heading: var(--app-font-heading);
+  --font-body: var(--app-font-body);
+  --font-mono: var(--app-font-mono);
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-hover: var(--primary-hover);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-danger: var(--danger);
+  --color-destructive: var(--destructive);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-info: var(--info);
+  --color-surface-raised: var(--surface-raised);
+  --color-surface-inverse: var(--surface-inverse);
+  --color-surface-inverse-foreground: var(--surface-inverse-foreground);
+  --color-brand-gold: var(--brand-gold);
+  --color-brand-black: var(--brand-black);
+  --color-brand-white: var(--brand-white);
+  --color-brand-silver: var(--brand-silver);
+  --color-brand: var(--primary);
+  --color-brand-secondary: var(--primary-hover);
+  --color-smooth-900: var(--foreground);
+  --color-blue: var(--info);
+  --color-blue-hover: var(--elo-blue-900);
+  --color-blue-fg: var(--elo-neutral-0);
+  --color-amber: var(--warning);
+  --color-amber-hover: var(--elo-orange-900);
+  --color-amber-fg: var(--elo-neutral-0);
+  --color-green: var(--success);
+  --color-green-hover: var(--elo-green-900);
+  --color-green-fg: var(--elo-neutral-0);
+  --animate-elo-listening-pulse: elo-listening-pulse 3.8s ease-out infinite;
+
+  @keyframes elo-listening-pulse {
+    0% {
+      opacity: .6;
+      transform: scale(.78);
+    }
+
+    80%,
+    100% {
+      opacity: 0;
+      transform: scale(1.28);
+    }
+  }
+}
+
+@utility h-landing {
+  min-height: calc(100dvh - var(--landing-h-offset));
+}
+
+@utility section {
+  @apply px-4 sm:px-6;
+}
+
+@layer utilities {
+  .skip-link {
+    @apply fixed top-3 left-3 z-100 min-h-11 -translate-y-[200%] bg-foreground px-4 py-3 font-bold text-background no-underline;
+  }
+
+  .skip-link:focus-visible {
+    @apply translate-y-0 outline-4 outline-offset-2 outline-ring;
+  }
+
+  .sr-only {
+    @apply absolute -m-px h-px w-px overflow-hidden border-0 p-0 whitespace-nowrap;
+    clip: rect(0, 0, 0, 0);
+  }
+}
+
+@layer base {
+  * {
+    @apply box-border border-border outline-ring/50;
+  }
+
+  html {
+    @apply h-full bg-background;
+    min-width: 20rem;
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply relative m-0 min-h-full overflow-x-hidden bg-background font-body text-foreground antialiased;
+    background-image: var(--landing-gradient-canvas);
+    background-repeat: no-repeat;
+  }
+
+  button,
+  input,
+  select,
+  textarea {
+    font: inherit;
+  }
+
+  button,
+  a {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  a {
+    color: inherit;
+  }
+
+  ::selection {
+    background: var(--primary);
+    color: var(--primary-foreground);
+  }
+}
+
+@custom-variant dark (&:is(.dark *));
+
+.dark {
+  color-scheme: dark;
+}
+
+:root {
+  --landing-h-offset: 3rem;
+}

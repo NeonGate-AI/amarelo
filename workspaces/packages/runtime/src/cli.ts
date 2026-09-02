@@ -1,8 +1,8 @@
+import { spawn, spawnSync } from 'node:child_process'
 import { randomBytes } from 'node:crypto'
 import { access, writeFile } from 'node:fs/promises'
 import { dirname, resolve } from 'node:path'
-import { fileURLToPath } from 'node:url'
-import { spawn, spawnSync } from 'node:child_process'
+import { fileURLToPath, pathToFileURL } from 'node:url'
 
 const runtimeDirectory = resolve(dirname(fileURLToPath(import.meta.url)), '..')
 const composeFile = resolve(runtimeDirectory, 'compose.yaml')
@@ -18,8 +18,9 @@ const composeActions = {
 
 type ComposeAction = keyof typeof composeActions
 
-async function main(): Promise<void> {
-  const rawArguments = process.argv.slice(2)
+export async function runRuntimeCli(
+  rawArguments: string[] = process.argv.slice(2)
+): Promise<number> {
   const normalizedArguments =
     rawArguments[0] === '--' ? rawArguments.slice(1) : rawArguments
   const [firstArgument, ...remainingArguments] = normalizedArguments
@@ -36,8 +37,7 @@ async function main(): Promise<void> {
     !isComposeAction(firstArgument)
   ) {
     printUsage(`Ação desconhecida: ${firstArgument}`)
-    process.exitCode = 1
-    return
+    return 1
   }
 
   assertDockerComposeIsAvailable()
@@ -49,8 +49,7 @@ async function main(): Promise<void> {
     )
   }
 
-  const exitCode = await runCompose(action, forwardedArguments)
-  process.exitCode = exitCode
+  return await runCompose(action, forwardedArguments)
 }
 
 function isComposeAction(value: string | undefined): value is ComposeAction {
@@ -166,8 +165,18 @@ function printUsage(message: string): void {
   )
 }
 
-main().catch((error: unknown) => {
-  const message = error instanceof Error ? error.message : String(error)
-  console.error(`[runtime] ${message}`)
-  process.exitCode = 1
-})
+const isDirectExecution =
+  process.argv[1] !== undefined &&
+  pathToFileURL(resolve(process.argv[1])).href === import.meta.url
+
+if (isDirectExecution) {
+  runRuntimeCli()
+    .then((exitCode) => {
+      process.exitCode = exitCode
+    })
+    .catch((error: unknown) => {
+      const message = error instanceof Error ? error.message : String(error)
+      console.error(`[runtime] ${message}`)
+      process.exitCode = 1
+    })
+}

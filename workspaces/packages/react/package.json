@@ -10,30 +10,20 @@
   "sideEffects": [
     "**/*.css"
   ],
-  "imports": {
-    "#components/*": "./src/ui/*/*.tsx",
-    "#hooks/*": "./src/hooks/*.ts",
-    "#shadcn/*": "./src/vendors/shadcn/*/*.tsx",
-    "#smoothui": "./src/vendors/smoothui/index.ts",
-    "#smoothui/*": "./src/vendors/smoothui/*/*.tsx",
-    "#smoothui/lib/*": "./src/vendors/smoothui/lib/*.ts",
-    "#utilities": "./src/utilities/index.ts",
-    "#utilities/*": "./src/utilities/*.ts"
-  },
   "exports": {
     "./fonts/satoshi.css": "./src/fonts/satoshi.css",
     "./fonts/satoshi-normal.css": "./src/fonts/satoshi-normal.css",
     "./formatters": "./src/formatters/index.ts",
     "./next/fonts": "./src/next/fonts/index.ts",
     "./styles.css": "./src/styles.css",
-    "./ui/agent-orb": "./src/ui/agent-orb/agent-orb.tsx",
-    "./ui/agent-orb/presets": "./src/ui/agent-orb/presets.ts",
-    "./ui/banner-section": "./src/ui/banner-section/banner-section.tsx",
-    "./ui/scroll-reveal-paragraph": "./src/vendors/smoothui/scroll-reveal-paragraph/scroll-reveal-paragraph.tsx",
-    "./ui/smooth-button": "./src/vendors/smoothui/smooth-button/smooth-button.tsx",
+    "./ui/agent-orb": "./src/ui/agent-orb/index.ts",
+    "./ui/banner-section": "./src/ui/banner-section/index.ts",
+    "./ui/scroll-reveal-paragraph": "./src/vendors/smoothui/scroll-reveal-paragraph/index.ts",
+    "./ui/smooth-button": "./src/vendors/smoothui/smooth-button/index.ts",
     "./utilities": "./src/utilities/index.ts",
-    "./vendors/shadcn/*": "./src/vendors/shadcn/*/*.tsx",
-    "./vendors/smoothui": "./src/vendors/smoothui/index.ts"
+    "./vendors/shadcn/*": "./src/vendors/shadcn/*/index.ts",
+    "./vendors/smoothui": "./src/vendors/smoothui/index.ts",
+    "./vendors/smoothui/lib": "./src/vendors/smoothui/lib/index.ts"
   },
   "dependencies": {
     "@neongate-ai/orbz": "0.3.1",

@@ -136,6 +136,37 @@ function stableJson(value: unknown): string | undefined {
   return `{${entries.join(',')}}`
 }
 
+function utf8ByteLength(value: string): number {
+  let byteLength = 0
+
+  for (let index = 0; index < value.length; index += 1) {
+    const codeUnit = value.charCodeAt(index)
+
+    if (codeUnit < 0x80) {
+      byteLength += 1
+      continue
+    }
+
+    if (codeUnit < 0x800) {
+      byteLength += 2
+      continue
+    }
+
+    if (codeUnit >= 0xd800 && codeUnit <= 0xdbff && index + 1 < value.length) {
+      const lowSurrogate = value.charCodeAt(index + 1)
+      if (lowSurrogate >= 0xdc00 && lowSurrogate <= 0xdfff) {
+        byteLength += 4
+        index += 1
+        continue
+      }
+    }
+
+    byteLength += 3
+  }
+
+  return byteLength
+}
+
 export function estimateMemorySearchContextTokens(
   context: MemorySearchContextProjection
 ): number {
@@ -150,9 +181,7 @@ export function estimateMemorySearchContextTokens(
     // byte-level tokenizers. The fixed reserve covers deterministic framing
     // around this exact public context projection. A consumer that serializes
     // additional fields must re-enforce its own tokenizer-specific limit.
-    return (
-      new TextEncoder().encode(serialized).byteLength + ITEM_RENDERING_OVERHEAD
-    )
+    return utf8ByteLength(serialized) + ITEM_RENDERING_OVERHEAD
   } catch {
     return Number.MAX_SAFE_INTEGER
   }

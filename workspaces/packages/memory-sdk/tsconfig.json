@@ -2,6 +2,7 @@
   "compilerOptions": {
     "allowJs": false,
     "allowImportingTsExtensions": true,
+    "baseUrl": ".",
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "lib": ["ES2022", "DOM"],
@@ -9,6 +10,10 @@
     "moduleResolution": "Bundler",
     "noEmit": true,
     "noUncheckedIndexedAccess": true,
+    "paths": {
+      "@memory-sdk": ["src/index.ts"],
+      "@memory-sdk/*": ["src/*"]
+    },
     "skipLibCheck": true,
     "strict": true,
     "target": "ES2022",

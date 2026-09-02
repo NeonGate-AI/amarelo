@@ -9,7 +9,7 @@
   "scripts": {
     "build": "tsc --noEmit",
     "eval": "pnpm run eval:rag",
-    "eval:rag": "node --import tsx evals/knowledge-rag/knowledge-rag.eval.ts",
+    "eval:rag": "node --import tsx src/assurance/evals/knowledge-rag/knowledge-rag.eval.ts",
     "typecheck": "tsc --noEmit"
   },
   "devDependencies": {
@@ -17,8 +17,5 @@
     "tsx": "4.23.12",
     "typescript": "5.9.2",
     "@repo/evaluation": "workspace:*"
-  },
-  "imports": {
-    "#knowledge": "./src/index.ts"
   }
 }

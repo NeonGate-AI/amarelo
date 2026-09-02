@@ -1,0 +1,2 @@
+#!/usr/bin/env sh
+exec ./cli/elo git commit-msg "$@"

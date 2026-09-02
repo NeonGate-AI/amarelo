@@ -4,13 +4,17 @@
   "private": true,
   "type": "module",
   "sideEffects": false,
-  "exports": { ".": "./src/index.ts" },
+  "exports": {
+    ".": "./src/index.ts"
+  },
   "scripts": {
     "build": "tsc --noEmit",
     "typecheck": "tsc --noEmit",
-    "eval": "node --import tsx evals/memory-sdk.eval.ts"
+    "eval": "node --import tsx src/assurance/evals/memory-sdk.eval.ts"
   },
-  "dependencies": { "zod": "4.4.3" },
+  "dependencies": {
+    "zod": "4.4.3"
+  },
   "devDependencies": {
     "@types/node": "24.13.3",
     "tsx": "4.23.12",

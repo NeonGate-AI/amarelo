@@ -20,9 +20,14 @@ export function scoreContextEfficiency(input: {
     }
   }
   const tokensAvoided = input.baselineTokens - input.projectedTokens
-  const compressionRatio = input.baselineTokens === 0 ? null : input.projectedTokens / input.baselineTokens
+  const compressionRatio =
+    input.baselineTokens === 0
+      ? null
+      : input.projectedTokens / input.baselineTokens
   const qualityRetention =
-    input.baselineQuality === undefined || input.projectedQuality === undefined || input.baselineQuality === 0
+    input.baselineQuality === undefined ||
+    input.projectedQuality === undefined ||
+    input.baselineQuality === 0
       ? null
       : input.projectedQuality / input.baselineQuality
   return Object.freeze({ compressionRatio, qualityRetention, tokensAvoided })

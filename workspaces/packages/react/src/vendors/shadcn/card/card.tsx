@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
 
-import { cn } from '#utilities/cn'
+import { cn } from '@repo/react/utilities'
 
 export interface CardProps {
   children: ReactNode
