@@ -4,7 +4,7 @@ import { X } from '@phosphor-icons/react'
 import * as DialogPrimitive from '@radix-ui/react-dialog'
 import type { ReactNode } from 'react'
 
-import { cn } from '@utilities'
+import { cn } from '@repo/react/utilities'
 
 export interface DialogProps {
   children: ReactNode
