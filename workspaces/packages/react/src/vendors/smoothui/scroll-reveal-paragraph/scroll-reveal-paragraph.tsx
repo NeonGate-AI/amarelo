@@ -11,7 +11,7 @@ import {
 } from 'motion/react'
 import { type AriaAttributes, useEffect, useRef } from 'react'
 
-import { cn } from '@utilities'
+import { cn } from '@repo/react/utilities'
 
 const DEFAULT_AUTO_DURATION_SECONDS = 3.8
 const KEY_PREFIX_LENGTH = 3
