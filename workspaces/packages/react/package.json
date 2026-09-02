@@ -22,7 +22,8 @@
     "./ui/smooth-button": "./src/vendors/smoothui/smooth-button/index.ts",
     "./utilities": "./src/utilities/index.ts",
     "./vendors/shadcn/*": "./src/vendors/shadcn/*/index.ts",
-    "./vendors/smoothui": "./src/vendors/smoothui/index.ts"
+    "./vendors/smoothui": "./src/vendors/smoothui/index.ts",
+    "./vendors/smoothui/lib": "./src/vendors/smoothui/lib/index.ts"
   },
   "dependencies": {
     "@neongate-ai/orbz": "0.3.1",
