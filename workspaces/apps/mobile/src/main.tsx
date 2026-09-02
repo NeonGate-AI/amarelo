@@ -3,10 +3,7 @@ import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 
 import { App } from './app'
-import {
-  applyPreviewStateAtom,
-  type PreviewState
-} from './state'
+import { applyPreviewStateAtom, type PreviewState } from './state'
 import './styles.css'
 
 function isPreviewState(value: string | null): value is PreviewState {
