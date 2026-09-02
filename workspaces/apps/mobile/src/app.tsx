@@ -3,11 +3,7 @@ import { useEffect } from 'react'
 
 import { ConversationScreen } from './ui'
 import { PwaLifecycle } from './ui'
-import {
-  type ColorTheme,
-  resolvedThemeAtom,
-  setSystemThemeAtom
-} from './state'
+import { type ColorTheme, resolvedThemeAtom, setSystemThemeAtom } from './state'
 
 function useThemeBridge() {
   const resolvedTheme = useAtomValue(resolvedThemeAtom)
