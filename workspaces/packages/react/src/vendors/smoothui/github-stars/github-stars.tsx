@@ -4,7 +4,7 @@ import { StarIcon } from '@phosphor-icons/react'
 import { motion, useReducedMotion, useSpring } from 'motion/react'
 import { useEffect, useState } from 'react'
 
-import { cn } from '@utilities'
+import { cn } from '@repo/react/utilities'
 
 const TRANSITION_DURATION = 0.3
 const EASE_OUT_CUBIC = [0.215, 0.61, 0.355, 1] as const

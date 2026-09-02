@@ -1,4 +1,4 @@
-import { agentOrbPresets } from '@repo/react/ui/agent-orb/presets'
+import { agentOrbPresets } from '@repo/react/ui/agent-orb'
 
 export type AgentId = 'ana' | 'nico' | 'isa'
 

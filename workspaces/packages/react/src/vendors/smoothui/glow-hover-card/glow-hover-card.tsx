@@ -10,7 +10,7 @@ import {
   useRef,
   useState
 } from 'react'
-import { cn } from '@utilities'
+import { cn } from '@repo/react/utilities'
 
 interface GlowElementProps {
   className?: string

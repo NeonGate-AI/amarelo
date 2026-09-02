@@ -13,8 +13,8 @@ import {
   useState
 } from 'react'
 
-import { DURATION_INSTANT, SPRING_DEFAULT, SPRING_SNAPPY } from '@smoothui/lib'
-import { cn } from '@utilities'
+import { DURATION_INSTANT, SPRING_DEFAULT, SPRING_SNAPPY } from '@repo/react/vendors/smoothui/lib'
+import { cn } from '@repo/react/utilities'
 
 // ---------------------------------------------------------------------------
 // Constants

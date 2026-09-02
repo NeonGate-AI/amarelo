@@ -15,7 +15,7 @@ import Image from 'next/image'
 import type { ReactNode } from 'react'
 
 import { AgentOrb } from '@repo/react/ui/agent-orb'
-import { agentOrbPresets } from '@repo/react/ui/agent-orb/presets'
+import { agentOrbPresets } from '@repo/react/ui/agent-orb'
 import { ShimmerSweep, SmoothButton } from '@repo/react/vendors/smoothui'
 
 import { AppStateShowcase } from './app-state-showcase'

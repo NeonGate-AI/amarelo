@@ -13,7 +13,7 @@ import Image from 'next/image'
 import { type KeyboardEvent, useRef, useState } from 'react'
 
 import { AgentOrb, type AgentOrbState } from '@repo/react/ui/agent-orb'
-import { agentOrbPresets } from '@repo/react/ui/agent-orb/presets'
+import { agentOrbPresets } from '@repo/react/ui/agent-orb'
 
 type AppStateId = 'listening' | 'muted' | 'speaking'
 
