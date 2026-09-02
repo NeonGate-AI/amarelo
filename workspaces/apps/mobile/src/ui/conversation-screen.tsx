@@ -1,6 +1,5 @@
 import { MoonStars, Sun, X } from '@phosphor-icons/react'
-import { AgentOrb } from '@repo/react/ui/agent-orb'
-import { agentOrbPresets } from '@repo/react/ui/agent-orb/presets'
+import { AgentOrb, agentOrbPresets } from '@repo/react/ui/agent-orb'
 import { SmoothButton } from '@repo/react/ui/smooth-button'
 import { useAtomValue, useSetAtom } from 'jotai'
 import { useCallback, useEffect } from 'react'
