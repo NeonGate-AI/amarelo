@@ -1,4 +1,4 @@
-export * from './auth-state'
+export * from './state'
 export * from './configuration'
 export * from './error-message'
 export * from './pending-auth'
