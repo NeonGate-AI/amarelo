@@ -1,5 +1,5 @@
 ---
-version: 2
+version: 3
 name: Import Boundaries
 description: Canonical first-party absolute aliases and barrel-only cross-directory source imports.
 alwaysApply: true
@@ -30,6 +30,10 @@ When an import crosses into another source directory, it terminates at that dire
 
 Modules already inside the same leaf may import sibling modules directly. This avoids self-barrel cycles such as `module → index → module`; the leaf `index.ts` remains the only supported entrypoint from outside that leaf.
 
-Package boundaries remain authoritative: do not use an internal alias to bypass another workspace's public package API. Framework-reserved route files and non-module assets are exempt from barrel creation where the framework owns their filename/lookup semantics.
+A barrel must preserve runtime boundaries. Never make a Client Component consume a mixed barrel that also reexports `server-only`, `next/headers`, server actions' implementation dependencies, credentials, or other server-only modules. Split the client-safe contract/state/data into its own leaf and import that leaf barrel instead. Likewise, do not weaken or remove a `server-only` marker merely to satisfy the barrel rule.
+
+Package boundaries remain authoritative: do not use an internal alias to bypass another workspace's public package API. Shared workspace source consumed by another package must resolve its own dependencies through that package's declared public exports rather than private TypeScript aliases that only exist in the producer's `tsconfig`.
+
+Framework-reserved route files and non-module assets are exempt from barrel creation where the framework owns their filename/lookup semantics.
 
 When moving source, update the relevant TypeScript `paths` mapping and the leaf barrels in the same change. Mechanical import-boundary checks must remain green.
