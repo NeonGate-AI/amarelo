@@ -1,4 +1,4 @@
-import { agentOrbPresets as eloPresets } from '@repo/react/ui/agent-orb/presets'
+import { agentOrbPresets as eloPresets } from '@repo/react/ui/agent-orb'
 
 export const dashboardData = {
   user: {
