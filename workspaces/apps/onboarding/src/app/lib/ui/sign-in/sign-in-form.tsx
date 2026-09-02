@@ -5,7 +5,7 @@ import { useActionState, useState } from 'react'
 
 import { signInAction } from '@action'
 import { SubmitButton } from '@component/auth-form'
-import { INITIAL_AUTH_STATE } from '@lib/auth'
+import { INITIAL_AUTH_STATE } from '@lib/auth/state'
 
 export function SignInForm() {
   const [state, formAction] = useActionState(signInAction, INITIAL_AUTH_STATE)

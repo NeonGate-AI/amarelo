@@ -7,7 +7,7 @@ import { useActionState } from 'react'
 import { verifyEmailAction } from '@action'
 import { SubmitButton } from '@component/auth-form'
 import { VoiceGuide } from '@component/voice-guide'
-import { INITIAL_AUTH_STATE } from '@lib/auth'
+import { INITIAL_AUTH_STATE } from '@lib/auth/state'
 
 const VERIFICATION_PROMPT =
   'Enviamos um código de seis números para o seu e-mail. Digite esse código aqui. Depois da verificação, seu Elo acompanha você no onboarding.'

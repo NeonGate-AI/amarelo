@@ -19,7 +19,7 @@ import { useActionState, useState } from 'react'
 import { signUpAction } from '@action'
 import { SubmitButton } from '@component/auth-form'
 import { planOptions, type PlanId, type PlanOption } from '@data'
-import { INITIAL_AUTH_STATE } from '@lib/auth'
+import { INITIAL_AUTH_STATE } from '@lib/auth/state'
 
 type SignUpStep = 'account' | 'plans'
 
