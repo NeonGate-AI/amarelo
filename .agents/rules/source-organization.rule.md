@@ -85,7 +85,7 @@ Use only suffixes defined here for project-created semantic modules. Add a suffi
 | `.port` | Application/architecture port | `memory-repository.port.ts` |
 | `.prompt` | Prompt artifact | `memory-extraction.prompt.ts` |
 | `.schema` | Runtime/schema definition | `memory.schema.ts` |
-| `.script` | Temporary executable audit/check script | `.audit/architecture.script.sh` |
+| `.audit` | Executable repository invariant checker | `.audit/architecture.audit.sh` |
 | `.server` | React server component/module | `logo.server.tsx` |
 | `.service` | Cohesive service | `projection.service.ts` |
 | `.state` | Initial/default state | `session.state.ts` |

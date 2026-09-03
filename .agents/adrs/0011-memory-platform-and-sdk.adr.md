@@ -200,7 +200,7 @@ narrow shared package outside the AI runtime.
 
 - Architecture map: `.agents/ARCHITECTURE.md`
 - Memory constitution: `.agents/MEMORY.md`
-- Memory behavior spec: `.agents/specs/001-memory-nucleus-product-contract.md`
+- Memory behavior spec: `.agents/specs/001-memory-nucleus-product-contract.spec.md`
 - Platform architecture: `elos/memory-platform/README.md`
 - Research register: `elos/memory-platform/docs/RESEARCH.md`
 - Superseded decision: `.agents/decisions/0010-elos-and-ai-domain-workspaces.md`

@@ -16,12 +16,12 @@ context:
   - .agents/context/product/strategy.md
   - .agents/context/workflows/landing.md
 rules:
-  - .agents/rules/product-safety-and-privacy.md
-  - .agents/rules/react-and-next.md
+  - .agents/rules/product-safety-and-privacy.rule.md
+  - .agents/rules/react-and-next.rule.md
 adrs:
-  - .agents/adrs/0001-shared-longitudinal-memory.md
-  - .agents/adrs/0002-elos-as-contextual-agents.md
-  - .agents/adrs/0003-authorization-before-retrieval.md
+  - .agents/adrs/0001-shared-longitudinal-memory.adr.md
+  - .agents/adrs/0002-elos-as-contextual-agents.adr.md
+  - .agents/adrs/0003-authorization-before-retrieval.adr.md
 skills:
   - .agents/skills/spec-driven-development/SKILL.md
   - .agents/skills/frontend-ui-engineering/SKILL.md

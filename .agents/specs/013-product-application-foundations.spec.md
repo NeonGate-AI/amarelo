@@ -15,22 +15,22 @@ targets:
   - workspaces/apps/mobile
   - shared product UI packages
 context:
-  - .agents/context/apps/
+  - .agents/context/workflows/
   - .agents/context/product/
 rules:
-  - .agents/rules/react-and-next.md
-  - .agents/rules/product-safety.md
-  - .agents/rules/package-ownership.md
+  - .agents/rules/react-and-next.rule.md
+  - .agents/rules/product-safety-and-privacy.rule.md
+  - .agents/rules/package-ownership.rule.md
 adrs:
   - .agents/adrs/
 skills:
   - .agents/skills/
 evidence:
   - https://github.com/NeonGate-AI/amarelo-v2/pull/1
-  - .agents/specs/006-product-narrative.md
-  - .agents/specs/004-account-and-elo-entry.md
-  - .agents/specs/005-memory-control.md
-  - .agents/specs/003-mobile-voice-experience.md
+  - .agents/specs/006-product-narrative.spec.md
+  - .agents/specs/004-account-and-elo-entry.spec.md
+  - .agents/specs/005-memory-control.spec.md
+  - .agents/specs/003-mobile-voice-experience.spec.md
   - workspaces/apps/
 ---
 

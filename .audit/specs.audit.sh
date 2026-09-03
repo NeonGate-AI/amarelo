@@ -365,6 +365,43 @@ while IFS= read -r target; do
       "point the index at an existing flat spec"
 done <"$index_targets"
 
+reference_files="$TMP_ROOT/semantic-reference-files"
+find "$PROJECT_ROOT" \
+  \( -path "$PROJECT_ROOT/.git" -o -path '*/node_modules' -o \
+     -path '*/dist' -o -path '*/.next' -o -path '*/.turbo' -o \
+     -path '*/coverage' \) -prune -o \
+  -type f \( -name '*.md' -o -name '*.sh' -o -name '*.yml' -o \
+    -name '*.yaml' -o -name '*.json' -o -name '*.ts' -o \
+    -name '*.tsx' -o -name '*.js' -o -name '*.mjs' \) -print | \
+  sort >"$reference_files"
+
+while IFS= read -r reference_file; do
+  [ -n "$reference_file" ] || continue
+  [ "$reference_file" != "$PROJECT_ROOT/.audit/specs.audit.sh" ] || continue
+
+  if grep -Eq '\.agents/adrs/[0-9][0-9][0-9][0-9]-[a-z0-9-]+\.md([^a-zA-Z0-9.]|$)' "$reference_file"; then
+    spec_fail unsuffixed-adr-reference "${reference_file#"$PROJECT_ROOT"/}" \
+      "reference points to an ADR without the canonical .adr.md suffix" \
+      "replace it with the canonical semantic-suffix path"
+  fi
+  if sed 's#\.agents/rules/readme\.md##g' "$reference_file" | \
+    grep -Eq '\.agents/rules/[a-z0-9-]+\.md([^a-zA-Z0-9.]|$)'; then
+    spec_fail unsuffixed-rule-reference "${reference_file#"$PROJECT_ROOT"/}" \
+      "reference points to a rule without the canonical .rule.md suffix" \
+      "replace it with the canonical semantic-suffix path"
+  fi
+  if grep -Eq '\.agents/specs/[0-9][0-9][0-9]-[a-z0-9-]+\.md([^a-zA-Z0-9.]|$)' "$reference_file"; then
+    spec_fail unsuffixed-spec-reference "${reference_file#"$PROJECT_ROOT"/}" \
+      "reference points to a numbered spec without the canonical .spec.md suffix" \
+      "replace it with the canonical semantic-suffix path"
+  fi
+  if grep -Eq '\.audit/[a-z0-9-]+\.script\.sh([^a-zA-Z0-9.]|$)' "$reference_file"; then
+    spec_fail legacy-audit-reference "${reference_file#"$PROJECT_ROOT"/}" \
+      "reference points to a retired .script.sh audit path" \
+      "replace it with the canonical .audit.sh path"
+  fi
+done <"$reference_files"
+
 if [ -s "$numbers" ]; then
   max_id=$(sort -n "$numbers" | tail -n 1)
   next_id=$(awk -v value="$max_id" 'BEGIN { printf "SPEC-%03d", value + 1 }')

@@ -91,7 +91,7 @@ if ! is_framework_owned_mjs workspaces/apps/example/postcss.config.mjs ||
   is_framework_owned_mjs workspaces/apps/example/src/scripts/postcss.config.mjs ||
   is_framework_owned_mjs workspaces/packages/design-system/src/scripts/build.config.mjs
 then
-  platform_fail .audit/elo-platform.script.sh "framework MJS allowlist contract is too broad"
+  platform_fail .audit/elo-platform.audit.sh "framework MJS allowlist contract is too broad"
 fi
 
 package_script_names() {

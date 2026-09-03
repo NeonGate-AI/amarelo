@@ -142,7 +142,7 @@ if ! grep -Fx './missing/conditional.js' "$TMP_ROOT/conditional-exports" >/dev/n
 then
   architecture_fail \
     audit-contract \
-    .audit/architecture.script.sh \
+    .audit/architecture.audit.sh \
     "conditional export fixture was not rejected" \
     "preserve recursive package export validation"
 fi

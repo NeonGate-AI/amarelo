@@ -14,12 +14,12 @@ targets:
 context:
   - .agents/context/workspaces/ai/conversation.md
 rules:
-  - .agents/rules/context-engineering.md
-  - .agents/rules/product-safety-and-privacy.md
+  - .agents/rules/context-engineering.rule.md
+  - .agents/rules/product-safety-and-privacy.rule.md
 adrs:
-  - .agents/adrs/0017-cognitive-routing-and-memory-boundary.md
-  - .agents/adrs/0020-conversation-agent-port.md
-  - .agents/adrs/0023-direct-ai-conversation-topology.md
+  - .agents/adrs/0017-cognitive-routing-and-memory-boundary.adr.md
+  - .agents/adrs/0020-conversation-agent-port.adr.md
+  - .agents/adrs/0023-direct-ai-conversation-topology.adr.md
 skills:
   - .agents/skills/spec-driven-development/SKILL.md
   - .agents/skills/code-review/SKILL.md
