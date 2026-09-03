@@ -1,5 +1,5 @@
 ---
-version: 3
+version: 4
 name: Architecture
 description: Repository topology, dependency direction, workspace ownership, and import boundaries.
 alwaysApply: true
@@ -14,9 +14,10 @@ tags:
 
 - Canonical source root is `workspaces/`; references to the retired source-root name are forbidden in live implementation/configuration.
 - A workspace must not contain a nested generic `apps/` or `packages/` mini-monorepo.
-- `workspaces/ai/agents/` and `workspaces/ai/orchestrator/` are structural capability parents. They own no package, `src/`, or TypeScript configuration.
-- Named product agents live under `workspaces/ai/agents/<agent>/`; current-interaction coordination runtimes live under `workspaces/ai/orchestrator/<runtime>/`.
-- Conversation's canonical workspace path is `workspaces/ai/orchestrator/conversation` and its package identity remains `@ai/conversation`.
+- `workspaces/ai/agents/` is a structural capability parent. It owns no package, `src/`, or TypeScript configuration.
+- Named product agents live under `workspaces/ai/agents/<agent>/`.
+- Conversation's canonical workspace path is `workspaces/ai/conversation` and its package identity remains `@ai/conversation`.
+- `workspaces/ai/orchestrator/` is a retired topology and must not be recreated without a superseding spec and ADR backed by multiple independently owned runtimes.
 - Memory Nucleus is a single workspace/package with real Clean Architecture direction: `infrastructure → application → domain`.
 - Domain must not import Application or Infrastructure. Application must not import concrete Infrastructure.
 - Cross-workspace imports use declared package names, never relative paths.

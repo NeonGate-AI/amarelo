@@ -9,8 +9,7 @@ workspaces/
   ai/
     agents/
       ana/
-    orchestrator/
-      conversation/
+    conversation/
     knowledge/
   memory-nucleus/
     src/
@@ -28,6 +27,6 @@ workspaces/
   context/ rules/ specs/ adrs/ skills/
 ```
 
-`agents/` and `orchestrator/` are structural AI capability parents, not packages. Named product agents own independent workspaces under `agents/`; Conversation and future coordination runtimes own independent workspaces under `orchestrator/`.
+`agents/` is a structural AI capability parent, not a package. Named product agents own independent workspaces beneath it. Conversation and Knowledge are direct concrete AI workspaces; package identities, public ports and exports express their boundaries without a generic single-child coordinator directory.
 
 Memory Nucleus is one workspace, not a nested mini-monorepo. Clean Architecture dependency direction is `infrastructure → application → domain`. AI consumes Memory Nucleus only through `@repo/memory-sdk`.

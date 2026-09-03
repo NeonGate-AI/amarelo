@@ -21,7 +21,7 @@ The specification catalog is flat, priority-ordered and mechanically checked.
 | 006 | SPEC-024 | implemented | [Public Amarelo product narrative](006-product-narrative.md) |
 | 007 | SPEC-025 | draft | [Plans, voice entitlements and capability gates](007-plans-and-entitlements.md) |
 | 008 | SPEC-026 | implemented | [Canonical spec template and priority migration](008-canonical-spec-template-and-priority-migration.md) |
-| 009 | reserved | — | `SPEC-027`: direct AI Conversation topology migration |
+| 009 | SPEC-027 | in-progress | [Direct AI Conversation topology](009-direct-ai-conversation-topology.md) |
 | 010 | reserved | — | `SPEC-028`: Elo CLI experience modernization |
 | 011 | SPEC-001 | implemented | [Repository harness and Elo foundation](011-repository-harness-and-elo-foundation.md) |
 | 012 | SPEC-002 | implemented | [Memory Nucleus MVP foundation](012-memory-nucleus-mvp-foundation.md) |
@@ -38,6 +38,6 @@ The specification catalog is flat, priority-ordered and mechanically checked.
 | 023 | SPEC-011 | ready | [Bounded Memory Nucleus serving context](023-bounded-nucleus-serving-context.md) |
 | 024 | SPEC-012 | ready | [Durable background memory-curation loop](024-background-memory-curation-loop.md) |
 
-The next durable delivery ID is `SPEC-027`. Priorities 009 and 010 are reserved by `SPEC-026` for the two owner-approved migrations that immediately follow this catalog change.
+The next durable delivery ID is `SPEC-028`. Priority 010 is reserved by `SPEC-026` for the owner-approved Elo CLI migration that immediately follows SPEC-027.
 
 Use `template.md` and `workflow.md` for every new numbered spec. Rules, context and ADRs remain separate sources of truth and should be referenced rather than copied.
