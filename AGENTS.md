@@ -26,6 +26,7 @@ Start from `.agents/context/workspaces/<area>/` when an area manifest exists. Fo
 
 - Personal memory is private by default; authorization precedes retrieval or exposure.
 - Product AI agents live under `workspaces/ai/agents/`; `.agents/` is the engineering harness.
+- Conversation and future AI coordination runtimes live under the structural `workspaces/ai/orchestrator/` parent.
 - Memory Nucleus remains a single workspace with semantic Clean Architecture dependency direction.
 - AI consumers access Memory Nucleus through its approved public boundary, not workspace internals.
 - First-party absolute aliases use `@`, never `#`; source imports stop at directory barrels rather than final semantic files.

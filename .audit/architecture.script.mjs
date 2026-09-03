@@ -137,12 +137,29 @@ export async function runArchitectureCheck({ projectRoot = process.cwd() } = {})
     }
   }
 
+  const conversationWorkspaces = workspaces.filter(
+    (workspace) => workspace.name === '@ai/conversation'
+  )
+  if (
+    conversationWorkspaces.length !== 1 ||
+    conversationWorkspaces[0]?.root !==
+      'workspaces/ai/orchestrator/conversation'
+  ) {
+    fail(
+      'conversation-topology',
+      'workspaces/ai/orchestrator/conversation',
+      '@ai/conversation must exist exactly once at its canonical orchestrator path',
+      'move or deduplicate the Conversation workspace'
+    )
+  }
+
   for (const required of [
     'AGENTS.md',
     '.agents/skills/readme.md',
     '.agents/context/product/strategy.md',
     'cli/elo',
-    'cli/src'
+    'cli/src',
+    'workspaces/ai/orchestrator/conversation'
   ]) {
     if (!(await exists(join(projectRoot, required)))) {
       fail(
@@ -160,7 +177,8 @@ export async function runArchitectureCheck({ projectRoot = process.cwd() } = {})
     'tooling',
     'workspaces/memory-nucleus/apps',
     'workspaces/memory-nucleus/packages',
-    'workspaces/ai/conversation/src/agents'
+    'workspaces/ai/conversation',
+    'workspaces/ai/orchestrator/conversation/src/agents'
   ]) {
     if (await exists(join(projectRoot, forbidden))) {
       fail(
@@ -169,6 +187,23 @@ export async function runArchitectureCheck({ projectRoot = process.cwd() } = {})
         'obsolete/forbidden path exists',
         'remove or migrate the path'
       )
+    }
+  }
+
+  for (const parent of [
+    'workspaces/ai/agents',
+    'workspaces/ai/orchestrator'
+  ]) {
+    for (const forbiddenChild of ['package.json', 'src', 'tsconfig.json']) {
+      const path = `${parent}/${forbiddenChild}`
+      if (await exists(join(projectRoot, path))) {
+        fail(
+          'ai-capability-parent',
+          path,
+          `${parent} is a structural parent and cannot own ${forbiddenChild}`,
+          'move ownership into a named child workspace'
+        )
+      }
     }
   }
 
