@@ -46,8 +46,8 @@ jobs:
 
           git rm -f .github/workflows/spec-031-audit-robustness.yml
           /bin/sh -n .audit/elo-platform-core.audit.sh
-          /bin/sh .audit/elo-platform-core.audit.sh
           /bin/sh .audit/rules.audit.sh
+          /bin/sh .audit/elo-scaffold.audit.sh
 
           git config user.name "Jonatas Sales"
           git config user.email "sykes.echo@proton.me"
