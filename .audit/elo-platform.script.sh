@@ -56,6 +56,31 @@ is_framework_owned_mjs() {
   esac
 }
 
+snapshot_directory() {
+  snapshot_root=$1
+  find "$snapshot_root" -print |
+    sort |
+    while IFS= read -r snapshot_path; do
+      [ -n "$snapshot_path" ] || continue
+      if [ "$snapshot_path" = "$snapshot_root" ]; then
+        snapshot_relative=.
+      else
+        snapshot_relative=${snapshot_path#"$snapshot_root"/}
+      fi
+
+      if [ -L "$snapshot_path" ]; then
+        printf 'link\t%s\n' "$snapshot_relative"
+      elif [ -d "$snapshot_path" ]; then
+        printf 'directory\t%s\n' "$snapshot_relative"
+      elif [ -f "$snapshot_path" ]; then
+        snapshot_checksum=$(cksum <"$snapshot_path")
+        printf 'file\t%s\t%s\n' "$snapshot_relative" "$snapshot_checksum"
+      else
+        printf 'other\t%s\n' "$snapshot_relative"
+      fi
+    done
+}
+
 if ! is_framework_owned_mjs workspaces/apps/example/postcss.config.mjs ||
   is_framework_owned_mjs workspaces/apps/example/src/scripts/postcss.config.mjs ||
   is_framework_owned_mjs workspaces/packages/design-system/src/scripts/build.config.mjs
@@ -311,6 +336,9 @@ for alternative_dir in "$contract_home" "$contract_pnpm" "$contract_xdg"; do
   mkdir "$alternative_dir"
   printf 'unchanged\n' >"$alternative_dir/.sentinel"
 done
+snapshot_directory "$contract_home" >"$TMP_ROOT/contract-home.before"
+snapshot_directory "$contract_pnpm" >"$TMP_ROOT/contract-pnpm.before"
+snapshot_directory "$contract_xdg" >"$TMP_ROOT/contract-xdg.before"
 if ! CI= ELO_SETUP_DISABLED= HOME="$contract_home" \
   PNPM_HOME="$contract_pnpm" XDG_BIN_HOME="$contract_xdg" \
   ELO_BIN_DIR="$contract_bin" \
@@ -320,12 +348,21 @@ then
 elif [ ! -x "$contract_bin/elo" ]; then
   platform_fail cli/src/commands/setup.sh "direct launcher was not created as an executable"
 else
-  for alternative_dir in "$contract_home" "$contract_pnpm" "$contract_xdg"; do
-    [ ! -e "$alternative_dir/elo" ] ||
-      platform_fail cli/src/commands/setup.sh "setup wrote outside the selected ELO_BIN_DIR"
-    [ "$(cat "$alternative_dir/.sentinel")" = unchanged ] ||
+  snapshot_directory "$contract_home" >"$TMP_ROOT/contract-home.after"
+  snapshot_directory "$contract_pnpm" >"$TMP_ROOT/contract-pnpm.after"
+  snapshot_directory "$contract_xdg" >"$TMP_ROOT/contract-xdg.after"
+  for alternative_name in contract-home contract-pnpm contract-xdg; do
+    cmp -s \
+      "$TMP_ROOT/$alternative_name.before" \
+      "$TMP_ROOT/$alternative_name.after" ||
       platform_fail cli/src/commands/setup.sh "setup modified an alternate destination"
   done
+  [ ! -e "$contract_home/.local/bin/elo" ] ||
+    platform_fail cli/src/commands/setup.sh "setup wrote to the HOME fallback despite ELO_BIN_DIR"
+  [ ! -e "$contract_pnpm/elo" ] ||
+    platform_fail cli/src/commands/setup.sh "setup wrote to PNPM_HOME despite ELO_BIN_DIR"
+  [ ! -e "$contract_xdg/elo" ] ||
+    platform_fail cli/src/commands/setup.sh "setup wrote to XDG_BIN_HOME despite ELO_BIN_DIR"
 
   cp "$contract_bin/elo" "$TMP_ROOT/elo.first"
   if ! CI= ELO_SETUP_DISABLED= HOME="$contract_home" \
@@ -457,6 +494,17 @@ else
   [ "$(cat "$symlink_sentinel")" = 'sentinel remains intact' ] ||
     platform_fail cli/src/commands/setup.sh "manual setup modified a symlink target"
 fi
+
+nonregular_bin="$TMP_ROOT/nonregular-bin"
+mkdir "$nonregular_bin"
+mkdir "$nonregular_bin/elo"
+CI= ELO_SETUP_DISABLED= ELO_BIN_DIR="$nonregular_bin" \
+  "$LAUNCHER" setup >"$TMP_ROOT/nonregular.out" 2>&1
+nonregular_status=$?
+[ "$nonregular_status" -ne 0 ] ||
+  platform_fail cli/src/commands/setup.sh "manual setup must reject a non-regular Elo collision"
+[ -d "$nonregular_bin/elo" ] ||
+  platform_fail cli/src/commands/setup.sh "manual setup replaced a non-regular Elo collision"
 
 ci_bin="$TMP_ROOT/ci-bin"
 if ! CI=1 ELO_SETUP_DISABLED= ELO_BIN_DIR="$ci_bin" \

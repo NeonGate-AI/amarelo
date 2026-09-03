@@ -149,12 +149,17 @@ if [ "$ci" = false ]; then
   direct_bin=$(elo_default_bin_dir 2>/dev/null || true)
   if [ -n "$direct_bin" ]; then
     direct_target="$direct_bin/elo"
-    direct_marker=$(sed -n '2p' "$direct_target" 2>/dev/null || true)
+    direct_elo_valid=false
     if [ -f "$direct_target" ] &&
       [ ! -L "$direct_target" ] &&
-      [ -x "$direct_target" ] &&
-      [ "$direct_marker" = '# managed-by: amarelo-elo' ]
+      [ -x "$direct_target" ]
     then
+      direct_marker=$(sed -n '2p' "$direct_target" 2>/dev/null || true)
+      [ "$direct_marker" = '# managed-by: amarelo-elo' ] &&
+        direct_elo_valid=true
+    fi
+
+    if [ "$direct_elo_valid" = true ]; then
       pass direct-elo "$direct_target"
     else
       warn direct-elo "not configured; run ./cli/elo setup"
