@@ -3,15 +3,17 @@
 : "${ELO_PROJECT_ROOT:?ELO_PROJECT_ROOT must be set by cli/src/elo.sh}"
 : "${ELO_CLI_DIR:?ELO_CLI_DIR must be set by cli/src/elo.sh}"
 
+. "$ELO_CLI_DIR/core/output.sh"
+
 elo_die() {
   elo_message=$1
   elo_status=${2:-1}
-  printf 'Elo: %s\n' "$elo_message" >&2
+  elo_print_error "Elo: $elo_message"
   exit "$elo_status"
 }
 
 elo_warn() {
-  printf 'Elo: warning: %s\n' "$*" >&2
+  elo_print_warning "Elo: $*"
 }
 
 elo_has() {

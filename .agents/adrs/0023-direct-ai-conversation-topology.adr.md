@@ -27,7 +27,7 @@ Preserve:
 
 `workspaces/ai/agents/` remains a structural parent that owns no package, source root or TypeScript configuration. Conversation and Knowledge are direct concrete AI workspaces. A future structural coordination parent requires at least two independently owned runtimes, an accepted ADR and evidence that the grouping reduces rather than adds ambiguity.
 
-Local runtime and pnpm configuration must follow the direct path. Because this repository deliberately does not track `pnpm-lock.yaml`, Docker and Compose bootstrap may not copy, require or use frozen-lockfile behavior against that absent file.
+Local runtime and pnpm configuration must follow the direct path. ADR-0024 supersedes the former no-lockfile clause: Docker and Compose copy and install from the tracked `pnpm-lock.yaml` with frozen-lockfile behavior.
 
 ## Alternatives considered
 
@@ -40,7 +40,7 @@ Local runtime and pnpm configuration must follow the direct path. Because this r
 
 - The common Conversation path is shorter and matches the package's concrete ownership.
 - `workspaces/ai/*` discovers Conversation without a dedicated nested workspace glob.
-- Runtime Docker/Compose paths align with the source tree and no-lockfile policy.
+- Runtime Docker/Compose paths align with the source tree and the tracked-lockfile policy in ADR-0024.
 - Historical ADR-0019 and its delivery record remain readable but are no longer normative.
 - A mechanical architecture check rejects recreation of `workspaces/ai/orchestrator`.
 - Future coordination work must either extend `@ai/conversation` within its contract or justify a new independent runtime and topology decision.

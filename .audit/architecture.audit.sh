@@ -587,7 +587,7 @@ if grep -F '"@neongate-ai/neon"' "$PROJECT_ROOT/package.json" >/dev/null 2>&1; t
     elo-ownership \
     package.json \
     "external generic Neon CLI dependency remains after Elo cutover" \
-    "remove @neongate-ai/neon without creating pnpm-lock.yaml"
+    "remove @neongate-ai/neon and update pnpm-lock.yaml"
 fi
 
 if [ "$failures" -gt 0 ]; then

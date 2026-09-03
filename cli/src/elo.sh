@@ -18,8 +18,8 @@ export ELO_PROJECT_ROOT="$PROJECT_ROOT"
 . "$CLI_DIR/core/common.sh"
 
 elo_usage_error() {
-  printf 'Elo: %s\n' "$1" >&2
-  printf "Run 'elo help' for usage.\n" >&2
+  elo_print_error "Elo: $1"
+  printf "Run 'elo --help' for usage.\n" >&2
   exit 2
 }
 
@@ -36,11 +36,29 @@ if [ "$#" -gt 0 ]; then
   shift
 fi
 
+if [ "$elo_command" = --logs ]; then
+  ELO_LOGS=true
+  export ELO_LOGS
+  elo_command=${1:-help}
+  if [ "$#" -gt 0 ]; then
+    shift
+  fi
+fi
+
+if [ "${1:-}" = --logs ]; then
+  ELO_LOGS=true
+  export ELO_LOGS
+  shift
+fi
+
+elo_log "command=$elo_command"
+
 case "$elo_command" in
   help|--help|-h)
     exec "$CLI_DIR/commands/help.sh" "$@"
     ;;
   version|--version|-V)
+    [ "$#" -eq 0 ] || elo_usage_error "Version does not accept arguments."
     elo_version=$(elo_project_version)
     [ -n "$elo_version" ] || elo_die "Unable to read the Elo version."
     printf 'elo %s\n' "$elo_version"
@@ -98,6 +116,9 @@ case "$elo_command" in
         ;;
       *) elo_usage_error "Usage: elo check <all|architecture|imports|memory|platform|skills|specs>" ;;
     esac
+    ;;
+  --*)
+    elo_usage_error "Unknown option: $elo_command"
     ;;
   *)
     elo_usage_error "Unknown command: $elo_command"

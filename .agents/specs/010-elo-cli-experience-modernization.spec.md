@@ -2,7 +2,7 @@
 id: SPEC-028
 title: Modernize the Elo CLI experience and restore reproducible installs
 type: feature
-status: ready
+status: in-progress
 mode: prospective
 created: 2026-09-03
 updated: 2026-09-03
@@ -30,6 +30,8 @@ skills:
   - .agents/skills/tdd/SKILL.md
   - .agents/skills/code-review/SKILL.md
 evidence:
+  - https://github.com/NeonGate-AI/amarelo/issues/24
+  - https://github.com/NeonGate-AI/amarelo/issues/25
   - pending
 ---
 
