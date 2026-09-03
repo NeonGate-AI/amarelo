@@ -1,0 +1,56 @@
+name: SPEC-031 audit robustness
+
+on:
+  push:
+    branches:
+      - governance/spec-031-numbered-rule-catalog
+    paths:
+      - .github/workflows/spec-031-audit-robustness.yml
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: governance/spec-031-numbered-rule-catalog
+          fetch-depth: 0
+
+      - name: Preserve public failure reporting in the rule fixture
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          python3 <<'PY'
+          from pathlib import Path
+
+          path = Path('.audit/elo-platform-core.audit.sh')
+          content = path.read_text(encoding='utf-8')
+          old = '''if ! "$scaffold_launcher" rule >"$TMP_ROOT/scaffold-rule.out" 2>&1 ||
+            scaffold_default_rule_name=012-new-rule.rule.md
+            [ ! -f "$scaffold_root/.agents/rules/$scaffold_default_rule_name" ]
+          then
+          '''
+          new = '''scaffold_default_rule_name=012-new-rule.rule.md
+          if ! "$scaffold_launcher" rule >"$TMP_ROOT/scaffold-rule.out" 2>&1 ||
+            [ ! -f "$scaffold_root/.agents/rules/$scaffold_default_rule_name" ]
+          then
+          '''
+          if old not in content:
+              raise RuntimeError('expected rule fixture condition is missing')
+          path.write_text(content.replace(old, new, 1), encoding='utf-8')
+          PY
+
+          git rm -f .github/workflows/spec-031-audit-robustness.yml
+          /bin/sh -n .audit/elo-platform-core.audit.sh
+          /bin/sh .audit/elo-platform-core.audit.sh
+          /bin/sh .audit/rules.audit.sh
+
+          git config user.name "Jonatas Sales"
+          git config user.email "sykes.echo@proton.me"
+          git add -A
+          git commit -m "test(cli): preserve rule fixture failure reporting"
+          git push origin HEAD:governance/spec-031-numbered-rule-catalog
