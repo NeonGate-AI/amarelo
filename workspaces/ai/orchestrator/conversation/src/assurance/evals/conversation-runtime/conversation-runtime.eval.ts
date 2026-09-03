@@ -19,7 +19,7 @@ import {
   FixedMemoryContextPort,
   RecordingConversationAgent,
   SYNTHETIC_MEMORY_PROJECTION
-} from './conversation-runtime.fixtures.js'
+} from './conversation-runtime.fixtures'
 
 async function evaluateRoutingPolicy() {
   assert.equal(routeConversationTurn('Oi!').lane, 'reflex')
@@ -119,7 +119,7 @@ async function evaluateAgentRegistryFailures() {
 
   assert.throws(
     () => new ConversationRuntime({ agents: [agent, agent] }),
-    DuplicateConversationAgentError
+    (error: unknown) => error instanceof DuplicateConversationAgentError
   )
 
   const runtime = new ConversationRuntime({ agents: [agent] })
@@ -130,7 +130,7 @@ async function evaluateAgentRegistryFailures() {
           agentId: 'nico'
         })
       ),
-    ConversationAgentNotConfiguredError
+    (error: unknown) => error instanceof ConversationAgentNotConfiguredError
   )
 }
 
@@ -147,7 +147,7 @@ async function evaluateAgentFailure() {
 
   await assert.rejects(
     () => runtime.execute(createConversationTurnInput({ message: 'Oi!' })),
-    ConversationAgentInvocationError
+    (error: unknown) => error instanceof ConversationAgentInvocationError
   )
 }
 
