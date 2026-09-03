@@ -2,10 +2,10 @@
 id: SPEC-006
 title: Establish the Amarelo spec-driven delivery workflow
 type: governance
-status: in-progress
+status: implemented
 mode: bootstrap
 created: 2026-09-02
-updated: 2026-09-02
+updated: 2026-09-03
 owners:
   - Jonatas Sales
 targets:
@@ -29,8 +29,10 @@ skills:
 evidence:
   - commit dfab038e2e8f43fb1cbcc194016fbf7c90717f61
   - commit 68d62c717b9beb0a6f1e3d61fbd26ac8ce8fa0a7
+  - commit 3d5b327028f77617791881131c1497cf7b7d7751
+  - https://github.com/NeonGate-AI/amarelo-v2/pull/2
+  - CI run 166 success
   - local ./cli/elo check specs PASS
-  - pull-request CI pending
 ---
 
 # SPEC-006: Establish the Amarelo spec-driven delivery workflow
@@ -127,7 +129,7 @@ The checker operates only on committed Markdown and repository metadata. It must
 - [x] `SPEC-001` through `SPEC-005` reconstruct the major pre-workflow capabilities without claiming fictional prior process.
 - [x] Elo exposes `check specs` and CI executes it.
 - [x] The structural checker passes for all numbered delivery specs.
-- [ ] Existing repository validation remains green.
+- [x] Existing repository validation remains green.
 - [x] Handoff 4 contains no product runtime, PWA, agent, Fastify, queue or workspace relocation implementation.
 - [x] The next available delivery ID is documented as `SPEC-007`.
 - [x] No Handoff 4.5 artifact is created.
@@ -160,8 +162,8 @@ Current evidence:
 - workflow foundation commit `dfab038e2e8f43fb1cbcc194016fbf7c90717f61`;
 - retrospective history commit `68d62c717b9beb0a6f1e3d61fbd26ac8ce8fa0a7`;
 - local `./cli/elo check specs` result: `Spec workflow PASS - 6 delivery specs`;
-- full pull-request CI remains the closure gate;
-- two-axis review is recorded in the pull request.
+- pull request #2 CI run #166 completed successfully on head `3d5b327028f77617791881131c1497cf7b7d7751`;
+- the pull request records the completed Standards and Spec review axes.
 
 Promotion:
 
@@ -175,4 +177,4 @@ Promotion:
 
 The first post-bootstrap product change should create a new prospective spec for the first agentic PWA conversation. That later spec should record the owner decision to use `workspaces/ai/orchestrator/conversation`, preserve package name `@ai/conversation`, use a minimal Fastify Node service and keep durable memory workers outside Edge runtimes.
 
-This document is a bootstrap spec, not a retrospective spec. It records the transition while it is being made and will be closed only after its own checks and repository CI pass.
+This document is a bootstrap spec, not a retrospective spec. It records the one-time transition and was closed after its structural check and the full repository CI completed successfully.
