@@ -533,8 +533,8 @@ then
   platform_fail cli/src/commands/scaffold.sh "elo adr did not allocate the next ADR"
 fi
 
+scaffold_default_rule_name=012-new-rule.rule.md
 if ! "$scaffold_launcher" rule >"$TMP_ROOT/scaffold-rule.out" 2>&1 ||
-  scaffold_default_rule_name=012-new-rule.rule.md
   [ ! -f "$scaffold_root/.agents/rules/$scaffold_default_rule_name" ]
 then
   platform_fail cli/src/commands/scaffold.sh "elo rule did not reserve the post-migration rule number"
