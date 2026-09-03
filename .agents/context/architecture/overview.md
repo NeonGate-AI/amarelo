@@ -29,6 +29,11 @@ workspaces/
   specs/
   adrs/
   skills/
+  prompts/
+    adr.prompt.md
+    rule.prompt.md
+    skill.prompt.md
+    spec.prompt.md
 
 .audit/
   *.audit.sh
@@ -47,6 +52,7 @@ Semantic suffixes make artifact ownership visible without opening the file:
 | Architecture decision | `.agents/adrs/<name>.adr.md` |
 | Durable rule | `.agents/rules/<name>.rule.md` |
 | Numbered delivery/product contract | `.agents/specs/NNN-<name>.spec.md` |
+| Empty engineering artifact template | `.agents/prompts/<type>.prompt.md` |
 | Executable invariant checker | `.audit/<name>.audit.sh` |
 
-Context documents and skills remain ordinary Markdown because their directory already identifies their role. `readme.md`, `template.md` and `workflow.md` are the only unnumbered support documents in `.agents/specs/`. Renames and references must be changed atomically; compatibility paths must not become new sources of truth.
+Context documents and skills remain ordinary Markdown because their directory already identifies their role. The four `.agents/prompts/*.prompt.md` files are authoring skeletons consumed by Elo, never runtime AI prompts or project decisions. `readme.md`, `template.md` and `workflow.md` are the only unnumbered support documents in `.agents/specs/`. Renames and references must be changed atomically; compatibility paths must not become new sources of truth.

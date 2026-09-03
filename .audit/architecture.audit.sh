@@ -330,7 +330,7 @@ if grep -F 'workspaces/ai/orchestrator/*' "$PROJECT_ROOT/pnpm-workspace.yaml" >/
     "remove the nested glob and discover Conversation through workspaces/ai/*"
 fi
 
-for expected_dir in adrs context rules skills specs; do
+for expected_dir in adrs context prompts rules skills specs; do
   [ -d "$PROJECT_ROOT/.agents/$expected_dir" ] ||
     architecture_fail \
       agents-taxonomy \
@@ -343,7 +343,7 @@ for agents_path in "$PROJECT_ROOT"/.agents/*; do
   [ -d "$agents_path" ] || continue
   agents_name=${agents_path##*/}
   case "$agents_name" in
-    adrs|context|rules|skills|specs) ;;
+    adrs|context|prompts|rules|skills|specs) ;;
     *)
       architecture_fail \
         agents-taxonomy \

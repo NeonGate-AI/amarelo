@@ -495,6 +495,100 @@ elif ! grep -F '🔎 doctor module initialized' "$TMP_ROOT/doctor-logs.err" >/de
   platform_fail cli/src/commands/doctor.sh "a dispatched command must observe ELO_LOGS=true"
 fi
 
+scaffold_root="$TMP_ROOT/scaffold-checkout"
+scaffold_launcher="$scaffold_root/cli/elo"
+mkdir -p \
+  "$scaffold_root/.agents/adrs" \
+  "$scaffold_root/.agents/rules" \
+  "$scaffold_root/.agents/specs" \
+  "$scaffold_root/.agents/skills"
+cp -R "$PROJECT_ROOT/cli" "$scaffold_root/cli"
+cp -R "$PROJECT_ROOT/.agents/prompts" "$scaffold_root/.agents/prompts"
+: >"$scaffold_root/.agents/adrs/0025-existing.adr.md"
+for scaffold_rule in architecture code-style context-engineering import-boundaries markdown memory-nucleus package-ownership product-safety-and-privacy react-and-next source-organization spec-driven-development; do
+  : >"$scaffold_root/.agents/rules/$scaffold_rule.rule.md"
+done
+cat >"$scaffold_root/.agents/specs/030-existing.spec.md" <<'EOF'
+---
+id: SPEC-030
+---
+EOF
+
+if ! "$scaffold_launcher" spec >"$TMP_ROOT/scaffold-spec.out" 2>&1; then
+  platform_fail cli/src/commands/scaffold.sh "elo spec failed in the isolated checkout"
+elif [ ! -f "$scaffold_root/.agents/specs/031-new-spec.spec.md" ]; then
+  platform_fail cli/src/commands/scaffold.sh "elo spec did not allocate the next priority"
+elif ! grep -F 'id: SPEC-031' "$scaffold_root/.agents/specs/031-new-spec.spec.md" >/dev/null 2>&1; then
+  platform_fail cli/src/commands/scaffold.sh "elo spec did not allocate the next durable ID"
+elif ! grep -F '## Failure Behavior' "$scaffold_root/.agents/specs/031-new-spec.spec.md" >/dev/null 2>&1; then
+  platform_fail .agents/prompts/spec.prompt.md "generated spec is missing canonical headings"
+fi
+
+if ! "$scaffold_launcher" adr >"$TMP_ROOT/scaffold-adr.out" 2>&1 ||
+  [ ! -f "$scaffold_root/.agents/adrs/0026-new-adr.adr.md" ]
+then
+  platform_fail cli/src/commands/scaffold.sh "elo adr did not allocate the next ADR"
+fi
+
+if ! "$scaffold_launcher" rule >"$TMP_ROOT/scaffold-rule.out" 2>&1 ||
+  [ ! -f "$scaffold_root/.agents/rules/012-new-rule.rule.md" ]
+then
+  platform_fail cli/src/commands/scaffold.sh "elo rule did not reserve the post-migration rule number"
+fi
+
+if ! "$scaffold_launcher" skill >"$TMP_ROOT/scaffold-skill.out" 2>&1 ||
+  [ ! -f "$scaffold_root/.agents/skills/new-skill/SKILL.md" ]
+then
+  platform_fail cli/src/commands/scaffold.sh "elo skill did not create the canonical SKILL.md path"
+fi
+
+"$scaffold_launcher" skill >"$TMP_ROOT/scaffold-skill-repeat.out" 2>&1
+scaffold_repeat_status=$?
+[ "$scaffold_repeat_status" -eq 2 ] ||
+  platform_fail cli/src/commands/scaffold.sh "scaffolding must not overwrite an existing target"
+
+"$scaffold_launcher" spec 'Bad Name' >"$TMP_ROOT/scaffold-invalid.out" 2>&1
+scaffold_invalid_status=$?
+[ "$scaffold_invalid_status" -eq 2 ] ||
+  platform_fail cli/src/commands/scaffold.sh "invalid artifact names must exit 2"
+
+cat >"$scaffold_root/.agents/specs/040-first.spec.md" <<'EOF'
+---
+id: SPEC-040
+---
+EOF
+cat >"$scaffold_root/.agents/specs/040-second.spec.md" <<'EOF'
+---
+id: SPEC-041
+---
+EOF
+"$scaffold_launcher" spec duplicate >"$TMP_ROOT/scaffold-duplicate-prefix.out" 2>&1
+scaffold_duplicate_prefix_status=$?
+[ "$scaffold_duplicate_prefix_status" -ne 0 ] ||
+  platform_fail cli/src/commands/scaffold.sh "duplicate artifact prefixes must block allocation"
+grep -F 'Duplicate artifact prefix: 040' "$TMP_ROOT/scaffold-duplicate-prefix.out" >/dev/null 2>&1 ||
+  platform_fail cli/src/commands/scaffold.sh "duplicate-prefix failure lacks clear guidance"
+
+rm -f "$scaffold_root/.agents/specs/040-second.spec.md"
+cat >"$scaffold_root/.agents/specs/041-second.spec.md" <<'EOF'
+---
+id: SPEC-040
+---
+EOF
+"$scaffold_launcher" spec duplicate >"$TMP_ROOT/scaffold-duplicate-id.out" 2>&1
+scaffold_duplicate_id_status=$?
+[ "$scaffold_duplicate_id_status" -ne 0 ] ||
+  platform_fail cli/src/commands/scaffold.sh "duplicate SPEC IDs must block allocation"
+grep -F 'Duplicate SPEC durable ID: SPEC-040' "$TMP_ROOT/scaffold-duplicate-id.out" >/dev/null 2>&1 ||
+  platform_fail cli/src/commands/scaffold.sh "duplicate-ID failure lacks clear guidance"
+
+if find "$scaffold_root/.agents" \
+  \( -type f -name '*.tmp.*' -o -type d -name '.elo-scaffold.*' \) -print |
+  grep . >/dev/null 2>&1
+then
+  platform_fail cli/src/commands/scaffold.sh "failed scaffolding left partial staging state"
+fi
+
 "$LAUNCHER" unknown-command >"$TMP_ROOT/unknown.out" 2>"$TMP_ROOT/unknown.err"
 unknown_status=$?
 [ "$unknown_status" -eq 2 ] ||

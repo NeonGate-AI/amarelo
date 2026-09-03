@@ -17,6 +17,7 @@ The end-to-end lifecycle is owned by `.agents/specs/workflow.md`. Its seven cano
 - Satisfy required behavior -> `.agents/specs/`
 - Understand consequential decisions -> `.agents/adrs/`
 - Follow a reusable engineering procedure -> `.agents/skills/`
+- Start an empty ADR, rule, skill or spec -> `.agents/prompts/` through `elo <type>`
 
 Start from `.agents/context/workspaces/<area>/` when an area manifest exists. Follow referenced scoped rules, specs and ADRs instead of loading the whole harness.
 
@@ -27,9 +28,10 @@ Harness artifacts use semantic suffixes at their ownership boundary:
 - ADRs: `lowercase-kebab-case.adr.md` under `.agents/adrs/`;
 - rules: `lowercase-kebab-case.rule.md` under `.agents/rules/`;
 - numbered specs: `NNN-lowercase-kebab-case.spec.md` under `.agents/specs/`;
+- artifact templates: `<type>.prompt.md` under `.agents/prompts/`;
 - executable audit checkers: `lowercase-kebab-case.audit.sh` under `.audit/`.
 
-Context documents, skills and the unnumbered spec support files `readme.md`, `template.md` and `workflow.md` keep their ordinary names. Repository references must use the exact semantic filename; do not reintroduce unsuffixed ADR, rule, numbered-spec or audit-checker paths.
+Context documents, skills, prompt templates and the unnumbered spec support files `readme.md`, `template.md` and `workflow.md` keep their ordinary names. Repository references must use the exact semantic filename; do not reintroduce unsuffixed ADR, rule, numbered-spec or audit-checker paths.
 
 ## Evidence is not canonical context
 

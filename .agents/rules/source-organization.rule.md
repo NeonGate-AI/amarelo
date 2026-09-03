@@ -1,5 +1,5 @@
 ---
-version: 6
+version: 7
 extends: code-style.rule.md
 name: Source Organization
 description: Source roots, module boundaries, file naming, barrels, and architectural source ownership.
@@ -42,6 +42,8 @@ Use kebab-case for project-created source files and folders. Framework-reserved 
 Files under `cli/src/` are shell modules ending in `.sh`. Commands live under `cli/src/commands/`; reusable CLI primitives live under `cli/src/core/`. Keep one command/primary concern per shell module. The TypeScript semantic suffix table below does not apply to `.sh` files.
 
 `cli/elo` is a thin launcher and contains no substantive CLI behavior.
+
+Engineering artifact skeletons live only in `.agents/prompts/` and are consumed by Elo's scaffold command. They are not executable source and do not change the rule that runtime AI `.prompt.ts` modules live in their owning workspace source tree.
 
 Executable repository/package automation enters through a POSIX `.sh` file. When structured data, typed contracts or non-trivial state make shell inappropriate, the `.sh` entrypoint may delegate to an owning TypeScript backend. The design-system token builder follows this shell-front/typed-backend form.
 

@@ -23,3 +23,6 @@ sed 's/\.script\.sh/\.audit.sh/g' \
 chmod 700 "$TMP_AUDIT"
 
 GITHUB_WORKSPACE="$PROJECT_ROOT" /bin/sh "$TMP_AUDIT"
+if [ "${ELO_PLATFORM_NESTED:-0}" != 1 ]; then
+  GITHUB_WORKSPACE="$PROJECT_ROOT" /bin/sh "$AUDIT_DIR/elo-scaffold.audit.sh"
+fi
