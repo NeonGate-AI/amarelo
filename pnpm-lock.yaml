@@ -62,7 +62,16 @@ importers:
       '@repo/memory-sdk':
         specifier: workspace:*
         version: link:../../../packages/memory-sdk
+      zod:
+        specifier: 4.4.3
+        version: 4.4.3
     devDependencies:
+      '@types/node':
+        specifier: 24.13.3
+        version: 24.13.3
+      tsx:
+        specifier: 4.23.12
+        version: 4.23.12
       typescript:
         specifier: 5.9.2
         version: 5.9.2
