@@ -1,0 +1,48 @@
+name: Execute SPEC-009 pre-Memory baseline
+
+on:
+  push:
+    branches:
+      - experiment/spec-009-first-ana-conversation-baseline
+    paths:
+      - .github/workflows/spec-009-baseline-executor.yml
+
+permissions:
+  contents: write
+
+jobs:
+  implement:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: experiment/spec-009-first-ana-conversation-baseline
+          fetch-depth: 0
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: Generate, validate, and commit
+        shell: bash
+        run: |
+          set -euo pipefail
+          export CI=true
+          pnpm install --frozen-lockfile
+          python3 .github/spec-009-baseline.py
+          pnpm --filter conversation-api exec node --import tsx src/assurance/evals/pre-memory-baseline/pre-memory-baseline.eval.ts --write
+          pnpm exec biome check --write workspaces/apps/conversation-api
+          git rm -f .github/spec-009-baseline.py
+          git rm -f .github/workflows/spec-009-baseline-executor.yml
+          pnpm --filter conversation-api typecheck
+          pnpm --filter conversation-api test
+          pnpm --filter conversation-api eval
+          ./cli/elo check architecture
+          ./cli/elo check imports
+          git config user.name "Jonatas Sales"
+          git config user.email "sykes.echo@proton.me"
+          git add -A
+          git commit -m "test(conversation): record the sanitized pre-Memory baseline" -m "Spec: SPEC-009"
+          git push origin HEAD:experiment/spec-009-first-ana-conversation-baseline
