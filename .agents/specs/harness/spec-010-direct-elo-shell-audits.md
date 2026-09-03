@@ -2,7 +2,7 @@
 id: SPEC-010
 title: Make Elo directly invokable and migrate executable MJS automation to shell
 type: feature
-status: in-progress
+status: implemented
 mode: prospective
 created: 2026-09-03
 updated: 2026-09-03
@@ -40,12 +40,21 @@ evidence:
   - commit 3e4ba88785dc766f2caf656aae284b19d21d79d5
   - commit 241f8c237d3f981ddd67ead99680fb41479bba91
   - commit f7f20c5e48a312d03e989577351613ef16e20840
+  - commit 0b256414003c31c8a8a09a584a6927880b652550
+  - commit 58def13f616eed7c3abf8b6fec6103dd3df0ef23
+  - commit 8c3154ab06aafb2489bed16a792fdbf536dc3fc6
+  - commit 2708cf4f163c234ec1bf7570f7b2de0fd36a4b3b
+  - commit 6c01e188847e51859adcec4ab806865d8dbf8e48
+  - commit 5797d4ebfea5df51bb10e7e498eb27faa2ce7c46
+  - commit 4b1e52eb7e41abadc113142903debdf11d49e0e0
+  - commit 45ff897b297938857053c7732b27b8280be8b6fc
   - https://github.com/NeonGate-AI/amarelo-v2/issues/6
   - https://github.com/NeonGate-AI/amarelo-v2/issues/7
   - https://github.com/NeonGate-AI/amarelo-v2/issues/8
   - https://github.com/NeonGate-AI/amarelo-v2/issues/12
   - https://github.com/NeonGate-AI/amarelo-v2/pull/11
-  - CI run 33718880661 success on f7f20c5e48a312d03e989577351613ef16e20840
+  - https://github.com/NeonGate-AI/amarelo-v2/actions/runs/33721619558
+  - https://github.com/NeonGate-AI/amarelo-v2/pull/11#issuecomment-5521409275
 ---
 
 # SPEC-010: Make Elo directly invokable and migrate executable MJS automation to shell
@@ -130,21 +139,21 @@ Fixtures create exclusive temporary directories with POSIX `mkdir`, use controll
 
 ## Acceptance Criteria
 
-- [ ] `SPEC-010` transitioned from approved `ready` to `in-progress` before executable implementation.
-- [ ] `elo setup` installs an idempotent managed launcher in the selected user-owned binary directory.
-- [ ] Setup never uses `sudo`, edits shell profiles or implicitly replaces an unmanaged `elo` command.
-- [ ] Local `pnpm install` invokes setup through `postinstall`; CI skips it safely.
-- [ ] The root exposes an explicit `postclone` script and documentation states that it is not an automatic npm/pnpm lifecycle.
-- [ ] After setup, `elo <command>` works without a `pnpm` prefix.
-- [ ] Elo without arguments shows help without mutation; usage errors return status 2.
-- [ ] Elo exposes `--version` and `check all` without duplicating Turborepo task graphs.
-- [ ] All five executable `.audit/*.script.mjs` checkers are replaced by executable POSIX `.audit/*.script.sh` checkers.
-- [ ] `build-tokens.mjs` is replaced by an executable shell entrypoint and a typed backend with equivalent generated artifacts.
-- [ ] Package scripts do not execute `.mjs` automation.
-- [ ] Framework-owned `.config.mjs` modules remain unchanged.
-- [ ] CI, audit hygiene, CLI help and durable source-organization documentation use the new contract.
-- [ ] Existing lint, typecheck, tests, database validation, AI evals, build and Git-hook smoke validation pass on the pull-request implementation head.
-- [ ] The spec closes as `implemented` with stable commit, issue, pull-request, review and CI evidence.
+- [x] `SPEC-010` transitioned from approved `ready` to `in-progress` before executable implementation.
+- [x] `elo setup` installs an idempotent managed launcher in the selected user-owned binary directory.
+- [x] Setup never uses `sudo`, edits shell profiles or implicitly replaces an unmanaged `elo` command.
+- [x] Local `pnpm install` invokes setup through `postinstall`; CI skips it safely.
+- [x] The root exposes an explicit `postclone` script and documentation states that it is not an automatic npm/pnpm lifecycle.
+- [x] After setup, `elo <command>` works without a `pnpm` prefix.
+- [x] Elo without arguments shows help without mutation; usage errors return status 2.
+- [x] Elo exposes `--version` and `check all` without duplicating Turborepo task graphs.
+- [x] All five executable `.audit/*.script.mjs` checkers are replaced by executable POSIX `.audit/*.script.sh` checkers.
+- [x] `build-tokens.mjs` is replaced by an executable shell entrypoint and a typed backend with equivalent generated artifacts.
+- [x] Package scripts do not execute `.mjs` automation.
+- [x] Framework-owned `.config.mjs` modules remain unchanged.
+- [x] CI, audit hygiene, CLI help and durable source-organization documentation use the new contract.
+- [x] Existing lint, typecheck, tests, database validation, AI evals, build and Git-hook smoke validation pass on the pull-request implementation head.
+- [x] The spec closes as `implemented` with stable commit, issue, pull-request, review and CI evidence.
 
 ## Failure Behavior
 
@@ -169,7 +178,7 @@ Fixtures create exclusive temporary directories with POSIX `mkdir`, use controll
 
 ## Evidence and Promotion
 
-Current evidence (baseline; final closure pending remediation and a new two-axis review):
+Final evidence:
 
 - `028b4ca70648ade3b1af288fd333cf4b5198af31` recorded the owner-approved ready contract under its initially assigned legacy ID;
 - `3e4ba88785dc766f2caf656aae284b19d21d79d5` moved the contract to `in-progress` before executable implementation;
@@ -178,10 +187,19 @@ Current evidence (baseline; final closure pending remediation and a new two-axis
 - `6fa6ad57dcd35737b62b271a5c69812f5dd07f62` replaced the five MJS audit programs with POSIX shell and updated CI dispatch;
 - `a002c8e88b29a3110dd1b0814d32b2f7ed2fd060` promoted the CLI and source-organization contracts;
 - `241f8c237d3f981ddd67ead99680fb41479bba91` reconciled the active record to `SPEC-010` and ADR 0022 after parallel reservations were discovered;
-- `f7f20c5e48a312d03e989577351613ef16e20840` hardened exclusive temporary creation, PATH parsing, symlink/non-regular collision handling and launcher fixtures;
-- issues #6, #7, #12 and #8 record the vertical delivery graph;
+- `f7f20c5e48a312d03e989577351613ef16e20840` hardened exclusive temporary creation, exact PATH parsing, collision handling and installed-launcher fixtures;
+- `0b256414003c31c8a8a09a584a6927880b652550` formally reopened the spec when deeper post-closure review found additional gaps;
+- `58def13f616eed7c3abf8b6fec6103dd3df0ef23` completed lifecycle, destination, stale-checkout, usage and executable-mode contracts;
+- `8c3154ab06aafb2489bed16a792fdbf536dc3fc6` restored recursive package-export validation and hardened portable audit signal handling;
+- `2708cf4f163c234ec1bf7570f7b2de0fd36a4b3b` added strict typechecking ownership for the design-token backend;
+- `6c01e188847e51859adcec4ab806865d8dbf8e48` completed recursive alternate-destination manifests and made doctor validate path type before reading;
+- `5797d4ebfea5df51bb10e7e498eb27faa2ce7c46` added a FIFO regression fixture proving doctor does not open non-regular launcher paths;
+- `4b1e52eb7e41abadc113142903debdf11d49e0e0` made that FIFO fixture deterministic and signal-safe;
+- `45ff897b297938857053c7732b27b8280be8b6fc` is the exact independently reviewed implementation head;
+- issues #6, #7, #12 and #8 record the completed vertical delivery graph;
 - pull request #11 contains the complete diff and references `SPEC-010`;
-- CI run `33718880661` / run number 220 completed Elo doctor, every shell audit, audit hygiene, Commitlint, Biome, typecheck, tests, Memory PostgreSQL validation, AI evals, full build and Git-hook smoke tests successfully on `f7f20c5e48a312d03e989577351613ef16e20840`;
+- the final two-axis completion review at https://github.com/NeonGate-AI/amarelo-v2/pull/11#issuecomment-5521409275 approved the exact implementation head with zero blocking findings;
+- CI run `33721619558` / run number 251 completed Elo doctor, every shell audit, audit hygiene, Commitlint, Biome, strict typecheck, tests, Memory PostgreSQL validation, AI evals, full build and Git-hook smoke tests successfully on `45ff897b297938857053c7732b27b8280be8b6fc`;
 
 Promotion completed:
 
