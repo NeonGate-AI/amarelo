@@ -1,74 +1,31 @@
 ---
 name: domain-modeling
-description: Build and sharpen a project's domain model. Use when discussing codebase terminology, writing or editing a CONTEXT.md, or recording or editing an ADR.
+description: Sharpen Amarelo vocabulary, context ownership and consequential architecture decisions.
 ---
 
 # Domain Modeling
 
-Actively build and sharpen the project's domain model as you design. This is the *active* discipline: challenging terms, inventing edge-case scenarios, and writing the glossary and decisions down the moment they crystallise. (Merely *reading* `CONTEXT.md` for vocabulary is not this skill: that's a one-line habit any skill can do. This skill is for when you're changing the model, not just consuming it.)
+Use this procedure when a term, boundary or hard-to-reverse tradeoff is being changed—not merely when reading existing vocabulary.
 
-## File structure
+## Canonical locations
 
-Most repos have a single context:
+- Stable vocabulary, responsibilities and relationships: `.agents/context/`.
+- Consequential accepted decisions: `.agents/adrs/<number>-<name>.adr.md`.
+- Required delivery behavior: `.agents/specs/<priority>-<name>.spec.md`.
+- Durable constraints: `.agents/rules/<name>.rule.md`.
 
-```
-/
-├── CONTEXT.md
-├── docs/
-│   └── adr/
-│       ├── 0001-event-sourced-orders.md
-│       └── 0002-postgres-for-write-model.md
-└── src/
-```
+Context is not a scratchpad, implementation plan or evidence log. ADRs explain a consequential choice and its alternatives; they do not restate ordinary code structure.
 
-If a `CONTEXT-MAP.md` exists at the root, the repo has multiple contexts. The map points to where each one lives:
+## Procedure
 
-```
-/
-├── CONTEXT-MAP.md
-├── docs/
-│   └── adr/                          ← system-wide decisions
-├── src/
-│   ├── ordering/
-│   │   ├── CONTEXT.md
-│   │   └── docs/adr/                 ← context-specific decisions
-│   └── billing/
-│       ├── CONTEXT.md
-│       └── docs/adr/
-```
+1. Load the narrowest existing context and accepted ADRs for the affected domain.
+2. Challenge overloaded or conflicting terms against repository language and current code.
+3. Test the proposed model with concrete normal, temporal, authorization and failure scenarios.
+4. Resolve one canonical term and owner for each concept. Record implementation-independent meaning in the appropriate scoped context document.
+5. Create or supersede an ADR only when the decision is hard to reverse, surprising without rationale and the result of a real tradeoff.
+6. Keep delivery requirements in the numbered spec and executable invariants in tests/checkers rather than duplicating them into context.
+7. Update every affected reference atomically and preserve `.adr.md`, `.rule.md` and `.spec.md` suffixes.
 
-Create files lazily: only when you have something to write. If no `CONTEXT.md` exists, create one when the first term is resolved. If no `docs/adr/` exists, create it when the first ADR is needed.
+## Completion criterion
 
-## During the session
-
-### Challenge against the glossary
-
-When the user uses a term that conflicts with the existing language in `CONTEXT.md`, call it out immediately. "Your glossary defines 'cancellation' as X, but you seem to mean Y. Which is it?"
-
-### Sharpen fuzzy language
-
-When the user uses vague or overloaded terms, propose a precise canonical term. "You're saying 'account': do you mean the Customer or the User? Those are different things."
-
-### Discuss concrete scenarios
-
-When domain relationships are being discussed, stress-test them with specific scenarios. Invent scenarios that probe edge cases and force the user to be precise about the boundaries between concepts.
-
-### Cross-reference with code
-
-When the user states how something works, check whether the code agrees. If you find a contradiction, surface it: "Your code cancels entire Orders, but you just said partial cancellation is possible. Which is right?"
-
-### Update CONTEXT.md inline
-
-When a term is resolved, update `CONTEXT.md` right there. Don't batch these up: capture them as they happen. Use the format in [CONTEXT-FORMAT.md](./CONTEXT-FORMAT.md).
-
-`CONTEXT.md` should be totally devoid of implementation details. Do not treat `CONTEXT.md` as a spec, a scratch pad, or a repository for implementation decisions. It is a glossary and nothing else.
-
-### Offer ADRs sparingly
-
-Only offer to create an ADR when all three are true:
-
-1. **Hard to reverse**: the cost of changing your mind later is meaningful
-2. **Surprising without context**: a future reader will wonder "why did they do it this way?"
-3. **The result of a real trade-off**: there were genuine alternatives and you picked one for specific reasons
-
-If any of the three is missing, skip the ADR. Use the format in [ADR-FORMAT.md](./ADR-FORMAT.md).
+The vocabulary has one source of truth, code and documents use it consistently, ownership boundaries are explicit, and any consequential tradeoff has an accepted or superseding ADR without duplicated implementation detail.

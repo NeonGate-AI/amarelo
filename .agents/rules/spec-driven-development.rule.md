@@ -1,7 +1,7 @@
 ---
-version: 3
+version: 4
 name: Spec-Driven Development
-description: Required numbered-spec lifecycle, vertical task decomposition, evidence and review boundaries.
+description: Required numbered-spec lifecycle, local workflow procedures, evidence and review boundaries.
 alwaysApply: true
 priority: high
 tags:
@@ -17,6 +17,8 @@ tags:
 - Every numbered spec uses the canonical frontmatter and body template, including retrospective product contracts and prospective drafts.
 - Implementation starts only when a prospective spec is `ready`; the first implementation change moves it to `in-progress`.
 - The numbered spec is the behavioral source of truth. Branches, issues, handoffs, chats and temporary plans only point to it.
+- `.agents/specs/workflow.md` owns the end-to-end lifecycle. Its canonical reusable procedures are the local `to-spec`, `to-tickets`, `implement`, `tdd`, `code-review`, `domain-modeling` and `writing-for-agents` skills.
+- A vendored procedure is referenced normatively through `.agents/skills/<name>/SKILL.md`. Remote skill URLs are allowed only as explicit attribution, provenance or immutable historical evidence.
 - Derived tickets are vertical tracer bullets with explicit blocking edges and independently demonstrable outcomes.
 - Tests are designed at pre-agreed public seams. Prefer the highest seam that can verify behavior without coupling to implementation details.
 - Acceptance criteria may change only through an explicit spec revision that records the rationale before affected implementation continues.

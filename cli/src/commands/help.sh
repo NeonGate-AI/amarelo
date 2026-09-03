@@ -17,7 +17,7 @@ Commands:
   changelog <product> [--path <file>] [--editor <command>]
   env <setup|validate>
   git <setup|doctor|pre-commit|commit-msg>
-  check <all|architecture|imports|memory|platform|specs>
+  check <all|architecture|imports|memory|platform|skills|specs>
 
 First checkout:
   pnpm install       installs dependencies and configures the direct user command

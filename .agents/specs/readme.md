@@ -42,8 +42,9 @@ The specification catalog is flat, priority-ordered and mechanically checked.
 | 026 | SPEC-011 | ready | [Shadow Memory serving and parity](026-shadow-memory-serving-parity.spec.md) |
 | 027 | SPEC-017 | ready | [Memory serving A/B and canary](027-memory-serving-ab-canary.spec.md) |
 | 028 | SPEC-018 | ready | [Memory unit economics and scale gates](028-memory-unit-economics-scale-gates.spec.md) |
+| 029 | SPEC-029 | in-progress | [Canonical local engineering workflow skills](029-canonical-local-workflow-skills.spec.md) |
 
-The next durable delivery ID is `SPEC-028`. Priority 010 remains reserved for that owner-approved Elo CLI change.
+`SPEC-028` remains reserved at priority 010. The next unallocated durable delivery ID is `SPEC-030`.
 
 The executable Memory Nucleus chain is:
 
