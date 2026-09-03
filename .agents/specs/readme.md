@@ -9,4 +9,4 @@ Use `template.md` for every new numbered delivery spec. Implemented delivery spe
 
 The workflow itself is defined only in `workflow.md`. Rules, context and ADRs remain separate sources of truth and should be referenced rather than copied into a spec.
 
-The next available numbered delivery spec after this bootstrap is `SPEC-007`.
+The next available numbered delivery spec is `SPEC-008`.
