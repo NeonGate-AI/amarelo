@@ -10,8 +10,10 @@
     "build": "tsc --noEmit",
     "dev": "tsx watch src/server/conversation-api.server.ts",
     "start": "tsx src/server/conversation-api.server.ts",
-    "test": "node --import tsx src/assurance/evals/conversation-api/conversation-api.eval.ts",
-    "typecheck": "tsc --noEmit"
+    "test": "node --import tsx src/assurance/evals/conversation-api/conversation-api.eval.ts && node --import tsx src/assurance/evals/pre-memory-baseline/pre-memory-baseline.eval.ts",
+    "typecheck": "tsc --noEmit",
+    "eval": "node --import tsx src/assurance/evals/pre-memory-baseline/pre-memory-baseline.eval.ts",
+    "eval:baseline": "node --import tsx src/assurance/evals/pre-memory-baseline/pre-memory-baseline.eval.ts"
   },
   "dependencies": {
     "@ai/ana": "workspace:*",
