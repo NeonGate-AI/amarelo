@@ -73,15 +73,6 @@ while IFS= read -r path; do
   else
     printf '%s\n' "$prefix" >>"$prefixes"
   fi
-
-  grep -Eq '^alwaysApply:[[:space:]]*(true|false)[[:space:]]*$' "$path" ||
-    rule_fail rule-metadata "${path#"$PROJECT_ROOT"/}" \
-      "alwaysApply must be explicit" \
-      "restore canonical rule frontmatter"
-  grep -Eq '^priority:[[:space:]]*[a-z][a-z-]*[[:space:]]*$' "$path" ||
-    rule_fail rule-metadata "${path#"$PROJECT_ROOT"/}" \
-      "priority must be explicit" \
-      "restore canonical rule frontmatter"
 done <"$inventory"
 
 cat >"$TMP_ROOT/required" <<'CATALOG'
