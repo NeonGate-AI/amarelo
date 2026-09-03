@@ -91,12 +91,26 @@ elo_default_bin_dir() {
   fi
 }
 
-elo_path_contains() {
-  case ":${PATH:-}:" in
-    *":$1:"*) return 0 ;;
-    *) return 1 ;;
-  esac
-}
+elo_path_contains() (
+  elo_path_wanted=$1
+  elo_path_rest=${PATH:-}
+
+  while :; do
+    case "$elo_path_rest" in
+      *:*)
+        elo_path_entry=${elo_path_rest%%:*}
+        elo_path_rest=${elo_path_rest#*:}
+        ;;
+      *)
+        elo_path_entry=$elo_path_rest
+        elo_path_rest=
+        ;;
+    esac
+
+    [ "$elo_path_entry" = "$elo_path_wanted" ] && return 0
+    [ -n "$elo_path_rest" ] || return 1
+  done
+)
 
 elo_shell_quote() {
   printf "'"

@@ -85,13 +85,59 @@ if [ ! -w "$elo_bin_dir" ]; then
 fi
 
 elo_target="$elo_bin_dir/elo"
-elo_tmp="$elo_bin_dir/.elo.tmp.$$"
 umask 077
 
+elo_setup_refuse_target() {
+  elo_setup_reason=$1
+  if [ "$elo_setup_mode" = lifecycle ]; then
+    elo_warn "$elo_setup_reason"
+    exit 0
+  fi
+  elo_die "$elo_setup_reason"
+}
+
+if [ -L "$elo_target" ]; then
+  elo_setup_refuse_target "direct command setup skipped; refusing to replace symlink at $elo_target"
+elif [ -e "$elo_target" ]; then
+  if [ ! -f "$elo_target" ]; then
+    elo_setup_refuse_target "direct command setup skipped; refusing to replace non-regular path at $elo_target"
+  fi
+  elo_managed_marker=$(sed -n '2p' "$elo_target" 2>/dev/null || true)
+  if [ "$elo_managed_marker" != '# managed-by: amarelo-elo' ]; then
+    elo_setup_refuse_target "direct command setup skipped; unmanaged command already exists at $elo_target"
+  fi
+fi
+
+elo_tmp_dir=
+elo_tmp=
 elo_setup_cleanup() {
-  rm -f "$elo_tmp"
+  if [ -n "$elo_tmp" ]; then
+    rm -f "$elo_tmp"
+  fi
+  if [ -n "$elo_tmp_dir" ]; then
+    rmdir "$elo_tmp_dir" 2>/dev/null || :
+  fi
 }
 trap elo_setup_cleanup 0 1 2 15
+
+elo_tmp_attempt=0
+while [ "$elo_tmp_attempt" -lt 100 ]; do
+  elo_tmp_attempt=$((elo_tmp_attempt + 1))
+  elo_tmp_candidate="$elo_bin_dir/.elo.tmp.$$.$elo_tmp_attempt"
+  if mkdir "$elo_tmp_candidate" 2>/dev/null; then
+    elo_tmp_dir=$elo_tmp_candidate
+    break
+  fi
+done
+
+if [ -z "$elo_tmp_dir" ]; then
+  if [ "$elo_setup_mode" = lifecycle ]; then
+    elo_warn "direct command setup skipped; cannot create an exclusive temporary directory in $elo_bin_dir"
+    exit 0
+  fi
+  elo_die "Cannot create an exclusive temporary directory in: $elo_bin_dir"
+fi
+elo_tmp="$elo_tmp_dir/elo"
 
 elo_fallback_root=$(elo_shell_quote "$ELO_PROJECT_ROOT")
 {
@@ -115,22 +161,15 @@ EOF
 } >"$elo_tmp"
 chmod 755 "$elo_tmp"
 
-if [ -e "$elo_target" ] || [ -L "$elo_target" ]; then
-  if ! grep -F '# managed-by: amarelo-elo' "$elo_target" >/dev/null 2>&1; then
-    if [ "$elo_setup_mode" = lifecycle ]; then
-      elo_warn "direct command setup skipped; unmanaged command already exists at $elo_target"
-      exit 0
-    fi
-    elo_die "Refusing to replace unmanaged command: $elo_target"
-  fi
-
-  if cmp -s "$elo_tmp" "$elo_target"; then
-    printf 'Elo direct command already configured at %s\n' "$elo_target"
-    exit 0
-  fi
+if [ -f "$elo_target" ] && cmp -s "$elo_tmp" "$elo_target"; then
+  printf 'Elo direct command already configured at %s\n' "$elo_target"
+  exit 0
 fi
 
 mv "$elo_tmp" "$elo_target"
+elo_tmp=
+rmdir "$elo_tmp_dir"
+elo_tmp_dir=
 trap - 0 1 2 15
 
 printf 'Elo direct command installed at %s\n' "$elo_target"

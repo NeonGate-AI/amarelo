@@ -29,7 +29,7 @@ Before the direct command exists, run:
 ./cli/elo setup
 ```
 
-Setup is idempotent. It replaces only a launcher containing the Amarelo managed marker and refuses to overwrite an unrelated `elo` executable. CI and `ELO_SETUP_DISABLED=1` skip lifecycle installation.
+Setup is idempotent. It replaces only a regular launcher with the exact Amarelo managed marker. Symlinks, non-regular paths and unrelated `elo` executables are never overwritten. CI and `ELO_SETUP_DISABLED=1` skip lifecycle installation.
 
 ## Entrypoints
 
@@ -46,7 +46,7 @@ elo git doctor
 elo check all
 ```
 
-`pnpm elo <command>` and `./cli/elo <command>` remain compatibity and recovery entrypoints. Running Elo without arguments shows help and does not bootstrap or install anything. Unknown commands and invalid subcommands return status 2.
+`pnpm elo <command>` and `./cli/elo <command>` remain compatibility and recovery entrypoints. Running Elo without arguments shows help and does not bootstrap or install anything. Unknown commands and invalid subcommands return status 2.
 
 The generated user launcher delegates to the checkout that most recently completed setup. After moving or deleting that checkout, run `./cli/elo setup` from a valid checkout.
 

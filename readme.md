@@ -39,4 +39,4 @@ cli/src/              Elo monorepo-platform CLI (POSIX shell)
 - **Cognitive lane** — Reflex, Contextual or Deliberative routing for an interaction.
 - **Elo** — project platform CLI for bootstrap, setup, doctor, cleanup, env, Git and invariant checks; it is not Turborepo.
 
-Engineering agents start at [`AGENTS.md`](./AGENTS.md). CLI instalation and command contracts are documented in [`cli/readme.md`](./cli/readme.md).
+Engineering agents start at [`AGENTS.md`](./AGENTS.md). CLI installation and command contracts are documented in [`cli/readme.md`](./cli/readme.md).

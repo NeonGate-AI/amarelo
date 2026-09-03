@@ -197,7 +197,7 @@ if [ -f "$DESIGN_SYSTEM_ROOT/package.json" ]; then
   token_dev=$(awk '
     /^[[:space:]]*"dev":[[:space:]]*/ {
       line = $0
-      sub(/^[^:]*:[[:pace:]]**"/, "", line)
+      sub(/^[^:]*:[[:space:]]*"/, "", line)
       sub(/",?[[:space:]]*$/, "", line)
       print line
       exit
@@ -302,6 +302,35 @@ else
   )
   [ "$actual_version" = "elo $expected_version" ] ||
     platform_fail "$contract_bin/elo" "installed launcher does not execute the configured checkout"
+
+  if [ "${ELO_PLATFORM_NESTED:-0}" != 1 ]; then
+    if ! ELO_PLATFORM_NESTED=1 "$contract_bin/elo" check platform \
+      >"$TMP_ROOT/installed-platform.out" 2>&1
+    then
+      platform_fail "$contract_bin/elo" "installed launcher cannot execute elo check platform"
+    fi
+  fi
+fi
+
+quoted_root="$TMP_ROOT/checkout with an apostrophe '"
+quoted_bin="$TMP_ROOT/quoted-bin"
+mkdir "$quoted_root"
+if ! cp -R "$PROJECT_ROOT/cli" "$quoted_root/cli" || \
+  ! cp "$PROJECT_ROOT/package.json" "$quoted_root/package.json"
+then
+  platform_fail cli/src/commands/setup.sh "cannot prepare the quoted-checkout fixture"
+elif ! CI= ELO_SETUP_DISABLED= ELO_BIN_DIR="$quoted_bin" \
+  "$quoted_root/cli/elo" setup >"$TMP_ROOT/quoted-setup.out" 2>&1
+then
+  platform_fail cli/src/commands/setup.sh "setup failed for a checkout path containing spaces and an apostrophe"
+else
+  quoted_version=$(
+    cd "$TMP_ROOT" &&
+      "$quoted_bin/elo" --version 2>/dev/null
+  )
+  expected_quoted_version=$("$LAUNCHER" --version 2>/dev/null)
+  [ "$quoted_version" = "$expected_quoted_version" ] ||
+    platform_fail "$quoted_bin/elo" "launcher did not preserve the quoted checkout path"
 fi
 
 if ! "$LAUNCHER" >"$TMP_ROOT/help.out" 2>"$TMP_ROOT/help.err"; then
@@ -328,6 +357,24 @@ collision_status=$?
 cmp -s "$TMP_ROOT/unmanaged.first" "$collision_bin/elo" ||
   platform_fail cli/src/commands/setup.sh "manual setup modified an unmanaged Elo collision"
 
+symlink_bin="$TMP_ROOT/symlink-bin"
+symlink_sentinel="$TMP_ROOT/symlink-sentinel"
+mkdir "$symlink_bin"
+printf 'sentinel remains intact\n' >"$symlink_sentinel"
+if ! ln -s "$symlink_sentinel" "$symlink_bin/elo"; then
+  platform_fail cli/src/commands/setup.sh "cannot prepare the symlink-collision fixture"
+else
+  CI= ELO_SETUP_DISABLED= ELO_BIN_DIR="$symlink_bin" \
+    "$LAUNCHER" setup >"$TMP_ROOT/symlink.out" 2>&1
+  symlink_status=$?
+  [ "$symlink_status" -ne 0 ] ||
+    platform_fail cli/src/commands/setup.sh "manual setup must reject an Elo symlink collision"
+  [ -L "$symlink_bin/elo" ] ||
+    platform_fail cli/src/commands/setup.sh "manual setup replaced an Elo symlink collision"
+  [ "$(cat "$symlink_sentinel")" = 'sentinel remains intact' ] ||
+    platform_fail cli/src/commands/setup.sh "manual setup modified a symlink target"
+fi
+
 ci_bin="$TMP_ROOT/ci-bin"
 if ! CI=1 ELO_SETUP_DISABLED= ELO_BIN_DIR="$ci_bin" \
   "$LAUNCHER" setup --postinstall >"$TMP_ROOT/ci-setup.out" 2>&1
@@ -335,6 +382,15 @@ then
   platform_fail cli/src/commands/setup.sh "postinstall setup must skip cleanly in CI"
 elif [ -e "$ci_bin/elo" ]; then
   platform_fail cli/src/commands/setup.sh "CI postinstall must not create a user launcher"
+fi
+
+disabled_bin="$TMP_ROOT/disabled-bin"
+if ! CI= ELO_SETUP_DISABLED=1 ELO_BIN_DIR="$disabled_bin" \
+  "$LAUNCHER" setup --postinstall >"$TMP_ROOT/disabled-setup.out" 2>&1
+then
+  platform_fail cli/src/commands/setup.sh "explicitly disabled postinstall setup must skip cleanly"
+elif [ -e "$disabled_bin/elo" ]; then
+  platform_fail cli/src/commands/setup.sh "disabled postinstall must not create a user launcher"
 fi
 
 if [ "$failures" -gt 0 ]; then
