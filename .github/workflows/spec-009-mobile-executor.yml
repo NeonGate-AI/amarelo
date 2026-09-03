@@ -39,7 +39,7 @@ jobs:
           git rm -f .github/workflows/spec-009-mobile-executor.yml
           pnpm --filter mobile typecheck
           pnpm --filter mobile test
-          pnpm --filter mobile build
+          pnpm exec turbo run build --filter=mobile
           ./cli/elo check architecture
           ./cli/elo check imports
           git config user.name "Jonatas Sales"
