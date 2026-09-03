@@ -16,16 +16,16 @@ context:
   - .agents/context/workspaces/memory-nucleus/
   - .agents/context/workspaces/packages/
 rules:
-  - .agents/rules/memory-nucleus.md
-  - .agents/rules/architecture.md
-  - .agents/rules/product-safety.md
+  - .agents/rules/memory-nucleus.rule.md
+  - .agents/rules/architecture.rule.md
+  - .agents/rules/product-safety-and-privacy.rule.md
 adrs:
   - .agents/adrs/
 skills:
   - .agents/skills/
 evidence:
   - https://github.com/NeonGate-AI/amarelo-v2/pull/1
-  - .agents/specs/001-memory-nucleus-product-contract.md
+  - .agents/specs/001-memory-nucleus-product-contract.spec.md
   - workspaces/memory-nucleus/src/
   - workspaces/packages/memory-sdk/src/
   - commit 68dec2000f4eb23756eae8222cb078cb1e4e9a90

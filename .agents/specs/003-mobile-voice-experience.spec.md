@@ -16,12 +16,12 @@ context:
   - .agents/context/workflows/mobile.md
   - .agents/context/product/overview.md
 rules:
-  - .agents/rules/product-safety-and-privacy.md
-  - .agents/rules/react-and-next.md
+  - .agents/rules/product-safety-and-privacy.rule.md
+  - .agents/rules/react-and-next.rule.md
 adrs:
-  - .agents/adrs/0001-shared-longitudinal-memory.md
-  - .agents/adrs/0005-orbz-web-component.md
-  - .agents/adrs/0006-mobile-react-vite-pwa.md
+  - .agents/adrs/0001-shared-longitudinal-memory.adr.md
+  - .agents/adrs/0005-orbz-web-component.adr.md
+  - .agents/adrs/0006-mobile-react-vite-pwa.adr.md
 skills:
   - .agents/skills/spec-driven-development/SKILL.md
   - .agents/skills/pwa-development/SKILL.md

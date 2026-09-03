@@ -17,9 +17,9 @@ context:
   - AGENTS.md
   - .agents/context/
 rules:
-  - .agents/rules/architecture.md
-  - .agents/rules/markdown.md
-  - .agents/rules/source-organization.md
+  - .agents/rules/architecture.rule.md
+  - .agents/rules/markdown.rule.md
+  - .agents/rules/source-organization.rule.md
 adrs:
   - .agents/adrs/
 skills:

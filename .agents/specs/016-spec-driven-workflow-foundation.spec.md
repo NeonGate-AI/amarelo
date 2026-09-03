@@ -16,11 +16,11 @@ targets:
 context:
   - AGENTS.md
 rules:
-  - .agents/rules/architecture.md
-  - .agents/rules/context-engineering.md
-  - .agents/rules/markdown.md
+  - .agents/rules/architecture.rule.md
+  - .agents/rules/context-engineering.rule.md
+  - .agents/rules/markdown.rule.md
 adrs:
-  - .agents/adrs/0018-spec-driven-delivery.md
+  - .agents/adrs/0018-spec-driven-delivery.adr.md
 skills:
   - https://github.com/NeonGate-AI/skills/tree/main/skills/engineering/to-spec
   - https://github.com/NeonGate-AI/skills/tree/main/skills/engineering/to-tickets
@@ -168,7 +168,7 @@ Current evidence:
 Promotion:
 
 - workflow procedure to `.agents/specs/workflow.md`;
-- durable constraint to `.agents/rules/spec-driven-development.md`;
+- durable constraint to `.agents/rules/spec-driven-development.rule.md`;
 - consequential tradeoff to ADR 0018;
 - historical delivery context to `.agents/specs/`;
 - mechanical contract to the Elo spec checker.

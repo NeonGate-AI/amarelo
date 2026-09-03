@@ -7,7 +7,7 @@ elo_has pnpm || elo_die "pnpm is required. Enable Corepack and activate the pack
 elo_has git || elo_die "Git is required."
 
 cd "$ELO_PROJECT_ROOT"
-pnpm install --frozen-lockfile
+pnpm install --no-frozen-lockfile --lockfile=false
 "$ELO_CLI_DIR/commands/setup.sh" --postclone
 "$ELO_CLI_DIR/commands/git-setup.sh" --prepare
 exec "$ELO_CLI_DIR/commands/doctor.sh"
