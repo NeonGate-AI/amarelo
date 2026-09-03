@@ -2,7 +2,7 @@
 id: SPEC-008
 title: Establish the framework-neutral Conversation turn runtime
 type: feature
-status: in-progress
+status: implemented
 mode: prospective
 created: 2026-09-03
 updated: 2026-09-03
@@ -33,16 +33,21 @@ skills:
   - https://github.com/NeonGate-AI/skills/tree/main/skills/engineering/tdd
 evidence:
   - https://github.com/NeonGate-AI/amarelo-v2/issues/5
-  - red seam committed before implementation
+  - https://github.com/NeonGate-AI/amarelo-v2/pull/9
+  - commit 05ccb183c336ada95fbe849dff3bfda759dfa546
+  - commit 42043c6b8c2fb5ad2309928699257e305cd2d9ba
+  - commit 83dd327cda90748e02d08bdf51e5a6c3ec3451bf
+  - commit ecac185183be3b863974724bfe41b4acc6ab845a
+  - CI run 185 success
 ---
 
 # SPEC-008: Establish the framework-neutral Conversation turn runtime
 
 ## Problem Statement
 
-The repository defines Conversation identifiers, cognitive-budget contracts and a Memory SDK context provider, but it does not yet have an executable turn-level use case. A transport or named agent wired directly to those fragments would need to decide routing, context budgets, memory failure behavior and output diagnostics itself.
+The repository defined Conversation identifiers, cognitive-budget contracts and a Memory SDK context provider, but it did not yet have an executable turn-level use case. A transport or named agent wired directly to those fragments would need to decide routing, context budgets, memory failure behavior and output diagnostics itself.
 
-Building Ana first would also risk coupling the orchestrator to LangChain types or creating a package cycle between `@ai/conversation` and `@ai/ana`. The product needs a stable framework-neutral seam that a LangChain agent, a Fastify service and assurance fixtures can all implement or consume independently.
+Building Ana first would also risk coupling the orchestrator to LangChain types or creating a package cycle between `@ai/conversation` and `@ai/ana`. The product needed a stable framework-neutral seam that a LangChain agent, a Fastify service and assurance fixtures could all implement or consume independently.
 
 ## Solution
 
@@ -141,25 +146,25 @@ Memory fixtures retain the `untrusted-memory-data` marker. A failing memory fixt
 
 ## Acceptance Criteria
 
-- [ ] Turn input is strict, bounded and runtime-validated before dependency calls.
-- [ ] The public agent port has no LangChain or provider-specific type.
-- [ ] The public memory port is satisfied by the existing Memory SDK context provider.
-- [ ] Duplicate configured agent IDs fail during runtime construction.
-- [ ] An unconfigured requested agent fails with a typed error before model invocation.
-- [ ] Reflex, Contextual and Deliberative routes are deterministic and make zero model calls.
-- [ ] Reflex turns request no longitudinal memory.
-- [ ] Contextual turns request at most the configured intermediate memory budget.
-- [ ] Deliberative turns request at most 600 Memory SDK tokens.
-- [ ] Recent history is selected within the declared context estimate and remains chronological.
-- [ ] Successful memory retrieval reaches the agent only as structured untrusted projections.
-- [ ] Memory retrieval failure yields an empty projection, `unavailable` diagnostics and continued agent invocation.
-- [ ] Agent failure propagates as a typed runtime error without a fabricated answer.
-- [ ] Results include routing, history, memory and optional model-usage diagnostics.
-- [ ] Synthetic evals cover success, lane boundaries, unavailable memory, missing agent and duplicate registry cases.
-- [ ] `@ai/conversation` exposes the runtime through its public package API.
-- [ ] The living routing spec and Conversation context describe the implemented behavior.
-- [ ] No LangChain agent, provider, HTTP route, PWA integration, queue or worker is implemented.
-- [ ] Full repository CI passes.
+- [x] Turn input is strict, bounded and runtime-validated before dependency calls.
+- [x] The public agent port has no LangChain or provider-specific type.
+- [x] The public memory port is satisfied by the existing Memory SDK context provider.
+- [x] Duplicate configured agent IDs fail during runtime construction.
+- [x] An unconfigured requested agent fails with a typed error before model invocation.
+- [x] Reflex, Contextual and Deliberative routes are deterministic and make zero model calls.
+- [x] Reflex turns request no longitudinal memory.
+- [x] Contextual turns request at most the configured intermediate memory budget.
+- [x] Deliberative turns request at most 600 Memory SDK tokens.
+- [x] Recent history is selected within the declared context estimate and remains chronological.
+- [x] Successful memory retrieval reaches the agent only as structured untrusted projections.
+- [x] Memory retrieval failure yields an empty projection, `unavailable` diagnostics and continued agent invocation.
+- [x] Agent failure propagates as a typed runtime error without a fabricated answer.
+- [x] Results include routing, history, memory and optional model-usage diagnostics.
+- [x] Synthetic evals cover success, lane boundaries, unavailable memory, missing agent and duplicate registry cases.
+- [x] `@ai/conversation` exposes the runtime through its public package API.
+- [x] The living routing spec and Conversation context describe the implemented behavior.
+- [x] No LangChain agent, provider, HTTP route, PWA integration, queue or worker is implemented.
+- [x] Full repository CI passes.
 
 ## Failure Behavior
 
@@ -188,20 +193,24 @@ Memory fixtures retain the `untrusted-memory-data` marker. A failing memory fixt
 
 ## Evidence and Promotion
 
-Current evidence:
+Evidence:
 
-- implementation issue #5;
-- red assurance seam committed before the production runtime;
-- package and repository validation pending after implementation.
+- issue #5 and pull request #9;
+- red seam commit `05ccb183c336ada95fbe849dff3bfda759dfa546` preceded the production runtime;
+- runtime implementation commit `42043c6b8c2fb5ad2309928699257e305cd2d9ba`;
+- generated lockfile commit `83dd327cda90748e02d08bdf51e5a6c3ec3451bf`;
+- canonical formatting and final implementation head `ecac185183be3b863974724bfe41b4acc6ab845a`;
+- CI run #185 completed successfully, including Conversation runtime evals and the full repository validation;
+- pull request #9 records separate Standards and Spec review axes.
 
-Planned promotion:
+Promotion:
 
-- current runtime ownership and failure behavior to Conversation context;
-- implemented lane budgets to the living routing spec;
-- package direction and framework-neutral port tradeoff to ADR 0020;
-- public contracts and executable evals to `@ai/conversation`;
-- final evidence to this delivery spec.
+- current runtime ownership and failure behavior were promoted to Conversation context;
+- implemented lane budgets were promoted to the living routing spec;
+- package direction and framework-neutral port tradeoff were recorded in ADR 0020;
+- public contracts and executable evals were added to `@ai/conversation`;
+- this delivery spec records final evidence.
 
 ## Further Notes
 
-This spec deliberately creates the seam that the next named-agent spec will implement. The first concrete implementation is expected to be Ana using LangChain `createAgent`, with the model injected rather than created inside the persona package.
+This spec created the seam that the next named-agent spec will implement. The first concrete implementation is Ana using LangChain `createAgent`, with the model injected rather than created inside the persona package.
