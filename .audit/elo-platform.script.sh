@@ -16,13 +16,19 @@ LAUNCHER="$PROJECT_ROOT/cli/elo"
 DESIGN_SYSTEM_ROOT="$PROJECT_ROOT/workspaces/packages/design-system"
 TOKEN_SCRIPT="$DESIGN_SYSTEM_ROOT/src/scripts/build-tokens.sh"
 TOKEN_BACKEND="$DESIGN_SYSTEM_ROOT/src/scripts/build-tokens.ts"
-TMP_ROOT="${TMPDIR:-/tmp}/amarelo-elo-platform.$$"
+TMP_ROOT="${TMPDIR:-/tmp}/amarelo-elo-platform.$"
+doctor_fifo_writer=
 umask 077
 mkdir "$TMP_ROOT" || {
   printf 'Elo platform audit FAIL: cannot create temporary directory\n' >&2
   exit 1
 }
 audit_cleanup() {
+  if [ -n "$doctor_fifo_writer" ]; then
+    kill "$doctor_fifo_writer" 2>/dev/null || :
+    wait "$doctor_fifo_writer" 2>/dev/null || :
+    doctor_fifo_writer=
+  fi
   rm -rf "$TMP_ROOT"
 }
 
@@ -513,8 +519,9 @@ if ! mkfifo "$doctor_fifo_bin/elo"; then
   platform_fail cli/src/commands/doctor.sh "cannot prepare the FIFO safety fixture"
 else
   (
-    printf '#!/bin/sh\n# managed-by: amarelo-elo\n' >"$doctor_fifo_bin/elo"
+    exec 3>"$doctor_fifo_bin/elo"
     : >"$doctor_fifo_opened"
+    printf '#!/bin/sh\n# managed-by: amarelo-elo\n' >&3
   ) &
   doctor_fifo_writer=$!
   ELO_BIN_DIR="$doctor_fifo_bin" "$LAUNCHER" doctor \
@@ -524,6 +531,7 @@ else
   fi
   kill "$doctor_fifo_writer" 2>/dev/null || :
   wait "$doctor_fifo_writer" 2>/dev/null || :
+  doctor_fifo_writer=
 fi
 
 ci_bin="$TMP_ROOT/ci-bin"
