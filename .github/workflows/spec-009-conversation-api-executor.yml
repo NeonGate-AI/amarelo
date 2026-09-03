@@ -94,6 +94,28 @@ jobs:
                   raise RuntimeError(f'expected fixture source is missing: {old!r}')
               fixture = fixture.replace(old, new, 1)
           fixture_path.write_text(fixture, encoding='utf-8')
+
+          app_path = Path(
+              'workspaces/apps/conversation-api/src/app/conversation-api.factory.ts'
+          )
+          app = app_path.read_text(encoding='utf-8')
+          app_replacements = [
+              (
+                  "    disableRequestLogging: true,\n",
+                  "",
+              ),
+              (
+                  "      return reply.status(200).send(mapSuccess(result, totalLatencyMs))",
+                  "      return reply\n"
+                  "        .status(200)\n"
+                  "        .send({ data: mapSuccess(result, totalLatencyMs) })",
+              ),
+          ]
+          for old, new in app_replacements:
+              if old not in app:
+                  raise RuntimeError(f'expected app source is missing: {old!r}')
+              app = app.replace(old, new, 1)
+          app_path.write_text(app, encoding='utf-8')
           PY
           pnpm install --lockfile-only
           pnpm install --frozen-lockfile
