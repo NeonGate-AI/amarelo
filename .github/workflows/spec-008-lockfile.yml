@@ -1,0 +1,33 @@
+name: SPEC-008 lockfile regeneration
+
+on:
+  push:
+    branches:
+      - feat/spec-008-conversation-runtime
+
+permissions:
+  contents: write
+
+jobs:
+  regenerate:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --lockfile-only --no-frozen-lockfile
+      - name: Commit generated lockfile and remove temporary workflow
+        shell: bash
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git rm .github/workflows/spec-008-lockfile.yml
+          git add pnpm-lock.yaml
+          git commit -m 'chore(deps): regenerate lockfile for spec 008' -m 'Spec: SPEC-008'
+          git push

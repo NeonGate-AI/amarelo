@@ -2,7 +2,7 @@
 id: SPEC-008
 title: Establish the framework-neutral Conversation turn runtime
 type: feature
-status: ready
+status: in-progress
 mode: prospective
 created: 2026-09-03
 updated: 2026-09-03
@@ -32,7 +32,8 @@ skills:
   - https://github.com/NeonGate-AI/skills/tree/main/skills/engineering/implement
   - https://github.com/NeonGate-AI/skills/tree/main/skills/engineering/tdd
 evidence:
-  - pending
+  - https://github.com/NeonGate-AI/amarelo-v2/issues/5
+  - red seam committed before implementation
 ---
 
 # SPEC-008: Establish the framework-neutral Conversation turn runtime
@@ -187,13 +188,11 @@ Memory fixtures retain the `untrusted-memory-data` marker. A failing memory fixt
 
 ## Evidence and Promotion
 
-Planned evidence:
+Current evidence:
 
-- spec issue and branch;
-- red-to-green synthetic runtime evals;
-- package typecheck and test;
-- full pull-request CI;
-- separate Standards and Spec reviews.
+- implementation issue #5;
+- red assurance seam committed before the production runtime;
+- package and repository validation pending after implementation.
 
 Planned promotion:
 
