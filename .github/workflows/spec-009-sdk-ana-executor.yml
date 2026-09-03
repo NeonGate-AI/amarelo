@@ -58,6 +58,22 @@ jobs:
           fixture = fixture_path.read_text(encoding='utf-8')
           fixture = fixture.replace("from '../../../model'", "from '@ai/ana'")
           fixture_path.write_text(fixture, encoding='utf-8')
+
+          Path(
+              'workspaces/ai/agents/ana/src/assurance/evals/'
+              'ana-agent/index.ts'
+          ).write_text(
+              "export * from './ana-agent.eval'\n"
+              "export * from './ana-agent.fixtures'\n",
+              encoding='utf-8',
+          )
+          Path(
+              'workspaces/packages/conversation-sdk/src/assurance/evals/'
+              'conversation-sdk/index.ts'
+          ).write_text(
+              "export * from './conversation-sdk.eval'\n",
+              encoding='utf-8',
+          )
           PY
           pnpm install --lockfile-only
           pnpm install --frozen-lockfile
