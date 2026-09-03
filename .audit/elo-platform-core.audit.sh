@@ -534,7 +534,8 @@ then
 fi
 
 if ! "$scaffold_launcher" rule >"$TMP_ROOT/scaffold-rule.out" 2>&1 ||
-  [ ! -f "$scaffold_root/.agents/rules/012-new-rule.rule.md" ]
+  scaffold_default_rule_name=012-new-rule.rule.md
+  [ ! -f "$scaffold_root/.agents/rules/$scaffold_default_rule_name" ]
 then
   platform_fail cli/src/commands/scaffold.sh "elo rule did not reserve the post-migration rule number"
 fi

@@ -178,7 +178,7 @@ then
 
   git -C "$PROJECT_ROOT" grep -h -o -E \
     '\.agents/rules/[0-9][0-9][0-9]-[a-z0-9]+(-[a-z0-9]+)*\.rule\.md' \
-    -- . ':(exclude).audit/**' 2>/dev/null |
+    -- . 2>/dev/null |
     sort -u >"$TMP_ROOT/references" || :
 
   while IFS= read -r reference; do
