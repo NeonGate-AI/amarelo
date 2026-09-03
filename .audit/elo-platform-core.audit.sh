@@ -489,6 +489,12 @@ elif ! grep -F '🔎 command=--help' "$TMP_ROOT/logs-after.err" >/dev/null 2>&1;
   platform_fail cli/src/elo.sh "--logs after a command must enable diagnostics"
 fi
 
+if ! "$LAUNCHER" doctor --logs --help >"$TMP_ROOT/doctor-logs.out" 2>"$TMP_ROOT/doctor-logs.err"; then
+  platform_fail cli/src/commands/doctor.sh "a dispatched command must accept global --logs"
+elif ! grep -F '🔎 doctor module initialized' "$TMP_ROOT/doctor-logs.err" >/dev/null 2>&1; then
+  platform_fail cli/src/commands/doctor.sh "a dispatched command must observe ELO_LOGS=true"
+fi
+
 "$LAUNCHER" unknown-command >"$TMP_ROOT/unknown.out" 2>"$TMP_ROOT/unknown.err"
 unknown_status=$?
 [ "$unknown_status" -eq 2 ] ||

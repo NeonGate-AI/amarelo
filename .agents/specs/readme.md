@@ -23,7 +23,7 @@ The specification catalog is flat, priority-ordered and mechanically checked.
 | 007 | SPEC-025 | draft | [Plans, voice entitlements and capability gates](007-plans-and-entitlements.spec.md) |
 | 008 | SPEC-026 | implemented | [Canonical spec template and priority migration](008-canonical-spec-template-and-priority-migration.spec.md) |
 | 009 | SPEC-027 | implemented | [Direct AI Conversation topology](009-direct-ai-conversation-topology.spec.md) |
-| 010 | SPEC-028 | in-progress | [Elo CLI experience modernization](010-elo-cli-experience-modernization.spec.md) |
+| 010 | SPEC-028 | implemented | [Elo CLI experience modernization](010-elo-cli-experience-modernization.spec.md) |
 | 011 | SPEC-001 | implemented | [Repository harness and Elo foundation](011-repository-harness-and-elo-foundation.spec.md) |
 | 012 | SPEC-002 | implemented | [Memory Nucleus MVP foundation](012-memory-nucleus-mvp-foundation.spec.md) |
 | 013 | SPEC-003 | implemented | [Product application foundations](013-product-application-foundations.spec.md) |

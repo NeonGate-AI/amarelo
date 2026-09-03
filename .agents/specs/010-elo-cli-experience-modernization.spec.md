@@ -2,7 +2,7 @@
 id: SPEC-028
 title: Modernize the Elo CLI experience and restore reproducible installs
 type: feature
-status: in-progress
+status: implemented
 mode: prospective
 created: 2026-09-03
 updated: 2026-09-03
@@ -32,7 +32,10 @@ skills:
 evidence:
   - https://github.com/NeonGate-AI/amarelo/issues/24
   - https://github.com/NeonGate-AI/amarelo/issues/25
-  - pending
+  - https://github.com/NeonGate-AI/amarelo/pull/26
+  - .audit/elo-platform-core.audit.sh
+  - .audit/workflow-skills.audit.sh
+  - .agents/adrs/0024-tracked-pnpm-lockfile.adr.md
 ---
 
 # SPEC-028: Modernize the Elo CLI experience and restore reproducible installs
@@ -91,14 +94,14 @@ Run `./cli/elo doctor --ci`, `./cli/elo check all`, Commitlint, Biome, typecheck
 
 ## Acceptance Criteria
 
-- [ ] `elo`, `elo help`, and `elo --help` show the yellow ELO wordmark and a scannable emoji command catalog.
-- [ ] Redirected help contains the wordmark without ANSI escapes; `NO_COLOR` suppresses color.
-- [ ] `--logs` works before or after a command and exposes `ELO_LOGS=true` to the dispatched module.
-- [ ] Unknown commands and invalid options still exit with status 2 and include recovery guidance.
-- [ ] Doctor uses consistent semantic status output and requires the tracked `pnpm-lock.yaml`.
-- [ ] Bootstrap, CI, and Compose use frozen lockfile installation.
-- [ ] Elo remains POSIX shell and does not duplicate Turborepo task ownership.
-- [ ] Exact-head CI and both required reviews pass before merge.
+- [x] `elo`, `elo help`, and `elo --help` show the yellow ELO wordmark and a scannable emoji command catalog.
+- [x] Redirected help contains the wordmark without ANSI escapes; `NO_COLOR` suppresses color.
+- [x] `--logs` works before or after a command and exposes `ELO_LOGS=true` to the dispatched module.
+- [x] Unknown commands and invalid options still exit with status 2 and include recovery guidance.
+- [x] Doctor uses consistent semantic status output and requires the tracked `pnpm-lock.yaml`.
+- [x] Bootstrap, CI, and Compose use frozen lockfile installation.
+- [x] Elo remains POSIX shell and does not duplicate Turborepo task ownership.
+- [x] Exact-head CI and both required reviews pass before merge.
 
 ## Failure Behavior
 
@@ -113,7 +116,7 @@ Invalid global options fail closed with status 2. Missing lockfiles or frozen-in
 
 ## Evidence and Promotion
 
-Planned evidence is the public CLI audit, exact-head CI run, independent Standards review, independent Spec-fidelity review, and merged pull request. The tracked-lockfile decision is promoted to ADR-0024 and current CLI/runtime documentation.
+The public CLI audit proves the branded help, color suppression, forced-color seam, global flags, dispatched verbose mode, and exit behavior. Pull request #26 records exact-head CI plus independent Standards and Spec-fidelity reviews before merge. The tracked-lockfile decision is promoted to ADR-0024, doctor, automated installation paths, executable harness checks, and current CLI/runtime documentation.
 
 ## Further Notes
 

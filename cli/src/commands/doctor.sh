@@ -2,6 +2,7 @@
 set -u
 . "$ELO_CLI_DIR/core/common.sh"
 
+elo_log "doctor module initialized"
 ci=false
 while [ "$#" -gt 0 ]; do
   case "$1" in
