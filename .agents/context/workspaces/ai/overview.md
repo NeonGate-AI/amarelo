@@ -2,8 +2,9 @@
 
 `workspaces/ai/` owns AI-facing product capabilities.
 
-- `conversation/`: conversation behavior, final context assembly and cognitive routing.
+- `agents/`: structural parent for independently packaged product agents such as `@ai/ana`.
+- `orchestrator/`: structural parent for independently packaged coordination runtimes.
+- `orchestrator/conversation/`: `@ai/conversation`, which owns current-interaction behavior, final context assembly and cognitive routing.
 - `knowledge/`: isolated non-personal Knowledge retrieval/RAG.
-- `agents/`: future product AI agent implementations; intentionally empty for this handoff.
 
-AI may consume Memory Nucleus only through `@repo/memory-sdk`.
+The `agents/` and `orchestrator/` parents own no `package.json`, `tsconfig.json` or `src/` of their own. AI may consume Memory Nucleus only through `@repo/memory-sdk`.

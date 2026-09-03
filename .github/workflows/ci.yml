@@ -40,36 +40,26 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: pnpm
 
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+        run: pnpm install --no-frozen-lockfile
 
       - name: Elo doctor
         run: ./cli/elo doctor --ci
 
-      - name: Elo platform audit
-        run: ./cli/elo check platform
-
-      - name: Architecture audit
-        run: ./cli/elo check architecture
-
-      - name: Spec workflow audit
-        run: ./cli/elo check specs
-
-      - name: Import boundaries audit
-        run: ./cli/elo check imports
-
-      - name: Memory invariants audit
-        run: ./cli/elo check memory
+      - name: Elo audit suite
+        run: ./cli/elo check all
 
       - name: Audit hygiene
-        shell: bash
+        shell: sh
         run: |
-          tracked="$(git ls-files '.audit/**' | grep -Ev '^\.audit/(\.gitkeep|architecture\.script\.mjs|elo-platform\.script\.mjs|import-boundaries\.script\.mjs|memory-invariants\.script\.mjs|specs\.script\.mjs)$' || true)"
+          tracked="$(
+            git ls-files '.audit/**' |
+              grep -Ev '^\.audit/(\.gitkeep|architecture\.script\.sh|elo-platform\.script\.sh|import-boundaries\.script\.sh|memory-invariants\.script\.sh|specs\.script\.sh)$' ||
+              true
+          )"
           if [ -n "$tracked" ]; then
-            echo 'Unexpected tracked .audit evidence:'
-            echo "$tracked"
+            printf 'Unexpected tracked .audit evidence:\n%s\n' "$tracked"
             exit 1
           fi
 
