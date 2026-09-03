@@ -110,6 +110,18 @@ jobs:
                   "        .status(200)\n"
                   "        .send({ data: mapSuccess(result, totalLatencyMs) })",
               ),
+              (
+                  "  message: string\n) {\n  request.log.error(\n    {\n      errorName: error instanceof Error ? error.name : 'UnknownError',\n      requestId: requestCorrelationId(request)\n",
+                  "  message: string,\n  correlationId: string = requestCorrelationId(request)\n) {\n  request.log.error(\n    {\n      errorName: error instanceof Error ? error.name : 'UnknownError',\n      requestId: correlationId\n",
+              ),
+              (
+                  "    payload: safeError(code, message, requestCorrelationId(request)),\n",
+                  "    payload: safeError(code, message, correlationId),\n",
+              ),
+              (
+                  "        isModelFailure\n          ? 'A Ana não conseguiu responder agora.'\n          : 'Não foi possível concluir a conversa.'\n      )",
+                  "        isModelFailure\n          ? 'A Ana não conseguiu responder agora.'\n          : 'Não foi possível concluir a conversa.',\n        input.requestId\n      )",
+              ),
           ]
           for old, new in app_replacements:
               if old not in app:
@@ -122,10 +134,28 @@ jobs:
               'conversation-api/conversation-api.eval.ts'
           )
           evaluation = eval_path.read_text(encoding='utf-8')
-          old_message = "  message: 'Oi, Ana.',\n"
-          if old_message not in evaluation:
-              raise RuntimeError('expected contextual fixture message is missing')
-          evaluation = evaluation.replace(old_message, "  message: 'Oi!',\n", 1)
+          eval_replacements = [
+              (
+                  "  message: 'Oi, Ana.',\n",
+                  "  message: 'Oi!',\n",
+              ),
+              (
+                  "async function evaluateInvalidRequestBeforeModel() {\n  const model = new RecordingAnaModel()",
+                  "async function evaluateInvalidRequestBeforeModel() {\n  const invalidInputSentinel = 'private-input-must-not-echo'\n  const model = new RecordingAnaModel()",
+              ),
+              (
+                  "    payload: JSON.stringify({ ...REQUEST, message: '' }),\n",
+                  "    payload: JSON.stringify({\n      ...REQUEST,\n      message: '',\n      unexpected: invalidInputSentinel\n    }),\n",
+              ),
+              (
+                  "  assert.equal(response.body.includes('message'), false)\n",
+                  "  assert.equal(response.body.includes(invalidInputSentinel), false)\n",
+              ),
+          ]
+          for old, new in eval_replacements:
+              if old not in evaluation:
+                  raise RuntimeError(f'expected evaluation source is missing: {old!r}')
+              evaluation = evaluation.replace(old, new, 1)
           eval_path.write_text(evaluation, encoding='utf-8')
           PY
           pnpm install --lockfile-only
