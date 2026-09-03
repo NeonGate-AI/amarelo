@@ -40,7 +40,7 @@
     "console": "layout",
     "landing": "public",
     "onboarding": "path",
-    "skills": "activity",
+    "skills": "jinja",
     "react": "react-components",
     "adrs": "scripts",
     "rules": "rules",
@@ -50,12 +50,12 @@
     "knowledge": "gitbook",
     "providers": "import",
     "rag": "archive",
-    "ana": "cline",
-    "isa": "cline",
-    "nico": "cline",
+    "ana": "grype",
+    "isa": "grype",
+    "nico": "grype",
     "context": "gitbook",
     "memory-nucleus": "quasar",
-    "memory-sdk": "activity",
+    "observability": "activity",
     "ranking-evaluation": "coverage",
     "common": "internal",
     "workspaces": "sky",
@@ -63,7 +63,17 @@
     ".audit": "benchmark",
     "evaluation": "chart",
     "packages": "plastic",
-    "architecture": "project"
+    "architecture": "project",
+    "memory-sdk": "sdk",
+    "runtime": "rocket",
+    "product": "notification"
+  },
+
+  "flow-icons.files.associations": {
+    "*.spec.md": "plist",
+    "*.rule.md": "bbx",
+    "*.adr.md": "coding-guidelines",
+    "*.audit.sh": "license"
   },
 
   "todohighlight.defaultStyle": {

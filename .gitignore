@@ -89,13 +89,3 @@ pnpm-lock.yaml
 
 bin/local/
 .direnv/
-
-# -----------------------------------------------------------------------------
-# Temporary audit evidence
-# -----------------------------------------------------------------------------
-
-.audit/*
-!.audit/.gitkeep
-!.audit/architecture.script.mjs
-!.audit/elo-platform.script.mjs
-!.audit/memory-invariants.script.mjs
