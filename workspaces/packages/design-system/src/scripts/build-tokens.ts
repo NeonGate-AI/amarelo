@@ -173,6 +173,9 @@ function resolveValue(
     }
 
     const reference = match[1]
+    if (reference === undefined) {
+      return value
+    }
     if (stack.includes(reference)) {
       throw new TypeError(
         `Circular token reference: ${[...stack, reference].join(' -> ')}`

@@ -20,6 +20,11 @@
   ],
   "scripts": {
     "build": "./src/scripts/build-tokens.sh",
-    "dev": "./src/scripts/build-tokens.sh --watch"
+    "dev": "./src/scripts/build-tokens.sh --watch",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@types/node": "24.13.3",
+    "typescript": "5.9.2"
   }
 }
