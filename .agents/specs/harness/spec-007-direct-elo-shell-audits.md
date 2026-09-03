@@ -2,7 +2,7 @@
 id: SPEC-007
 title: Make Elo directly invokable and migrate audit automation to POSIX shell
 type: feature
-status: ready
+status: in-progress
 mode: prospective
 created: 2026-09-03
 updated: 2026-09-03
