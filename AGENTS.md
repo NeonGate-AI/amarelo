@@ -2,11 +2,11 @@
 
 This is the canonical engineering-agent entry point for the monorepo.
 
-Before modifying project code, load every `.agents/rules/*.md` rule whose frontmatter declares `alwaysApply: true`. Then load only the additional context required for the active area.
+Before modifying project code, load every `.agents/rules/*.rule.md` rule whose frontmatter declares `alwaysApply: true`. Then load only the additional context required for the active area.
 
 ## Delivery workflow
 
-Before changing repository behavior, load `.agents/specs/workflow.md` and the active numbered delivery spec. Implementation starts only from a spec whose status is `ready`; the first implementation change moves it to `in-progress`.
+Before changing repository behavior, load `.agents/specs/workflow.md` and the active numbered `*.spec.md` delivery contract. Implementation starts only from a prospective spec whose status is `ready`; the first implementation change moves it to `in-progress`.
 
 ## Navigate
 
@@ -16,11 +16,22 @@ Before changing repository behavior, load `.agents/specs/workflow.md` and the ac
 - Understand consequential decisions -> `.agents/adrs/`
 - Follow a reusable engineering procedure -> `.agents/skills/`
 
-Start from `.agents/context/workspaces/<area>/` when an area manifest exists. Follow referenced scoped rules/specs/ADRs instead of loading the whole harness.
+Start from `.agents/context/workspaces/<area>/` when an area manifest exists. Follow referenced scoped rules, specs and ADRs instead of loading the whole harness.
+
+## Semantic harness filenames
+
+Harness artifacts use semantic suffixes at their ownership boundary:
+
+- ADRs: `lowercase-kebab-case.adr.md` under `.agents/adrs/`;
+- rules: `lowercase-kebab-case.rule.md` under `.agents/rules/`;
+- numbered specs: `NNN-lowercase-kebab-case.spec.md` under `.agents/specs/`;
+- executable audit checkers: `lowercase-kebab-case.audit.sh` under `.audit/`.
+
+Context documents, skills and the unnumbered spec support files `readme.md`, `template.md` and `workflow.md` keep their ordinary names. Repository references must use the exact semantic filename; do not reintroduce unsuffixed ADR, rule, numbered-spec or audit-checker paths.
 
 ## Evidence is not canonical context
 
-`.audit/` is a temporary execution-evidence plane. Do not treat audit artifacts as rules, context, specs, ADRs, or skills. Promote durable conclusions into `.agents/` before deleting the corresponding audit output.
+`.audit/` is a temporary execution-evidence plane. Its tracked `*.audit.sh` files are executable invariant checkers, not product truth. Do not treat transient audit output as rules, context, specs, ADRs or skills. Promote durable conclusions into `.agents/` before deleting the corresponding evidence.
 
 ## Non-negotiable boundaries
 

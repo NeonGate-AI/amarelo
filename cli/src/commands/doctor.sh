@@ -35,8 +35,7 @@ printf 'Elo doctor\n'
 
 if elo_has node; then
   node_version=$(node --version 2>/dev/null || true)
-  node_major=$(printf '%s' "$node_version" |
-    sed 's/^v\([0-9][0-9]*\).*/\1/')
+  node_major=$(printf '%s' "$node_version" | sed 's/^v\([0-9][0-9]*\).*/\1/')
   if [ "$node_major" = 24 ]; then
     pass node "$node_version"
   else
@@ -59,12 +58,10 @@ if elo_has pnpm; then
   if [ -z "$expected_pnpm" ] || [ "$pnpm_version" = "$expected_pnpm" ]; then
     pass pnpm "$pnpm_version"
   else
-    fail pnpm "$pnpm_version (expected $expected_pnpm)" \
-      "Activate the repository pnpm version."
+    fail pnpm "$pnpm_version (expected $expected_pnpm)" "Activate the repository pnpm version."
   fi
 else
-  fail pnpm "not available" \
-    "Enable Corepack and activate the repository pnpm version."
+  fail pnpm "not available" "Enable Corepack and activate the repository pnpm version."
 fi
 
 if elo_has git; then
@@ -74,20 +71,12 @@ else
 fi
 
 if elo_has node; then
-  for package_name in \
-    typescript \
-    @biomejs/biome \
-    turbo \
-    @commitlint/cli \
-    husky \
-    lint-staged
-  do
+  for package_name in typescript @biomejs/biome turbo @commitlint/cli husky lint-staged; do
     actual=$(elo_local_package_version "$package_name" 2>/dev/null || true)
     if [ -n "$actual" ]; then
       pass "$package_name" "$actual"
     else
-      fail "$package_name" "not installed" \
-        "Run pnpm install --frozen-lockfile."
+      fail "$package_name" "not installed" "Run pnpm install --no-frozen-lockfile --lockfile=false."
     fi
   done
 fi
@@ -110,12 +99,14 @@ else
   fail docker-daemon unreachable "Start the Docker daemon after installing Docker."
 fi
 
-[ -f "$ELO_PROJECT_ROOT/pnpm-lock.yaml" ] &&
-  pass lockfile pnpm-lock.yaml ||
-  fail lockfile missing "Restore pnpm-lock.yaml."
+if [ -e "$ELO_PROJECT_ROOT/pnpm-lock.yaml" ]; then
+  fail lockfile-policy "pnpm-lock.yaml exists" "Remove it and install with --lockfile=false."
+else
+  pass lockfile-policy "pnpm-lock.yaml absent"
+fi
 [ -d "$ELO_PROJECT_ROOT/node_modules" ] &&
   pass install-state node_modules ||
-  fail install-state missing "Run pnpm install --frozen-lockfile."
+  fail install-state missing "Run pnpm install --no-frozen-lockfile --lockfile=false."
 [ -f "$ELO_PROJECT_ROOT/commitlint.config.js" ] &&
   pass commitlint-config commitlint.config.js ||
   fail commitlint-config missing "Restore Commitlint configuration."
@@ -129,19 +120,12 @@ fi
   pass memory-schema schema.sql ||
   fail memory-schema missing "Restore the Memory Nucleus schema."
 
-for audit_name in \
-  architecture \
-  elo-platform \
-  import-boundaries \
-  memory-invariants \
-  specs
-do
-  audit_path="$ELO_PROJECT_ROOT/.audit/$audit_name.script.sh"
+for audit_name in architecture elo-platform import-boundaries memory-invariants specs; do
+  audit_path="$ELO_PROJECT_ROOT/.audit/$audit_name.audit.sh"
   if [ -f "$audit_path" ]; then
-    pass "$audit_name-audit" ".audit/$audit_name.script.sh"
+    pass "$audit_name-audit" ".audit/$audit_name.audit.sh"
   else
-    fail "$audit_name-audit" missing \
-      "Restore .audit/$audit_name.script.sh."
+    fail "$audit_name-audit" missing "Restore .audit/$audit_name.audit.sh."
   fi
 done
 
@@ -150,13 +134,9 @@ if [ "$ci" = false ]; then
   if [ -n "$direct_bin" ]; then
     direct_target="$direct_bin/elo"
     direct_elo_valid=false
-    if [ -f "$direct_target" ] &&
-      [ ! -L "$direct_target" ] &&
-      [ -x "$direct_target" ]
-    then
+    if [ -f "$direct_target" ] && [ ! -L "$direct_target" ] && [ -x "$direct_target" ]; then
       direct_marker=$(sed -n '2p' "$direct_target" 2>/dev/null || true)
-      [ "$direct_marker" = '# managed-by: amarelo-elo' ] &&
-        direct_elo_valid=true
+      [ "$direct_marker" = '# managed-by: amarelo-elo' ] && direct_elo_valid=true
     fi
 
     if [ "$direct_elo_valid" = true ]; then
@@ -166,11 +146,7 @@ if [ "$ci" = false ]; then
     fi
 
     if [ -d "$direct_bin" ]; then
-      direct_bin=$(
-        CDPATH=
-        cd -P "$direct_bin"
-        pwd
-      )
+      direct_bin=$(CDPATH= cd -P "$direct_bin" && pwd)
       if ! elo_path_contains "$direct_bin"; then
         warn direct-elo-path "$direct_bin is not on PATH"
       fi
@@ -184,9 +160,7 @@ if [ "$ci" = false ]; then
     while IFS= read -r template; do
       [ -n "$template" ] || continue
       target="$(dirname "$template")/.env"
-      [ -f "$target" ] ||
-        printf 'WARN  env target missing — %s (run elo env setup)\n' \
-          "$(elo_rel "$template")"
+      [ -f "$target" ] || printf 'WARN  env target missing — %s (run elo env setup)\n' "$(elo_rel "$template")"
     done <<EOF
 $templates
 EOF

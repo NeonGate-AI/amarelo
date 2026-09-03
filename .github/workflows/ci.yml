@@ -11,6 +11,7 @@ on:
       - docs/**
       - chore/**
       - test/**
+      - governance/**
   pull_request:
     branches:
       - main
@@ -42,7 +43,7 @@ jobs:
           node-version: ${{ env.NODE_VERSION }}
 
       - name: Install dependencies
-        run: pnpm install --no-frozen-lockfile
+        run: pnpm install --no-frozen-lockfile --lockfile=false
 
       - name: Elo doctor
         run: ./cli/elo doctor --ci
@@ -55,7 +56,7 @@ jobs:
         run: |
           tracked="$(
             git ls-files '.audit/**' |
-              grep -Ev '^\.audit/(\.gitkeep|architecture\.script\.sh|elo-platform\.script\.sh|import-boundaries\.script\.sh|memory-invariants\.script\.sh|specs\.script\.sh)$' ||
+              grep -Ev '^\.audit/(\.gitkeep|[a-z0-9-]+\.audit\.sh)$' ||
               true
           )"
           if [ -n "$tracked" ]; then
