@@ -10,18 +10,18 @@ owners:
   - Jonatas Sales
 targets:
   - .agents/specs
-  - .agents/rules/spec-driven-development.md
-  - .audit/specs.script.sh
+  - .agents/rules/spec-driven-development.rule.md
+  - .audit/specs.audit.sh
   - AGENTS.md
 context:
   - .agents/specs/readme.md
   - .agents/specs/workflow.md
 rules:
-  - .agents/rules/context-engineering.md
-  - .agents/rules/markdown.md
-  - .agents/rules/spec-driven-development.md
+  - .agents/rules/context-engineering.rule.md
+  - .agents/rules/markdown.rule.md
+  - .agents/rules/spec-driven-development.rule.md
 adrs:
-  - .agents/adrs/0018-spec-driven-delivery.md
+  - .agents/adrs/0018-spec-driven-delivery.adr.md
 skills:
   - .agents/skills/spec-driven-development/SKILL.md
   - .agents/skills/to-spec/SKILL.md
@@ -30,7 +30,7 @@ skills:
   - .agents/skills/code-review/SKILL.md
 evidence:
   - .agents/specs/readme.md priority registry
-  - .audit/specs.script.sh flat-catalog enforcement
+  - .audit/specs.audit.sh flat-catalog enforcement
   - GitHub Actions CI on the final pull-request head
 ---
 
@@ -91,7 +91,7 @@ This change owns:
 
 ### Primary seam
 
-The primary seam is the repository command `./cli/elo check all`, with `.audit/specs.script.sh` proving the flat catalog contract and the Markdown/context checks proving references remain valid.
+The primary seam is the repository command `./cli/elo check all`, with `.audit/specs.audit.sh` proving the flat catalog contract and the Markdown/context checks proving references remain valid.
 
 ### Secondary seams
 
@@ -140,7 +140,7 @@ The migration fails closed if two files map to the same target, a priority rank 
 
 ## Evidence and Promotion
 
-Planned evidence includes the final flat tree, the priority index, zero stale-path search results, the spec checker result, full CI and independent reviews. Durable catalog rules are promoted to `workflow.md`, the always-applied spec rule and `.audit/specs.script.sh`; the migration spec records the final mapping.
+Planned evidence includes the final flat tree, the priority index, zero stale-path search results, the spec checker result, full CI and independent reviews. Durable catalog rules are promoted to `workflow.md`, the always-applied spec rule and `.audit/specs.audit.sh`; the migration spec records the final mapping.
 
 ## Further Notes
 

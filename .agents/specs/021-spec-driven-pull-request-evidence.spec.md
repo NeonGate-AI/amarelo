@@ -11,17 +11,17 @@ owners:
 targets:
   - .github/pull_request_template.md
   - .agents/specs/workflow.md
-  - .audit/specs.script.sh
+  - .audit/specs.audit.sh
 context:
   - .agents/specs/readme.md
   - .agents/specs/workflow.md
 rules:
-  - .agents/rules/context-engineering.md
-  - .agents/rules/markdown.md
-  - .agents/rules/product-safety-and-privacy.md
-  - .agents/rules/spec-driven-development.md
+  - .agents/rules/context-engineering.rule.md
+  - .agents/rules/markdown.rule.md
+  - .agents/rules/product-safety-and-privacy.rule.md
+  - .agents/rules/spec-driven-development.rule.md
 adrs:
-  - .agents/adrs/0018-spec-driven-delivery.md
+  - .agents/adrs/0018-spec-driven-delivery.adr.md
 skills:
   - .agents/skills/spec-driven-development/SKILL.md
   - .agents/skills/to-spec/SKILL.md
@@ -30,7 +30,7 @@ skills:
   - .agents/skills/code-review/SKILL.md
 evidence:
   - .github/pull_request_template.md
-  - .audit/specs.script.sh template-contract enforcement
+  - .audit/specs.audit.sh template-contract enforcement
   - GitHub Actions CI on the final pull-request head
 ---
 

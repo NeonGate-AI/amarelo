@@ -19,14 +19,14 @@ context:
   - .agents/context/workspaces/ai/overview.md
   - .agents/context/workspaces/ai/conversation.md
 rules:
-  - .agents/rules/architecture.md
-  - .agents/rules/import-boundaries.md
-  - .agents/rules/source-organization.md
-  - .agents/rules/spec-driven-development.md
+  - .agents/rules/architecture.rule.md
+  - .agents/rules/import-boundaries.rule.md
+  - .agents/rules/source-organization.rule.md
+  - .agents/rules/spec-driven-development.rule.md
 adrs:
-  - .agents/adrs/0019-ai-orchestrator-topology.md
-  - .agents/adrs/0020-conversation-agent-port.md
-  - .agents/adrs/0023-direct-ai-conversation-topology.md
+  - .agents/adrs/0019-ai-orchestrator-topology.adr.md
+  - .agents/adrs/0020-conversation-agent-port.adr.md
+  - .agents/adrs/0023-direct-ai-conversation-topology.adr.md
 skills:
   - .agents/skills/spec-driven-development/SKILL.md
   - .agents/skills/to-tickets/SKILL.md
@@ -35,8 +35,8 @@ skills:
   - .agents/skills/code-review/SKILL.md
 evidence:
   - workspaces/ai/conversation package tree with preserved source blobs and public package identity
-  - .agents/adrs/0023-direct-ai-conversation-topology.md accepted topology decision
-  - .audit/architecture.script.sh direct-path and retired-parent checks
+  - .agents/adrs/0023-direct-ai-conversation-topology.adr.md accepted topology decision
+  - .audit/architecture.audit.sh direct-path and retired-parent checks
   - workspaces/packages/runtime Docker and Compose no-lockfile-compatible bootstrap
   - pull request 21 final GitHub Actions CI and exact-head independent reviews
 ---

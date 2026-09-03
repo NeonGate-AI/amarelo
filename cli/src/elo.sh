@@ -25,9 +25,9 @@ elo_usage_error() {
 
 elo_run_check() {
   elo_check_name=$1
-  elo_check_path="$PROJECT_ROOT/.audit/$elo_check_name.script.sh"
+  elo_check_path="$PROJECT_ROOT/.audit/$elo_check_name.audit.sh"
   [ -f "$elo_check_path" ] ||
-    elo_die "Audit checker is missing: .audit/$elo_check_name.script.sh"
+    elo_die "Audit checker is missing: .audit/$elo_check_name.audit.sh"
   /bin/sh "$elo_check_path"
 }
 

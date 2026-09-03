@@ -24,9 +24,29 @@ workspaces/
     ...
 
 .agents/
-  context/ rules/ specs/ adrs/ skills/
+  context/
+  rules/
+  specs/
+  adrs/
+  skills/
+
+.audit/
+  *.audit.sh
 ```
 
 `agents/` is a structural AI capability parent, not a package. Named product agents own independent workspaces beneath it. Conversation and Knowledge are direct concrete AI workspaces; package identities, public ports and exports express their boundaries without a generic single-child coordinator directory.
 
 Memory Nucleus is one workspace, not a nested mini-monorepo. Clean Architecture dependency direction is `infrastructure → application → domain`. AI consumes Memory Nucleus only through `@repo/memory-sdk`.
+
+## Harness filename contract
+
+Semantic suffixes make artifact ownership visible without opening the file:
+
+| Boundary | Canonical filename |
+|---|---|
+| Architecture decision | `.agents/adrs/<name>.adr.md` |
+| Durable rule | `.agents/rules/<name>.rule.md` |
+| Numbered delivery/product contract | `.agents/specs/NNN-<name>.spec.md` |
+| Executable invariant checker | `.audit/<name>.audit.sh` |
+
+Context documents and skills remain ordinary Markdown because their directory already identifies their role. `readme.md`, `template.md` and `workflow.md` are the only unnumbered support documents in `.agents/specs/`. Renames and references must be changed atomically; compatibility paths must not become new sources of truth.
