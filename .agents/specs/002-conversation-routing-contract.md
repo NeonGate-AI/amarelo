@@ -9,7 +9,7 @@ updated: 2026-09-03
 owners:
   - Jonatas Sales
 targets:
-  - workspaces/ai/orchestrator/conversation
+  - workspaces/ai/conversation
   - Conversation routing contract
 context:
   - .agents/context/workspaces/ai/conversation.md
@@ -18,15 +18,15 @@ rules:
   - .agents/rules/product-safety-and-privacy.md
 adrs:
   - .agents/adrs/0017-cognitive-routing-and-memory-boundary.md
-  - .agents/adrs/0019-ai-orchestrator-topology.md
   - .agents/adrs/0020-conversation-agent-port.md
+  - .agents/adrs/0023-direct-ai-conversation-topology.md
 skills:
   - .agents/skills/spec-driven-development/SKILL.md
   - .agents/skills/code-review/SKILL.md
 evidence:
-  - workspaces/ai/orchestrator/conversation/src/routing
-  - workspaces/ai/orchestrator/conversation/src/context
-  - workspaces/ai/orchestrator/conversation/src/assurance/evals/conversation-runtime
+  - workspaces/ai/conversation/src/routing
+  - workspaces/ai/conversation/src/context
+  - workspaces/ai/conversation/src/assurance/evals/conversation-runtime
 ---
 
 # SPEC-020: Preserve deterministic Conversation routing and budgets
@@ -110,7 +110,7 @@ The routing policy, history budget, runtime diagnostics and synthetic evals prov
 
 ## Further Notes
 
-This file replaces the legacy `102-routing.md` contract. The later direct-Conversation topology migration may update physical paths without changing these public routing semantics.
+This file replaces the legacy `102-routing.md` contract. SPEC-027 moved the unchanged implementation to the direct `workspaces/ai/conversation/` path and ADR-0023 now owns the current physical topology.
 
 ## Retrospective Integrity
 

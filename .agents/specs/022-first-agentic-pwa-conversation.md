@@ -11,7 +11,7 @@ owners:
 targets:
   - workspaces/apps/mobile
   - workspaces/apps/conversation-api
-  - workspaces/ai/orchestrator/conversation
+  - workspaces/ai/conversation
   - workspaces/ai/agents/ana
 context:
   - .agents/context/workflows/mobile.md
@@ -27,7 +27,7 @@ adrs:
   - .agents/adrs/0004-product-agent-workspace.md
   - .agents/adrs/0006-mobile-react-vite-pwa.md
   - .agents/adrs/0017-cognitive-routing-and-memory-boundary.md
-  - .agents/adrs/0019-ai-orchestrator-topology.md
+  - .agents/adrs/0023-direct-ai-conversation-topology.md
 skills:
   - https://github.com/NeonGate-AI/skills/tree/main/skills/engineering/to-spec
   - https://github.com/NeonGate-AI/skills/tree/main/skills/engineering/tdd
@@ -184,4 +184,4 @@ After success, promote current runtime behavior to the AI Conversation, agent an
 
 ## Further Notes
 
-`SPEC-007` and `SPEC-008` are implemented. This branch remains contract-only until execution begins. The experiment proves the conversation seam; it does not yet prove longitudinal memory or Memory ROI.
+`SPEC-007` and `SPEC-008` are implemented. SPEC-027 moved Conversation to its direct AI path without changing this experiment's runtime contract. This spec remains contract-only until execution begins and does not yet prove longitudinal memory or Memory ROI.

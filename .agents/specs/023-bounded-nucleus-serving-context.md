@@ -9,7 +9,7 @@ updated: 2026-09-03
 owners:
   - Jonatas Sales
 targets:
-  - workspaces/ai/orchestrator/conversation
+  - workspaces/ai/conversation
   - workspaces/apps/conversation-api
   - workspaces/packages/memory-sdk
   - Memory serving assurance
@@ -28,6 +28,7 @@ adrs:
   - .agents/adrs/0008-cost-first-background-memory-curation.md
   - .agents/adrs/0011-memory-platform-and-sdk.md
   - .agents/adrs/0017-cognitive-routing-and-memory-boundary.md
+  - .agents/adrs/0023-direct-ai-conversation-topology.md
 skills:
   - https://github.com/NeonGate-AI/skills/tree/main/skills/engineering/to-spec
   - https://github.com/NeonGate-AI/skills/tree/main/skills/engineering/tdd
@@ -178,4 +179,4 @@ After success, promote serving responsibilities to Conversation context and beha
 
 ## Further Notes
 
-This spec is blocked by `SPEC-009`. Its branch remains contract-only until the first real conversation is accepted. The experiment tests the serving half of Memory Nucleus; it does not yet create memory from a completed PWA conversation.
+This spec is blocked by `SPEC-009`. SPEC-027 changed only the physical Conversation path. The experiment tests the serving half of Memory Nucleus; it does not yet create memory from a completed PWA conversation.

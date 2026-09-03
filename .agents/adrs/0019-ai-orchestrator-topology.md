@@ -2,7 +2,7 @@
 
 ## Status
 
-Accepted on 2026-09-03.
+Superseded on 2026-09-03 by [ADR-0023](0023-direct-ai-conversation-topology.md).
 
 ## Context
 
@@ -24,9 +24,11 @@ The `orchestrator/` parent itself owns no `package.json`, `tsconfig.json` or `sr
 
 ## Consequences
 
-- Physical topology now distinguishes agent identity from interaction orchestration.
-- Future orchestration runtimes have a canonical capability family without forcing them into Conversation.
-- pnpm needs an explicit `workspaces/ai/orchestrator/*` workspace glob.
-- Moving Conversation changes lockfile importer paths but not its package identity.
-- Harness context and architecture checks must reject the retired direct path and prevent the parent from becoming a package.
-- The term `orchestration` remains valid for the activity, but `orchestrator` is the canonical directory/subsystem name.
+- Physical topology distinguished agent identity from interaction orchestration during the lifetime of this decision.
+- pnpm required an explicit `workspaces/ai/orchestrator/*` workspace glob.
+- Moving Conversation changed the importer path while preserving package identity.
+- Harness context and architecture checks rejected the direct path and prevented the parent from becoming a package.
+
+## Supersession note
+
+The owner later selected a simpler topology after confirming that Conversation was the only coordination runtime and that package/port boundaries already expressed ownership. ADR-0023 restores the direct path, removes the generic parent and preserves all runtime semantics from this historical decision.
