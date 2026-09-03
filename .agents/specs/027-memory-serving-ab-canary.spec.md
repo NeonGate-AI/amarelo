@@ -31,7 +31,6 @@ adrs:
 skills:
   - .agents/skills/spec-driven-development/SKILL.md
   - .agents/skills/to-tickets/SKILL.md
-  - .agents/skills/implement-spec/SKILL.md
   - .agents/skills/implement/SKILL.md
   - .agents/skills/code-review/SKILL.md
 evidence:
