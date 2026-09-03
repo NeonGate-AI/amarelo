@@ -10,24 +10,24 @@ type TokenNode = JsonRecord & {
   $value?: unknown
 }
 
-type FlattenedToken = {
+interface FlattenedToken {
   path: string[]
   token: TokenNode & { $value: unknown }
   type: string
 }
 
-type ColorValue = {
+interface ColorValue {
   alpha?: number
   components: number[]
   hex?: string
 }
 
-type DimensionValue = {
+interface DimensionValue {
   unit: string
   value: number | string
 }
 
-type GradientStop = {
+interface GradientStop {
   color: ColorValue
   position: number
 }
@@ -218,7 +218,10 @@ function serializeValue(
       return `${String(dimension.value)}${dimension.unit}`
     }
     case 'fontFamily':
-      if (!Array.isArray(value) || !value.every((item) => typeof item === 'string')) {
+      if (
+        !Array.isArray(value) ||
+        !value.every((item) => typeof item === 'string')
+      ) {
         throw new TypeError('fontFamily token must be an array of strings')
       }
       return value.map(serializeFontFamily).join(', ')
