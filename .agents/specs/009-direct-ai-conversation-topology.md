@@ -2,7 +2,7 @@
 id: SPEC-027
 title: Move Conversation directly under the AI workspace
 type: refactor
-status: in-progress
+status: implemented
 mode: prospective
 created: 2026-09-03
 updated: 2026-09-03
@@ -34,22 +34,26 @@ skills:
   - .agents/skills/implement/SKILL.md
   - .agents/skills/code-review/SKILL.md
 evidence:
-  - pending
+  - workspaces/ai/conversation package tree with preserved source blobs and public package identity
+  - .agents/adrs/0023-direct-ai-conversation-topology.md accepted topology decision
+  - .audit/architecture.script.sh direct-path and retired-parent checks
+  - workspaces/packages/runtime Docker and Compose no-lockfile-compatible bootstrap
+  - pull request 21 final GitHub Actions CI and exact-head independent reviews
 ---
 
 # SPEC-027: Move Conversation directly under the AI workspace
 
 ## Problem Statement
 
-`@ai/conversation` is currently nested under the structural `workspaces/ai/orchestrator/` parent even though it is the only coordination runtime in that family. The extra directory adds workspace discovery, runtime-volume, documentation and audit complexity without representing an independently useful ownership boundary. It also places a generic architectural category between AI and the concrete Conversation package while the repository already relies on package identity and framework-neutral ports to preserve the true boundary.
+`@ai/conversation` was nested under the structural `workspaces/ai/orchestrator/` parent even though it was the only coordination runtime in that family. The extra directory added workspace discovery, runtime-volume, documentation and audit complexity without representing an independently useful ownership boundary. It also placed a generic architectural category between AI and the concrete Conversation package while the repository already relied on package identity and framework-neutral ports to preserve the true boundary.
 
-The owner has chosen the simpler topology: Conversation should live directly under `workspaces/ai/`. This migration must not alter routing, history budgeting, Memory access, agent invocation, public exports or package identity.
+The owner selected the simpler topology: Conversation lives directly under `workspaces/ai/`. The migration must not alter routing, history budgeting, Memory access, agent invocation, public exports or package identity.
 
 ## Solution
 
 Move the complete Conversation workspace from `workspaces/ai/orchestrator/conversation/` to `workspaces/ai/conversation/`. Preserve package name `@ai/conversation`, source layout, public exports, framework-neutral `ConversationAgentPort`, Memory SDK boundary, deterministic routing and all existing eval behavior.
 
-Remove the now-empty `orchestrator/` structural parent and its workspace glob. Supersede ADR-0019 with ADR-0023, update current context/rules/spec references, repair runtime bootstrap paths and enforce the direct topology mechanically. Historical records may describe the former topology but must clearly point to the superseding decision rather than act as current normative guidance.
+Remove the empty `orchestrator/` structural parent and its workspace glob. Supersede ADR-0019 with ADR-0023, update current context/rules/spec references, repair runtime bootstrap paths and enforce the direct topology mechanically. Historical records may describe the former topology but point to the superseding decision rather than act as current normative guidance.
 
 ## User Stories
 
@@ -76,14 +80,14 @@ Remove the now-empty `orchestrator/` structural parent and its workspace glob. S
 - Package and port boundaries, not a generic directory name, express Conversation ownership.
 - A future coordination family may receive a structural parent only after at least two independently owned runtimes demonstrate the need and a new ADR accepts the topology.
 - This is a path-only refactor for Conversation source. It adds no Fastify app, model provider, named-agent adapter, Memory serving behavior, queue or product feature.
-- Runtime bootstrap uses pnpm's no-lockfile-compatible install behavior. The migration must not create, copy, require or document `pnpm-lock.yaml` as present.
+- Runtime bootstrap uses pnpm's no-lockfile-compatible install behavior. The migration does not create, copy, require or document `pnpm-lock.yaml` as present.
 - Historical specs and ADRs remain readable; current context and prospective work reference ADR-0023 and the direct path.
 
 ## Testing Decisions
 
 ### Primary seam
 
-The public `@ai/conversation` package and its existing runtime evals are the primary seam. Imports and behavior must remain unchanged while the resolved workspace path moves.
+The public `@ai/conversation` package and its existing runtime evals are the primary seam. Imports and behavior remain unchanged while the resolved workspace path moves.
 
 ### Secondary seams
 
@@ -103,20 +107,20 @@ Run `./cli/elo doctor --ci`, `./cli/elo check all`, Conversation typecheck/tests
 
 ## Acceptance Criteria
 
-- [ ] `@ai/conversation` exists exactly once at `workspaces/ai/conversation/`.
-- [ ] `workspaces/ai/orchestrator/` and its workspace glob are absent.
-- [ ] Conversation package name, exports, scripts, source modules and public behavior remain unchanged.
-- [ ] `ConversationAgentPort`, deterministic routing, history budgets, Memory SDK boundary and diagnostics retain their existing tests/evals.
-- [ ] Current architecture context, rules, prospective specs and package/runtime documentation use the direct path and ADR-0023.
-- [ ] ADR-0019 is explicitly superseded by ADR-0023 while historical evidence remains readable.
-- [ ] Architecture checks require the direct path and reject the retired topology.
-- [ ] Docker/Compose bootstrap no longer copies, requires or freezes against an absent `pnpm-lock.yaml`.
-- [ ] `pnpm-lock.yaml` remains absent and ignored.
-- [ ] Full CI and both independent review axes pass on the exact final head.
+- [x] `@ai/conversation` exists exactly once at `workspaces/ai/conversation/`.
+- [x] `workspaces/ai/orchestrator/` and its workspace glob are absent.
+- [x] Conversation package name, exports, scripts, source modules and public behavior remain unchanged.
+- [x] `ConversationAgentPort`, deterministic routing, history budgets, Memory SDK boundary and diagnostics retain their existing tests/evals.
+- [x] Current architecture context, rules, prospective specs and package/runtime documentation use the direct path and ADR-0023.
+- [x] ADR-0019 is explicitly superseded by ADR-0023 while historical evidence remains readable.
+- [x] Architecture checks require the direct path and reject the retired topology.
+- [x] Docker/Compose bootstrap no longer copies, requires or freezes against an absent `pnpm-lock.yaml`.
+- [x] `pnpm-lock.yaml` remains absent and ignored.
+- [x] Full CI and both independent review axes pass on the exact final head.
 
 ## Failure Behavior
 
-A duplicate `@ai/conversation` package, surviving old directory, unresolved workspace, changed public export, stale normative path, lockfile creation or behavioral eval regression blocks merge. Runtime bootstrap must fail explicitly on real dependency/network errors; it must not manufacture a lockfile requirement. Any semantic Conversation change is removed or moved to its owning later spec.
+A duplicate `@ai/conversation` package, surviving old directory, unresolved workspace, changed public export, stale normative path, lockfile creation or behavioral eval regression blocks merge. Runtime bootstrap fails explicitly on real dependency/network errors; it does not manufacture a lockfile requirement. Any semantic Conversation change is removed or moved to its owning later spec.
 
 ## Out of Scope
 
@@ -124,7 +128,7 @@ Ana model instructions, Fastify `conversation-api`, browser SDK, PWA HTTP integr
 
 ## Evidence and Promotion
 
-Final evidence will include the Git tree move, package-resolution and architecture audits, unchanged Conversation evals, runtime bootstrap checks, full CI and exact-head reviews. The accepted direct topology is promoted to ADR-0023, architecture context, rules and mechanical checks.
+The Git tree move, package-resolution and architecture audits, unchanged Conversation evals, runtime bootstrap checks, full CI and exact-head reviews provide the evidence. The accepted direct topology is promoted to ADR-0023, architecture context, rules and mechanical checks.
 
 ## Further Notes
 
