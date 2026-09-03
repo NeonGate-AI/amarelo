@@ -113,7 +113,12 @@ elo_scaffold_render() {
     elo_die "Cannot render artifact template."
   fi
   chmod 644 "$elo_scaffold_temp" || elo_die "Cannot set artifact permissions."
-  mv "$elo_scaffold_temp" "$elo_scaffold_target" || elo_die "Cannot publish the generated artifact."
+  if ! ln "$elo_scaffold_temp" "$elo_scaffold_target" 2>/dev/null; then
+    [ ! -e "$elo_scaffold_target" ] ||
+      elo_die "Artifact already exists: $(elo_rel "$elo_scaffold_target")" 2
+    elo_die "Cannot publish the generated artifact."
+  fi
+  rm -f "$elo_scaffold_temp"
   trap - 0 1 2 15
   elo_print_success "Created $(elo_rel "$elo_scaffold_target")"
 }
