@@ -2,6 +2,7 @@
 set -u
 . "$ELO_CLI_DIR/core/common.sh"
 
+elo_log "doctor module initialized"
 ci=false
 while [ "$#" -gt 0 ]; do
   case "$1" in
@@ -18,20 +19,25 @@ done
 failures=0
 
 pass() {
-  printf 'PASS  %s%s\n' "$1" "${2:+ — $2}"
+  elo_status_detail=${2:+ — $2}
+  printf '%s%s PASS  %s%s%s\n' "$ELO_COLOR_GREEN" "$ELO_ICON_SUCCESS" "$1" "$elo_status_detail" "$ELO_COLOR_RESET"
 }
 
 warn() {
-  printf 'WARN  %s%s\n' "$1" "${2:+ — $2}"
+  elo_status_detail=${2:+ — $2}
+  printf '%s%s WARN  %s%s%s\n' "$ELO_COLOR_YELLOW" "$ELO_ICON_WARNING" "$1" "$elo_status_detail" "$ELO_COLOR_RESET"
 }
 
 fail() {
-  printf 'FAIL  %s%s\n' "$1" "${2:+ — $2}"
+  elo_status_detail=${2:+ — $2}
+  printf '%s%s FAIL  %s%s%s\n' "$ELO_COLOR_RED" "$ELO_ICON_ERROR" "$1" "$elo_status_detail" "$ELO_COLOR_RESET"
   [ -z "${3:-}" ] || printf '      fix: %s\n' "$3"
   failures=$((failures + 1))
 }
 
+elo_print_logo
 printf 'Elo doctor\n'
+elo_log "ci=$ci"
 
 if elo_has node; then
   node_version=$(node --version 2>/dev/null || true)
@@ -76,7 +82,7 @@ if elo_has node; then
     if [ -n "$actual" ]; then
       pass "$package_name" "$actual"
     else
-      fail "$package_name" "not installed" "Run pnpm install --no-frozen-lockfile --lockfile=false."
+      fail "$package_name" "not installed" "Run pnpm install --frozen-lockfile."
     fi
   done
 fi
@@ -99,14 +105,18 @@ else
   fail docker-daemon unreachable "Start the Docker daemon after installing Docker."
 fi
 
-if [ -e "$ELO_PROJECT_ROOT/pnpm-lock.yaml" ]; then
-  fail lockfile-policy "pnpm-lock.yaml exists" "Remove it and install with --lockfile=false."
+if [ ! -f "$ELO_PROJECT_ROOT/pnpm-lock.yaml" ]; then
+  fail lockfile-policy "pnpm-lock.yaml missing" "Restore pnpm-lock.yaml or regenerate it intentionally."
+elif ! elo_git_checkout; then
+  fail lockfile-policy "Git checkout unavailable" "Run Elo from the Amarelo checkout."
+elif git -C "$ELO_PROJECT_ROOT" ls-files --error-unmatch -- pnpm-lock.yaml >/dev/null 2>&1; then
+  pass lockfile-policy "pnpm-lock.yaml tracked"
 else
-  pass lockfile-policy "pnpm-lock.yaml absent"
+  fail lockfile-policy "pnpm-lock.yaml is untracked" "Add pnpm-lock.yaml to the repository before using frozen installs."
 fi
 [ -d "$ELO_PROJECT_ROOT/node_modules" ] &&
   pass install-state node_modules ||
-  fail install-state missing "Run pnpm install --no-frozen-lockfile --lockfile=false."
+  fail install-state missing "Run pnpm install --frozen-lockfile."
 [ -f "$ELO_PROJECT_ROOT/commitlint.config.js" ] &&
   pass commitlint-config commitlint.config.js ||
   fail commitlint-config missing "Restore Commitlint configuration."
@@ -160,7 +170,7 @@ if [ "$ci" = false ]; then
     while IFS= read -r template; do
       [ -n "$template" ] || continue
       target="$(dirname "$template")/.env"
-      [ -f "$target" ] || printf 'WARN  env target missing — %s (run elo env setup)\n' "$(elo_rel "$template")"
+      [ -f "$target" ] || warn "env target missing" "$(elo_rel "$template") (run elo env setup)"
     done <<EOF
 $templates
 EOF
@@ -168,8 +178,9 @@ EOF
 fi
 
 if [ "$failures" -gt 0 ]; then
-  printf 'Elo doctor FAIL — %s required check(s) failed\n' "$failures" >&2
+  elo_print_error "Elo doctor FAIL — $failures required check(s) failed"
   exit 1
 fi
 
-printf 'Elo doctor PASS\n'
+elo_print_success "Elo doctor PASS"
+

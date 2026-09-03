@@ -24,7 +24,7 @@ Setup is idempotent, uses a managed marker, writes through a temporary file in t
 
 The root `postinstall` lifecycle invokes setup after local dependency installation. CI and explicitly disabled environments skip user installation. Because npm and pnpm do not define an automatic post-clone lifecycle, the root also exposes a documented explicit `postclone` script. The existing `prepare` lifecycle retains Git/Husky setup ownership.
 
-Executable repository audits use `.audit/*.script.sh` and POSIX shell. The five existing `.script.mjs` audits are replaced rather than wrapped.
+Executable repository audits use `.audit/*.audit.sh` and POSIX shell. The five existing `.script.mjs` audits are replaced rather than wrapped.
 
 Executable package automation also enters through shell. The design-system package uses `build-tokens.sh` for build/watch selection and retains JSON/reference/serialization behavior in `build-tokens.ts`. The typed backend uses erasable TypeScript syntax executed directly by the required Node.js 24 runtime. This preserves the shell-front/typed-backend boundary instead of rebuilding structured-data logic in shell.
 

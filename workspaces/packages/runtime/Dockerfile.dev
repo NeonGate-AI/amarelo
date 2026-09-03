@@ -14,7 +14,7 @@ USER node
 WORKDIR /workspace
 RUN corepack install --global pnpm@10.32.1
 
-COPY --chown=node:node package.json pnpm-workspace.yaml turbo.json ./
+COPY --chown=node:node package.json pnpm-lock.yaml pnpm-workspace.yaml turbo.json ./
 COPY --chown=node:node workspaces/ai/conversation/package.json ./workspaces/ai/conversation/package.json
 COPY --chown=node:node workspaces/ai/knowledge/package.json ./workspaces/ai/knowledge/package.json
 COPY --chown=node:node workspaces/memory-nucleus/package.json ./workspaces/memory-nucleus/package.json
@@ -29,7 +29,7 @@ COPY --chown=node:node workspaces/packages/observability/package.json ./workspac
 COPY --chown=node:node workspaces/packages/react/package.json ./workspaces/packages/react/package.json
 COPY --chown=node:node workspaces/packages/runtime/package.json ./workspaces/packages/runtime/package.json
 
-RUN pnpm install --no-frozen-lockfile --lockfile=false
+RUN pnpm install --frozen-lockfile
 COPY --chown=node:node . .
 RUN pnpm --filter @repo/ds build \
   && mkdir -p workspaces/apps/console/.next workspaces/apps/landing/.next workspaces/apps/onboarding/.next workspaces/apps/mobile/dist

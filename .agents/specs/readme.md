@@ -23,7 +23,7 @@ The specification catalog is flat, priority-ordered and mechanically checked.
 | 007 | SPEC-025 | draft | [Plans, voice entitlements and capability gates](007-plans-and-entitlements.spec.md) |
 | 008 | SPEC-026 | implemented | [Canonical spec template and priority migration](008-canonical-spec-template-and-priority-migration.spec.md) |
 | 009 | SPEC-027 | implemented | [Direct AI Conversation topology](009-direct-ai-conversation-topology.spec.md) |
-| 010 | reserved | — | `SPEC-028`: Elo CLI experience modernization |
+| 010 | SPEC-028 | implemented | [Elo CLI experience modernization](010-elo-cli-experience-modernization.spec.md) |
 | 011 | SPEC-001 | implemented | [Repository harness and Elo foundation](011-repository-harness-and-elo-foundation.spec.md) |
 | 012 | SPEC-002 | implemented | [Memory Nucleus MVP foundation](012-memory-nucleus-mvp-foundation.spec.md) |
 | 013 | SPEC-003 | implemented | [Product application foundations](013-product-application-foundations.spec.md) |
@@ -44,7 +44,7 @@ The specification catalog is flat, priority-ordered and mechanically checked.
 | 028 | SPEC-018 | ready | [Memory unit economics and scale gates](028-memory-unit-economics-scale-gates.spec.md) |
 | 029 | SPEC-029 | implemented | [Canonical local engineering workflow skills](029-canonical-local-workflow-skills.spec.md) |
 
-`SPEC-028` remains reserved at priority 010. The next unallocated durable delivery ID is `SPEC-030`.
+The next unallocated durable delivery ID is `SPEC-030`.
 
 The executable Memory Nucleus chain is:
 

@@ -449,6 +449,52 @@ elif ! grep -F 'Usage:' "$TMP_ROOT/help.out" >/dev/null 2>&1; then
   platform_fail cli/src/elo.sh "no-argument execution must print help"
 fi
 
+if ! "$LAUNCHER" --help >"$TMP_ROOT/global-help.out" 2>"$TMP_ROOT/global-help.err"; then
+  platform_fail cli/src/elo.sh "--help must exit successfully"
+elif ! grep -F '███████╗██╗      ██████╗' "$TMP_ROOT/global-help.out" >/dev/null 2>&1; then
+  platform_fail cli/src/commands/help.sh "global help must print the ELO wordmark"
+elif ! grep -F '🚀 bootstrap' "$TMP_ROOT/global-help.out" >/dev/null 2>&1; then
+  platform_fail cli/src/commands/help.sh "global help must expose the emoji command catalog"
+fi
+
+elo_escape=$(printf '\033')
+if grep -F "$elo_escape" "$TMP_ROOT/global-help.out" >/dev/null 2>&1; then
+  platform_fail cli/src/core/output.sh "redirected help must not contain ANSI escapes"
+fi
+
+if ! NO_COLOR= ELO_FORCE_COLOR=1 "$LAUNCHER" --help >"$TMP_ROOT/no-color.out" 2>&1; then
+  platform_fail cli/src/core/output.sh "NO_COLOR help invocation failed"
+elif grep -F "$elo_escape" "$TMP_ROOT/no-color.out" >/dev/null 2>&1; then
+  platform_fail cli/src/core/output.sh "NO_COLOR must suppress ANSI escapes"
+fi
+
+if ! (
+  unset NO_COLOR
+  ELO_FORCE_COLOR=1 "$LAUNCHER" --help
+) >"$TMP_ROOT/force-color.out" 2>&1; then
+  platform_fail cli/src/core/output.sh "forced-color help invocation failed"
+elif ! grep -F "$elo_escape" "$TMP_ROOT/force-color.out" >/dev/null 2>&1; then
+  platform_fail cli/src/core/output.sh "forced-color help must contain ANSI escapes"
+fi
+
+if ! "$LAUNCHER" --logs --help >"$TMP_ROOT/logs-before.out" 2>"$TMP_ROOT/logs-before.err"; then
+  platform_fail cli/src/elo.sh "--logs before a command must be accepted"
+elif ! grep -F '🔎 command=--help' "$TMP_ROOT/logs-before.err" >/dev/null 2>&1; then
+  platform_fail cli/src/elo.sh "--logs before a command must enable diagnostics"
+fi
+
+if ! "$LAUNCHER" --help --logs >"$TMP_ROOT/logs-after.out" 2>"$TMP_ROOT/logs-after.err"; then
+  platform_fail cli/src/elo.sh "--logs after a command must be accepted"
+elif ! grep -F '🔎 command=--help' "$TMP_ROOT/logs-after.err" >/dev/null 2>&1; then
+  platform_fail cli/src/elo.sh "--logs after a command must enable diagnostics"
+fi
+
+if ! "$LAUNCHER" doctor --logs --help >"$TMP_ROOT/doctor-logs.out" 2>"$TMP_ROOT/doctor-logs.err"; then
+  platform_fail cli/src/commands/doctor.sh "a dispatched command must accept global --logs"
+elif ! grep -F '🔎 doctor module initialized' "$TMP_ROOT/doctor-logs.err" >/dev/null 2>&1; then
+  platform_fail cli/src/commands/doctor.sh "a dispatched command must observe ELO_LOGS=true"
+fi
+
 "$LAUNCHER" unknown-command >"$TMP_ROOT/unknown.out" 2>"$TMP_ROOT/unknown.err"
 unknown_status=$?
 [ "$unknown_status" -eq 2 ] ||

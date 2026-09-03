@@ -30,6 +30,6 @@ pnpm runtime -- down
 
 O comando padrão executa `docker compose up --build --remove-orphans` sem modo detached. `Ctrl+C` encerra os serviços com os períodos de graça configurados. `down` remove containers e a rede, mas preserva o volume do PostgreSQL.
 
-Os quatro apps e PostgreSQL/Redis são publicados somente em `127.0.0.1`. O código-fonte é montado no container para hot reload; dependências e saídas de build usam volumes nomeados para não misturar artefatos Linux com o host. O serviço one-shot `workspace-prepare` resolve os manifests sem frozen lockfile e sem criar `pnpm-lock.yaml`, depois gera os tokens do design system antes dos apps.
+Os quatro apps e PostgreSQL/Redis são publicados somente em `127.0.0.1`. O código-fonte é montado no container para hot reload; dependências e saídas de build usam volumes nomeados para não misturar artefatos Linux com o host. O serviço one-shot `workspace-prepare` instala o grafo reproduzível de dependências com o `pnpm-lock.yaml` versionado e `--frozen-lockfile`, depois gera os tokens do design system antes dos apps.
 
 Para escolher outras portas ou credenciais locais, copie `.env.example` para `.env` antes de iniciar. Use senhas URL-safe porque as URLs de conexão são montadas diretamente a partir dessas variáveis.
