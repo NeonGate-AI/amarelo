@@ -2,7 +2,7 @@
 id: SPEC-010
 title: Make Elo directly invokable and migrate executable MJS automation to shell
 type: feature
-status: implemented
+status: in-progress
 mode: prospective
 created: 2026-09-03
 updated: 2026-09-03
@@ -46,7 +46,6 @@ evidence:
   - https://github.com/NeonGate-AI/amarelo-v2/issues/12
   - https://github.com/NeonGate-AI/amarelo-v2/pull/11
   - CI run 33718880661 success on f7f20c5e48a312d03e989577351613ef16e20840
-  - pull request review 5098153019 completed with no blocking findings
 ---
 
 # SPEC-010: Make Elo directly invokable and migrate executable MJS automation to shell
@@ -114,7 +113,7 @@ ELO_BIN_DIR=<temporary-directory> ./cli/elo setup
 <temporary-directory>/elo check platform
 ```
 
-The fixture proves creation, direct nested command execution, idempotence, unmanaged regular-file and symlink collision protection, CI skipping, path handling for spaces and apostrophes, and no writes outside the selected temporary destination.
+The fixture must prove creation, direct nested command execution, idempotence including executable-mode repair, manual and lifecycle collision behavior, CI/disable/missing-destination skipping, path handling for spaces and apostrophes, stale-checkout guidance, invalid-subcommand status, and no writes outside the selected temporary destination.
 
 Secondary seams are:
 
@@ -131,21 +130,21 @@ Fixtures create exclusive temporary directories with POSIX `mkdir`, use controll
 
 ## Acceptance Criteria
 
-- [x] `SPEC-010` transitioned from approved `ready` to `in-progress` before executable implementation.
-- [x] `elo setup` installs an idempotent managed launcher in the selected user-owned binary directory.
-- [x] Setup never uses `sudo`, edits shell profiles or implicitly replaces an unmanaged `elo` command.
-- [x] Local `pnpm install` invokes setup through `postinstall`; CI skips it safely.
-- [x] The root exposes an explicit `postclone` script and documentation states that it is not an automatic npm/pnpm lifecycle.
-- [x] After setup, `elo <command>` works without a `pnpm` prefix.
-- [x] Elo without arguments shows help without mutation; usage errors return status 2.
-- [x] Elo exposes `--version` and `check all` without duplicating Turborepo task graphs.
-- [x] All five executable `.audit/*.script.mjs` checkers are replaced by executable POSIX `.audit/*.script.sh` checkers.
-- [x] `build-tokens.mjs` is replaced by an executable shell entrypoint and a typed backend with equivalent generated artifacts.
-- [x] Package scripts do not execute `.mjs` automation.
-- [x] Framework-owned `.config.mjs` modules remain unchanged.
-- [x] CI, audit hygiene, CLI help and durable source-organization documentation use the new contract.
-- [x] Existing lint, typecheck, tests, database validation, AI evals, build and Git-hook smoke validation pass on the pull-request implementation head.
-- [x] The spec closes as `implemented` with stable commit, issue, pull-request, review and CI evidence.
+- [ ] `SPEC-010` transitioned from approved `ready` to `in-progress` before executable implementation.
+- [ ] `elo setup` installs an idempotent managed launcher in the selected user-owned binary directory.
+- [ ] Setup never uses `sudo`, edits shell profiles or implicitly replaces an unmanaged `elo` command.
+- [ ] Local `pnpm install` invokes setup through `postinstall`; CI skips it safely.
+- [ ] The root exposes an explicit `postclone` script and documentation states that it is not an automatic npm/pnpm lifecycle.
+- [ ] After setup, `elo <command>` works without a `pnpm` prefix.
+- [ ] Elo without arguments shows help without mutation; usage errors return status 2.
+- [ ] Elo exposes `--version` and `check all` without duplicating Turborepo task graphs.
+- [ ] All five executable `.audit/*.script.mjs` checkers are replaced by executable POSIX `.audit/*.script.sh` checkers.
+- [ ] `build-tokens.mjs` is replaced by an executable shell entrypoint and a typed backend with equivalent generated artifacts.
+- [ ] Package scripts do not execute `.mjs` automation.
+- [ ] Framework-owned `.config.mjs` modules remain unchanged.
+- [ ] CI, audit hygiene, CLI help and durable source-organization documentation use the new contract.
+- [ ] Existing lint, typecheck, tests, database validation, AI evals, build and Git-hook smoke validation pass on the pull-request implementation head.
+- [ ] The spec closes as `implemented` with stable commit, issue, pull-request, review and CI evidence.
 
 ## Failure Behavior
 
@@ -170,7 +169,7 @@ Fixtures create exclusive temporary directories with POSIX `mkdir`, use controll
 
 ## Evidence and Promotion
 
-Current evidence:
+Current evidence (baseline; final closure pending remediation and a new two-axis review):
 
 - `028b4ca70648ade3b1af288fd333cf4b5198af31` recorded the owner-approved ready contract under its initially assigned legacy ID;
 - `3e4ba88785dc766f2caf656aae284b19d21d79d5` moved the contract to `in-progress` before executable implementation;
@@ -183,7 +182,6 @@ Current evidence:
 - issues #6, #7, #12 and #8 record the vertical delivery graph;
 - pull request #11 contains the complete diff and references `SPEC-010`;
 - CI run `33718880661` / run number 220 completed Elo doctor, every shell audit, audit hygiene, Commitlint, Biome, typecheck, tests, Memory PostgreSQL validation, AI evals, full build and Git-hook smoke tests successfully on `f7f20c5e48a312d03e989577351613ef16e20840`;
-- pull-request review `5098153019` completed independent Standards and Spec axes with no unresolved blocking finding.
 
 Promotion completed:
 
