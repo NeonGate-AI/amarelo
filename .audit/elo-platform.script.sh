@@ -506,6 +506,26 @@ nonregular_status=$?
 [ -d "$nonregular_bin/elo" ] ||
   platform_fail cli/src/commands/setup.sh "manual setup replaced a non-regular Elo collision"
 
+doctor_fifo_bin="$TMP_ROOT/doctor-fifo-bin"
+doctor_fifo_opened="$TMP_ROOT/doctor-fifo-opened"
+mkdir "$doctor_fifo_bin"
+if ! mkfifo "$doctor_fifo_bin/elo"; then
+  platform_fail cli/src/commands/doctor.sh "cannot prepare the FIFO safety fixture"
+else
+  (
+    printf '#!/bin/sh\n# managed-by: amarelo-elo\n' >"$doctor_fifo_bin/elo"
+    : >"$doctor_fifo_opened"
+  ) &
+  doctor_fifo_writer=$!
+  ELO_BIN_DIR="$doctor_fifo_bin" "$LAUNCHER" doctor \
+    >"$TMP_ROOT/doctor-fifo.out" 2>&1 || :
+  if [ -e "$doctor_fifo_opened" ]; then
+    platform_fail cli/src/commands/doctor.sh "doctor opened a non-regular direct-command path"
+  fi
+  kill "$doctor_fifo_writer" 2>/dev/null || :
+  wait "$doctor_fifo_writer" 2>/dev/null || :
+fi
+
 ci_bin="$TMP_ROOT/ci-bin"
 if ! CI=1 ELO_SETUP_DISABLED= ELO_BIN_DIR="$ci_bin" \
   "$LAUNCHER" setup --postinstall >"$TMP_ROOT/ci-setup.out" 2>&1
