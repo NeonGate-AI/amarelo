@@ -19,7 +19,12 @@
     "dist"
   ],
   "scripts": {
-    "build": "node src/scripts/build-tokens.mjs",
-    "dev": "node --watch src/scripts/build-tokens.mjs"
+    "build": "./src/scripts/build-tokens.sh",
+    "dev": "./src/scripts/build-tokens.sh --watch",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@types/node": "24.13.3",
+    "typescript": "5.9.2"
   }
 }
