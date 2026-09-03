@@ -242,10 +242,15 @@ for spec in "$SPEC_ROOT"/*.spec.md; do
   done <"$refs"
 done
 
-[ -f "$PROJECT_ROOT/pnpm-lock.yaml" ] ||
+if [ ! -f "$PROJECT_ROOT/pnpm-lock.yaml" ]; then
   workflow_fail lockfile pnpm-lock.yaml \
     "tracked repository lockfile is missing" \
     "restore pnpm-lock.yaml or regenerate it intentionally"
+elif ! git -C "$PROJECT_ROOT" ls-files --error-unmatch -- pnpm-lock.yaml >/dev/null 2>&1; then
+  workflow_fail lockfile pnpm-lock.yaml \
+    "repository lockfile is not tracked" \
+    "add pnpm-lock.yaml to the repository before using frozen installs"
+fi
 
 fixture="$TMP_ROOT/remote.spec.md"
 cat >"$fixture" <<'EOF'

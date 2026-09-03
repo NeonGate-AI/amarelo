@@ -2,7 +2,11 @@
 
 : "${ELO_LOGS:=false}"
 
-if [ "${NO_COLOR+x}" != x ] && { [ "${ELO_FORCE_COLOR:-0}" = 1 ] || [ -t 1 ]; }; then
+elo_stdout_is_tty() {
+  command -v tty >/dev/null 2>&1 && tty -s <&1 2>/dev/null
+}
+
+if [ "${NO_COLOR+x}" != x ] && { [ "${ELO_FORCE_COLOR:-0}" = 1 ] || elo_stdout_is_tty; }; then
   ELO_COLOR_YELLOW=$(printf '\033[33m')
   ELO_COLOR_GREEN=$(printf '\033[32m')
   ELO_COLOR_RED=$(printf '\033[31m')

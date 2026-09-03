@@ -104,10 +104,14 @@ else
   fail docker-daemon unreachable "Start the Docker daemon after installing Docker."
 fi
 
-if [ -f "$ELO_PROJECT_ROOT/pnpm-lock.yaml" ]; then
+if [ ! -f "$ELO_PROJECT_ROOT/pnpm-lock.yaml" ]; then
+  fail lockfile-policy "pnpm-lock.yaml missing" "Restore pnpm-lock.yaml or regenerate it intentionally."
+elif ! elo_git_checkout; then
+  fail lockfile-policy "Git checkout unavailable" "Run Elo from the Amarelo checkout."
+elif git -C "$ELO_PROJECT_ROOT" ls-files --error-unmatch -- pnpm-lock.yaml >/dev/null 2>&1; then
   pass lockfile-policy "pnpm-lock.yaml tracked"
 else
-  fail lockfile-policy "pnpm-lock.yaml missing" "Restore pnpm-lock.yaml or regenerate it intentionally."
+  fail lockfile-policy "pnpm-lock.yaml is untracked" "Add pnpm-lock.yaml to the repository before using frozen installs."
 fi
 [ -d "$ELO_PROJECT_ROOT/node_modules" ] &&
   pass install-state node_modules ||
