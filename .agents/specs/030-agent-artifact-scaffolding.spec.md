@@ -2,7 +2,7 @@
 id: SPEC-030
 title: Scaffold canonical agent artifacts through Elo
 type: feature
-status: ready
+status: in-progress
 mode: prospective
 created: 2026-09-03
 updated: 2026-09-03
@@ -32,6 +32,8 @@ skills:
   - .agents/skills/writing-for-agents/SKILL.md
   - .agents/skills/code-review/SKILL.md
 evidence:
+  - https://github.com/NeonGate-AI/amarelo/issues/27
+  - https://github.com/NeonGate-AI/amarelo/issues/28
   - pending
 ---
 

@@ -78,6 +78,9 @@ case "$elo_command" in
   changelog)
     exec "$CLI_DIR/commands/changelog.sh" "$@"
     ;;
+  adr|rule|skill|spec)
+    exec "$CLI_DIR/commands/scaffold.sh" "$elo_command" "$@"
+    ;;
   env)
     elo_subcommand=${1:-}
     [ "$#" -eq 0 ] || shift

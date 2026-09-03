@@ -12,6 +12,7 @@ PROJECT_ROOT=${GITHUB_WORKSPACE:-$(
   pwd
 )}
 SPEC_ROOT="$PROJECT_ROOT/.agents/specs"
+PROMPT_ROOT="$PROJECT_ROOT/.agents/prompts"
 TMP_ROOT="${TMPDIR:-/tmp}/amarelo-spec-audit.$$"
 
 umask 077
@@ -113,6 +114,10 @@ for required_file in \
   .agents/specs/readme.md \
   .agents/specs/template.md \
   .agents/specs/workflow.md \
+  .agents/prompts/adr.prompt.md \
+  .agents/prompts/rule.prompt.md \
+  .agents/prompts/skill.prompt.md \
+  .agents/prompts/spec.prompt.md \
   .github/pull_request_template.md
 do
   [ -f "$PROJECT_ROOT/$required_file" ] ||
@@ -120,6 +125,22 @@ do
       "required spec-driven workflow file is missing" \
       "restore the canonical workflow artifact"
 done
+
+if [ -d "$PROMPT_ROOT" ]; then
+  find "$PROMPT_ROOT" -mindepth 1 -maxdepth 1 -print | sort >"$TMP_ROOT/prompt-paths"
+  while IFS= read -r path; do
+    [ -n "$path" ] || continue
+    base=${path##*/}
+    case "$base" in
+      adr.prompt.md|rule.prompt.md|skill.prompt.md|spec.prompt.md) ;;
+      *)
+        spec_fail prompt-inventory "${path#"$PROJECT_ROOT"/}" \
+          "only the four canonical agent artifact templates are allowed" \
+          "remove the extra path or govern a template-contract change"
+        ;;
+    esac
+  done <"$TMP_ROOT/prompt-paths"
+fi
 
 grep -F '.agents/specs/workflow.md' "$PROJECT_ROOT/AGENTS.md" >/dev/null 2>&1 ||
   spec_fail workflow-entrypoint AGENTS.md \

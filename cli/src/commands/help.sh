@@ -20,6 +20,10 @@ Commands:
   🩺 doctor [--ci]                         Diagnose repository prerequisites
   🧹 cleanup [--apply] [--dependencies]    Inspect or remove generated state
   📝 changelog <product> [options]          Prepare a product changelog
+  🧱 adr [name]                             Create the next empty ADR
+  📏 rule [name]                            Create the next empty rule
+  🧰 skill [name]                           Create an empty local skill
+  📋 spec [name]                            Create the next empty spec
   🌱 env <setup|validate>                   Prepare or validate environment files
   🔧 git <setup|doctor|pre-commit|commit-msg>
                                              Manage repository Git integration
