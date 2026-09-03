@@ -32,6 +32,22 @@ jobs:
           export CI=true
           pnpm install --frozen-lockfile
           python3 .github/spec-009-sdk-ana.py
+          python3 <<'PY'
+          import json
+          from pathlib import Path
+
+          path = Path('workspaces/ai/agents/ana/tsconfig.json')
+          data = json.loads(path.read_text(encoding='utf-8'))
+          data['compilerOptions']['paths'] = {
+              '@context': ['../../conversation/src/context/index.ts'],
+              '@contracts': ['../../conversation/src/contracts/index.ts'],
+              '@memory': ['../../conversation/src/memory/index.ts'],
+              '@ports': ['../../conversation/src/ports/index.ts'],
+              '@routing': ['../../conversation/src/routing/index.ts'],
+              '@runtime': ['../../conversation/src/runtime/index.ts'],
+          }
+          path.write_text(json.dumps(data, indent=2) + '\n', encoding='utf-8')
+          PY
           pnpm install --lockfile-only
           pnpm install --frozen-lockfile
           pnpm exec biome check --write workspaces/packages/conversation-sdk workspaces/ai/agents/ana
