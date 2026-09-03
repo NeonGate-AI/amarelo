@@ -20,7 +20,7 @@ Those upstream skills are authoring references. This document owns the Amarelo w
 A living contract for current product or system behavior. Existing area specs remain behavior specs and are updated when that behavior changes.
 
 **Delivery spec**  
-A numbered `SPEC-###` contract for one bounded change. It records the problem, desired behavior, decisions, test seams, acceptance criteria and promotion plan.
+A durable `SPEC-###` contract for one bounded change. It is stored in a flat `NNN-lowercase-slug.md` file whose numeric prefix expresses mutable priority, and records the problem, desired behavior, decisions, test seams, acceptance criteria and promotion plan.
 
 **Retrospective spec**  
 A delivery spec reconstructed after implementation from code, commits, pull requests and durable harness evidence. It documents observed capability without pretending the earlier work followed this workflow.
@@ -36,6 +36,16 @@ Reproducible outputs showing what was verified. Temporary outputs live in `.audi
 
 **Promotion**  
 The final step that moves proven durable knowledge into the correct behavior spec, context, rule, ADR or mechanical check.
+
+## Catalog layout
+
+`.agents/specs/` is flat. It contains only:
+
+- `readme.md`, `template.md` and `workflow.md` as unnumbered support documents;
+- delivery specs named `001-lowercase-slug.md` through `099-lowercase-slug.md`;
+- behavior specs named `101-lowercase-slug.md` through `199-lowercase-slug.md`.
+
+The filename prefix is a unique, mutable priority rank. It is not the durable spec ID. Reserved delivery ranks are allowed only when named in `readme.md`. A priority change updates the index and every repository path reference atomically. No spec subdirectory, including a history directory, is permitted. Retrospective mode is metadata, not a location.
 
 ## Sources of truth
 
@@ -71,7 +81,7 @@ Completion criterion: every affected public boundary and every applicable durabl
 
 ### 2. Synthesize
 
-Create the numbered delivery spec from the owner decision and repository evidence. Follow `template.md`. Do not reopen questions already settled by the owner or codebase. Record unresolved questions only when they materially block a decision.
+Create the next durable delivery spec from the owner decision and repository evidence, then assign its filename priority in the flat catalog. Follow `template.md`. Do not reopen questions already settled by the owner or codebase. Record unresolved questions only when they materially block a decision.
 
 Prefer the highest existing observable test seam. The ideal spec has one primary seam and only the secondary seams required for failures that the primary seam cannot localize.
 
@@ -146,7 +156,7 @@ Completion criterion: the harness describes the resulting system without relying
 
 ### 9. Close
 
-Set the delivery spec to `implemented`, record final evidence and merge through a pull request that references its ID. An implemented delivery spec is historical and is not rewritten to describe later behavior. A later change receives a new ID and may supersede it.
+Set the delivery spec to `implemented`, record final evidence and merge through a pull request that references its durable ID. Its acceptance contract is not rewritten to describe later behavior, but its filename priority may change through an explicit catalog reordering. A later behavior change receives a new ID and may supersede it.
 
 Completion criterion: implementation, evidence and promoted harness state agree, and temporary execution artifacts are removed.
 

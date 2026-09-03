@@ -48,4 +48,4 @@ Contracts and synthetic offline evals must reject `longitudinal` as a candidate 
 - Shared-memory decision: `.agents/decisions/0001-shared-longitudinal-memory.md`
 - Memory constitution: `.agents/MEMORY.md`
 - Runtime memory design: `elos/memory-nucleus/docs/MEMORY.md`
-- Workflow spec: `.agents/specs/ai/memory-curation-and-rag.md`
+- Memory behavior spec: `.agents/specs/101-memory-nucleus.md`

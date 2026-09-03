@@ -25,7 +25,7 @@ skills:
   - .agents/skills/
 evidence:
   - https://github.com/NeonGate-AI/amarelo-v2/pull/1
-  - .agents/specs/ai/memory-nucleus.md
+  - .agents/specs/101-memory-nucleus.md
   - workspaces/memory-nucleus/src/
   - workspaces/packages/memory-sdk/src/
   - commit 68dec2000f4eb23756eae8222cb078cb1e4e9a90

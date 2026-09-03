@@ -183,9 +183,101 @@ then
     "declare alwaysApply: true in rule frontmatter"
 fi
 
+nested_dirs=$(find "$SPEC_ROOT" -mindepth 1 -type d -print | sort)
+if [ -n "$nested_dirs" ]; then
+  while IFS= read -r nested_dir; do
+    [ -n "$nested_dir" ] || continue
+    spec_fail \
+      flat-spec-catalog \
+      "${nested_dir#"$PROJECT_ROOT"/}" \
+      "spec subdirectories are not allowed" \
+      "move every spec document directly under .agents/specs"
+  done <<EOF
+$nested_dirs
+EOF
+fi
+
+catalog_priorities="$TMP_ROOT/catalog-priorities"
+: >"$catalog_priorities"
+for catalog_path in "$SPEC_ROOT"/*.md; do
+  [ -f "$catalog_path" ] || continue
+  catalog_file=${catalog_path#"$PROJECT_ROOT"/}
+  catalog_base=$(basename "$catalog_path")
+  case "$catalog_base" in
+    readme.md|template.md|workflow.md) continue ;;
+  esac
+  if ! printf '%s\n' "$catalog_base" |
+    grep -Eq '^[0-9][0-9][0-9]-[a-z0-9]+(-[a-z0-9]+)*\.md$'
+  then
+    spec_fail \
+      catalog-filename \
+      "$catalog_file" \
+      "spec filename must use a three-digit priority and lowercase kebab-case slug" \
+      "rename the file to NNN-lowercase-slug.md"
+    continue
+  fi
+  priority=$(printf '%s\n' "$catalog_base" | cut -c 1-3)
+  if grep -Fx "$priority" "$catalog_priorities" >/dev/null 2>&1; then
+    spec_fail \
+      duplicate-priority \
+      "$catalog_file" \
+      "priority $priority is already assigned" \
+      "assign one unique catalog priority"
+  else
+    printf '%s\n' "$priority" >>"$catalog_priorities"
+  fi
+  case "$priority" in
+    00[1-9]|0[1-9][0-9]|10[1-9]|1[1-9][0-9]) ;;
+    *)
+      spec_fail \
+        priority-band \
+        "$catalog_file" \
+        "priority must be in delivery band 001-099 or behavior band 101-199" \
+        "choose a priority from the documented catalog bands"
+      ;;
+  esac
+done
+
+reference_scan="$TMP_ROOT/reference-files"
+find "$PROJECT_ROOT" \
+  \( -path "$PROJECT_ROOT/.git" -o \
+     -path "$PROJECT_ROOT/node_modules" -o \
+     -path '*/node_modules' -o \
+     -path '*/dist' -o \
+     -path '*/.turbo' \) -prune -o \
+  -type f \( -name '*.md' -o -name '*.sh' -o -name '*.yml' -o -name '*.yaml' \) -print |
+  sort >"$reference_scan"
+
+while IFS= read -r reference_file; do
+  [ -n "$reference_file" ] || continue
+  if grep -Eq '\.agents/specs/(ai|console|harness|history|landing|mobile|onboarding|product)/' "$reference_file"; then
+    spec_fail \
+      stale-spec-reference \
+      "${reference_file#"$PROJECT_ROOT"/}" \
+      "reference points into a removed spec subdirectory" \
+      "replace it with the canonical flat priority path"
+  fi
+done <"$reference_scan"
+
+index_targets="$TMP_ROOT/index-targets"
+sed -n 's/.*](\([^)]*\.md\)).*/\1/p' "$SPEC_ROOT/readme.md" >"$index_targets"
+while IFS= read -r index_target; do
+  [ -n "$index_target" ] || continue
+  case "$index_target" in
+    http://*|https://*) continue ;;
+  esac
+  if [ ! -f "$SPEC_ROOT/$index_target" ]; then
+    spec_fail \
+      spec-index-reference \
+      .agents/specs/readme.md \
+      "catalog link $index_target does not resolve" \
+      "point the index at an existing flat spec file"
+  fi
+done <"$index_targets"
+
 delivery_list="$TMP_ROOT/delivery-files"
-find "$SPEC_ROOT" -type f \
-  -name 'spec-[0-9][0-9][0-9]-*.md' -print |
+find "$SPEC_ROOT" -maxdepth 1 -type f \
+  -name '0[0-9][0-9]-*.md' -print |
   sort >"$delivery_list"
 
 delivery_count=$(awk 'END { print NR + 0 }' "$delivery_list")
@@ -207,18 +299,14 @@ while IFS= read -r path; do
   file=${path#"$PROJECT_ROOT"/}
   base_name=$(basename "$path")
   if ! printf '%s\n' "$base_name" |
-    grep -Eq '^spec-[0-9][0-9][0-9]-[a-z0-9]+(-[a-z0-9]+)*\.md$'
+    grep -Eq '^0[0-9][0-9]-[a-z0-9]+(-[a-z0-9]+)*\.md$'
   then
     spec_fail \
       spec-filename \
       "$file" \
-      "delivery spec filename must use a lowercase kebab-case slug" \
-      "rename the file to spec-NNN-lowercase-slug.md"
+      "delivery spec filename must use a three-digit priority and lowercase kebab-case slug" \
+      "rename the file to NNN-lowercase-slug.md"
   fi
-  number=$(printf '%s\n' "$base_name" |
-    sed -n 's/^spec-\([0-9][0-9][0-9]\)-.*/\1/p')
-  expected_id="SPEC-$number"
-
   problem=$(frontmatter_problem "$path")
   if [ -n "$problem" ]; then
     spec_fail \
@@ -256,12 +344,12 @@ while IFS= read -r path; do
   spec_status=$(frontmatter_scalar "$path" status)
   spec_mode=$(frontmatter_scalar "$path" mode)
 
-  if [ "$spec_id" != "$expected_id" ]; then
+  if ! printf '%s\n' "$spec_id" | grep -Eq '^SPEC-[0-9][0-9][0-9]$'; then
     spec_fail \
-      spec-id-filename \
+      spec-id-format \
       "$file" \
-      "frontmatter id ${spec_id:-<missing>} does not match $expected_id" \
-      "make the stable ID and lowercase filename agree"
+      "frontmatter id ${spec_id:-<missing>} is not a durable SPEC-### identifier" \
+      "assign a unique durable SPEC-### ID independently from filename priority"
   fi
 
   if grep -F "${spec_id}	" "$ids_file" >/dev/null 2>&1; then
@@ -275,7 +363,8 @@ while IFS= read -r path; do
     printf '%s\t%s\n' "$spec_id" "$file" >>"$ids_file"
   fi
 
-  printf '%s\n' "$number" >>"$numbers_file"
+  spec_number=$(printf '%s\n' "$spec_id" | sed -n 's/^SPEC-\([0-9][0-9][0-9]\)$/\1/p')
+  [ -n "$spec_number" ] && printf '%s\n' "$spec_number" >>"$numbers_file"
 
   case "$spec_type" in
     chore|experiment|feature|fix|governance|migration|refactor) ;;
@@ -318,16 +407,6 @@ while IFS= read -r path; do
         "retrospective specs must record implemented pre-workflow work" \
         "set status to implemented or use prospective mode"
     fi
-    case "$file" in
-      .agents/specs/history/*) ;;
-      *)
-        spec_fail \
-          retrospective-location \
-          "$file" \
-          "retrospective specs must live under .agents/specs/history/" \
-          "move the file to the history directory"
-        ;;
-    esac
 
     integrity=$(section_text "$path" "Retrospective Integrity")
     integrity_length=$(printf '%s' "$integrity" | wc -c | tr -d '[:space:]')
@@ -395,13 +474,13 @@ while IFS= read -r path; do
 
   title=$(document_title "$path")
   case "$title" in
-    "# $expected_id: "*) ;;
+    "# $spec_id: "*) ;;
     *)
       spec_fail \
         spec-title \
         "$file" \
-        "document title must start with # $expected_id:" \
-        "align the H1 with the stable spec ID"
+        "document title must start with # $spec_id:" \
+        "align the H1 with the durable spec ID"
       ;;
   esac
 done <"$delivery_list"
