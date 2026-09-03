@@ -187,6 +187,8 @@ New work after this bootstrap uses a spec-based identifier:
 
 The pull request title and body reference `SPEC-###`. Commit messages remain conventional commits and include `Spec: SPEC-###` in the body when the relationship is not obvious from the branch and pull request.
 
+The repository-level `.github/pull_request_template.md` is the canonical merge record. Complete its spec link, observable outcome, scoped evidence, exact merge-base and reviewed head, independent Standards and Spec-fidelity results, conditional safety/privacy and Memory ROI sections, promotion record and merge gate. A green run or review from an older head does not authorize merge.
+
 The Handoff 4 branch is a one-time transition artifact. There is no Handoff 4.5 and future work is not planned through numbered handoff documents.
 
 ## Retrospective reconstruction

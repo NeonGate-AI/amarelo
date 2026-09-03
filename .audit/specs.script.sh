@@ -154,6 +154,7 @@ for required_file in \
   AGENTS.md \
   .agents/rules/spec-driven-development.md \
   .agents/specs/readme.md \
+  .github/pull_request_template.md \
   .agents/specs/template.md \
   .agents/specs/workflow.md
 do
@@ -181,6 +182,57 @@ then
     .agents/rules/spec-driven-development.md \
     "the spec-driven rule is not always applied" \
     "declare alwaysApply: true in rule frontmatter"
+fi
+
+if [ -f "$PROJECT_ROOT/.github/pr_template.md" ]; then
+  spec_fail \
+    legacy-pr-template \
+    .github/pr_template.md \
+    "GitHub does not discover the legacy pull request template filename" \
+    "remove it and use .github/pull_request_template.md"
+fi
+
+PR_TEMPLATE="$PROJECT_ROOT/.github/pull_request_template.md"
+if [ -f "$PR_TEMPLATE" ]; then
+  for template_heading in \
+    "## Delivery contract" \
+    "## Outcome" \
+    "## Scope" \
+    "## Dependencies and order" \
+    "## Acceptance evidence" \
+    "## Validation" \
+    "## Independent review" \
+    "### Standards" \
+    "### Spec fidelity" \
+    "## Safety and privacy" \
+    "## Memory ROI" \
+    "## Promotion" \
+    "## Merge gate"
+  do
+    if ! grep -Fx "$template_heading" "$PR_TEMPLATE" >/dev/null 2>&1; then
+      spec_fail \
+        pr-template-section \
+        .github/pull_request_template.md \
+        "required section is missing: $template_heading" \
+        "restore the spec-driven pull request evidence contract"
+    fi
+  done
+  for template_phrase in \
+    "Fixed merge-base SHA:" \
+    "Reviewed head SHA:" \
+    "CI run:" \
+    "delivery spec is \`implemented\`" \
+    "conflict-free" \
+    "Both independent review axes pass on the final head"
+  do
+    if ! grep -F "$template_phrase" "$PR_TEMPLATE" >/dev/null 2>&1; then
+      spec_fail \
+        pr-template-gate \
+        .github/pull_request_template.md \
+        "required merge evidence is missing: $template_phrase" \
+        "restore the exact-head review, CI and conflict gate"
+    fi
+  done
 fi
 
 nested_dirs=$(find "$SPEC_ROOT" -mindepth 1 -type d -print | sort)
