@@ -9,6 +9,7 @@ import {
 import { MemoryContextPort } from '@memory'
 import {
   ConversationAgentPort,
+  type ConversationAgentResult,
   ConversationAgentResultSchema
 } from '@ports'
 import { routeConversationTurn } from '@routing'
@@ -115,7 +116,7 @@ export class ConversationRuntime {
     })
     const messages = Object.freeze([...history.messages, currentMessage])
 
-    let agentResult
+    let agentResult: ConversationAgentResult
     try {
       agentResult = ConversationAgentResultSchema.parse(
         await agent.invoke(
