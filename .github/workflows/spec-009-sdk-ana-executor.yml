@@ -36,8 +36,8 @@ jobs:
           import json
           from pathlib import Path
 
-          path = Path('workspaces/ai/agents/ana/tsconfig.json')
-          data = json.loads(path.read_text(encoding='utf-8'))
+          tsconfig_path = Path('workspaces/ai/agents/ana/tsconfig.json')
+          data = json.loads(tsconfig_path.read_text(encoding='utf-8'))
           data['compilerOptions']['paths'] = {
               '@context': ['../../conversation/src/context/index.ts'],
               '@contracts': ['../../conversation/src/contracts/index.ts'],
@@ -46,7 +46,18 @@ jobs:
               '@routing': ['../../conversation/src/routing/index.ts'],
               '@runtime': ['../../conversation/src/runtime/index.ts'],
           }
-          path.write_text(json.dumps(data, indent=2) + '\n', encoding='utf-8')
+          tsconfig_path.write_text(
+              json.dumps(data, indent=2) + '\n',
+              encoding='utf-8',
+          )
+
+          fixture_path = Path(
+              'workspaces/ai/agents/ana/src/assurance/evals/'
+              'ana-agent/ana-agent.fixtures.ts'
+          )
+          fixture = fixture_path.read_text(encoding='utf-8')
+          fixture = fixture.replace("from '../../../model'", "from '@ai/ana'")
+          fixture_path.write_text(fixture, encoding='utf-8')
           PY
           pnpm install --lockfile-only
           pnpm install --frozen-lockfile
