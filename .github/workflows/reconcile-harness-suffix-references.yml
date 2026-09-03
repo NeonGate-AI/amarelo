@@ -44,7 +44,17 @@ jobs:
               '.agents/rules/product-safety-and-privacy.md': '.agents/rules/product-safety-and-privacy.rule.md',
               '.agents/context/apps/': '.agents/context/workflows/',
               '.agents/adrs/0011-memory-platform-and-sdk.adr.md': '.agents/adrs/0012-memory-nucleus-layout.adr.md',
+              '.agents/specs/014-background-memory-curation-loop.md': '.agents/specs/025-background-memory-curation-loop.spec.md',
           })
+
+          special_replacements = {
+              '.agents/adrs/0008-cost-first-background-memory-curation.adr.md': {
+                  '.agents/rules/ai-runtime.md': '.agents/rules/memory-nucleus.rule.md',
+              },
+              '.agents/adrs/0010-elos-and-ai-domain-workspaces.adr.md': {
+                  '.agents/rules/ai-runtime.md': '.agents/rules/context-engineering.rule.md',
+              },
+          }
 
           excluded = {'.git', 'node_modules', 'dist', '.next', '.turbo', 'coverage'}
           text_suffixes = {'.md', '.sh', '.yml', '.yaml', '.json', '.ts', '.tsx', '.js', '.mjs'}
@@ -60,6 +70,8 @@ jobs:
               except UnicodeDecodeError:
                   continue
               updated = text
+              for old, new in special_replacements.get(path.as_posix(), {}).items():
+                  updated = updated.replace(old, new)
               for old, new in sorted(mapping.items(), key=lambda item: len(item[0]), reverse=True):
                   updated = updated.replace(old, new)
               updated = updated.replace(
