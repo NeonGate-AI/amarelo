@@ -8,6 +8,8 @@ Before modifying project code, load every `.agents/rules/*.rule.md` rule whose f
 
 Before changing repository behavior, load `.agents/specs/workflow.md` and the active numbered `*.spec.md` delivery contract. Implementation starts only from a prospective spec whose status is `ready`; the first implementation change moves it to `in-progress`.
 
+The end-to-end lifecycle is owned by `.agents/specs/workflow.md`. Its seven canonical local procedures are `to-spec`, `to-tickets`, `implement`, `tdd`, `code-review`, `domain-modeling` and `writing-for-agents`. Load them from `.agents/skills/<name>/SKILL.md`; do not substitute a remote copy. The ownership and inventory model is described in `.agents/context/engineering/workflow-skills.md`.
+
 ## Navigate
 
 - Understand the system or a workspace -> `.agents/context/`

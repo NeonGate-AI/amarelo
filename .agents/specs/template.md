@@ -17,7 +17,7 @@ rules:
 adrs:
   - <relevant .agents/adrs path or none>
 skills:
-  - https://github.com/NeonGate-AI/skills/tree/main/skills/engineering/to-spec
+  - .agents/skills/to-spec/SKILL.md
 evidence:
   - pending
 ---

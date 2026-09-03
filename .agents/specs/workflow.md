@@ -1,208 +1,164 @@
 # Amarelo spec-driven workflow
 
-This document is the canonical delivery workflow for bounded repository changes.
+This document is the canonical end-to-end delivery lifecycle for bounded repository changes. Local skills support individual phases; they do not replace or redefine this workflow.
 
-It adapts the stable practices from the `NeonGate-AI/skills` repository:
+## Canonical local procedures
 
-- `to-spec`: synthesize an implementation-ready contract from owner conversation, repository context and existing decisions.
-- `to-tickets`: decompose the spec into vertical tracer bullets with explicit blocking edges.
-- `implement`: execute only the unlocked work, using test-driven development at agreed seams.
-- `tdd`: verify behavior through public interfaces, one red-to-green slice at a time.
-- `code-review`: review the completed diff independently against repository standards and against the originating spec.
-- `domain-modeling`: keep glossary and ADR decisions separate from implementation specifications.
-- `writing-for-agents`: use progressive disclosure, explicit completion criteria and one source of truth.
+| Procedure | Role in this lifecycle |
+|---|---|
+| [`to-spec`](../skills/to-spec/SKILL.md) | Synthesize an owner-approved contract from repository reality. |
+| [`to-tickets`](../skills/to-tickets/SKILL.md) | Decompose one ready spec into vertical GitHub issues with blocking edges. |
+| [`implement`](../skills/implement/SKILL.md) | Execute the unblocked work through evidence and merge readiness. |
+| [`tdd`](../skills/tdd/SKILL.md) | Drive one observable behavior at a declared seam from red to green. |
+| [`code-review`](../skills/code-review/SKILL.md) | Review the exact final head independently for Standards and Spec fidelity. |
+| [`domain-modeling`](../skills/domain-modeling/SKILL.md) | Sharpen vocabulary, ownership and consequential decisions. |
+| [`writing-for-agents`](../skills/writing-for-agents/SKILL.md) | Structure durable agent-facing context with explicit pointers and completion criteria. |
 
-Those upstream skills are authoring references. This document owns the Amarelo workflow and does not depend on a beta orchestration skill at runtime.
+These repository-local files are the normative procedures. An external repository may be cited for attribution or historical provenance, but it is not an executable source of truth for current delivery.
 
 ## Vocabulary
 
 **Numbered spec**  
-A durable `SPEC-###` contract stored in a flat `NNN-lowercase-slug.md` file. Its numeric filename prefix expresses mutable priority. It may be prospective work, a retrospective record of pre-workflow capability or a draft product contract, but it always uses the canonical template and metadata model.
+A durable `SPEC-###` contract stored in a flat `NNN-lowercase-slug.spec.md` file. Its numeric filename prefix expresses mutable priority; its frontmatter ID is the durable identity.
 
 **Retrospective spec**  
-A numbered spec reconstructed after implementation from code, commits, pull requests and durable harness evidence. It documents observed capability without pretending the earlier work followed this workflow.
+A numbered spec reconstructed from existing code and evidence after implementation. It documents observed capability without pretending the earlier work followed this workflow.
 
 **Active spec**  
-A prospective numbered spec with status `ready` or `in-progress`. Only one active spec should own the same behavioral seam at a time.
+A prospective numbered spec with status `ready` or `in-progress`. Only one active spec owns the same behavioral seam at a time.
 
 **Ticket graph**  
-The vertical implementation slices derived from one numbered spec. Tickets are execution units, not alternative sources of product truth.
+Vertical implementation slices derived from one ready spec. GitHub issues are execution units, not alternative product truth.
 
 **Evidence**  
-Reproducible outputs showing what was verified. Temporary outputs live in `.audit/`; stable links and conclusions are recorded in the numbered spec.
+Reproducible output showing what was verified. Temporary output lives in `.audit/`; stable references and conclusions are recorded in the numbered spec and PR.
 
 **Promotion**  
-The final step that moves proven durable knowledge into the correct numbered contract, context, rule, ADR or mechanical check without duplicating ownership.
+Moving a proven durable conclusion to the correct context, rule, ADR, spec or mechanical check without duplicating ownership.
 
 ## Catalog layout
 
-`.agents/specs/` is flat. It contains only:
+`.agents/specs/` is flat and contains:
 
-- `readme.md`, `template.md` and `workflow.md` as unnumbered support documents;
-- numbered specs named `001-lowercase-slug.md` through `099-lowercase-slug.md`.
+- `readme.md`, `template.md` and `workflow.md` as unnumbered support files;
+- numbered specs named `001-lowercase-slug.spec.md` through `099-lowercase-slug.spec.md`.
 
-The filename prefix is a unique, mutable priority rank. It is not the durable spec ID. Reserved ranks are allowed only when named in `readme.md`. A priority change updates the index and every repository path reference atomically. No spec subdirectory, including a history directory, is permitted. Retrospective mode is metadata, not a location.
+The filename prefix is a unique mutable priority rank. Reserved ranks must be named in `readme.md`. A priority or semantic-suffix change updates every repository reference atomically. Retrospective mode is metadata, not a subdirectory.
 
 ## Sources of truth
 
-The repository uses this hierarchy:
-
 ```text
-owner decision and repository reality
-                 |
-                 v
-             numbered spec
-                 |
-                 v
-     vertical ticket dependency graph
-                 |
-                 v
-       implementation and evidence
-                 |
-                 v
- context / rules / ADRs / checks and superseding specs
+owner decision + repository reality
+                ↓
+         numbered SPEC-###
+                ↓
+       vertical ticket graph
+                ↓
+     implementation + evidence
+                ↓
+ context / rules / ADRs / checks
 ```
 
-A handoff, chat transcript, branch name, issue or temporary plan is not the source of truth. It may provide authoring evidence, but the numbered spec controls scope and acceptance.
-
-GitHub Issues are the default ticket tracker. Every derived issue must link the `SPEC-###` file, describe one demonstrable vertical slice and declare what blocks it. The issue tracker never replaces the spec.
+A handoff, chat, issue, branch name or temporary plan may supply evidence, but cannot replace the numbered spec. GitHub Issues are the default ticket tracker and must link the canonical `.spec.md` path.
 
 ## Lifecycle
 
 ### 1. Discover
 
-Load `AGENTS.md`, all `alwaysApply` rules, the relevant workspace context, current numbered product contracts and applicable ADRs. Inspect the implementation before describing a change.
+Load `AGENTS.md`, every applicable `alwaysApply` rule, scoped context, current product contracts, accepted ADRs and the implementation. Use [`domain-modeling`](../skills/domain-modeling/SKILL.md) only when vocabulary or ownership itself is changing.
 
-Completion criterion: every affected public boundary and every applicable durable constraint is named in the draft spec.
+Completion: every affected public boundary and durable constraint is identified.
 
 ### 2. Synthesize
 
-Create the next durable numbered spec from the owner decision and repository evidence, then assign its filename priority in the flat catalog. Follow `template.md`. Do not reopen questions already settled by the owner or codebase. Record unresolved questions only when they materially block a decision.
+Use [`to-spec`](../skills/to-spec/SKILL.md) and `template.md` to create or revise the next durable spec. Prefer the highest observable test seam and record unresolved questions only when they materially block execution.
 
-Prefer the highest existing observable test seam. The ideal spec has one primary seam and only the secondary seams required for failures that the primary seam cannot localize.
-
-Completion criterion: the spec contains an observable solution, user stories, explicit scope, implementation decisions, testing decisions, acceptance criteria, failure behavior, exclusions and a promotion plan.
+Completion: solution, actors, scope, constraints, testing decisions, acceptance criteria, failure behavior, exclusions and promotion plan are checkable.
 
 ### 3. Approve
 
-A draft becomes `ready` only after the owner accepts its scope and consequential decisions. Approval does not mean every implementation detail is frozen. It means the behavioral contract and acceptance boundary are stable enough to execute.
+A prospective spec becomes `ready` only after the owner accepts its behavioral contract and consequential decisions.
 
-Completion criterion: status is `ready`, acceptance criteria are checkable and no unresolved item blocks the first slice.
+Completion: no unresolved decision blocks the first slice.
 
 ### 4. Decompose
 
-Convert the ready spec into tracer-bullet tickets. Each ticket must:
+Use [`to-tickets`](../skills/to-tickets/SKILL.md) to publish tracer-bullet GitHub issues. Each ticket cuts a narrow complete path, names its public seam, declares blocking edges and maps to spec criteria. Wide mechanical changes may use expand–migrate–contract.
 
-- cut a narrow but complete path through the necessary layers;
-- produce behavior that can be demonstrated independently;
-- fit within one focused implementation context;
-- identify the public seam it changes or verifies;
-- declare blocking and blocked-by relationships;
-- avoid horizontal technology-only work unless it is a required prefactor.
-
-For broad migrations, use expand, migrate and contract stages while keeping each stage independently safe.
-
-Completion criterion: the dependency graph has at least one unlocked frontier ticket and no acceptance criterion is orphaned.
+Completion: the dependency graph has an unblocked frontier and no orphaned criterion.
 
 ### 5. Execute
 
-Create or use a spec-named branch. The first implementation commit changes the spec from `ready` to `in-progress`. Work only from the unlocked frontier.
+Start a spec-named branch from the required base. The first implementation commit changes status to `in-progress`. Use [`implement`](../skills/implement/SKILL.md) and [`tdd`](../skills/tdd/SKILL.md) at the agreed seams. Work only from the unblocked frontier.
 
-At each agreed seam:
+Do not weaken acceptance criteria to match an implementation result. A material contract change returns to owner approval before work continues.
 
-1. write one failing behavior test;
-2. implement the minimum change that makes it pass;
-3. run the relevant typecheck and test;
-4. continue with the next vertical slice.
+Completion: every ticket is complete and scoped validation is green.
 
-Do not weaken acceptance criteria to match an implementation result. A material contract change returns to the owner and updates the spec with rationale before execution continues.
+### 6. Capture evidence
 
-Completion criterion: every ticket is complete, the full repository validation passes and the implementation remains within the approved scope.
+Store transient logs and reports in `.audit/`; use synthetic fixtures unless an approved privacy rule authorizes another class. Every checked criterion points to a reproducible test, trace, diff or reviewed procedure.
 
-### 6. Review
+Completion: no checked criterion relies on assertion alone.
 
-Pin the merge-base and review the final diff on two independent axes:
+### 7. Promote
 
-- **Standards**: repository rules, context, ADRs, architecture and code quality.
-- **Spec fidelity**: missing requirements, incorrect behavior and scope creep against the numbered spec.
+Use [`writing-for-agents`](../skills/writing-for-agents/SKILL.md) when changing agent-facing documents. Promote vocabulary to context, permanent constraints to rules, consequential tradeoffs to ADRs and executable invariants to tests/checkers. A changed product contract receives a new or superseding spec rather than rewriting history.
 
-One axis must not mask the other. Findings are resolved or explicitly accepted before completion.
+Completion: the resulting system is understandable without the delivery conversation.
 
-Completion criterion: both review axes have no unresolved blocking finding on the exact final head.
+### 8. Close the spec
 
-### 7. Capture evidence
+Set status to `implemented`, replace pending evidence with stable references and check every acceptance criterion only after the implementation is reproducible. Remove transient artifacts that no longer serve review.
 
-Store transient logs, reports and experiment output in `.audit/`. Record stable evidence references in the numbered spec. Use synthetic fixtures unless the spec and privacy rules explicitly authorize another class of data.
+Completion: implementation, evidence and promoted harness state agree.
 
-Completion criterion: every checked acceptance criterion points to a reproducible test, check, diff, trace or reviewed manual procedure.
+### 9. Validate and review
 
-### 8. Promote
+Run the complete repository CI. Then use [`code-review`](../skills/code-review/SKILL.md) against the fixed merge base on two independent axes:
 
-Move only proven durable conclusions to their proper source:
+- **Standards**: rules, context, accepted ADRs, architecture, privacy and code quality.
+- **Spec fidelity**: missing requirements, wrong behavior, unsupported evidence and scope creep.
 
-- a changed product contract receives a new numbered spec that supersedes the earlier record;
-- system vocabulary goes to context;
-- permanent constraints go to rules;
-- consequential tradeoffs go to ADRs;
-- mechanically enforceable invariants go to checkers or tests.
+Both reviews and CI apply to the exact same final head. Any head change invalidates all three and requires repetition.
 
-Do not duplicate the same rule or decision across categories. Evidence stays evidence.
+Completion: CI is fully green and both axes have zero unresolved blocking findings.
 
-Completion criterion: the harness describes the resulting system without relying on the delivery conversation or temporary audit files.
+### 10. Merge
 
-### 9. Close
+Confirm the branch is current with its base, conflict-free and free of generated or prohibited artifacts. Complete `.github/pull_request_template.md` with the merge base, reviewed head, CI run, reviews, safety/privacy applicability, Memory ROI applicability and promotion record. Merge using the exact expected head SHA.
 
-Set the numbered spec to `implemented`, record final evidence and merge through a pull request that references its durable ID. Its acceptance contract is not rewritten to describe later behavior, but its filename priority may change through an explicit catalog reordering. A later behavior change receives a new ID and may supersede it.
-
-Completion criterion: implementation, evidence and promoted harness state agree, and temporary execution artifacts are removed.
+Completion: the merge result and spec evidence agree, and dependent work can begin from the resulting `main`.
 
 ## Status model
 
 ```text
-draft -> ready -> in-progress -> implemented
-                    |
-                    +-> superseded
-                    |
-                    +-> retired
+draft → ready → in-progress → implemented
+                    ├────────→ superseded
+                    └────────→ retired
 ```
 
-- `draft`: still being authored; implementation is blocked.
+- `draft`: decisions or acceptance boundaries remain open.
 - `ready`: owner-approved and executable.
 - `in-progress`: implementation has started.
 - `implemented`: accepted and evidenced.
-- `superseded`: replaced before or after implementation by a newer numbered spec.
-- `retired`: intentionally abandoned without a replacement.
+- `superseded`: replaced by a newer contract.
+- `retired`: intentionally abandoned without replacement.
 
-## Branch and pull request conventions
+## Branch and PR conventions
 
-New work uses a spec-based identifier:
+Branches use `<type>/spec-###-short-slug`. PR titles and bodies reference the same durable ID. Conventional commits include `Spec: SPEC-###` when the relationship is not otherwise obvious.
 
-```text
-<type>/spec-###-short-slug
-```
-
-The pull request title and body reference `SPEC-###`. Commit messages remain conventional commits and include `Spec: SPEC-###` in the body when the relationship is not obvious from the branch and pull request.
-
-The repository-level `.github/pull_request_template.md` is the canonical merge record. Complete its spec link, observable outcome, scoped evidence, exact merge-base and reviewed head, independent Standards and Spec-fidelity results, conditional safety/privacy and Memory ROI sections, promotion record and merge gate. A green run or review from an older head does not authorize merge.
+The PR is the merge record, not a substitute for the spec. A green run or review from an older head never authorizes merge.
 
 ## Retrospective reconstruction
 
-A retrospective spec must:
-
-- use `mode: retrospective`;
-- use `status: implemented`;
-- state the evidence used to reconstruct it;
-- distinguish current code from reported historical validation;
-- state missing proof and current limitations;
-- include a `Retrospective Integrity` section;
-- avoid claiming that the original work was test-first, spec-driven or planned exactly as reconstructed.
-
-Retrospective mode is limited to work that predates this workflow. It cannot be used to bypass prospective specification for new work.
+A retrospective spec uses `mode: retrospective`, `status: implemented`, checked criteria, stable evidence and a substantive `Retrospective Integrity` section. It distinguishes observed code from reported historical validation and cannot be used to bypass prospective specification for new work.
 
 ## Emergency changes
 
-An urgent fix still starts from a minimal `type: fix` numbered spec marked `ready`. The spec may be short, but it must name the failing behavior, the public seam, rollback behavior and acceptance check before code changes begin.
+Urgent work still begins with a minimal owner-approved `type: fix` spec. It names the failing behavior, public seam, rollback and acceptance check before code changes begin.
 
 ## Workflow evolution
 
-A change to this workflow requires its own numbered spec and, when the tradeoff is consequential, an ADR. The structural checker validates document contracts but does not replace owner approval or semantic review.
+Changing this lifecycle requires its own numbered governance spec and, when the tradeoff is consequential, an ADR. Mechanical checks validate document contracts but do not replace owner approval or semantic review.
