@@ -2,7 +2,7 @@
 id: SPEC-031
 title: Enumerate the canonical rule catalog and reconcile the harness
 type: governance
-status: in-progress
+status: implemented
 mode: prospective
 created: 2026-09-03
 updated: 2026-09-03
@@ -45,7 +45,8 @@ skills:
   - .agents/skills/code-review/SKILL.md
 evidence:
   - .audit/rules.audit.sh
-  - https://github.com/NeonGate-AI/amarelo/issues/30
+  - .audit/elo-scaffold.audit.sh
+  - https://github.com/NeonGate-AI/amarelo/pull/31
 ---
 
 # SPEC-031: Enumerate the canonical rule catalog and reconcile the harness
@@ -115,15 +116,15 @@ Run `./cli/elo doctor --ci`, `./cli/elo check all`, Commitlint, lint, typecheck,
 
 ## Acceptance Criteria
 
-- [ ] Every canonical rule except `readme.md` uses a unique `NNN-lowercase-kebab-case.rule.md` path.
-- [ ] The eleven existing rules map to `001`–`011` in lexical slug order without semantic content changes.
-- [ ] Prefixes are documented as stable identities that never imply precedence, and existing rule metadata is preserved.
-- [ ] Every exact repository reference uses the numbered path and no old unnumbered rule path remains.
-- [ ] The rule index lists every numbered rule exactly once and documents addition, retirement, and non-reuse behavior.
-- [ ] `elo rule` allocates `012` for the next rule and fails closed on malformed, duplicate, or ambiguous catalogs.
-- [ ] `./cli/elo check rules` and `./cli/elo check all` enforce the numbered catalog and reference integrity.
-- [ ] The migration changes no product, runtime, Memory Nucleus, authorization, safety, or rule-policy behavior.
-- [ ] Exact-head CI and both independent reviews pass before merge.
+- [x] Every canonical rule except `readme.md` uses a unique `NNN-lowercase-kebab-case.rule.md` path.
+- [x] The eleven existing rules map to `001`–`011` in lexical slug order without semantic content changes.
+- [x] Prefixes are documented as stable identities that never imply precedence, and existing rule metadata is preserved.
+- [x] Every exact repository reference uses the numbered path and no old unnumbered rule path remains.
+- [x] The rule index lists every numbered rule exactly once and documents addition, retirement, and non-reuse behavior.
+- [x] `elo rule` allocates `012` for the next rule and fails closed on malformed, duplicate, or ambiguous catalogs.
+- [x] `./cli/elo check rules` and `./cli/elo check all` enforce the numbered catalog and reference integrity.
+- [x] The migration changes no product, runtime, Memory Nucleus, authorization, safety, or rule-policy behavior.
+- [x] Exact-head CI and both independent reviews pass before merge.
 
 ## Failure Behavior
 
@@ -139,7 +140,9 @@ An unnumbered rule, malformed or duplicate prefix, catalog/index mismatch, stale
 
 ## Evidence and Promotion
 
-The final pull request must preserve the rename map, exact merge base and reviewed head, complete CI run, two independent review results, and a reproducible rules audit. Promote the stable numbered-rule identity model to the rules index, root harness navigation, relevant architecture/source/spec guidance, Elo scaffolding behavior, and executable checks. Retain no transient migration report after the stable checker and PR record exist.
+`.audit/rules.audit.sh`, exposed as `./cli/elo check rules` and included in `./cli/elo check all`, verifies the flat numbered inventory, unique and required identities, exact index parity, lifecycle wording, absence of legacy unnumbered paths, and resolution of durable references outside synthetic audit fixtures. `.audit/elo-scaffold.audit.sh` proves that `elo rule` allocates `012`, accepts custom slugs, rejects malformed and duplicate catalogs, preserves existing targets, and leaves no partial staging state.
+
+ADR-0026, the root harness, architecture context, the Markdown/source-organization/spec-driven rules, CLI help, CLI documentation, historical rule references, and every spec reference now publish the same numbered identity model. Pull request #31 is the stable exact-head CI, independent-review, and merge record. No temporary migration workflow or transient report remains in the repository.
 
 ## Further Notes
 
