@@ -552,8 +552,41 @@ scaffold_invalid_status=$?
 [ "$scaffold_invalid_status" -eq 2 ] ||
   platform_fail cli/src/commands/scaffold.sh "invalid artifact names must exit 2"
 
-if find "$scaffold_root/.agents" -type f -name '*.tmp.*' -print | grep . >/dev/null 2>&1; then
-  platform_fail cli/src/commands/scaffold.sh "failed scaffolding left a partial temporary file"
+cat >"$scaffold_root/.agents/specs/040-first.spec.md" <<'EOF'
+---
+id: SPEC-040
+---
+EOF
+cat >"$scaffold_root/.agents/specs/040-second.spec.md" <<'EOF'
+---
+id: SPEC-041
+---
+EOF
+"$scaffold_launcher" spec duplicate >"$TMP_ROOT/scaffold-duplicate-prefix.out" 2>&1
+scaffold_duplicate_prefix_status=$?
+[ "$scaffold_duplicate_prefix_status" -ne 0 ] ||
+  platform_fail cli/src/commands/scaffold.sh "duplicate artifact prefixes must block allocation"
+grep -F 'Duplicate artifact prefix: 040' "$TMP_ROOT/scaffold-duplicate-prefix.out" >/dev/null 2>&1 ||
+  platform_fail cli/src/commands/scaffold.sh "duplicate-prefix failure lacks clear guidance"
+
+rm -f "$scaffold_root/.agents/specs/040-second.spec.md"
+cat >"$scaffold_root/.agents/specs/041-second.spec.md" <<'EOF'
+---
+id: SPEC-040
+---
+EOF
+"$scaffold_launcher" spec duplicate >"$TMP_ROOT/scaffold-duplicate-id.out" 2>&1
+scaffold_duplicate_id_status=$?
+[ "$scaffold_duplicate_id_status" -ne 0 ] ||
+  platform_fail cli/src/commands/scaffold.sh "duplicate SPEC IDs must block allocation"
+grep -F 'Duplicate SPEC durable ID: SPEC-040' "$TMP_ROOT/scaffold-duplicate-id.out" >/dev/null 2>&1 ||
+  platform_fail cli/src/commands/scaffold.sh "duplicate-ID failure lacks clear guidance"
+
+if find "$scaffold_root/.agents" \
+  \( -type f -name '*.tmp.*' -o -type d -name '.elo-scaffold.*' \) -print |
+  grep . >/dev/null 2>&1
+then
+  platform_fail cli/src/commands/scaffold.sh "failed scaffolding left partial staging state"
 fi
 
 "$LAUNCHER" unknown-command >"$TMP_ROOT/unknown.out" 2>"$TMP_ROOT/unknown.err"

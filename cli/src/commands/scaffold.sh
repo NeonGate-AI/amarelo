@@ -11,8 +11,17 @@ EOF
 }
 
 elo_scaffold_decimal() {
-  elo_scaffold_value=$(printf '%s' "$1" | sed 's/^0*//')
-  printf '%s\n' "${elo_scaffold_value:-0}"
+  elo_scaffold_input=$1
+  elo_scaffold_digits=$2
+  elo_scaffold_label=$3
+  case "$elo_scaffold_input" in
+    ''|*[!0-9]*) elo_die "$elo_scaffold_label is not a decimal number: $elo_scaffold_input" ;;
+  esac
+  elo_scaffold_value=$(printf '%s' "$elo_scaffold_input" | sed 's/^0*//')
+  elo_scaffold_value=${elo_scaffold_value:-0}
+  [ "${#elo_scaffold_value}" -le "$elo_scaffold_digits" ] ||
+    elo_die "$elo_scaffold_label exceeds the supported $elo_scaffold_digits-digit range."
+  printf '%s\n' "$elo_scaffold_value"
 }
 
 elo_scaffold_next_prefix() {
@@ -20,6 +29,7 @@ elo_scaffold_next_prefix() {
   elo_scaffold_width=$2
   elo_scaffold_suffix=$3
   elo_scaffold_max=0
+  elo_scaffold_seen=' '
 
   for elo_scaffold_path in "$elo_scaffold_dir"/*"$elo_scaffold_suffix"; do
     [ -f "$elo_scaffold_path" ] || continue
@@ -29,7 +39,11 @@ elo_scaffold_next_prefix() {
     case "$elo_scaffold_prefix" in
       *[!0-9]*) continue ;;
     esac
-    elo_scaffold_number=$(elo_scaffold_decimal "$elo_scaffold_prefix")
+    elo_scaffold_number=$(elo_scaffold_decimal "$elo_scaffold_prefix" "$elo_scaffold_width" "Artifact prefix")
+    case "$elo_scaffold_seen" in
+      *" $elo_scaffold_number "*) elo_die "Duplicate artifact prefix: $elo_scaffold_prefix" ;;
+    esac
+    elo_scaffold_seen="$elo_scaffold_seen$elo_scaffold_number "
     if [ "$elo_scaffold_number" -gt "$elo_scaffold_max" ]; then
       elo_scaffold_max=$elo_scaffold_number
     fi
@@ -47,6 +61,7 @@ elo_scaffold_next_prefix() {
 elo_scaffold_next_rule_prefix() {
   elo_scaffold_rule_max=0
   elo_scaffold_rule_count=0
+  elo_scaffold_rule_seen=' '
 
   for elo_scaffold_path in "$ELO_PROJECT_ROOT"/.agents/rules/*.rule.md; do
     [ -f "$elo_scaffold_path" ] || continue
@@ -57,7 +72,11 @@ elo_scaffold_next_rule_prefix() {
     case "$elo_scaffold_prefix" in
       *[!0-9]*) continue ;;
     esac
-    elo_scaffold_number=$(elo_scaffold_decimal "$elo_scaffold_prefix")
+    elo_scaffold_number=$(elo_scaffold_decimal "$elo_scaffold_prefix" 3 "Rule prefix")
+    case "$elo_scaffold_rule_seen" in
+      *" $elo_scaffold_number "*) elo_die "Duplicate rule prefix: $elo_scaffold_prefix" ;;
+    esac
+    elo_scaffold_rule_seen="$elo_scaffold_rule_seen$elo_scaffold_number "
     if [ "$elo_scaffold_number" -gt "$elo_scaffold_rule_max" ]; then
       elo_scaffold_rule_max=$elo_scaffold_number
     fi
@@ -73,11 +92,17 @@ elo_scaffold_next_rule_prefix() {
 
 elo_scaffold_next_spec_id() {
   elo_scaffold_max=0
+  elo_scaffold_seen=' '
   for elo_scaffold_path in "$ELO_PROJECT_ROOT"/.agents/specs/*.spec.md; do
     [ -f "$elo_scaffold_path" ] || continue
-    elo_scaffold_id=$(sed -n 's/^id:[[:space:]]*SPEC-\([0-9][0-9]*\)[[:space:]]*$/\1/p' "$elo_scaffold_path" | sed -n '1p')
-    [ -n "$elo_scaffold_id" ] || continue
-    elo_scaffold_number=$(elo_scaffold_decimal "$elo_scaffold_id")
+    elo_scaffold_id=$(sed -n 's/^id:[[:space:]]*//p' "$elo_scaffold_path" | sed -n '1p')
+    printf '%s\n' "$elo_scaffold_id" | grep -Eq '^SPEC-[0-9][0-9][0-9]$' ||
+      elo_die "Cannot allocate after malformed spec ID in $(elo_rel "$elo_scaffold_path")."
+    elo_scaffold_number=$(elo_scaffold_decimal "${elo_scaffold_id#SPEC-}" 3 "SPEC durable ID")
+    case "$elo_scaffold_seen" in
+      *" $elo_scaffold_number "*) elo_die "Duplicate SPEC durable ID: $elo_scaffold_id" ;;
+    esac
+    elo_scaffold_seen="$elo_scaffold_seen$elo_scaffold_number "
     if [ "$elo_scaffold_number" -gt "$elo_scaffold_max" ]; then
       elo_scaffold_max=$elo_scaffold_number
     fi
@@ -100,9 +125,19 @@ elo_scaffold_render() {
   [ ! -e "$elo_scaffold_target" ] || elo_die "Artifact already exists: $(elo_rel "$elo_scaffold_target")" 2
   mkdir -p "$elo_scaffold_parent" || elo_die "Cannot create artifact directory: $(elo_rel "$elo_scaffold_parent")"
 
-  elo_scaffold_temp="$elo_scaffold_target.tmp.$$"
-  [ ! -e "$elo_scaffold_temp" ] || elo_die "Temporary artifact path already exists: $(elo_rel "$elo_scaffold_temp")"
-  trap 'rm -f "$elo_scaffold_temp"' 0 1 2 15
+  elo_scaffold_attempt=0
+  elo_scaffold_temp_dir="$elo_scaffold_parent/.elo-scaffold.$$"
+  while ! (umask 077 && mkdir "$elo_scaffold_temp_dir") 2>/dev/null; do
+    elo_scaffold_attempt=$((elo_scaffold_attempt + 1))
+    [ "$elo_scaffold_attempt" -lt 10 ] || elo_die "Cannot reserve a private artifact staging directory."
+    elo_scaffold_temp_dir="$elo_scaffold_parent/.elo-scaffold.$$.$elo_scaffold_attempt"
+  done
+  elo_scaffold_temp="$elo_scaffold_temp_dir/artifact"
+  elo_scaffold_cleanup() {
+    rm -f "$elo_scaffold_temp"
+    rmdir "$elo_scaffold_temp_dir" 2>/dev/null || :
+  }
+  trap elo_scaffold_cleanup 0 1 2 15
   if ! sed \
     -e "s/{{ADR_NUMBER}}/$elo_scaffold_adr_number/g" \
     -e "s/{{SPEC_ID}}/$elo_scaffold_spec_id/g" \
@@ -119,6 +154,7 @@ elo_scaffold_render() {
     elo_die "Cannot publish the generated artifact."
   fi
   rm -f "$elo_scaffold_temp"
+  rmdir "$elo_scaffold_temp_dir" 2>/dev/null || :
   trap - 0 1 2 15
   elo_print_success "Created $(elo_rel "$elo_scaffold_target")"
 }

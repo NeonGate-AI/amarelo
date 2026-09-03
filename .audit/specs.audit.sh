@@ -127,12 +127,11 @@ do
 done
 
 if [ -d "$PROMPT_ROOT" ]; then
-  find "$PROMPT_ROOT" -mindepth 1 -maxdepth 1 -print | sort >"$TMP_ROOT/prompt-paths"
+  find "$PROMPT_ROOT" -mindepth 1 -print | sort >"$TMP_ROOT/prompt-paths"
   while IFS= read -r path; do
     [ -n "$path" ] || continue
-    base=${path##*/}
-    case "$base" in
-      adr.prompt.md|rule.prompt.md|skill.prompt.md|spec.prompt.md) ;;
+    case "$path" in
+      "$PROMPT_ROOT/adr.prompt.md"|"$PROMPT_ROOT/rule.prompt.md"|"$PROMPT_ROOT/skill.prompt.md"|"$PROMPT_ROOT/spec.prompt.md") ;;
       *)
         spec_fail prompt-inventory "${path#"$PROJECT_ROOT"/}" \
           "only the four canonical agent artifact templates are allowed" \
