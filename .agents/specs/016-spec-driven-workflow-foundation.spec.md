@@ -16,9 +16,9 @@ targets:
 context:
   - AGENTS.md
 rules:
-  - .agents/rules/architecture.rule.md
-  - .agents/rules/context-engineering.rule.md
-  - .agents/rules/markdown.rule.md
+  - .agents/rules/001-architecture.rule.md
+  - .agents/rules/003-context-engineering.rule.md
+  - .agents/rules/005-markdown.rule.md
 adrs:
   - .agents/adrs/0018-spec-driven-delivery.adr.md
 skills:
@@ -168,7 +168,7 @@ Current evidence:
 Promotion:
 
 - workflow procedure to `.agents/specs/workflow.md`;
-- durable constraint to `.agents/rules/spec-driven-development.rule.md`;
+- durable constraint to `.agents/rules/011-spec-driven-development.rule.md`;
 - consequential tradeoff to ADR 0018;
 - historical delivery context to `.agents/specs/`;
 - mechanical contract to the Elo spec checker.

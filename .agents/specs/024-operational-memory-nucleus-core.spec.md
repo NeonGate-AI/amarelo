@@ -17,10 +17,10 @@ context:
   - .agents/context/architecture/boundaries/ai-memory-nucleus.md
   - .agents/context/workspaces/memory-nucleus/overview.md
 rules:
-  - .agents/rules/architecture.rule.md
-  - .agents/rules/memory-nucleus.rule.md
-  - .agents/rules/product-safety-and-privacy.rule.md
-  - .agents/rules/spec-driven-development.rule.md
+  - .agents/rules/001-architecture.rule.md
+  - .agents/rules/006-memory-nucleus.rule.md
+  - .agents/rules/008-product-safety-and-privacy.rule.md
+  - .agents/rules/011-spec-driven-development.rule.md
 adrs:
   - .agents/adrs/0001-shared-longitudinal-memory.adr.md
   - .agents/adrs/0003-authorization-before-retrieval.adr.md

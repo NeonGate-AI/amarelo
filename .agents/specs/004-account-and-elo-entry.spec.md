@@ -15,8 +15,8 @@ context:
   - .agents/context/workflows/onboarding.md
   - .agents/context/product/overview.md
 rules:
-  - .agents/rules/product-safety-and-privacy.rule.md
-  - .agents/rules/react-and-next.rule.md
+  - .agents/rules/008-product-safety-and-privacy.rule.md
+  - .agents/rules/009-react-and-next.rule.md
 adrs:
   - .agents/adrs/0002-elos-as-contextual-agents.adr.md
   - .agents/adrs/0003-authorization-before-retrieval.adr.md

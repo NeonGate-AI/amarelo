@@ -14,7 +14,7 @@ targets:
   - .agents/specs/workflow.md
   - .agents/specs/template.md
   - .agents/context/engineering/workflow-skills.md
-  - .agents/rules/spec-driven-development.rule.md
+  - .agents/rules/011-spec-driven-development.rule.md
   - .audit/workflow-skills.audit.sh
   - cli/src/elo.sh
   - AGENTS.md
@@ -26,9 +26,9 @@ context:
   - .agents/specs/readme.md
   - .agents/specs/workflow.md
 rules:
-  - .agents/rules/context-engineering.rule.md
-  - .agents/rules/markdown.rule.md
-  - .agents/rules/spec-driven-development.rule.md
+  - .agents/rules/003-context-engineering.rule.md
+  - .agents/rules/005-markdown.rule.md
+  - .agents/rules/011-spec-driven-development.rule.md
 adrs:
   - none
 skills:
@@ -156,7 +156,7 @@ Ambiguous provenance fails closed by preserving the directory until ownership is
 
 ## Evidence and Promotion
 
-The before/after import inventory, preserved project inventory, retained-skill rewrites, active metadata changes and executable checker form the implementation evidence. Durable ownership was promoted to `AGENTS.md`, `.agents/specs/workflow.md`, `.agents/specs/template.md`, `.agents/skills/readme.md`, `.agents/context/engineering/workflow-skills.md`, `.agents/rules/spec-driven-development.rule.md` and `.audit/workflow-skills.audit.sh`.
+The before/after import inventory, preserved project inventory, retained-skill rewrites, active metadata changes and executable checker form the implementation evidence. Durable ownership was promoted to `AGENTS.md`, `.agents/specs/workflow.md`, `.agents/specs/template.md`, `.agents/skills/readme.md`, `.agents/context/engineering/workflow-skills.md`, `.agents/rules/011-spec-driven-development.rule.md` and `.audit/workflow-skills.audit.sh`.
 
 PR #22 merged the implementation at `811427fb08b56880a4ece06e2acc18690c613210`; CI run `33787881077` passed on that exact `main`. The narrow closure PR records its own exact-head CI and review submissions because adding those identifiers here would itself invalidate the reviewed head.
 

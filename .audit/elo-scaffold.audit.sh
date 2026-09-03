@@ -72,8 +72,11 @@ cp -R "$PROJECT_ROOT/.agents/prompts" "$FIXTURE_ROOT/.agents/prompts" || {
 }
 
 : >"$FIXTURE_ROOT/.agents/adrs/0025-existing.adr.md"
+scaffold_rule_number=1
 for scaffold_rule in architecture code-style context-engineering import-boundaries markdown memory-nucleus package-ownership product-safety-and-privacy react-and-next source-organization spec-driven-development; do
-  : >"$FIXTURE_ROOT/.agents/rules/$scaffold_rule.rule.md"
+  scaffold_rule_prefix=$(printf '%03d' "$scaffold_rule_number")
+  : >"$FIXTURE_ROOT/.agents/rules/$scaffold_rule_prefix-$scaffold_rule.rule.md"
+  scaffold_rule_number=$((scaffold_rule_number + 1))
 done
 cat >"$FIXTURE_ROOT/.agents/specs/030-existing.spec.md" <<'SPEC'
 ---
@@ -110,7 +113,9 @@ fi
 
 default_spec="$FIXTURE_ROOT/.agents/specs/031-new-spec.spec.md"
 default_adr="$FIXTURE_ROOT/.agents/adrs/0026-new-adr.adr.md"
-default_rule="$FIXTURE_ROOT/.agents/rules/012-new-rule.rule.md"
+default_rule_name=012-new-rule.rule.md
+default_rule="$FIXTURE_ROOT/.agents/rules/$default_rule_name"
+default_rule_relative=".agents/rules/$default_rule_name"
 default_skill="$FIXTURE_ROOT/.agents/skills/new-skill/SKILL.md"
 
 require_file "$default_spec" cli/src/commands/scaffold.sh
@@ -119,7 +124,7 @@ require_file "$default_rule" cli/src/commands/scaffold.sh
 require_file "$default_skill" cli/src/commands/scaffold.sh
 require_output_path "$TMP_ROOT/default-spec.out" '.agents/specs/031-new-spec.spec.md'
 require_output_path "$TMP_ROOT/default-adr.out" '.agents/adrs/0026-new-adr.adr.md'
-require_output_path "$TMP_ROOT/default-rule.out" '.agents/rules/012-new-rule.rule.md'
+require_output_path "$TMP_ROOT/default-rule.out" "$default_rule_relative"
 require_output_path "$TMP_ROOT/default-skill.out" '.agents/skills/new-skill/SKILL.md'
 
 if [ -f "$default_spec" ]; then
@@ -217,11 +222,40 @@ then
   scaffold_fail cli/src/commands/scaffold.sh "elo adr did not accept a custom slug"
 fi
 
+custom_rule_name=013-custom-rule.rule.md
+custom_rule="$FIXTURE_ROOT/.agents/rules/$custom_rule_name"
 if ! "$LAUNCHER" rule custom-rule >"$TMP_ROOT/custom-rule.out" 2>&1 ||
-  [ ! -f "$FIXTURE_ROOT/.agents/rules/013-custom-rule.rule.md" ]
+  [ ! -f "$custom_rule" ]
 then
   scaffold_fail cli/src/commands/scaffold.sh "elo rule did not accept a custom slug"
 fi
+
+legacy_rule="$FIXTURE_ROOT/.agents/rules/legacy.rule.md"
+blocked_rule_name=014-blocked-rule.rule.md
+blocked_rule="$FIXTURE_ROOT/.agents/rules/$blocked_rule_name"
+: >"$legacy_rule"
+"$LAUNCHER" rule blocked-rule >"$TMP_ROOT/malformed-rule.out" 2>&1
+malformed_rule_status=$?
+[ "$malformed_rule_status" -ne 0 ] ||
+  scaffold_fail cli/src/commands/scaffold.sh "an unnumbered rule catalog entry must fail allocation"
+[ ! -e "$blocked_rule" ] ||
+  scaffold_fail cli/src/commands/scaffold.sh "malformed rule allocation created a target"
+grep -F 'malformed rule filename' "$TMP_ROOT/malformed-rule.out" >/dev/null 2>&1 ||
+  scaffold_fail cli/src/commands/scaffold.sh "malformed rule failure did not explain the catalog error"
+rm -f "$legacy_rule"
+
+duplicate_rule_name=013-duplicate.rule.md
+duplicate_rule="$FIXTURE_ROOT/.agents/rules/$duplicate_rule_name"
+: >"$duplicate_rule"
+"$LAUNCHER" rule blocked-rule >"$TMP_ROOT/duplicate-rule.out" 2>&1
+duplicate_rule_status=$?
+[ "$duplicate_rule_status" -ne 0 ] ||
+  scaffold_fail cli/src/commands/scaffold.sh "a duplicate rule identity must fail allocation"
+[ ! -e "$blocked_rule" ] ||
+  scaffold_fail cli/src/commands/scaffold.sh "duplicate rule allocation created a target"
+grep -F 'Duplicate rule prefix: 013' "$TMP_ROOT/duplicate-rule.out" >/dev/null 2>&1 ||
+  scaffold_fail cli/src/commands/scaffold.sh "duplicate rule failure did not identify the prefix"
+rm -f "$duplicate_rule"
 
 if ! "$LAUNCHER" skill custom-skill >"$TMP_ROOT/custom-skill.out" 2>&1 ||
   [ ! -f "$FIXTURE_ROOT/.agents/skills/custom-skill/SKILL.md" ]

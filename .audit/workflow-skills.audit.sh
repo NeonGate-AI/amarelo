@@ -192,7 +192,7 @@ for document in \
   .agents/specs/template.md \
   .agents/skills/readme.md \
   .agents/context/engineering/workflow-skills.md \
-  .agents/rules/spec-driven-development.rule.md
+  .agents/rules/011-spec-driven-development.rule.md
 do
   path="$PROJECT_ROOT/$document"
   [ -f "$path" ] || {

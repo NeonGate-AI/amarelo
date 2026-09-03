@@ -14,8 +14,8 @@ targets:
 context:
   - .agents/context/workspaces/ai/conversation.md
 rules:
-  - .agents/rules/context-engineering.rule.md
-  - .agents/rules/product-safety-and-privacy.rule.md
+  - .agents/rules/003-context-engineering.rule.md
+  - .agents/rules/008-product-safety-and-privacy.rule.md
 adrs:
   - .agents/adrs/0017-cognitive-routing-and-memory-boundary.adr.md
   - .agents/adrs/0020-conversation-agent-port.adr.md

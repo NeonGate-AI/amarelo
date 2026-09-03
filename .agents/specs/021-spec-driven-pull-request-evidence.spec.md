@@ -16,10 +16,10 @@ context:
   - .agents/specs/readme.md
   - .agents/specs/workflow.md
 rules:
-  - .agents/rules/context-engineering.rule.md
-  - .agents/rules/markdown.rule.md
-  - .agents/rules/product-safety-and-privacy.rule.md
-  - .agents/rules/spec-driven-development.rule.md
+  - .agents/rules/003-context-engineering.rule.md
+  - .agents/rules/005-markdown.rule.md
+  - .agents/rules/008-product-safety-and-privacy.rule.md
+  - .agents/rules/011-spec-driven-development.rule.md
 adrs:
   - .agents/adrs/0018-spec-driven-delivery.adr.md
 skills:

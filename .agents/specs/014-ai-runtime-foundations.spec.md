@@ -15,10 +15,10 @@ targets:
 context:
   - .agents/context/workspaces/ai/
 rules:
-  - .agents/rules/architecture.rule.md
-  - .agents/rules/context-engineering.rule.md
-  - .agents/rules/package-ownership.rule.md
-  - .agents/rules/memory-nucleus.rule.md
+  - .agents/rules/001-architecture.rule.md
+  - .agents/rules/003-context-engineering.rule.md
+  - .agents/rules/007-package-ownership.rule.md
+  - .agents/rules/006-memory-nucleus.rule.md
 adrs:
   - .agents/adrs/
 skills:

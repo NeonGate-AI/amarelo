@@ -22,11 +22,11 @@ context:
   - workspaces/packages/design-system/package.json
   - .github/workflows/ci.yml
 rules:
-  - .agents/rules/architecture.rule.md
-  - .agents/rules/context-engineering.rule.md
-  - .agents/rules/markdown.rule.md
-  - .agents/rules/source-organization.rule.md
-  - .agents/rules/spec-driven-development.rule.md
+  - .agents/rules/001-architecture.rule.md
+  - .agents/rules/003-context-engineering.rule.md
+  - .agents/rules/005-markdown.rule.md
+  - .agents/rules/010-source-organization.rule.md
+  - .agents/rules/011-spec-driven-development.rule.md
 adrs:
   - .agents/adrs/0014-workspaces-and-centralized-harness.adr.md
   - .agents/adrs/0018-spec-driven-delivery.adr.md
@@ -204,7 +204,7 @@ Final evidence:
 Promotion completed:
 
 - developer-facing installation and command behavior in `cli/readme.md` and the root `readme.md`;
-- permanent executable-script and task-ownership constraints in `.agents/rules/source-organization.rule.md`;
+- permanent executable-script and task-ownership constraints in `.agents/rules/010-source-organization.rule.md`;
 - the shell-control-plane and user-launcher tradeoff in `.agents/adrs/0022-posix-elo-control-plane.adr.md`;
 - lifecycle entrypoints in `package.json`;
 - shell-front/typed-backend token execution in `workspaces/packages/design-system/package.json` and `src/scripts/`;

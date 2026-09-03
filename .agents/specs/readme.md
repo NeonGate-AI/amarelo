@@ -44,8 +44,9 @@ The specification catalog is flat, priority-ordered and mechanically checked.
 | 028 | SPEC-018 | ready | [Memory unit economics and scale gates](028-memory-unit-economics-scale-gates.spec.md) |
 | 029 | SPEC-029 | implemented | [Canonical local engineering workflow skills](029-canonical-local-workflow-skills.spec.md) |
 | 030 | SPEC-030 | implemented | [Agent artifact scaffolding](030-agent-artifact-scaffolding.spec.md) |
+| 031 | SPEC-031 | implemented | [Numbered canonical rule catalog](031-numbered-rule-catalog.spec.md) |
 
-The next unallocated durable delivery ID is `SPEC-031`.
+The next unallocated durable delivery ID is `SPEC-032`.
 
 The executable Memory Nucleus chain is:
 
@@ -53,4 +54,4 @@ The executable Memory Nucleus chain is:
 
 Each implementation PR starts from the `main` produced by its prerequisite. A later phase cannot merge until the preceding gate is proved on the exact reviewed head.
 
-Use `template.md` and `workflow.md` for every new numbered spec. Rules, context and ADRs remain separate sources of truth and must be referenced by their canonical semantic filenames.
+Use `template.md` and `workflow.md` for every new numbered spec. Rules, context and ADRs remain separate sources of truth and must be referenced by their canonical numbered semantic filenames.

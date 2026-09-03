@@ -48,12 +48,13 @@ elo spec [lowercase-kebab-name]
 elo env setup
 elo env validate
 elo git doctor
+elo check rules
 elo check all
 ```
 
 `pnpm elo <command>` and `./cli/elo <command>` remain compatibility and recovery entrypoints. Running Elo without arguments shows the yellow ELO wordmark and emoji command catalog without bootstrapping or installing anything. `--logs` may appear before or immediately after a command and sends additional, secret-safe diagnostics to stderr. ANSI color is limited to interactive output and is disabled by `NO_COLOR`. Unknown commands and invalid subcommands return status 2.
 
-The artifact commands render the four canonical empty templates in `.agents/prompts/`. ADRs, rules, and specs receive their next repository number; specs also receive the next durable `SPEC-###` ID. Skills preserve `.agents/skills/<name>/SKILL.md`. Generation never overwrites an existing target or updates approval/catalog state automatically.
+The artifact commands render the four canonical empty templates in `.agents/prompts/`. ADRs, rules, and specs receive their next repository number; rule numbers are stable catalog identities rather than precedence; specs also receive the next durable `SPEC-###` ID. Skills preserve `.agents/skills/<name>/SKILL.md`. Generation never overwrites an existing target or updates approval/catalog state automatically.
 
 The generated user launcher delegates to the checkout that most recently completed setup. After moving or deleting that checkout, run `./cli/elo setup` from a valid checkout.
 

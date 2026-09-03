@@ -26,12 +26,12 @@ Start from `.agents/context/workspaces/<area>/` when an area manifest exists. Fo
 Harness artifacts use semantic suffixes at their ownership boundary:
 
 - ADRs: `lowercase-kebab-case.adr.md` under `.agents/adrs/`;
-- rules: `lowercase-kebab-case.rule.md` under `.agents/rules/`;
+- rules: `NNN-lowercase-kebab-case.rule.md` under `.agents/rules/`;
 - numbered specs: `NNN-lowercase-kebab-case.spec.md` under `.agents/specs/`;
 - artifact templates: `<type>.prompt.md` under `.agents/prompts/`;
 - executable audit checkers: `lowercase-kebab-case.audit.sh` under `.audit/`.
 
-Context documents, skills, prompt templates and the unnumbered spec support files `readme.md`, `template.md` and `workflow.md` keep their ordinary names. Repository references must use the exact semantic filename; do not reintroduce unsuffixed ADR, rule, numbered-spec or audit-checker paths.
+Context documents, skills, prompt templates, `.agents/rules/readme.md`, and the unnumbered spec support files `readme.md`, `template.md` and `workflow.md` keep their ordinary names. Rule prefixes are stable catalog identities and never imply precedence; existing rule metadata and authored policy remain authoritative. Repository references must use the exact semantic filename; do not reintroduce unsuffixed ADR, rule, numbered-spec or audit-checker paths.
 
 ## Evidence is not canonical context
 

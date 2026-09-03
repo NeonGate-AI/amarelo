@@ -16,9 +16,9 @@ context:
   - .agents/context/workspaces/memory-nucleus/
   - .agents/context/workspaces/packages/
 rules:
-  - .agents/rules/memory-nucleus.rule.md
-  - .agents/rules/architecture.rule.md
-  - .agents/rules/product-safety-and-privacy.rule.md
+  - .agents/rules/006-memory-nucleus.rule.md
+  - .agents/rules/001-architecture.rule.md
+  - .agents/rules/008-product-safety-and-privacy.rule.md
 adrs:
   - .agents/adrs/
 skills:
