@@ -32,6 +32,65 @@ jobs:
           export CI=true
           pnpm install --frozen-lockfile
           python3 .github/spec-009-conversation-api.py
+          python3 <<'PY'
+          import json
+          from pathlib import Path
+
+          tsconfig_path = Path('workspaces/apps/conversation-api/tsconfig.json')
+          tsconfig = json.loads(tsconfig_path.read_text(encoding='utf-8'))
+          tsconfig['compilerOptions']['lib'] = ['ES2022', 'DOM', 'DOM.Iterable']
+          tsconfig_path.write_text(
+              json.dumps(tsconfig, indent=2) + '\n',
+              encoding='utf-8',
+          )
+
+          fixture_path = Path(
+              'workspaces/apps/conversation-api/src/assurance/evals/'
+              'conversation-api/conversation-api.fixtures.ts'
+          )
+          fixture = fixture_path.read_text(encoding='utf-8')
+          replacements = [
+              (
+                  "import type { FastifyInstance } from 'fastify'",
+                  "import type { FastifyInstance, HTTPMethods } from 'fastify'",
+              ),
+              (
+                  "    const url = new URL(typeof input === 'string' ? input : input.url)\n",
+                  "    const inputUrl =\n"
+                  "      typeof input === 'string'\n"
+                  "        ? input\n"
+                  "        : input instanceof URL\n"
+                  "          ? input.href\n"
+                  "          : input.url\n"
+                  "    const url = new URL(inputUrl)\n",
+              ),
+              (
+                  "    const response = await app.inject({\n",
+                  "    const injectedResponse = await app.inject({\n",
+              ),
+              (
+                  "      method: init?.method ?? 'GET',\n",
+                  "      method: (init?.method ?? 'GET') as HTTPMethods,\n",
+              ),
+              (
+                  "Object.entries(response.headers)",
+                  "Object.entries(injectedResponse.headers)",
+              ),
+              (
+                  "new Response(response.body,",
+                  "new Response(injectedResponse.body,",
+              ),
+              (
+                  "status: response.statusCode",
+                  "status: injectedResponse.statusCode",
+              ),
+          ]
+          for old, new in replacements:
+              if old not in fixture:
+                  raise RuntimeError(f'expected fixture source is missing: {old!r}')
+              fixture = fixture.replace(old, new, 1)
+          fixture_path.write_text(fixture, encoding='utf-8')
+          PY
           pnpm install --lockfile-only
           pnpm install --frozen-lockfile
           pnpm exec biome check --write workspaces/apps/conversation-api
