@@ -52,7 +52,8 @@ case "$command" in
       imports) exec node "$PROJECT_ROOT/.audit/import-boundaries.script.mjs" ;;
       memory) exec node "$PROJECT_ROOT/.audit/memory-invariants.script.mjs" ;;
       platform) exec node "$PROJECT_ROOT/.audit/elo-platform.script.mjs" ;;
-      *) echo "Usage: ./cli/elo check <architecture|imports|memory|platform>" >&2; exit 2 ;;
+      specs) exec node "$PROJECT_ROOT/.audit/specs.script.mjs" ;;
+      *) echo "Usage: ./cli/elo check <architecture|imports|memory|platform|specs>" >&2; exit 2 ;;
     esac
     ;;
   *)

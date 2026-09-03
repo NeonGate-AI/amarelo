@@ -27,7 +27,10 @@ skills:
   - https://github.com/NeonGate-AI/skills/tree/main/skills/engineering/implement
   - https://github.com/NeonGate-AI/skills/tree/main/skills/engineering/code-review
 evidence:
-  - pending
+  - commit dfab038e2e8f43fb1cbcc194016fbf7c90717f61
+  - commit 68d62c717b9beb0a6f1e3d61fbd26ac8ce8fa0a7
+  - local ./cli/elo check specs PASS
+  - pull-request CI pending
 ---
 
 # SPEC-006: Establish the Amarelo spec-driven delivery workflow
@@ -116,18 +119,18 @@ The checker operates only on committed Markdown and repository metadata. It must
 
 ## Acceptance Criteria
 
-- [ ] `workflow.md` defines discovery, synthesis, approval, decomposition, execution, review, evidence, promotion and closure.
-- [ ] `template.md` encodes the metadata and sections required for prospective and retrospective delivery specs.
-- [ ] An always-applied rule requires a ready numbered spec before implementation.
-- [ ] ADR 0018 records the replacement of handoff-driven planning with spec-driven delivery.
-- [ ] `AGENTS.md` directs agents to load the workflow and active spec.
-- [ ] `SPEC-001` through `SPEC-005` reconstruct the major pre-workflow capabilities without claiming fictional prior process.
-- [ ] Elo exposes `check specs` and CI executes it.
-- [ ] The structural checker passes for all numbered delivery specs.
+- [x] `workflow.md` defines discovery, synthesis, approval, decomposition, execution, review, evidence, promotion and closure.
+- [x] `template.md` encodes the metadata and sections required for prospective and retrospective delivery specs.
+- [x] An always-applied rule requires a ready numbered spec before implementation.
+- [x] ADR 0018 records the replacement of handoff-driven planning with spec-driven delivery.
+- [x] `AGENTS.md` directs agents to load the workflow and active spec.
+- [x] `SPEC-001` through `SPEC-005` reconstruct the major pre-workflow capabilities without claiming fictional prior process.
+- [x] Elo exposes `check specs` and CI executes it.
+- [x] The structural checker passes for all numbered delivery specs.
 - [ ] Existing repository validation remains green.
-- [ ] Handoff 4 contains no product runtime, PWA, agent, Fastify, queue or workspace relocation implementation.
-- [ ] The next available delivery ID is documented as `SPEC-007`.
-- [ ] No Handoff 4.5 artifact is created.
+- [x] Handoff 4 contains no product runtime, PWA, agent, Fastify, queue or workspace relocation implementation.
+- [x] The next available delivery ID is documented as `SPEC-007`.
+- [x] No Handoff 4.5 artifact is created.
 
 ## Failure Behavior
 
@@ -152,14 +155,15 @@ The checker operates only on committed Markdown and repository metadata. It must
 
 ## Evidence and Promotion
 
-Planned evidence:
+Current evidence:
 
-- commits on `docs/handoff-04-spec-driven-workflow`;
-- `./cli/elo check specs`;
-- full pull-request CI;
-- two-axis review against this spec and repository rules.
+- workflow foundation commit `dfab038e2e8f43fb1cbcc194016fbf7c90717f61`;
+- retrospective history commit `68d62c717b9beb0a6f1e3d61fbd26ac8ce8fa0a7`;
+- local `./cli/elo check specs` result: `Spec workflow PASS - 6 delivery specs`;
+- full pull-request CI remains the closure gate;
+- two-axis review is recorded in the pull request.
 
-Planned promotion:
+Promotion:
 
 - workflow procedure to `.agents/specs/workflow.md`;
 - durable constraint to `.agents/rules/spec-driven-development.md`;
