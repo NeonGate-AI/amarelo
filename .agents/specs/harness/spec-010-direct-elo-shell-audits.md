@@ -1,5 +1,5 @@
 ---
-id: SPEC-007
+id: SPEC-010
 title: Make Elo directly invokable and migrate executable MJS automation to shell
 type: feature
 status: in-progress
@@ -30,7 +30,7 @@ rules:
 adrs:
   - .agents/adrs/0014-workspaces-and-centralized-harness.md
   - .agents/adrs/0018-spec-driven-delivery.md
-  - .agents/adrs/0019-posix-elo-control-plane.md
+  - .agents/adrs/0022-posix-elo-control-plane.md
 skills:
   - https://github.com/NeonGate-AI/skills/tree/main/skills/engineering/to-spec
   - https://github.com/NeonGate-AI/skills/tree/main/skills/engineering/implement
@@ -39,7 +39,7 @@ evidence:
   - pending
 ---
 
-# SPEC-007: Make Elo directly invokable and migrate executable MJS automation to shell
+# SPEC-010: Make Elo directly invokable and migrate executable MJS automation to shell
 
 ## Problem Statement
 
@@ -117,11 +117,11 @@ Secondary seams are:
 - `pnpm --filter @repo/ds build` generates the same token JSON and CSS contract;
 - existing repository validation remains green.
 
-Fixtures use `mktemp`, controlled environment variables and generated collisions. They do not contact registries, start Docker, read product data or edit user shell configuration.
+Fixtures create exclusive temporary directories with POSIX `mkdir`, use controlled environment variables and generate collisions. They do not contact registries, start Docker, read product data or edit user shell configuration.
 
 ## Acceptance Criteria
 
-- [ ] `SPEC-007` transitioned from approved `ready` to `in-progress` before executable implementation.
+- [ ] `SPEC-010` transitioned from approved `ready` to `in-progress` before executable implementation.
 - [ ] `elo setup` installs an idempotent managed launcher in the selected user-owned binary directory.
 - [ ] Setup never uses `sudo`, edits shell profiles or implicitly replaces an unmanaged `elo` command.
 - [ ] Local `pnpm install` invokes setup through `postinstall`; CI can skip it safely.
@@ -162,9 +162,11 @@ Fixtures use `mktemp`, controlled environment variables and generated collisions
 
 Implementation evidence will include the spec/ADR commits, derived issues #6, #7, #8 and #12, direct-launcher fixtures, shell syntax checks, design-token build output, the pull request and its full CI run.
 
-Durable conclusions are promoted to `cli/readme.md`, `.agents/rules/source-organization.md`, `.agents/adrs/0019-posix-elo-control-plane.md`, `package.json`, the design-system package manifest and `.github/workflows/ci.yml`.
+Durable conclusions are promoted to `cli/readme.md`, `.agents/rules/source-organization.md`, `.agents/adrs/0022-posix-elo-control-plane.md`, `package.json`, the design-system package manifest and `.github/workflows/ci.yml`.
 
 ## Further Notes
+
+The first implementation commits used `SPEC-007` and ADR 0019 while parallel approved delivery branches had already reserved `SPEC-007` through `SPEC-009` and ADRs 0019 through 0021. This record is therefore renumbered to `SPEC-010` and ADR 0022 before promotion. The legacy branch name and early commit trailers remain historical Git metadata.
 
 The owner approved this bounded change on 2026-09-03. The attached research supports a thin shell control plane while retaining pnpm/Turborepo and typed backends for non-trivial behavior. The implementation therefore removes executable `.mjs` entrypoints without turning JSON transformation into a shell application.
 

@@ -1,4 +1,4 @@
-# ADR 0019: Use a POSIX shell control plane and user-scoped Elo launcher
+# ADR 0022: Use a POSIX shell control plane and user-scoped Elo launcher
 
 ## Status
 
@@ -11,6 +11,8 @@ Amarelo already implements its repository platform CLI in POSIX shell at `cli/el
 Five invariant checkers under `.audit/` and the design-system token builder are executable `.mjs` programs. The checkers are repository platform automation and naturally belong to the shell control plane. Token generation performs non-trivial JSON traversal, reference resolution and CSS serialization, which is unsuitable for direct POSIX text processing.
 
 A direct command could be delivered as a published/global npm package, a root binary, shell-profile mutation, a symlink or a generated user launcher. Publishing creates unnecessary distribution ownership, the canonical binary already lives under `cli/`, profile mutation is intrusive, and a symlink would break the launcher's checkout-relative root discovery.
+
+Number 0022 is used because ADRs 0019 through 0021 were already reserved by parallel delivery branches when this decision was promoted.
 
 ## Decision
 

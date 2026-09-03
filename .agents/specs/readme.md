@@ -9,4 +9,4 @@ Use `template.md` for every new numbered delivery spec. Implemented delivery spe
 
 The workflow itself is defined only in `workflow.md`. Rules, context and ADRs remain separate sources of truth and should be referenced rather than copied into a spec.
 
-The next available numbered delivery spec is `SPEC-008`.
+`SPEC-007` through `SPEC-009` are reserved by active parallel delivery branches, and `SPEC-010` is reserved by the Elo CLI migration. The next available numbered delivery spec is `SPEC-011`.
