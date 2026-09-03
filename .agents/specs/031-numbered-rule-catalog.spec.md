@@ -46,6 +46,7 @@ skills:
 evidence:
   - .audit/rules.audit.sh
   - .audit/elo-scaffold.audit.sh
+  - .audit/elo-platform-core.audit.sh
   - https://github.com/NeonGate-AI/amarelo/pull/31
 ---
 
@@ -140,7 +141,7 @@ An unnumbered rule, malformed or duplicate prefix, catalog/index mismatch, stale
 
 ## Evidence and Promotion
 
-`.audit/rules.audit.sh`, exposed as `./cli/elo check rules` and included in `./cli/elo check all`, verifies the flat numbered inventory, unique and required identities, exact index parity, lifecycle wording, absence of legacy unnumbered paths, and resolution of every canonical-looking numbered rule reference across the repository. Synthetic filenames used by scaffold checks are composed from fixture-local variables rather than stored as durable-looking path literals, so `.audit/` remains within the repository-wide scan without producing false references. `.audit/elo-scaffold.audit.sh` proves that `elo rule` allocates `012`, accepts custom slugs, rejects malformed and duplicate catalogs, preserves existing targets, and leaves no partial staging state.
+`.audit/rules.audit.sh`, exposed as `./cli/elo check rules` and included in `./cli/elo check all`, verifies the flat numbered inventory, unique and required identities, exact index parity, lifecycle wording, absence of legacy unnumbered paths, and resolution of every canonical-looking numbered rule reference across the repository. Synthetic filenames used by scaffold checks are composed from fixture-local variables rather than stored as durable-looking path literals, so `.audit/` remains within the repository-wide scan without producing false references. `.audit/elo-scaffold.audit.sh` proves that `elo rule` allocates `012`, accepts custom slugs, rejects malformed and duplicate catalogs, preserves existing targets, and leaves no partial staging state. `.audit/elo-platform-core.audit.sh` initializes the expected fixture filename before invoking the public launcher, so a launcher failure reaches the normal `platform_fail` diagnostic instead of terminating under `set -u`.
 
 ADR-0026, the root harness, architecture context, the Markdown/source-organization/spec-driven rules, CLI help, CLI documentation, historical rule references, and every spec reference now publish the same numbered identity model. Pull request #31 is the stable exact-head CI, independent-review, and merge record. No temporary migration workflow or transient report remains in the repository.
 
