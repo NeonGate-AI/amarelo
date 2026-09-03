@@ -108,6 +108,8 @@ jobs:
           rules_path.write_text(rules.replace(old, new, 1), encoding='utf-8')
           PY
 
+          git rm -f .github/workflows/spec-031-reference-hardening.yml
+
           if git grep -n -E '\.agents/rules/(012-new-rule|013-custom-rule|013-duplicate|014-blocked-rule)\.rule\.md' -- .audit; then
             echo 'Synthetic fixture still exposes a canonical-looking rule reference.' >&2
             exit 1
@@ -116,7 +118,6 @@ jobs:
           /bin/sh .audit/rules.audit.sh
           /bin/sh .audit/elo-scaffold.audit.sh
 
-          git rm -f .github/workflows/spec-031-reference-hardening.yml
           git config user.name "Jonatas Sales"
           git config user.email "sykes.echo@proton.me"
           git add -A
