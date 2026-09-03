@@ -1,0 +1,93 @@
+name: SPEC-031 fixture and semantics fix
+
+on:
+  push:
+    branches:
+      - governance/spec-031-numbered-rule-catalog
+    paths:
+      - .github/workflows/spec-031-fixture-fix.yml
+
+permissions:
+  contents: write
+
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: governance/spec-031-numbered-rule-catalog
+          fetch-depth: 0
+
+      - name: Reconcile numbered fixtures and precedence language
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          python3 <<'PY'
+          from pathlib import Path
+
+          replacements = {
+              '.audit/elo-platform-core.audit.sh': [(
+                  '''for scaffold_rule in architecture code-style context-engineering import-boundaries markdown memory-nucleus package-ownership product-safety-and-privacy react-and-next source-organization spec-driven-development; do
+            : >"$scaffold_root/.agents/rules/$scaffold_rule.rule.md"
+          done'''.replace('          ', ''),
+                  '''scaffold_rule_number=1
+          for scaffold_rule in architecture code-style context-engineering import-boundaries markdown memory-nucleus package-ownership product-safety-and-privacy react-and-next source-organization spec-driven-development; do
+            scaffold_rule_prefix=$(printf '%03d' "$scaffold_rule_number")
+            : >"$scaffold_root/.agents/rules/$scaffold_rule_prefix-$scaffold_rule.rule.md"
+            scaffold_rule_number=$((scaffold_rule_number + 1))
+          done'''.replace('          ', ''),
+              )],
+              '.audit/rules.audit.sh': [(
+                  "    'Frontmatter `priority` governs precedence' \\\n",
+                  "    'never defines enforcement order or precedence' \\\n",
+              )],
+              'AGENTS.md': [(
+                  'Rule prefixes are stable catalog identities; frontmatter `priority` governs precedence.',
+                  'Rule prefixes are stable catalog identities and never imply precedence; existing rule metadata and authored policy remain authoritative.',
+              )],
+              '.agents/context/architecture/overview.md': [(
+                  'Rule numbers are stable catalog identities, not load-order or precedence values; frontmatter `priority` remains authoritative.',
+                  'Rule numbers are stable catalog identities and never imply load order or precedence; existing rule metadata and authored policy remain authoritative.',
+              )],
+              '.agents/rules/010-source-organization.rule.md': [(
+                  'Their numeric prefix is a stable catalog identity, while frontmatter `priority` controls precedence.',
+                  'Their numeric prefix is a stable catalog identity and never controls precedence.',
+              )],
+              '.agents/adrs/0026-numbered-rule-catalog.adr.md': [(
+                  'The prefix is a stable catalog identity, not enforcement precedence. Frontmatter `priority` continues to govern precedence.',
+                  'The prefix is a stable catalog identity and never defines enforcement precedence. Existing rule metadata and authored policy remain authoritative.',
+              )],
+              '.agents/specs/031-numbered-rule-catalog.spec.md': [
+                  (
+                      'Treat the prefix as durable catalog identity rather than enforcement precedence; the existing frontmatter `priority` field continues to express precedence.',
+                      'Treat the prefix as durable catalog identity that never implies enforcement precedence; existing rule metadata and authored policy remain unchanged.',
+                  ),
+                  (
+                      'Prefixes are stable catalog identities, not mutable priorities. Rule frontmatter `priority` remains the source of enforcement precedence.',
+                      'Prefixes are stable catalog identities and never define enforcement precedence; existing rule metadata and authored policy remain authoritative.',
+                  ),
+                  (
+                      'Prefixes are documented as stable identities, while frontmatter `priority` remains enforcement precedence.',
+                      'Prefixes are documented as stable identities that never imply precedence, and existing rule metadata is preserved.',
+                  ),
+              ],
+          }
+
+          for filename, pairs in replacements.items():
+              path = Path(filename)
+              content = path.read_text(encoding='utf-8')
+              for old, new in pairs:
+                  if old not in content:
+                      raise RuntimeError(f'expected text missing from {filename}: {old!r}')
+                  content = content.replace(old, new, 1)
+              path.write_text(content, encoding='utf-8')
+          PY
+
+          git rm -f .github/workflows/spec-031-fixture-fix.yml
+          git config user.name "Jonatas Sales"
+          git config user.email "sykes.echo@proton.me"
+          git add -A
+          git commit -m "fix(rules): align fixtures with numbered catalog"
+          git push origin HEAD:governance/spec-031-numbered-rule-catalog
