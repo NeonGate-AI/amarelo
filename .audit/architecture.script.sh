@@ -17,7 +17,18 @@ mkdir "$TMP_ROOT" || {
   printf 'Architecture FAIL: cannot create temporary directory\n' >&2
   exit 1
 }
-trap 'rm -rf "$TMP_ROOT"' 0 1 2 15
+audit_cleanup() {
+  rm -rf "$TMP_ROOT"
+}
+
+audit_on_signal() {
+  trap - 0 1 2 15
+  audit_cleanup
+  exit 1
+}
+
+trap audit_cleanup 0
+trap audit_on_signal 1 2 15
 
 failures=0
 workspace_count=0
@@ -41,19 +52,49 @@ package_name() {
 }
 
 export_targets() {
-  awk '
-    /^[[:space:]]*"exports":[[:space:]]*\{/ {
-      inside = 1
-      next
-    }
-    inside && /^  \},?[[:space:]]*$/ { exit }
-    inside && /^[[:space:]]*"[^"]+":[[:space:]]*"\.\// {
-      line = $0
-      sub(/^[^:]*:[[:space:]]*"/, "", line)
-      sub(/".*$/, "", line)
-      print line
-    }
-  ' "$1"
+  node - "$1" <<'NODE'
+const fs = require('node:fs')
+const manifestPath = process.argv[2]
+const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'))
+
+function visit(value) {
+  if (typeof value === 'string') {
+    process.stdout.write(value + '\n')
+    return
+  }
+  if (value !== null && typeof value === 'object') {
+    for (const nested of Object.values(value)) visit(nested)
+  }
+}
+
+visit(manifest.exports)
+NODE
+}
+
+export_target_resolves() {
+  export_target=$1
+  export_workspace_root=$2
+  export_package_file=$3
+
+  case "$export_target" in
+    ./*) ;;
+    *) return 0 ;;
+  esac
+
+  export_normalized=${export_target#./}
+  case "$export_normalized" in
+    *'*'*) export_prefix=${export_normalized%%\**} ;;
+    *) export_prefix=$export_normalized ;;
+  esac
+
+  [ -e "$export_workspace_root/$export_prefix" ] && return 0
+  case "$export_normalized" in
+    dist/*)
+      grep -Eq '^[[:space:]]*"build":[[:space:]]*"' "$export_package_file" &&
+        return 0
+      ;;
+  esac
+  return 1
 }
 
 is_source_file() {
@@ -76,6 +117,34 @@ is_allowed_workspace_config() {
       ;;
   esac
 }
+
+export_fixture_root="$TMP_ROOT/conditional-export-fixture"
+mkdir "$export_fixture_root"
+cat >"$export_fixture_root/package.json" <<'JSON'
+{
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./src/index.ts",
+        "default": "./missing/conditional.js"
+      }
+    }
+  }
+}
+JSON
+export_targets "$export_fixture_root/package.json" >"$TMP_ROOT/conditional-exports"
+if ! grep -Fx './missing/conditional.js' "$TMP_ROOT/conditional-exports" >/dev/null 2>&1 ||
+  export_target_resolves \
+    ./missing/conditional.js \
+    "$export_fixture_root" \
+    "$export_fixture_root/package.json"
+then
+  architecture_fail \
+    audit-contract \
+    .audit/architecture.script.sh \
+    "conditional export fixture was not rejected" \
+    "preserve recursive package export validation"
+fi
 
 find "$PROJECT_ROOT" \
   \( -type d \( \
@@ -166,26 +235,19 @@ while IFS= read -r package_file; do
       "code-bearing workspace has no src/" \
       "move first-party implementation under src/"
 
-  export_targets "$package_file" >"$TMP_ROOT/exports"
+  if ! export_targets "$package_file" >"$TMP_ROOT/exports"; then
+    architecture_fail \
+      package-json \
+      "$workspace_relative/package.json" \
+      "package manifest could not be parsed" \
+      "repair the package manifest"
+    : >"$TMP_ROOT/exports"
+  fi
   while IFS= read -r target; do
     [ -n "$target" ] || continue
-    normalized=${target#./}
-    case "$normalized" in
-      *'*'*) prefix=${normalized%%\**} ;;
-      *) prefix=$normalized ;;
-    esac
-
-    if [ -e "$workspace_root/$prefix" ]; then
+    if export_target_resolves "$target" "$workspace_root" "$package_file"; then
       continue
     fi
-
-    case "$normalized" in
-      dist/*)
-        if grep -Eq '^[[:space:]]*"build":[[:space:]]*"' "$package_file"; then
-          continue
-        fi
-        ;;
-    esac
 
     architecture_fail \
       package-export \

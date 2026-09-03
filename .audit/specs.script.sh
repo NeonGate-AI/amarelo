@@ -18,7 +18,18 @@ mkdir "$TMP_ROOT" || {
   printf 'Spec workflow FAIL: cannot create temporary directory\n' >&2
   exit 1
 }
-trap 'rm -rf "$TMP_ROOT"' 0 1 2 15
+audit_cleanup() {
+  rm -rf "$TMP_ROOT"
+}
+
+audit_on_signal() {
+  trap - 0 1 2 15
+  audit_cleanup
+  exit 1
+}
+
+trap audit_cleanup 0
+trap audit_on_signal 1 2 15
 
 failures=0
 delivery_count=0
