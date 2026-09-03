@@ -13,35 +13,28 @@ PROJECT_ROOT=${GITHUB_WORKSPACE:-$(
 )}
 SPEC_ROOT="$PROJECT_ROOT/.agents/specs"
 TMP_ROOT="${TMPDIR:-/tmp}/amarelo-spec-audit.$$"
+
 umask 077
 mkdir "$TMP_ROOT" || {
   printf 'Spec workflow FAIL: cannot create temporary directory\n' >&2
   exit 1
 }
-audit_cleanup() {
+
+cleanup() {
   rm -rf "$TMP_ROOT"
 }
-
-audit_on_signal() {
-  trap - 0 1 2 15
-  audit_cleanup
-  exit 1
-}
-
-trap audit_cleanup 0
-trap audit_on_signal 1 2 15
+trap cleanup 0 1 2 15
 
 failures=0
-delivery_count=0
+spec_count=0
 
 spec_fail() {
-  spec_rule=$1
-  spec_file=$2
-  spec_detail=$3
-  spec_fix=$4
+  rule=$1
+  file=$2
+  detail=$3
+  fix=$4
   failures=$((failures + 1))
-  printf '\n[%s] %s\n  %s\n  fix: %s\n' \
-    "$spec_rule" "$spec_file" "$spec_detail" "$spec_fix" >&2
+  printf '\n[%s] %s\n  %s\n  fix: %s\n' "$rule" "$file" "$detail" "$fix" >&2
 }
 
 frontmatter_scalar() {
@@ -154,16 +147,17 @@ for required_file in \
   AGENTS.md \
   .agents/rules/spec-driven-development.md \
   .agents/specs/readme.md \
-  .github/pull_request_template.md \
   .agents/specs/template.md \
-  .agents/specs/workflow.md
+  .agents/specs/workflow.md \
+  .github/pull_request_template.md
 do
-  [ -f "$PROJECT_ROOT/$required_file" ] ||
+  if [ ! -f "$PROJECT_ROOT/$required_file" ]; then
     spec_fail \
       required-workflow-file \
       "$required_file" \
       "required spec-driven workflow file is missing" \
       "restore the canonical workflow artifact"
+  fi
 done
 
 if ! grep -F '.agents/specs/workflow.md' "$PROJECT_ROOT/AGENTS.md" >/dev/null 2>&1; then
@@ -194,7 +188,7 @@ fi
 
 PR_TEMPLATE="$PROJECT_ROOT/.github/pull_request_template.md"
 if [ -f "$PR_TEMPLATE" ]; then
-  for template_heading in \
+  for heading in \
     "## Delivery contract" \
     "## Outcome" \
     "## Scope" \
@@ -209,15 +203,16 @@ if [ -f "$PR_TEMPLATE" ]; then
     "## Promotion" \
     "## Merge gate"
   do
-    if ! grep -Fx "$template_heading" "$PR_TEMPLATE" >/dev/null 2>&1; then
+    if ! grep -Fx "$heading" "$PR_TEMPLATE" >/dev/null 2>&1; then
       spec_fail \
         pr-template-section \
         .github/pull_request_template.md \
-        "required section is missing: $template_heading" \
+        "required section is missing: $heading" \
         "restore the spec-driven pull request evidence contract"
     fi
   done
-  for template_phrase in \
+
+  for phrase in \
     "Fixed merge-base SHA:" \
     "Reviewed head SHA:" \
     "CI run:" \
@@ -225,11 +220,11 @@ if [ -f "$PR_TEMPLATE" ]; then
     "conflict-free" \
     "Both independent review axes pass on the final head"
   do
-    if ! grep -F "$template_phrase" "$PR_TEMPLATE" >/dev/null 2>&1; then
+    if ! grep -F "$phrase" "$PR_TEMPLATE" >/dev/null 2>&1; then
       spec_fail \
         pr-template-gate \
         .github/pull_request_template.md \
-        "required merge evidence is missing: $template_phrase" \
+        "required merge evidence is missing: $phrase" \
         "restore the exact-head review, CI and conflict gate"
     fi
   done
@@ -249,116 +244,72 @@ $nested_dirs
 EOF
 fi
 
-catalog_priorities="$TMP_ROOT/catalog-priorities"
-: >"$catalog_priorities"
-for catalog_path in "$SPEC_ROOT"/*.md; do
-  [ -f "$catalog_path" ] || continue
-  catalog_file=${catalog_path#"$PROJECT_ROOT"/}
-  catalog_base=$(basename "$catalog_path")
-  case "$catalog_base" in
+spec_files="$TMP_ROOT/spec-files"
+priorities="$TMP_ROOT/priorities"
+ids="$TMP_ROOT/ids"
+numbers="$TMP_ROOT/numbers"
+: >"$spec_files"
+: >"$priorities"
+: >"$ids"
+: >"$numbers"
+
+for path in "$SPEC_ROOT"/*.md; do
+  [ -f "$path" ] || continue
+  base=$(basename "$path")
+  case "$base" in
     readme.md|template.md|workflow.md) continue ;;
   esac
-  if ! printf '%s\n' "$catalog_base" |
-    grep -Eq '^[0-9][0-9][0-9]-[a-z0-9]+(-[a-z0-9]+)*\.md$'
+
+  file=${path#"$PROJECT_ROOT"/}
+  if ! printf '%s\n' "$base" |
+    grep -Eq '^0[0-9][0-9]-[a-z0-9]+(-[a-z0-9]+)*\.md$'
   then
     spec_fail \
       catalog-filename \
-      "$catalog_file" \
-      "spec filename must use a three-digit priority and lowercase kebab-case slug" \
-      "rename the file to NNN-lowercase-slug.md"
+      "$file" \
+      "every numbered spec must use priority 001-099 and lowercase kebab-case" \
+      "rename the file to 0NN-lowercase-slug.md"
     continue
   fi
-  priority=$(printf '%s\n' "$catalog_base" | cut -c 1-3)
-  if grep -Fx "$priority" "$catalog_priorities" >/dev/null 2>&1; then
+
+  priority=$(printf '%s\n' "$base" | cut -c 1-3)
+  case "$priority" in
+    000)
+      spec_fail \
+        priority-band \
+        "$file" \
+        "priority 000 is reserved and cannot identify a spec" \
+        "choose a unique priority from 001 through 099"
+      continue
+      ;;
+  esac
+
+  if grep -Fx "$priority" "$priorities" >/dev/null 2>&1; then
     spec_fail \
       duplicate-priority \
-      "$catalog_file" \
+      "$file" \
       "priority $priority is already assigned" \
       "assign one unique catalog priority"
   else
-    printf '%s\n' "$priority" >>"$catalog_priorities"
+    printf '%s\n' "$priority" >>"$priorities"
   fi
-  case "$priority" in
-    00[1-9]|0[1-9][0-9]|10[1-9]|1[1-9][0-9]) ;;
-    *)
-      spec_fail \
-        priority-band \
-        "$catalog_file" \
-        "priority must be in delivery band 001-099 or behavior band 101-199" \
-        "choose a priority from the documented catalog bands"
-      ;;
-  esac
+  printf '%s\n' "$path" >>"$spec_files"
 done
 
-reference_scan="$TMP_ROOT/reference-files"
-find "$PROJECT_ROOT" \
-  \( -path "$PROJECT_ROOT/.git" -o \
-     -path "$PROJECT_ROOT/node_modules" -o \
-     -path '*/node_modules' -o \
-     -path '*/dist' -o \
-     -path '*/.turbo' \) -prune -o \
-  -type f \( -name '*.md' -o -name '*.sh' -o -name '*.yml' -o -name '*.yaml' \) -print |
-  sort >"$reference_scan"
-
-while IFS= read -r reference_file; do
-  [ -n "$reference_file" ] || continue
-  if grep -Eq '\.agents/specs/(ai|console|harness|history|landing|mobile|onboarding|product)/' "$reference_file"; then
-    spec_fail \
-      stale-spec-reference \
-      "${reference_file#"$PROJECT_ROOT"/}" \
-      "reference points into a removed spec subdirectory" \
-      "replace it with the canonical flat priority path"
-  fi
-done <"$reference_scan"
-
-index_targets="$TMP_ROOT/index-targets"
-sed -n 's/.*](\([^)]*\.md\)).*/\1/p' "$SPEC_ROOT/readme.md" >"$index_targets"
-while IFS= read -r index_target; do
-  [ -n "$index_target" ] || continue
-  case "$index_target" in
-    http://*|https://*) continue ;;
-  esac
-  if [ ! -f "$SPEC_ROOT/$index_target" ]; then
-    spec_fail \
-      spec-index-reference \
-      .agents/specs/readme.md \
-      "catalog link $index_target does not resolve" \
-      "point the index at an existing flat spec file"
-  fi
-done <"$index_targets"
-
-delivery_list="$TMP_ROOT/delivery-files"
-find "$SPEC_ROOT" -maxdepth 1 -type f \
-  -name '0[0-9][0-9]-*.md' -print |
-  sort >"$delivery_list"
-
-delivery_count=$(awk 'END { print NR + 0 }' "$delivery_list")
-if [ "$delivery_count" -eq 0 ]; then
+spec_count=$(awk 'END { print NR + 0 }' "$spec_files")
+if [ "$spec_count" -eq 0 ]; then
   spec_fail \
-    delivery-spec-presence \
+    spec-presence \
     .agents/specs \
-    "no numbered delivery specs were found" \
+    "no numbered specs were found" \
     "create a SPEC-### document from the canonical template"
 fi
-
-ids_file="$TMP_ROOT/ids"
-numbers_file="$TMP_ROOT/numbers"
-: >"$ids_file"
-: >"$numbers_file"
 
 while IFS= read -r path; do
   [ -n "$path" ] || continue
   file=${path#"$PROJECT_ROOT"/}
-  base_name=$(basename "$path")
-  if ! printf '%s\n' "$base_name" |
-    grep -Eq '^0[0-9][0-9]-[a-z0-9]+(-[a-z0-9]+)*\.md$'
-  then
-    spec_fail \
-      spec-filename \
-      "$file" \
-      "delivery spec filename must use a three-digit priority and lowercase kebab-case slug" \
-      "rename the file to NNN-lowercase-slug.md"
-  fi
+  base=$(basename "$path")
+
   problem=$(frontmatter_problem "$path")
   if [ -n "$problem" ]; then
     spec_fail \
@@ -376,7 +327,7 @@ while IFS= read -r path; do
         required-metadata \
         "$file" \
         "$key must be a non-empty scalar" \
-        "complete the canonical delivery-spec frontmatter"
+        "complete the canonical numbered-spec frontmatter"
     fi
   done
 
@@ -387,7 +338,7 @@ while IFS= read -r path; do
         required-list-metadata \
         "$file" \
         "$key must contain at least one item" \
-        "complete the canonical delivery-spec frontmatter"
+        "complete the canonical numbered-spec frontmatter"
     fi
   done
 
@@ -402,21 +353,19 @@ while IFS= read -r path; do
       "$file" \
       "frontmatter id ${spec_id:-<missing>} is not a durable SPEC-### identifier" \
       "assign a unique durable SPEC-### ID independently from filename priority"
+  else
+    if awk -F '|' -v wanted="$spec_id" '$1 == wanted { found = 1 } END { exit(found ? 0 : 1) }' "$ids"; then
+      first_file=$(awk -F '|' -v wanted="$spec_id" '$1 == wanted { print $2; exit }' "$ids")
+      spec_fail \
+        duplicate-spec-id \
+        "$file" \
+        "$spec_id is already used by $first_file" \
+        "assign the next unused sequential durable ID"
+    else
+      printf '%s|%s\n' "$spec_id" "$file" >>"$ids"
+    fi
+    printf '%s\n' "$spec_id" | sed -n 's/^SPEC-\([0-9][0-9][0-9]\)$/\1/p' >>"$numbers"
   fi
-
-  if grep -F "${spec_id}	" "$ids_file" >/dev/null 2>&1; then
-    first_file=$(awk -F '	' -v id="$spec_id" '$1 == id { print $2; exit }' "$ids_file")
-    spec_fail \
-      duplicate-spec-id \
-      "$file" \
-      "$spec_id is already used by $first_file" \
-      "assign the next unused sequential delivery ID"
-  elif [ -n "$spec_id" ]; then
-    printf '%s\t%s\n' "$spec_id" "$file" >>"$ids_file"
-  fi
-
-  spec_number=$(printf '%s\n' "$spec_id" | sed -n 's/^SPEC-\([0-9][0-9][0-9]\)$/\1/p')
-  [ -n "$spec_number" ] && printf '%s\n' "$spec_number" >>"$numbers_file"
 
   case "$spec_type" in
     chore|experiment|feature|fix|governance|migration|refactor) ;;
@@ -459,7 +408,6 @@ while IFS= read -r path; do
         "retrospective specs must record implemented pre-workflow work" \
         "set status to implemented or use prospective mode"
     fi
-
     integrity=$(section_text "$path" "Retrospective Integrity")
     integrity_length=$(printf '%s' "$integrity" | wc -c | tr -d '[:space:]')
     if [ "${integrity_length:-0}" -lt 80 ]; then
@@ -473,23 +421,19 @@ while IFS= read -r path; do
 
   if [ "$spec_status" = implemented ]; then
     acceptance=$(section_text "$path" "Acceptance Criteria")
-    if ! printf '%s\n' "$acceptance" |
-      grep -Eq '^- \[[xX]\][[:space:]]+'
-    then
+    if ! printf '%s\n' "$acceptance" | grep -Eq '^- \[[xX]\][[:space:]]+'; then
       spec_fail \
         implemented-acceptance \
         "$file" \
         "implemented spec has no checked acceptance criteria" \
         "record evidenced completion with checked criteria"
     fi
-    if printf '%s\n' "$acceptance" |
-      grep -Eq '^- \[ \][[:space:]]+'
-    then
+    if printf '%s\n' "$acceptance" | grep -Eq '^- \[ \][[:space:]]+'; then
       spec_fail \
         implemented-acceptance \
         "$file" \
         "implemented spec still contains unchecked acceptance criteria" \
-        "finish, supersede or explicitly remove unmet scope before closure"
+        "finish, supersede or remove unmet scope before closure"
     fi
     if frontmatter_list_contains "$path" evidence pending; then
       spec_fail \
@@ -520,7 +464,7 @@ while IFS= read -r path; do
         required-section \
         "$file" \
         "missing or empty section: $heading" \
-        "complete the canonical delivery-spec body"
+        "complete the canonical numbered-spec body"
     fi
   done
 
@@ -535,17 +479,69 @@ while IFS= read -r path; do
         "align the H1 with the durable spec ID"
       ;;
   esac
-done <"$delivery_list"
 
-if [ -s "$numbers_file" ]; then
-  max_id=$(sort -n "$numbers_file" | tail -n 1)
+  if ! grep -F "($base)" "$SPEC_ROOT/readme.md" >/dev/null 2>&1; then
+    spec_fail \
+      missing-index-entry \
+      "$file" \
+      "numbered spec is not linked from the catalog" \
+      "add the exact filename to .agents/specs/readme.md"
+  fi
+done <"$spec_files"
+
+index_targets="$TMP_ROOT/index-targets"
+sed -n 's/.*](\([^)]*\.md\)).*/\1/p' "$SPEC_ROOT/readme.md" >"$index_targets"
+while IFS= read -r target; do
+  [ -n "$target" ] || continue
+  case "$target" in
+    http://*|https://*) continue ;;
+  esac
+  if [ ! -f "$SPEC_ROOT/$target" ]; then
+    spec_fail \
+      spec-index-reference \
+      .agents/specs/readme.md \
+      "catalog link $target does not resolve" \
+      "point the index at an existing flat numbered spec"
+  fi
+done <"$index_targets"
+
+reference_scan="$TMP_ROOT/reference-files"
+find "$PROJECT_ROOT" \
+  \( -path "$PROJECT_ROOT/.git" -o \
+     -path "$PROJECT_ROOT/node_modules" -o \
+     -path '*/node_modules' -o \
+     -path '*/dist' -o \
+     -path '*/.turbo' \) -prune -o \
+  -type f \( -name '*.md' -o -name '*.sh' -o -name '*.yml' -o -name '*.yaml' \) -print |
+  sort >"$reference_scan"
+
+while IFS= read -r reference_file; do
+  [ -n "$reference_file" ] || continue
+  if grep -Eq '\.agents/specs/(ai|console|harness|history|landing|mobile|onboarding|product)/' "$reference_file"; then
+    spec_fail \
+      stale-spec-reference \
+      "${reference_file#"$PROJECT_ROOT"/}" \
+      "reference points into a removed spec subdirectory" \
+      "replace it with the canonical flat priority path"
+  fi
+  if grep -Eq '\.agents/specs/10[1-7]-' "$reference_file"; then
+    spec_fail \
+      legacy-spec-reference \
+      "${reference_file#"$PROJECT_ROOT"/}" \
+      "reference points to a retired legacy-priority spec" \
+      "replace it with the migrated priority 001-007 path"
+  fi
+done <"$reference_scan"
+
+if [ -s "$numbers" ]; then
+  max_id=$(sort -n "$numbers" | tail -n 1)
   next_id=$(awk -v value="$max_id" 'BEGIN { printf "SPEC-%03d", value + 1 }')
   if ! grep -F "$next_id" "$SPEC_ROOT/readme.md" >/dev/null 2>&1; then
     spec_fail \
       next-spec-id \
       .agents/specs/readme.md \
-      "the next available delivery ID should be $next_id" \
-      "update the spec index after adding or retiring an ID"
+      "the next available durable ID should be $next_id" \
+      "update the catalog after adding or retiring an ID"
   fi
 fi
 
@@ -554,4 +550,4 @@ if [ "$failures" -gt 0 ]; then
   exit 1
 fi
 
-printf 'Spec workflow PASS - %s delivery specs\n' "$delivery_count"
+printf 'Spec workflow PASS - %s numbered specs\n' "$spec_count"

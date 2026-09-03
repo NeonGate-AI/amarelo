@@ -22,7 +22,7 @@ Use this workflow for the installable `apps/mobile` React/Vite surface. It narro
 This skill is implementation guidance, not product authority. Before changing behavior, read:
 
 1. `AGENTS.md`;
-2. `.agents/specs/103-mobile-voice-experience.md`;
+2. `.agents/specs/003-mobile-voice-experience.md`;
 3. `.agents/decisions/0006-mobile-react-vite-pwa.md`;
 4. `.agents/rules/react-and-next.md`;
 5. the current `apps/mobile` source and configuration.
