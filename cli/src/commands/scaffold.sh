@@ -65,8 +65,7 @@ elo_scaffold_next_rule_prefix() {
   for elo_scaffold_path in "$ELO_PROJECT_ROOT"/.agents/rules/*.rule.md; do
     [ -f "$elo_scaffold_path" ] || continue
     elo_scaffold_base=${elo_scaffold_path##*/}
-    if ! printf '%s
-' "$elo_scaffold_base" |
+    if ! printf '%s\n' "$elo_scaffold_base" |
       grep -Eq '^[0-9][0-9][0-9]-[a-z0-9]+(-[a-z0-9]+)*\.rule\.md$'
     then
       elo_die "Cannot allocate after malformed rule filename: $(elo_rel "$elo_scaffold_path")."
@@ -84,8 +83,7 @@ elo_scaffold_next_rule_prefix() {
 
   elo_scaffold_next=$((elo_scaffold_rule_max + 1))
   [ "$elo_scaffold_next" -le 999 ] || elo_die "Three-digit rule numbering is exhausted."
-  printf '%03d
-' "$elo_scaffold_next"
+  printf '%03d\n' "$elo_scaffold_next"
 }
 
 elo_scaffold_next_spec_id() {
