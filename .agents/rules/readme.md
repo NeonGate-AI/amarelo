@@ -1,7 +1,7 @@
 ---
 version: 3
 name: Rules Index
-description: Stable identities, catalog, precedence, and lifecycle of durable repository rules.
+description: Stable identities, catalog, and lifecycle of durable repository rules.
 alwaysApply: true
 priority: high
 tags:
@@ -13,7 +13,7 @@ tags:
 
 Rules are durable constraints that implementations and engineering agents must obey. Every canonical rule is a direct child named `NNN-lowercase-kebab-case.rule.md`; this `readme.md` is the only unnumbered support document in the boundary.
 
-The three-digit prefix is a stable catalog identity, not enforcement order. Frontmatter `priority` governs precedence. Existing identities are never reassigned, compacted, or reused after retirement. A new rule receives one greater than the highest allocated identity and must update this index, exact references, and executable checks in the same change.
+The three-digit prefix is a stable catalog identity and never defines enforcement order or precedence. Existing rule metadata and authored policy remain authoritative. Existing identities are never reassigned, compacted, or reused after retirement. A new rule receives one greater than the highest allocated identity and must update this index, exact references, and executable checks in the same change.
 
 Prefer small rules with one clear concern. When a rule can be checked mechanically, the repository harness should enforce it. Do not store temporary task instructions here. Complex architectural changes must consider an ADR, spec, contract, and mechanical invariant in the same cycle.
 
