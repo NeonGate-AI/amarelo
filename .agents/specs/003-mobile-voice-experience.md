@@ -1,162 +1,209 @@
 ---
-id: SPEC-MOBILE-VOICE-001
-title: Mobile PWA voice-state mock
-status: approved-current-direction
-owner: product-owner
-last-reviewed: 2026-08-27
-related-decisions:
-  - ADR-0001
-  - ADR-0005
-  - ADR-0006
+id: SPEC-021
+title: Preserve the Mobile PWA voice-state experience
+type: feature
+status: implemented
+mode: retrospective
+created: 2026-08-27
+updated: 2026-09-03
+owners:
+  - Jonatas Sales
+targets:
+  - workspaces/apps/mobile
+  - workspaces/packages/react/src/ui/agent-orb
+  - Mobile PWA voice-state presentation
+context:
+  - .agents/context/workflows/mobile.md
+  - .agents/context/product/overview.md
+rules:
+  - .agents/rules/product-safety-and-privacy.md
+  - .agents/rules/react-and-next.md
+adrs:
+  - .agents/adrs/0001-shared-longitudinal-memory.md
+  - .agents/adrs/0005-orbz-web-component.md
+  - .agents/adrs/0006-mobile-react-vite-pwa.md
+skills:
+  - .agents/skills/spec-driven-development/SKILL.md
+  - .agents/skills/pwa-development/SKILL.md
+  - .agents/skills/accessibility/SKILL.md
+  - .agents/skills/code-review/SKILL.md
+evidence:
+  - workspaces/apps/mobile deterministic Jotai state and one-screen PWA implementation
+  - workspaces/packages/react AgentOrb and ScrollRevealParagraph public boundaries
+  - Mobile typecheck, build, generated manifest and service-worker validation in repository CI
 ---
 
-# SPEC-MOBILE-VOICE-001: Mobile PWA voice-state mock
+# SPEC-021: Preserve the Mobile PWA voice-state experience
 
-## Purpose and boundary
+## Problem Statement
 
-Provide an installable, portrait-first React PWA that reproduces the approved Ana mockups and demonstrates deterministic component-state changes while remaining fully usable in landscape. This slice is presentation only. It does not capture microphone input, play audio, synthesize speech, transcribe, call an API or MCP server, invoke a product agent, read or write longitudinal memory, authenticate, upload, or synchronize anything.
+Amarelo needs an installable portrait-first PWA that communicates the approved Ana voice experience before real microphone, speech, model and Memory infrastructure are connected. The interface must remain truthful: visual speaking/listening states are deterministic presentation fixtures and cannot imply that real audio, transcription, API, agent or memory behavior already exists. The legacy contract contained the required detail but used an obsolete spec format and stale harness paths.
 
-The canonical product and privacy boundaries remain in `.agents/PRODUCT.md`, `.agents/MEMORY.md`, and `.agents/rules/product-safety-and-privacy.md`. ADR-0006 owns the framework decision; ADR-0005 owns the Orbz integration contract.
+## Solution
 
-## Experience layout
+Preserve the implemented one-screen React/Vite PWA and its deterministic state model. The default experience renders Ana through Orbz, presents synthetic captions and maps local controls to `speaking`, `listening`, `muted` and `ended` states. It remains usable in portrait and landscape, installable as a PWA and accessible under WCAG 2.2 Level AA while making no production voice or AI claim.
 
-Render a real full-viewport application, not the phone hardware shown around the references. Do not reproduce the iPhone frame, notch, status bar, camera, or side buttons.
+## User Stories
 
-The active surface contains, from top to bottom:
+1. As a participant, I want a calm installable mobile surface that visibly distinguishes when Ana is speaking, listening, muted or ended, so that the intended interaction model is understandable.
+2. As a keyboard, screen-reader or reduced-motion user, I want every state and complete utterance available without relying on animation or color, so that the mock remains operable and understandable.
+3. As a reviewer, I want the local demo to state its boundaries truthfully, so that synthetic captions and Orb animation cannot be mistaken for real audio, model output or stored conversation history.
+4. As a maintainer, I want one atomic Jotai state model and one PWA shell, so that controls cannot create contradictory mute, volume, phase or lifecycle state.
 
-1. theme control at the top-left and end control at the top-right;
-2. centered `Ana` heading and state label;
-3. one central conversation group containing a large Ana Elo rendered by Orbz and its transcript directly below it;
-4. a bottom control dock with microphone, volume range, and speaker controls.
+## Scope
 
-The Orb and transcript must share one layout group with an explicit, stable gap. Free viewport height may be distributed around that group, but it must not create an expanding row between the Orb and transcript. Use `100dvh`, `viewport-fit=cover`, and `env(safe-area-inset-*)`. Keep the content calm and balanced on narrow devices. On wider screens, center the experience in a constrained column without drawing a fake device shell. The approved light and dark themes use the existing design tokens and Satoshi typography.
+### Purpose and boundary
 
-Vertically center the `Ana` heading and current status in the region between the top safe-area content edge and the top of the Orb stage. The corner controls remain anchored at the start of that same region and must not push the identity/status block upward. The light canvas uses the approved `#F9F8F2` ivory foundation with a subtle `yellow-50` gradient; it must read as gently warm rather than white, gray, or saturated yellow.
+The PWA is a presentation-only slice. It does not capture microphone input, play or synthesize speech, transcribe, call a product API or MCP server, invoke Ana as a model-backed agent, read or write longitudinal memory, authenticate, upload or synchronize data.
 
-## Canonical experience states
+### Experience layout
+
+- Render a real full-viewport application rather than a phone hardware frame. Do not reproduce an iPhone frame, notch, status bar, camera or side buttons.
+- The active surface contains top-left theme control, top-right end control, centered `Ana` identity and state label, one central Orb/transcript group and a bottom dock with microphone, volume range and speaker controls.
+- Orb and transcript share one layout group with an explicit stable gap; free height may surround the group but may not create an expanding row between them.
+- Use `100dvh`, `viewport-fit=cover` and safe-area insets.
+- Center identity/status in the region between the top safe-area edge and Orb stage while corner controls remain independently anchored.
+- The light canvas uses the approved `#F9F8F2` ivory foundation with a subtle `yellow-50` gradient and must read as warm rather than white, gray or saturated yellow.
+- Wider screens use a constrained centered column without drawing a fake device shell. Both themes use existing tokens and Satoshi typography.
+
+### Canonical experience states
 
 | Experience state | Status | Transcript presentation | Orbz state | Control presentation |
 |---|---|---|---|---|
-| `speaking` | `Ana está falando` | Five ordered synthetic local utterances rendered with `ScrollRevealParagraph` | `speaking` | Default state; output volume above zero |
-| `listening` | `Ana está ouvindo você` | One complete synthetic listening prompt | `listening` | Mock conversation audio was restored after mute/zero volume |
-| `muted` | `Conversa silenciada` | One complete synthetic muted-state explanation without implying real audio | `idle` | Mock conversation audio is muted or volume is zero |
-| `ended` | `Conversa encerrada` | A short synthetic explanation that the local demonstration ended | No active Orb | Replace the active surface with a calm local end state and a `Reiniciar demonstração` action |
+| `speaking` | `Ana está falando` | Five ordered synthetic local utterances through `ScrollRevealParagraph` | `speaking` | Default state; output volume above zero |
+| `listening` | `Ana está ouvindo você` | One complete synthetic listening prompt | `listening` | Mock conversation audio restored after mute/zero volume |
+| `muted` | `Conversa silenciada` | One complete synthetic explanation without implying real audio | `idle` | Mock audio muted or volume zero |
+| `ended` | `Conversa encerrada` | Short synthetic local-end explanation | no active Orb | Calm end state with `Reiniciar demonstração` |
 
-The default app boot always initializes the local demonstration in `speaking`, clears the mute presentation, and restores `lastAudibleVolumeAtom`. This is a deliberate mock reset, even when the previous session persisted volume zero. An explicit `?state=` preview overrides that default. The five utterances are fixed local fixtures shown in a deterministic order. They are not recordings, microphone input, generated output, or durable conversation history. No transcript in this slice proves real audio or transcription.
+Default boot initializes `speaking`, clears mute presentation and restores `lastAudibleVolumeAtom`. A valid `?state=` preview may override it. The five speaking utterances are fixed local fixtures in deterministic order and are not recordings, generated output, transcription or durable history.
 
-Zeroing the volume or activating either audio icon control produces one coherent local muted presentation: both icon controls appear muted, volume becomes zero, and Orbz becomes `idle`. Restoring audio through either icon control restores the last audible volume, clears both mute presentations, and transitions the local phase to `listening`. These controls are deterministic UI fixtures; they do not simulate microphone capture or real audio routing.
-
-## Orbz contract
+### Orbz contract
 
 - Use `@neongate-ai/orbz` exactly at `0.3.1` through the shared `AgentOrb` exported by `@repo/react`.
 - Ana uses the supported `peach` preset.
-- Default to Orbz `speaking`. Map restored audible output to Orbz `listening`, zero or muted output to Orbz `idle`, and the ended state to no active Orb.
-- The ended state contains no active Orb.
-- Do not configure `voiceEngine`, call `startTalking()`, add a fake speech engine, import a removed React adapter, pass `className` to `<orb-z>`, or recreate a custom-palette API.
-- Orbz animation state is visual only. It never implies audible output.
+- Map audible restored output to `listening`, speaking phase to `speaking`, muted/zero volume to `idle`, and ended to no Orb.
+- Do not configure `voiceEngine`, call `startTalking()`, add a fake speech engine, import a removed React adapter, pass `className` to `<orb-z>` or recreate a custom-palette API.
+- Orbz animation is visual only and never proves audible output.
 
-## Controls
+### Controls and transcript
 
-- Use the existing SmoothUI `SmoothButton` from `@repo/react` for icon buttons. Use the existing Phosphor icon dependency rather than adding another icon library.
-- Theme toggles between the approved light and dark presentations without changing the conversation phase or audio-control state. First load may resolve the system preference; an explicit choice becomes the persisted preference.
-- The microphone and speaker icon controls both toggle the same coherent mock-audio presentation. Muting through either control sets `microphoneMuted`, sets volume to `0`, presents both controls as muted, and yields Orbz `idle`.
-- The visible native range control sets volume from `0` through `100`. Setting it to `0` synchronizes the muted presentation and yields Orbz `idle`; restoring it above `0` updates the last audible value, clears both mute presentations, and yields `listening`.
-- Restoring through either icon control clears `microphoneMuted`, restores `lastAudibleVolumeAtom`, and yields `listening`.
-- The X ends only this local demonstration. It must not attempt to close the browser, dismiss an OS surface, call a backend, claim that a conversation was saved, or show a confirmation dialog.
-- Restart returns to the default `speaking` state, unmutes the microphone, and restores the last audible volume while retaining the theme preference.
-- WCAG 2.2 Level AA is normative. WCAG 2.5.8 permits a 24 by 24 CSS-pixel minimum with defined exceptions; Amarelo targets at least 44 by 44 CSS pixels for practical controls whenever an exception does not apply.
+- Use the existing SmoothUI `SmoothButton` and Phosphor icons rather than adding another UI or icon library.
+- Theme changes presentation without mutating conversation phase or audio-control state. System preference may initialize the first load; an explicit choice may persist.
+- Microphone and speaker controls toggle one coherent mock-audio state. Muting either sets `microphoneMuted`, sets volume to zero, presents both controls as muted and yields Orbz `idle`.
+- The native visible range accepts integer `0..100`. Zero synchronizes mute and `idle`; a nonzero restoration updates `lastAudibleVolumeAtom`, clears mute and yields `listening`.
+- The X ends only the local demonstration. It never closes the browser, dismisses an OS surface, calls a backend, claims persistence or opens a confirmation dialog.
+- Restart returns to `speaking`, clears microphone mute, restores last audible volume and retains theme preference.
+- Controls target at least 44 by 44 CSS pixels whenever no WCAG exception applies.
+- Keep exactly five synthetic speaking utterances in deterministic order. Complete text remains in the DOM and is exposed as one programmatically available value with `aria-live="polite"` and `aria-atomic="true"`.
+- Reduced motion shows stable complete text without delayed, removed or reordered utterances.
+- Do not use ellipsis as the accessible replacement and do not add a text field, keyboard conversation path or transcript-history surface.
 
-## Transcript behavior
+### Atomic state model
 
-- Define exactly five synthetic local utterances in a deterministic order without making their literal copy part of this architectural contract.
-- Render the ordered fixtures through `@repo/react/ui/scroll-reveal-paragraph`, implemented at `workspaces/packages/react/src/vendors/smoothui/scroll-reveal-paragraph/scroll-reveal-paragraph.tsx`.
-- The reveal and final-line fade are decorative presentation only. Keep the five complete fixtures in deterministic source order. For each displayed utterance, keep its complete text in the DOM and expose it as one programmatically available value with `aria-live="polite"` and `aria-atomic="true"`.
-- Under `prefers-reduced-motion: reduce`, show the stable transcript presentation without reveal animation; reduced motion must not delay, remove, or reorder any utterance.
-- Do not use ellipsis as the accessible replacement and do not create a text field, keyboard input, transcript history, or second written-conversation path.
+Jotai is the only shared application-state mechanism. Component-local visual details remain local; React Context, Redux, Zustand or a second global store are not introduced.
 
-## Atomic state model
-
-Jotai is the only shared application-state mechanism for this PWA. Keep component-local visual details local; do not add React Context, Redux, Zustand, or a second global store.
-
-### Source atoms
+Source atoms:
 
 | Atom | Type or domain | Persistence |
 |---|---|---|
-| `themePreferenceAtom` | `system | light | dark` | Allowed |
-| `systemThemeAtom` | `light | dark` from `matchMedia` | Ephemeral |
-| `volumeAtom` | integer `0..100` | Allowed |
-| `lastAudibleVolumeAtom` | integer `1..100` | Allowed |
-| `microphoneMutedAtom` | boolean | Ephemeral |
-| `conversationPhaseAtom` | `listening | speaking | ended`, initially `speaking` | Ephemeral |
-| `captionIndexAtom` | integer index into the five speaking fixtures | Ephemeral |
-| `onlineAtom` | browser online signal | Ephemeral |
-| `standaloneAtom` | installed-display signal | Ephemeral |
-| `pwaOfflineReadyAtom` | service-worker readiness signal | Ephemeral |
-| `pwaUpdateAvailableAtom` | service-worker update signal | Ephemeral |
+| `themePreferenceAtom` | `system | light | dark` | allowed |
+| `systemThemeAtom` | `light | dark` from `matchMedia` | ephemeral |
+| `volumeAtom` | integer `0..100` | allowed |
+| `lastAudibleVolumeAtom` | integer `1..100` | allowed |
+| `microphoneMutedAtom` | boolean | ephemeral |
+| `conversationPhaseAtom` | `listening | speaking | ended`, initially `speaking` | ephemeral |
+| `captionIndexAtom` | index into five speaking fixtures | ephemeral |
+| `onlineAtom` | browser online hint | ephemeral |
+| `standaloneAtom` | installed-display signal | ephemeral |
+| `pwaOfflineReadyAtom` | service-worker readiness | ephemeral |
+| `pwaUpdateAvailableAtom` | service-worker update signal | ephemeral |
 
-`navigator.onLine` is only a browser connectivity hint; the UI must not claim that an external service is reachable. The current slice has no external service.
+`navigator.onLine` remains only a browser hint and cannot prove an external service is reachable.
 
-### Derived atoms
+Derived atoms:
 
 | Atom | Rule |
 |---|---|
-| `resolvedThemeAtom` | explicit preference, otherwise current system theme |
+| `resolvedThemeAtom` | explicit preference, otherwise system theme |
 | `speakerMutedAtom` | `volume === 0` |
 | `sessionOpenAtom` | `conversationPhase !== ended` |
-| `experienceStateAtom` | `ended` wins; then `muted` when either mute presentation is active or volume is zero; otherwise the current phase |
-| `statusLabelAtom` | exact PT-BR status for the derived experience state |
-| `captionAtom` | current complete synthetic utterance for the derived experience state |
-| `orbStateAtom` | `listening`, `speaking`, `idle`, or absent according to the state table |
+| `experienceStateAtom` | ended wins; then muted when mute presentation is active or volume is zero; otherwise current phase |
+| `statusLabelAtom` | exact PT-BR status for derived state |
+| `captionAtom` | complete fixture for derived state |
+| `orbStateAtom` | `listening`, `speaking`, `idle` or absent according to the state table |
 
-Do not store a separate `muted` or `sessionOpen` source atom. They are derived facts, and duplicating them would permit contradictory states.
+Do not store separate `muted` or `sessionOpen` source atoms. Write-only actions own theme toggle, coherent mock-audio toggle, clamped volume change, fixture advance, end, restart, preview initialization and PWA lifecycle events. Every nonzero volume updates `lastAudibleVolumeAtom`; zero-to-audible restoration clears mute and sets `listening`. The same preview action initializes the default store before the first React paint. Supported deterministic previews are `?state=listening`, `speaking`, `muted` and `ended`.
 
-### Action atoms
+### PWA delivery boundary
 
-Implement write-only actions for theme toggle, coherent mock-audio toggle, volume change, speaking-fixture advance, conversation end, demonstration restart, preview initialization, and PWA lifecycle events. Clamp volume input. Whenever a non-zero volume is selected, update `lastAudibleVolumeAtom`. A transition from zero to an audible volume also clears the muted presentation and sets the local phase to `listening`. Restart sets the default phase to `speaking` and resets the fixture index.
+- Use React, TypeScript, Vite, Tailwind CSS, Jotai and `vite-plugin-pwa`; do not use Next.js, Expo Web, React Native Web, Capacitor or a router for this one-screen slice.
+- Provide a PT-BR manifest with `display: standalone`, no orientation lock, correct scope/start URL, `#F9F8F2` initial background/theme metadata, 192 and 512 icons, maskable icon and Apple touch icon under `icons/`.
+- Generate Workbox service worker through `vite-plugin-pwa` with prompt-based updates; never silently reload an active surface.
+- Precache only public shell, fonts, icons and versioned static visual assets. Add no runtime caching for APIs, audio, runtime captions, conversation data, memory or user-generated content.
+- Do not add push, background sync, share targets, file/protocol handlers, install analytics, external telemetry or a custom install prompt.
+- Detect standalone display with `matchMedia('(display-mode: standalone)')` and the iOS standalone property rather than depending on `beforeinstallprompt`.
+- The precached static shell may open offline but must not simulate a working voice or AI service.
 
-Initialize the default store with the same write-only preview action using `speaking`, so the first React paint already has the canonical state and restored audible volume. Support deterministic overrides with `?state=listening`, `?state=speaking`, `?state=muted`, and `?state=ended`. These parameters set local atoms only; they do not represent navigation or an external protocol.
+### Motion and accessibility
 
-## PWA delivery boundary
+Meet WCAG 2.2 Level AA with semantic HTML, logical focus, visible focus, contrast, reflow, orientation support and state communicated by text/accessibility properties rather than color or animation alone. Clean up browser, media-query and service-worker listeners.
 
-- Use React, TypeScript, Vite, Tailwind CSS, Jotai, and `vite-plugin-pwa`; do not use Next.js, Expo Web, React Native Web, Capacitor, or a router for this one-screen slice.
-- Provide a PT-BR manifest with `display: standalone`, no orientation lock, correct scope/start URL for the deployed app, `#F9F8F2` initial background/theme metadata, a 192-pixel icon, a 512-pixel icon, a maskable icon, and an Apple touch icon under `icons/`.
-- Generate the service worker with Workbox through `vite-plugin-pwa` and use a prompt-based update flow. Do not silently reload an active surface.
-- Precache only the public HTML/CSS/JavaScript shell, fonts, icons, and versioned static visual assets produced by the build.
-- Do not add runtime caching for APIs, audio, transcripts, captions produced at runtime, conversation data, memory, or user-generated content.
-- Do not add push notifications, background sync, share targets, file handlers, protocol handlers, install analytics, external telemetry, or a custom install prompt.
-- Detect standalone display with `matchMedia('(display-mode: standalone)')` and the iOS standalone property. Do not depend on `beforeinstallprompt`, which is not a universal installation mechanism.
-- The static mock must still open from its precached shell while offline. Offline operation does not simulate a working voice or AI service.
+## Implementation Decisions
 
-## Motion and accessibility
+- The product remains voice-first; the text shown here is synthetic presentation, not a second conversation transport.
+- One derived state model prevents contradictory phase, mute and volume values.
+- The mock is deterministic and locally resettable.
+- PWA caching excludes sensitive or runtime-generated data.
+- Accessibility and reduced motion are normative, not optional polish.
+- The current presentation does not claim production microphone, speech, model, persistence or memory behavior.
 
-- Meet WCAG 2.2 Level AA. Preserve semantic HTML, logical focus order, readable contrast, reflow, orientation support, and visible focus in both themes.
-- Respect `prefers-reduced-motion`; reduce decorative transitions without hiding the current state.
-- State is communicated by text and accessible properties, never color or animation alone.
-- Browser listeners, media-query listeners, and service-worker subscriptions must be cleaned up.
+## Testing Decisions
 
-## Acceptance evidence
+### Primary seam
 
-- `pnpm install --frozen-lockfile`
-- residue search confirms no Expo, React Native, NativeWind, gluestack, Reanimated, Worklets, `@repo/react-web`, or `@repo/react-mobile` references remain in active manifests and source;
-- `pnpm lint`;
-- a fresh root `pnpm build` immediately before production preview or start;
-- `pnpm --filter mobile preview` reaches readiness;
-- built manifest, service-worker registration, precache boundary, icons, and standalone metadata are inspected;
-- default `speaking`, five ordered synthetic utterances, zero/muted mock audio to `idle`, restored audio to `listening`, all query-initialized states, both themes, range keyboard behavior, safe areas, portrait and landscape, reduced motion, and each complete screen-reader utterance value are manually inspected.
+The built Mobile PWA and its public state/actions are the primary seam. Reviewers observe default boot, explicit previews, control transitions, complete captions, Orbz mapping, end/restart and PWA metadata.
 
-Automated tests and audits remain deferred by repository policy. Do not add or run Lighthouse, axe automation, browser automation, unit, integration, end-to-end, smoke, Playwright, Cypress, or evaluation suites.
+### Secondary seams
 
-## Open decisions
+Source/type checks localize state-model and package-boundary failures; generated manifest/service-worker inspection localizes PWA boundary failures; manual keyboard, screen-reader, reduced-motion, portrait and landscape checks cover presentation not fully represented by static type validation.
 
-- Production microphone capture, speech input/output, interruption, latency, failure, and permission flows.
-- Backend protocol and integration with the separately owned conversation domain.
-- Authentication, lifecycle, and deployment-path decisions beyond this static mock.
+### Fixtures and privacy
 
-## Links
+All utterances and identities are synthetic local fixtures. No microphone capture, generated response, account data, longitudinal memory or private health/family content is stored, cached or emitted.
 
-- Product: `.agents/PRODUCT.md`
-- Memory: `.agents/MEMORY.md`
-- Safety and privacy: `.agents/rules/product-safety-and-privacy.md`
-- React and PWA rules: `.agents/rules/react-and-next.md`
-- PWA decision: `.agents/decisions/0006-mobile-react-vite-pwa.md`
-- Mobile implementation: `workspaces/apps/mobile`
+### Required validation
+
+Run repository lint and typecheck, a fresh root build, Mobile build/PWA generation, supported package/source audits and manual checks for all canonical states, themes, orientation, range keyboard behavior, safe areas, complete accessible utterances and reduced motion. Historical instructions that broadly deferred automation are not carried forward as a prohibition against current repository CI.
+
+## Acceptance Criteria
+
+- [x] The PWA renders a full-viewport device-independent experience with the approved layout and warm light foundation.
+- [x] Default boot and `?state=` previews deterministically produce speaking, listening, muted and ended states.
+- [x] Microphone, speaker and range controls maintain one coherent mute/volume/phase model.
+- [x] Orbz uses the approved package, `peach` preset and exact state mapping without a fake voice engine.
+- [x] Five ordered synthetic speaking utterances remain complete and programmatically available.
+- [x] Jotai is the only shared state mechanism and duplicated derived source state is absent.
+- [x] Manifest, icons, standalone behavior and prompt-based service-worker update flow are configured.
+- [x] Runtime caching excludes APIs, audio, conversation data, memory and user-generated content.
+- [x] WCAG 2.2 AA, visible focus, orientation support and reduced-motion behavior are normative.
+- [x] Mobile typecheck, build and PWA generation are included in the repository validation path.
+
+## Failure Behavior
+
+Invalid preview values fall back to the canonical default. Zero volume always resolves to muted/idle. Aborted or ended local state cannot claim a saved conversation. Offline shell availability cannot claim service reachability. Missing PWA updates remain user-prompted rather than silently reloading. Listener cleanup prevents stale lifecycle updates after unmount.
+
+## Out of Scope
+
+Production microphone capture, STT, TTS, interruption, latency, permissions, model/provider integration, backend protocol, authentication, durable conversation history, Memory Nucleus access and deployment-path decisions beyond the static PWA remain separate work.
+
+## Evidence and Promotion
+
+The current Mobile source, Jotai state model, shared Orbz/ScrollReveal boundaries, generated PWA artifacts and repository build provide retrospective evidence. Stable framework, cache, accessibility and truthfulness boundaries are promoted to Mobile context and React/privacy rules.
+
+## Further Notes
+
+This file replaces `103-mobile-voice-experience.md`. Its stale `.agents/PRODUCT.md`, `.agents/MEMORY.md` and `.agents/decisions` links were replaced with the current context/rules/ADR taxonomy.
+
+## Retrospective Integrity
+
+This spec was reconstructed after the visual PWA and its state model had already been implemented. It preserves the legacy contract's detailed product boundaries and current observable behavior, but it does not claim that the original work followed today's spec-driven process or that the mock proves real voice, model, API or longitudinal-memory operation.
