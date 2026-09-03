@@ -227,7 +227,7 @@ for catalog_path in "$SPEC_ROOT"/*.md; do
     printf '%s\n' "$priority" >>"$catalog_priorities"
   fi
   case "$priority" in
-    0[0-9][0-9]|1[0-9][0-9]) ;;
+    00[1-9]|0[1-9][0-9]|10[1-9]|1[1-9][0-9]) ;;
     *)
       spec_fail \
         priority-band \
