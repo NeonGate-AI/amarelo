@@ -242,10 +242,10 @@ for spec in "$SPEC_ROOT"/*.spec.md; do
   done <"$refs"
 done
 
-[ ! -e "$PROJECT_ROOT/pnpm-lock.yaml" ] ||
+[ -f "$PROJECT_ROOT/pnpm-lock.yaml" ] ||
   workflow_fail lockfile pnpm-lock.yaml \
-    "repository lockfile was recreated" \
-    "remove it and preserve the project no-lockfile policy"
+    "tracked repository lockfile is missing" \
+    "restore pnpm-lock.yaml or regenerate it intentionally"
 
 fixture="$TMP_ROOT/remote.spec.md"
 cat >"$fixture" <<'EOF'
