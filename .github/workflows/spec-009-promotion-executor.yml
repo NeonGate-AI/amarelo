@@ -1,0 +1,47 @@
+name: Execute SPEC-009 promotion
+
+on:
+  push:
+    branches:
+      - experiment/spec-009-first-ana-conversation-baseline
+    paths:
+      - .github/workflows/spec-009-promotion-executor.yml
+
+permissions:
+  contents: write
+
+jobs:
+  promote:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: experiment/spec-009-first-ana-conversation-baseline
+          fetch-depth: 0
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: Promote, validate, and commit
+        shell: bash
+        run: |
+          set -euo pipefail
+          export CI=true
+          pnpm install --frozen-lockfile
+          python3 .github/spec-009-promotion.py
+          git rm -f .github/spec-009-promotion.py
+          git rm -f .github/workflows/spec-009-promotion-executor.yml
+          ./cli/elo doctor --ci
+          ./cli/elo check all
+          pnpm exec biome check workspaces cli
+          pnpm exec turbo run typecheck
+          pnpm exec turbo run test
+          pnpm exec turbo run build
+          git config user.name "Jonatas Sales"
+          git config user.email "sykes.echo@proton.me"
+          git add -A
+          git commit -m "docs(spec-009): promote the first Ana serving baseline"
+          git push origin HEAD:experiment/spec-009-first-ana-conversation-baseline
