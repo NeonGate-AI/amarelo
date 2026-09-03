@@ -1,6 +1,6 @@
 ---
-version: 5
-extends: code-style.md
+version: 6
+extends: code-style.rule.md
 name: Source Organization
 description: Source roots, module boundaries, file naming, barrels, and architectural source ownership.
 alwaysApply: true
@@ -85,7 +85,7 @@ Use only suffixes defined here for project-created semantic modules. Add a suffi
 | `.port` | Application/architecture port | `memory-repository.port.ts` |
 | `.prompt` | Prompt artifact | `memory-extraction.prompt.ts` |
 | `.schema` | Runtime/schema definition | `memory.schema.ts` |
-| `.script` | Temporary executable audit/check script | `.audit/architecture.script.sh` |
+| `.audit` | Executable repository invariant checker | `.audit/architecture.audit.sh` |
 | `.server` | React server component/module | `logo.server.tsx` |
 | `.service` | Cohesive service | `projection.service.ts` |
 | `.state` | Initial/default state | `session.state.ts` |
@@ -147,7 +147,7 @@ AI-engineering assurance source belongs under the owner's `src/assurance/` area 
 
 `.audit/` is outside `.agents/`, product source roots, and CLI source. It is the temporary evidence/checking plane.
 
-Generated evidence is ignored. During an active migration, narrowly scoped executable checker `.script.sh` files may be committed in `.audit/` so CI and reviewers can reproduce the audit. Executable repository audit/check scripts use POSIX shell and end in `.sh`; `.script.mjs` is not an allowed executable audit format. Package `scripts` must not execute `.mjs` automation; use a shell entrypoint and, when needed, an owning typed backend.
+Generated evidence is ignored. During an active migration, narrowly scoped executable checker `.audit.sh` files may be committed in `.audit/` so CI and reviewers can reproduce the audit. Executable repository audit/check scripts use POSIX shell and end in `.audit.sh`; `.script.mjs` is not an allowed executable audit format. Package `scripts` must not execute `.mjs` automation; use a shell entrypoint and, when needed, an owning typed backend.
 
 Framework-owned `.mjs` configuration modules, including `postcss.config.mjs`, are not executable repository audit scripts and remain in the locations and formats required by their tools.
 
@@ -177,4 +177,4 @@ The shell checkers themselves live in `.audit/`, never under `cli/src/`.
 
 ## 14. Mechanical enforcement
 
-Executable `.audit/*.script.sh` checkers and durable CI/harness mechanisms enforce filesystem/import invariants. Elo exposes shell entrypoints that invoke active audit checkers, but Elo does not own their implementation or duplicate the repository task graph.
+Executable `.audit/*.audit.sh` checkers and durable CI/harness mechanisms enforce filesystem/import invariants. Elo exposes shell entrypoints that invoke active audit checkers, but Elo does not own their implementation or duplicate the repository task graph.

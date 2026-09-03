@@ -88,8 +88,8 @@ economic evidence; compilation alone is insufficient.
 
 ## Links
 
-- Runtime rule: `.agents/rules/ai-runtime.md`
+- Runtime rule: `.agents/rules/memory-nucleus.rule.md`
 - Memory constitution: `.agents/MEMORY.md`
 - Runtime architecture: `elos/ai/ARCHITECTURE.md`
 - Memory Nucleus architecture: `elos/memory-nucleus/README.md`
-- Curation delivery spec: `.agents/specs/014-background-memory-curation-loop.md`
+- Curation delivery spec: `.agents/specs/025-background-memory-curation-loop.spec.md`

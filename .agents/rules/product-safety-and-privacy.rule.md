@@ -17,9 +17,9 @@ authority: owner-aligned non-negotiable policy
 - Permission to contribute to a person's memory never implies permission to read it or another person's private conversation.
 - Derived artifacts do not inherit broader permissions, and sharing them does not reveal source material automatically.
 - Do not silently contact a support person or professional, and do not create family surveillance or automated escalation behavior.
-- The current public positioning and mobile implementation are voice-only. Do not add text conversation without a new owner decision.
+- The public product remains voice-first. A text conversation path is prohibited unless an owner-approved `ready` or `in-progress` spec defines it as a bounded development/test seam; that seam does not create a public text-product commitment.
 - Render the Elo's spoken output as readable captions. Visual truncation or fading must not remove the full spoken text from assistive technology.
-- In the current mobile PWA, captions and conversation states are synthetic local fixtures. Do not add microphone capture, speech recognition, audio playback, API calls, MCP calls, product-agent calls, or any other external interaction under the guise of completing the mock.
+- The current mobile PWA uses synthetic local fixtures. SPEC-009 may replace timed mock state only with its approved browser-safe HTTP text driver and synthetic tests. Microphone capture, speech recognition, audio playback, MCP calls, direct browser access to AI/Memory internals and any broader external interaction remain prohibited until separately specified.
 - Persist only approved theme and volume preferences. Do not persist phase, mute state, captions, simulated conversation state, or service-worker lifecycle state.
 - Precache only the public application shell and versioned static build assets. Never runtime-cache API responses, audio, transcripts, conversation content, memory, or user-generated data.
 - Do not claim LGPD, clinical, security, deletion, encryption, residency, or regulatory compliance without implementation evidence and appropriate review.

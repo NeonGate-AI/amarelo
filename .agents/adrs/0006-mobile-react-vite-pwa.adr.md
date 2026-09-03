@@ -72,7 +72,7 @@ Automated tests remain deferred by repository policy.
 ## Links
 
 - Architecture: `.agents/ARCHITECTURE.md`
-- Mobile specification: `.agents/specs/003-mobile-voice-experience.md`
+- Mobile specification: `.agents/specs/003-mobile-voice-experience.spec.md`
 - Orbz decision: `.agents/decisions/0005-orbz-web-component.md`
-- React and PWA rules: `.agents/rules/react-and-next.md`
+- React and PWA rules: `.agents/rules/react-and-next.rule.md`
 - Mobile implementation: `elos/apps/mobile`

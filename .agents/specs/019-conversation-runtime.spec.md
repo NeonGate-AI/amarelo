@@ -17,15 +17,15 @@ context:
   - .agents/context/workspaces/ai/conversation.md
   - .agents/context/workspaces/ai/overview.md
 rules:
-  - .agents/rules/architecture.md
-  - .agents/rules/context-engineering.md
-  - .agents/rules/import-boundaries.md
-  - .agents/rules/product-safety-and-privacy.md
-  - .agents/rules/source-organization.md
-  - .agents/rules/spec-driven-development.md
+  - .agents/rules/architecture.rule.md
+  - .agents/rules/context-engineering.rule.md
+  - .agents/rules/import-boundaries.rule.md
+  - .agents/rules/product-safety-and-privacy.rule.md
+  - .agents/rules/source-organization.rule.md
+  - .agents/rules/spec-driven-development.rule.md
 adrs:
-  - .agents/adrs/0017-cognitive-routing-and-memory-boundary.md
-  - .agents/adrs/0020-conversation-agent-port.md
+  - .agents/adrs/0017-cognitive-routing-and-memory-boundary.adr.md
+  - .agents/adrs/0020-conversation-agent-port.adr.md
 skills:
   - https://github.com/NeonGate-AI/skills/tree/main/skills/engineering/to-spec
   - https://github.com/NeonGate-AI/skills/tree/main/skills/engineering/to-tickets

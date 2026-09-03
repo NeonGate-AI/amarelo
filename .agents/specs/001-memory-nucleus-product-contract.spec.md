@@ -16,15 +16,15 @@ context:
   - .agents/context/architecture/boundaries/ai-memory-nucleus.md
   - .agents/context/workspaces/memory-nucleus/overview.md
 rules:
-  - .agents/rules/memory-nucleus.md
-  - .agents/rules/product-safety-and-privacy.md
+  - .agents/rules/memory-nucleus.rule.md
+  - .agents/rules/product-safety-and-privacy.rule.md
 adrs:
-  - .agents/adrs/0001-shared-longitudinal-memory.md
-  - .agents/adrs/0003-authorization-before-retrieval.md
-  - .agents/adrs/0007-memory-taxonomy-and-longitudinal-projections.md
-  - .agents/adrs/0009-postgresql-jsonb-fts-memory-store.md
-  - .agents/adrs/0015-memory-nucleus-mvp-clean-architecture.md
-  - .agents/adrs/0016-shared-memory-sdk-observability-evaluation.md
+  - .agents/adrs/0001-shared-longitudinal-memory.adr.md
+  - .agents/adrs/0003-authorization-before-retrieval.adr.md
+  - .agents/adrs/0007-memory-taxonomy-and-longitudinal-projections.adr.md
+  - .agents/adrs/0009-postgresql-jsonb-fts-memory-store.adr.md
+  - .agents/adrs/0015-memory-nucleus-mvp-clean-architecture.adr.md
+  - .agents/adrs/0016-shared-memory-sdk-observability-evaluation.adr.md
 skills:
   - .agents/skills/spec-driven-development/SKILL.md
   - .agents/skills/agent-memory-systems/SKILL.md

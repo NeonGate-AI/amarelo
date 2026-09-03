@@ -16,14 +16,14 @@ context:
   - .agents/context/product/overview.md
   - .agents/context/product/strategy.md
 rules:
-  - .agents/rules/memory-nucleus.md
-  - .agents/rules/product-safety-and-privacy.md
+  - .agents/rules/memory-nucleus.rule.md
+  - .agents/rules/product-safety-and-privacy.rule.md
 adrs:
-  - .agents/adrs/0001-shared-longitudinal-memory.md
-  - .agents/adrs/0003-authorization-before-retrieval.md
-  - .agents/adrs/0008-cost-first-background-memory-curation.md
-  - .agents/adrs/0016-shared-memory-sdk-observability-evaluation.md
-  - .agents/adrs/0017-cognitive-routing-and-memory-boundary.md
+  - .agents/adrs/0001-shared-longitudinal-memory.adr.md
+  - .agents/adrs/0003-authorization-before-retrieval.adr.md
+  - .agents/adrs/0008-cost-first-background-memory-curation.adr.md
+  - .agents/adrs/0016-shared-memory-sdk-observability-evaluation.adr.md
+  - .agents/adrs/0017-cognitive-routing-and-memory-boundary.adr.md
 skills:
   - .agents/skills/spec-driven-development/SKILL.md
   - .agents/skills/domain-modeling/SKILL.md
