@@ -1,4 +1,15 @@
 {
   "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@context": ["src/context/index.ts"],
+      "@contracts": ["src/contracts/index.ts"],
+      "@memory": ["src/memory/index.ts"],
+      "@ports": ["src/ports/index.ts"],
+      "@routing": ["src/routing/index.ts"],
+      "@runtime": ["src/runtime/index.ts"]
+    }
+  },
   "include": ["src/**/*.ts"]
 }
