@@ -3,13 +3,12 @@
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
-      "@assurance/*": ["src/assurance/*"],
-      "@context/*": ["src/context/*"],
-      "@contracts/*": ["src/contracts/*"],
-      "@memory/*": ["src/memory/*"],
-      "@ports/*": ["src/ports/*"],
-      "@routing/*": ["src/routing/*"],
-      "@runtime/*": ["src/runtime/*"]
+      "@context": ["src/context/index.ts"],
+      "@contracts": ["src/contracts/index.ts"],
+      "@memory": ["src/memory/index.ts"],
+      "@ports": ["src/ports/index.ts"],
+      "@routing": ["src/routing/index.ts"],
+      "@runtime": ["src/runtime/index.ts"]
     }
   },
   "include": ["src/**/*.ts"]
