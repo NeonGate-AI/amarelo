@@ -22,7 +22,18 @@ mkdir "$TMP_ROOT" || {
   printf 'Elo platform audit FAIL: cannot create temporary directory\n' >&2
   exit 1
 }
-trap 'rm -rf "$TMP_ROOT"' 0 1 2 15
+audit_cleanup() {
+  rm -rf "$TMP_ROOT"
+}
+
+audit_on_signal() {
+  trap - 0 1 2 15
+  audit_cleanup
+  exit 1
+}
+
+trap audit_cleanup 0
+trap audit_on_signal 1 2 15
 
 failures=0
 
@@ -30,6 +41,27 @@ platform_fail() {
   failures=$((failures + 1))
   printf '%s\n' "- $1: $2" >&2
 }
+
+is_framework_owned_mjs() {
+  case "$1" in
+    workspaces/apps/*/postcss.config.mjs)
+      elo_mjs_app=${1#workspaces/apps/}
+      elo_mjs_app=${elo_mjs_app%/postcss.config.mjs}
+      case "$elo_mjs_app" in
+        ''|*/*) return 1 ;;
+        *) return 0 ;;
+      esac
+      ;;
+    *) return 1 ;;
+  esac
+}
+
+if ! is_framework_owned_mjs workspaces/apps/example/postcss.config.mjs ||
+  is_framework_owned_mjs workspaces/apps/example/src/scripts/postcss.config.mjs ||
+  is_framework_owned_mjs workspaces/packages/design-system/src/scripts/build.config.mjs
+then
+  platform_fail .audit/elo-platform.script.sh "framework MJS allowlist contract is too broad"
+fi
 
 package_script_names() {
   awk '
@@ -224,16 +256,10 @@ find "$PROJECT_ROOT" \
 while IFS= read -r path; do
   [ -n "$path" ] || continue
   relative=${path#"$PROJECT_ROOT"/}
-  case "$relative" in
-    workspaces/apps/*/postcss.config.mjs)
-      ;;
-    *.config.mjs)
-      ;;
-    *)
-      platform_fail "$relative" \
-        "MJS is reserved for framework configuration; executable automation must enter through shell"
-      ;;
-  esac
+  if ! is_framework_owned_mjs "$relative"; then
+    platform_fail "$relative" \
+      "MJS is reserved for framework-owned app configuration; executable automation must enter through shell"
+  fi
 done <"$TMP_ROOT/mjs-files"
 
 find "$PROJECT_ROOT" \
@@ -263,7 +289,10 @@ done <"$TMP_ROOT/package-files"
 {
   printf '%s\n' "$LAUNCHER"
   find "$CLI_ROOT" -type f -name '*.sh' -print
-  find "$PROJECT_ROOT/.audit" -maxdepth 1 -type f -name '*.script.sh' -print
+  for elo_audit_path in "$PROJECT_ROOT"/.audit/*.script.sh; do
+    [ -f "$elo_audit_path" ] || continue
+    printf '%s\n' "$elo_audit_path"
+  done
   printf '%s\n' "$TOKEN_SCRIPT"
 } >"$TMP_ROOT/shell-files"
 while IFS= read -r path; do
@@ -274,21 +303,50 @@ while IFS= read -r path; do
 done <"$TMP_ROOT/shell-files"
 
 contract_bin="$TMP_ROOT/direct-bin"
+contract_home="$TMP_ROOT/contract-home"
+contract_pnpm="$TMP_ROOT/contract-pnpm"
+contract_xdg="$TMP_ROOT/contract-xdg"
 contract_output="$TMP_ROOT/setup.out"
-if ! CI= ELO_SETUP_DISABLED= ELO_BIN_DIR="$contract_bin" \
+for alternative_dir in "$contract_home" "$contract_pnpm" "$contract_xdg"; do
+  mkdir "$alternative_dir"
+  printf 'unchanged\n' >"$alternative_dir/.sentinel"
+done
+if ! CI= ELO_SETUP_DISABLED= HOME="$contract_home" \
+  PNPM_HOME="$contract_pnpm" XDG_BIN_HOME="$contract_xdg" \
+  ELO_BIN_DIR="$contract_bin" \
   "$LAUNCHER" setup >"$contract_output" 2>&1
 then
   platform_fail cli/src/commands/setup.sh "direct launcher setup failed in an isolated destination"
 elif [ ! -x "$contract_bin/elo" ]; then
   platform_fail cli/src/commands/setup.sh "direct launcher was not created as an executable"
 else
+  for alternative_dir in "$contract_home" "$contract_pnpm" "$contract_xdg"; do
+    [ ! -e "$alternative_dir/elo" ] ||
+      platform_fail cli/src/commands/setup.sh "setup wrote outside the selected ELO_BIN_DIR"
+    [ "$(cat "$alternative_dir/.sentinel")" = unchanged ] ||
+      platform_fail cli/src/commands/setup.sh "setup modified an alternate destination"
+  done
+
   cp "$contract_bin/elo" "$TMP_ROOT/elo.first"
-  if ! CI= ELO_SETUP_DISABLED= ELO_BIN_DIR="$contract_bin" \
+  if ! CI= ELO_SETUP_DISABLED= HOME="$contract_home" \
+    PNPM_HOME="$contract_pnpm" XDG_BIN_HOME="$contract_xdg" \
+    ELO_BIN_DIR="$contract_bin" \
     "$LAUNCHER" setup >>"$contract_output" 2>&1
   then
     platform_fail cli/src/commands/setup.sh "idempotent setup rerun failed"
   elif ! cmp -s "$TMP_ROOT/elo.first" "$contract_bin/elo"; then
     platform_fail cli/src/commands/setup.sh "idempotent setup changed an equivalent managed launcher"
+  fi
+
+  chmod 600 "$contract_bin/elo"
+  if ! CI= ELO_SETUP_DISABLED= HOME="$contract_home" \
+    PNPM_HOME="$contract_pnpm" XDG_BIN_HOME="$contract_xdg" \
+    ELO_BIN_DIR="$contract_bin" \
+    "$LAUNCHER" setup >>"$contract_output" 2>&1
+  then
+    platform_fail cli/src/commands/setup.sh "setup did not repair a managed launcher without execute permission"
+  elif [ ! -x "$contract_bin/elo" ]; then
+    platform_fail cli/src/commands/setup.sh "repaired managed launcher is not executable"
   fi
 
   expected_version=$(
@@ -331,6 +389,15 @@ else
   expected_quoted_version=$("$LAUNCHER" --version 2>/dev/null)
   [ "$quoted_version" = "$expected_quoted_version" ] ||
     platform_fail "$quoted_bin/elo" "launcher did not preserve the quoted checkout path"
+
+  moved_quoted_root="$quoted_root.moved"
+  mv "$quoted_root" "$moved_quoted_root"
+  "$quoted_bin/elo" --version >"$TMP_ROOT/missing-checkout.out" 2>&1
+  missing_checkout_status=$?
+  [ "$missing_checkout_status" -eq 2 ] ||
+    platform_fail "$quoted_bin/elo" "launcher with an unavailable checkout must exit 2"
+  grep -F 'run ./cli/elo setup from a valid checkout' "$TMP_ROOT/missing-checkout.out" >/dev/null 2>&1 ||
+    platform_fail "$quoted_bin/elo" "unavailable checkout error lacks setup recovery guidance"
 fi
 
 if ! "$LAUNCHER" >"$TMP_ROOT/help.out" 2>"$TMP_ROOT/help.err"; then
@@ -344,6 +411,11 @@ unknown_status=$?
 [ "$unknown_status" -eq 2 ] ||
   platform_fail cli/src/elo.sh "unknown commands must exit with status 2"
 
+"$LAUNCHER" check unknown-check >"$TMP_ROOT/unknown-check.out" 2>"$TMP_ROOT/unknown-check.err"
+unknown_check_status=$?
+[ "$unknown_check_status" -eq 2 ] ||
+  platform_fail cli/src/elo.sh "invalid check subcommands must exit with status 2"
+
 collision_bin="$TMP_ROOT/collision-bin"
 mkdir "$collision_bin"
 printf '#!/bin/sh\nexit 0\n' >"$collision_bin/elo"
@@ -356,6 +428,17 @@ collision_status=$?
   platform_fail cli/src/commands/setup.sh "manual setup must reject an unmanaged Elo collision"
 cmp -s "$TMP_ROOT/unmanaged.first" "$collision_bin/elo" ||
   platform_fail cli/src/commands/setup.sh "manual setup modified an unmanaged Elo collision"
+
+if ! CI= ELO_SETUP_DISABLED= ELO_BIN_DIR="$collision_bin" \
+  "$LAUNCHER" setup --postinstall >"$TMP_ROOT/lifecycle-collision.out" 2>&1
+then
+  platform_fail cli/src/commands/setup.sh "lifecycle setup must skip an unmanaged collision"
+elif ! grep -F 'unmanaged command already exists' "$TMP_ROOT/lifecycle-collision.out" >/dev/null 2>&1
+then
+  platform_fail cli/src/commands/setup.sh "lifecycle collision skip must emit a warning"
+fi
+cmp -s "$TMP_ROOT/unmanaged.first" "$collision_bin/elo" ||
+  platform_fail cli/src/commands/setup.sh "lifecycle setup modified an unmanaged collision"
 
 symlink_bin="$TMP_ROOT/symlink-bin"
 symlink_sentinel="$TMP_ROOT/symlink-sentinel"
@@ -391,6 +474,15 @@ then
   platform_fail cli/src/commands/setup.sh "explicitly disabled postinstall setup must skip cleanly"
 elif [ -e "$disabled_bin/elo" ]; then
   platform_fail cli/src/commands/setup.sh "disabled postinstall must not create a user launcher"
+fi
+
+if ! CI= ELO_SETUP_DISABLED= ELO_BIN_DIR= PNPM_HOME= XDG_BIN_HOME= HOME= \
+  "$LAUNCHER" setup --postinstall >"$TMP_ROOT/no-destination.out" 2>&1
+then
+  platform_fail cli/src/commands/setup.sh "lifecycle setup without a destination must skip cleanly"
+elif ! grep -F 'no user binary directory is available' "$TMP_ROOT/no-destination.out" >/dev/null 2>&1
+then
+  platform_fail cli/src/commands/setup.sh "missing-destination lifecycle skip must emit a warning"
 fi
 
 if [ "$failures" -gt 0 ]; then

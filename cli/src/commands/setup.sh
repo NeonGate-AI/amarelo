@@ -118,7 +118,14 @@ elo_setup_cleanup() {
     rmdir "$elo_tmp_dir" 2>/dev/null || :
   fi
 }
-trap elo_setup_cleanup 0 1 2 15
+elo_setup_on_signal() {
+  trap - 0 1 2 15
+  elo_setup_cleanup
+  exit 1
+}
+
+trap elo_setup_cleanup 0
+trap elo_setup_on_signal 1 2 15
 
 elo_tmp_attempt=0
 while [ "$elo_tmp_attempt" -lt 100 ]; do
@@ -161,7 +168,7 @@ EOF
 } >"$elo_tmp"
 chmod 755 "$elo_tmp"
 
-if [ -f "$elo_target" ] && cmp -s "$elo_tmp" "$elo_target"; then
+if [ -x "$elo_target" ] && cmp -s "$elo_tmp" "$elo_target"; then
   printf 'Elo direct command already configured at %s\n' "$elo_target"
   exit 0
 fi

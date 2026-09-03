@@ -149,8 +149,11 @@ if [ "$ci" = false ]; then
   direct_bin=$(elo_default_bin_dir 2>/dev/null || true)
   if [ -n "$direct_bin" ]; then
     direct_target="$direct_bin/elo"
+    direct_marker=$(sed -n '2p' "$direct_target" 2>/dev/null || true)
     if [ -f "$direct_target" ] &&
-      grep -F '# managed-by: amarelo-elo' "$direct_target" >/dev/null 2>&1
+      [ ! -L "$direct_target" ] &&
+      [ -x "$direct_target" ] &&
+      [ "$direct_marker" = '# managed-by: amarelo-elo' ]
     then
       pass direct-elo "$direct_target"
     else
