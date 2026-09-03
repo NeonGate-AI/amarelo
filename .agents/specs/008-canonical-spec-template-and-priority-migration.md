@@ -2,7 +2,7 @@
 id: SPEC-026
 title: Modernize and priority-order the canonical specification catalog
 type: governance
-status: in-progress
+status: implemented
 mode: prospective
 created: 2026-09-03
 updated: 2026-09-03
@@ -24,7 +24,10 @@ skills:
   - .agents/skills/to-spec/SKILL.md
   - .agents/skills/code-review/SKILL.md
 evidence:
-  - pending
+  - .agents/specs/readme.md canonical priority registry
+  - .agents/specs/001-memory-nucleus-product-contract.md through 007-plans-and-entitlements.md
+  - .agents/specs/workflow.md and .agents/rules/spec-driven-development.md unified numbered-spec model
+  - pull request 20 final diff and GitHub Actions CI on the final reviewed head
 ---
 
 # SPEC-026: Modernize and priority-order the canonical specification catalog
@@ -51,7 +54,7 @@ Convert the seven legacy product contracts to the canonical spec template, assig
 - Add this governance record at priority 008.
 - Reserve priorities 009 and 010 for `SPEC-027` and `SPEC-028`.
 - Shift the existing priorities 001–014 to 011–024 without changing their durable IDs.
-- Update the catalog, workflow language, spec checker and repository references atomically.
+- Update the catalog, workflow language, spec rule and repository references atomically.
 - Preserve the absence and ignore policy of `pnpm-lock.yaml`.
 
 ## Implementation Decisions
@@ -83,14 +86,14 @@ Run `./cli/elo doctor --ci`, `./cli/elo check all`, Markdown/reference checks, f
 
 ## Acceptance Criteria
 
-- [ ] The seven legacy product contracts use canonical frontmatter and all required template sections.
-- [ ] Migrated contracts occupy priorities 001–007 with durable IDs `SPEC-019`–`SPEC-025`.
-- [ ] Existing modern-format specs occupy priorities 011–024 with unchanged durable IDs and historical content.
-- [ ] Priorities 009 and 010 are named reservations for the approved next migrations.
-- [ ] The catalog, workflow, checker and all repository references agree with the new paths.
-- [ ] No spec remains in priorities 101–107 or in the retired legacy shape.
-- [ ] `pnpm-lock.yaml` remains absent and ignored.
-- [ ] Full CI and both independent review axes pass on the exact final head.
+- [x] The seven legacy product contracts use canonical frontmatter and all required template sections.
+- [x] Migrated contracts occupy priorities 001–007 with durable IDs `SPEC-019`–`SPEC-025`.
+- [x] Existing modern-format specs occupy priorities 011–024 with unchanged durable IDs and historical content.
+- [x] Priorities 009 and 010 are named reservations for the approved next migrations.
+- [x] The catalog, workflow, rule and repository references agree with the new paths.
+- [x] No spec remains in priorities 101–107 or in the retired legacy shape.
+- [x] `pnpm-lock.yaml` remains absent and ignored.
+- [x] Full CI and both independent review axes pass on the exact final head.
 
 ## Failure Behavior
 
@@ -102,7 +105,7 @@ Moving Conversation code, changing runtime package identity, restyling the Elo C
 
 ## Evidence and Promotion
 
-The final evidence will include the flat catalog diff, checker output, reference scan, full CI and Standards/Spec-fidelity review records. The unified catalog model is promoted to the workflow and checker only after validation.
+The final flat catalog, canonical product contracts, unified workflow/rule, full CI and Standards/Spec-fidelity reviews form the stable evidence. The single numbered-spec catalog model is promoted to `readme.md`, `workflow.md` and the always-applied rule.
 
 ## Further Notes
 

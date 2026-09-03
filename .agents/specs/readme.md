@@ -20,7 +20,7 @@ The specification catalog is flat, priority-ordered and mechanically checked.
 | 005 | SPEC-023 | implemented | [Longitudinal-memory review and control](005-memory-control.md) |
 | 006 | SPEC-024 | implemented | [Public Amarelo product narrative](006-product-narrative.md) |
 | 007 | SPEC-025 | draft | [Plans, voice entitlements and capability gates](007-plans-and-entitlements.md) |
-| 008 | SPEC-026 | in-progress | [Canonical spec template and priority migration](008-canonical-spec-template-and-priority-migration.md) |
+| 008 | SPEC-026 | implemented | [Canonical spec template and priority migration](008-canonical-spec-template-and-priority-migration.md) |
 | 009 | reserved | — | `SPEC-027`: direct AI Conversation topology migration |
 | 010 | reserved | — | `SPEC-028`: Elo CLI experience modernization |
 | 011 | SPEC-001 | implemented | [Repository harness and Elo foundation](011-repository-harness-and-elo-foundation.md) |

@@ -140,7 +140,7 @@ Completion criterion: every checked acceptance criterion points to a reproducibl
 
 Move only proven durable conclusions to their proper source:
 
-- an changed product contract receives a new numbered spec that supersedes the earlier record;
+- a changed product contract receives a new numbered spec that supersedes the earlier record;
 - system vocabulary goes to context;
 - permanent constraints go to rules;
 - consequential tradeoffs go to ADRs;
