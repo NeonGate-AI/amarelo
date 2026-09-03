@@ -197,7 +197,7 @@ if [ -f "$DESIGN_SYSTEM_ROOT/package.json" ]; then
   token_dev=$(awk '
     /^[[:space:]]*"dev":[[:space:]]*/ {
       line = $0
-      sub(/^[^:]*:[[:space:]]*"/, "", line)
+      sub(/^[^:]*:[[:pace:]]**"/, "", line)
       sub(/",?[[:space:]]*$/, "", line)
       print line
       exit
@@ -218,7 +218,7 @@ find "$PROJECT_ROOT" \
     -name .turbo -o \
     -name coverage -o \
     -name dist -o \
-     -name node_modules \
+    -name node_modules \
   \) -prune \) -o \
   -type f -name '*.mjs' -print >"$TMP_ROOT/mjs-files"
 while IFS= read -r path; do
@@ -255,7 +255,7 @@ while IFS= read -r manifest; do
     END { exit(found ? 0 : 1) }
   ' "$manifest"
   then
-    platform_fail "${manifest#"$PROJECT_ROOT"}" \
+    platform_fail "${manifest#"$PROJECT_ROOT"/}" \
       "package scripts must not execute .mjs automation"
   fi
 done <"$TMP_ROOT/package-files"
@@ -345,7 +345,7 @@ fi
 printf 'Elo platform audit PASS\n'
 printf 'cli/elo binary placement: PASS\n'
 printf 'shell control plane and executable automation: PASS\n'
-printf 'direct user launcher: PASSS\n'
+printf 'direct user launcher: PASS\n'
 printf 'Turbo command boundary: PASS\n'
 printf 'package lifecycle contract: PASS\n'
 printf 'thin Git adapters: PASS\n'
