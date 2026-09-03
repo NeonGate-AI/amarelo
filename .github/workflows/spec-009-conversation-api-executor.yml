@@ -51,10 +51,6 @@ jobs:
           fixture = fixture_path.read_text(encoding='utf-8')
           replacements = [
               (
-                  "import type { FastifyInstance } from 'fastify'",
-                  "import type { FastifyInstance, HTTPMethods } from 'fastify'",
-              ),
-              (
                   "    const url = new URL(typeof input === 'string' ? input : input.url)\n",
                   "    const inputUrl =\n"
                   "      typeof input === 'string'\n"
@@ -62,7 +58,11 @@ jobs:
                   "        : input instanceof URL\n"
                   "          ? input.href\n"
                   "          : input.url\n"
-                  "    const url = new URL(inputUrl)\n",
+                  "    const url = new URL(inputUrl)\n"
+                  "    const method = (init?.method ?? 'GET').toUpperCase()\n"
+                  "    if (method !== 'GET' && method !== 'POST') {\n"
+                  "      throw new TypeError(`Unsupported injected method: ${method}`)\n"
+                  "    }\n",
               ),
               (
                   "    const response = await app.inject({\n",
@@ -70,7 +70,7 @@ jobs:
               ),
               (
                   "      method: init?.method ?? 'GET',\n",
-                  "      method: (init?.method ?? 'GET') as HTTPMethods,\n",
+                  "      method,\n",
               ),
               (
                   "Object.entries(response.headers)",
