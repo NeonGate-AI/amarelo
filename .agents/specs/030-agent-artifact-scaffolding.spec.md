@@ -2,7 +2,7 @@
 id: SPEC-030
 title: Scaffold canonical agent artifacts through Elo
 type: feature
-status: in-progress
+status: implemented
 mode: prospective
 created: 2026-09-03
 updated: 2026-09-03
@@ -12,6 +12,7 @@ targets:
   - .agents/prompts
   - cli/src/commands
   - .audit/elo-platform-core.audit.sh
+  - .audit/elo-scaffold.audit.sh
   - repository engineering harness
 context:
   - .agents/context/architecture/overview.md
@@ -32,16 +33,16 @@ skills:
   - .agents/skills/writing-for-agents/SKILL.md
   - .agents/skills/code-review/SKILL.md
 evidence:
-  - https://github.com/NeonGate-AI/amarelo/issues/27
-  - https://github.com/NeonGate-AI/amarelo/issues/28
-  - pending
+  - .audit/elo-scaffold.audit.sh
+  - .audit/specs.audit.sh
+  - https://github.com/NeonGate-AI/amarelo/pull/29
 ---
 
 # SPEC-030: Scaffold canonical agent artifacts through Elo
 
 ## Problem Statement
 
-Creating a spec, ADR, durable rule, or local skill currently requires remembering its location, semantic suffix, numbering convention, and required headings. This creates avoidable formatting drift before substantive work begins. The owner requires four durable empty templates and direct Elo commands that create the correctly placed file when invoked without additional input.
+Creating a spec, ADR, durable rule, or local skill currently requires remembering its location, semantic suffix, numbering convention, and required headings. This creates avoidable formatting drift before substantive work begins. The owner requires four durable empty templates and direct Elo creation commands backed by those templates.
 
 ## Solution
 
@@ -69,7 +70,7 @@ Add `.agents/prompts/` as the narrowly owned source for four artifact templates:
 - Spec filenames allocate the next three-digit priority and their frontmatter allocates the next durable `SPEC-###` ID independently.
 - Rule filenames allocate the next three-digit prefix. Until the numbered-rule migration lands, existing unnumbered rule documents count as occupied positions, so generated rules cannot collide with that migration.
 - Skills preserve the established `.agents/skills/<name>/SKILL.md` identity and are not assigned an invented numeric catalog.
-- Creation writes through a same-directory temporary file and never overwrites an existing destination.
+- Creation writes through a private same-directory staging path and publishes without overwriting an existing destination.
 - The prompts are authoring scaffolds, not runtime product prompts and not replacements for workflow approval.
 
 ## Testing Decisions
@@ -80,7 +81,7 @@ Exercise `cli/elo` from an isolated checkout fixture and assert the exact destin
 
 ### Secondary seams
 
-Verify custom slug validation, required headings, non-overwrite behavior, POSIX syntax, help output, and prompt inventory through executable audits.
+Verify custom slug validation, required metadata and headings for every template, reported destination paths, non-overwrite behavior, missing-template cleanup, POSIX syntax, help output, and prompt inventory through executable audits.
 
 ### Fixtures and privacy
 
@@ -92,19 +93,19 @@ Run `./cli/elo doctor --ci`, `./cli/elo check all`, Commitlint, Biome, typecheck
 
 ## Acceptance Criteria
 
-- [ ] `.agents/prompts/` contains exactly the four requested `.prompt.md` templates.
-- [ ] Each template has the canonical metadata and Markdown headings with empty author-owned body sections.
-- [ ] `elo spec` with no argument creates the next `NNN-new-spec.spec.md` with the next durable `SPEC-###` ID.
-- [ ] `elo adr` and `elo rule` create the next correctly prefixed semantic filename.
-- [ ] `elo skill` creates `.agents/skills/new-skill/SKILL.md` without inventing a skill numbering scheme.
-- [ ] Each command accepts an optional lowercase kebab-case slug and rejects invalid or extra arguments with status 2.
-- [ ] Existing targets are never overwritten and failures do not leave partial files.
-- [ ] Help, CLI docs, harness taxonomy, and executable audits describe and enforce the capability.
-- [ ] Exact-head CI and both independent reviews pass before merge.
+- [x] `.agents/prompts/` contains exactly the four requested `.prompt.md` templates.
+- [x] Each template has the canonical metadata and Markdown headings with empty author-owned body sections.
+- [x] `elo spec` with no argument creates the next `NNN-new-spec.spec.md` with the next durable `SPEC-###` ID.
+- [x] `elo adr` and `elo rule` create the next correctly prefixed semantic filename.
+- [x] `elo skill` creates `.agents/skills/new-skill/SKILL.md` without inventing a skill numbering scheme.
+- [x] Each command accepts an optional lowercase kebab-case slug and rejects invalid or extra arguments with status 2.
+- [x] Existing targets are never overwritten and failures do not leave partial files.
+- [x] Help, CLI docs, harness taxonomy, and executable audits describe and enforce the capability.
+- [x] Exact-head CI and both independent reviews pass before merge.
 
 ## Failure Behavior
 
-Missing templates, malformed slugs, exhausted numeric widths, invalid arguments, allocation ambiguity, existing destinations, or write/move failures produce a clear error and non-zero status. Generation never edits the spec catalog automatically, never marks a spec ready, and never overwrites an existing artifact.
+Missing templates, malformed slugs, exhausted numeric widths, invalid arguments, allocation ambiguity, existing destinations, or write/publish failures produce a clear error and non-zero status. Generation never edits the spec catalog automatically, never marks a spec ready, and never overwrites an existing artifact.
 
 ## Out of Scope
 
@@ -115,7 +116,9 @@ Missing templates, malformed slugs, exhausted numeric widths, invalid arguments,
 
 ## Evidence and Promotion
 
-Planned evidence is the isolated public-CLI fixture, prompt inventory checks, exact-head CI, independent Standards review, independent Spec-fidelity review, and merged pull request. Durable prompt ownership is promoted to ADR-0025, root harness navigation, architecture context, and the Markdown rule.
+`.audit/elo-scaffold.audit.sh` exercises the four commands through the public `cli/elo` launcher with default and custom names, validates every generated template shape, verifies status-2 argument failures, protects existing content, and checks failure cleanup. `.audit/specs.audit.sh` constrains the exact prompt inventory, while the architecture and Elo platform audits enforce taxonomy and command integration. Pull request #29 is the stable exact-head CI, independent-review, and merge record.
+
+Template ownership is promoted to ADR-0025, root harness navigation, architecture context, the Markdown rule, and source-organization guidance. No transient evidence is retained.
 
 ## Further Notes
 
