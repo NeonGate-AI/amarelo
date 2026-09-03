@@ -180,12 +180,12 @@ while IFS= read -r package_file; do
 
   if [ "$name" = @ai/conversation ]; then
     conversation_workspace_count=$((conversation_workspace_count + 1))
-    if [ "$workspace_relative" != workspaces/ai/orchestrator/conversation ]; then
+    if [ "$workspace_relative" != workspaces/ai/conversation ]; then
       architecture_fail \
         conversation-topology \
         "$workspace_relative" \
-        "@ai/conversation must live at workspaces/ai/orchestrator/conversation" \
-        "move the Conversation workspace to its canonical orchestrator path"
+        "@ai/conversation must live at workspaces/ai/conversation" \
+        "move the Conversation workspace to its canonical direct AI path"
     fi
   fi
 
@@ -272,8 +272,8 @@ done <"$TMP_ROOT/workspaces"
 if [ "$conversation_workspace_count" -ne 1 ]; then
   architecture_fail \
     conversation-topology \
-    workspaces/ai/orchestrator/conversation \
-    "@ai/conversation must exist exactly once at its canonical orchestrator path" \
+    workspaces/ai/conversation \
+    "@ai/conversation must exist exactly once at its canonical direct AI path" \
     "move or deduplicate the Conversation workspace"
 fi
 
@@ -283,7 +283,7 @@ for required_path in \
   .agents/context/product/strategy.md \
   cli/elo \
   cli/src \
-  workspaces/ai/orchestrator/conversation
+  workspaces/ai/conversation
 do
   [ -e "$PROJECT_ROOT/$required_path" ] ||
     architecture_fail \
@@ -299,8 +299,8 @@ for forbidden_path in \
   tooling \
   workspaces/memory-nucleus/apps \
   workspaces/memory-nucleus/packages \
-  workspaces/ai/conversation \
-  workspaces/ai/orchestrator/conversation/src/agents
+  workspaces/ai/orchestrator \
+  workspaces/ai/conversation/src/agents
 do
   [ ! -e "$PROJECT_ROOT/$forbidden_path" ] ||
     architecture_fail \
@@ -310,10 +310,7 @@ do
       "remove or migrate the path"
 done
 
-for ai_parent in \
-  workspaces/ai/agents \
-  workspaces/ai/orchestrator
-do
+for ai_parent in workspaces/ai/agents; do
   for forbidden_child in package.json src tsconfig.json; do
     ai_parent_child="$ai_parent/$forbidden_child"
     [ ! -e "$PROJECT_ROOT/$ai_parent_child" ] ||
@@ -324,6 +321,14 @@ do
         "move ownership into a named child workspace"
   done
 done
+
+if grep -F 'workspaces/ai/orchestrator/*' "$PROJECT_ROOT/pnpm-workspace.yaml" >/dev/null 2>&1; then
+  architecture_fail \
+    conversation-topology \
+    pnpm-workspace.yaml \
+    "retired orchestrator workspace glob remains" \
+    "remove the nested glob and discover Conversation through workspaces/ai/*"
+fi
 
 for expected_dir in adrs context rules skills specs; do
   [ -d "$PROJECT_ROOT/.agents/$expected_dir" ] ||
@@ -582,7 +587,7 @@ if grep -F '"@neongate-ai/neon"' "$PROJECT_ROOT/package.json" >/dev/null 2>&1; t
     elo-ownership \
     package.json \
     "external generic Neon CLI dependency remains after Elo cutover" \
-    "remove @neongate-ai/neon and regenerate the lockfile"
+    "remove @neongate-ai/neon without creating pnpm-lock.yaml"
 fi
 
 if [ "$failures" -gt 0 ]; then
