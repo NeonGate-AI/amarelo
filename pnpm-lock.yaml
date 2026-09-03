@@ -40,7 +40,24 @@ importers:
         specifier: 5.9.2
         version: 5.9.2
 
-  workspaces/ai/agents/ana: {}
+  workspaces/ai/agents/ana:
+    dependencies:
+      '@ai/conversation':
+        specifier: workspace:*
+        version: link:../../conversation
+      zod:
+        specifier: 4.4.3
+        version: 4.4.3
+    devDependencies:
+      '@types/node':
+        specifier: 24.13.3
+        version: 24.13.3
+      tsx:
+        specifier: 4.23.12
+        version: 4.23.12
+      typescript:
+        specifier: 5.9.2
+        version: 5.9.2
 
   workspaces/ai/conversation:
     dependencies:
@@ -287,6 +304,22 @@ importers:
       '@repo/evaluation':
         specifier: workspace:*
         version: link:../packages/evaluation
+      '@types/node':
+        specifier: 24.13.3
+        version: 24.13.3
+      tsx:
+        specifier: 4.23.12
+        version: 4.23.12
+      typescript:
+        specifier: 5.9.2
+        version: 5.9.2
+
+  workspaces/packages/conversation-sdk:
+    dependencies:
+      zod:
+        specifier: 4.4.3
+        version: 4.4.3
+    devDependencies:
       '@types/node':
         specifier: 24.13.3
         version: 24.13.3
