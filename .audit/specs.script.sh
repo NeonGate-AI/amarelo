@@ -238,6 +238,43 @@ for catalog_path in "$SPEC_ROOT"/*.md; do
   esac
 done
 
+reference_scan="$TMP_ROOT/reference-files"
+find "$PROJECT_ROOT" \
+  \( -path "$PROJECT_ROOT/.git" -o \
+     -path "$PROJECT_ROOT/node_modules" -o \
+     -path '*/node_modules' -o \
+     -path '*/dist' -o \
+     -path '*/.turbo' \) -prune -o \
+  -type f \( -name '*.md' -o -name '*.sh' -o -name '*.yml' -o -name '*.yaml' \) -print |
+  sort >"$reference_scan"
+
+while IFS= read -r reference_file; do
+  [ -n "$reference_file" ] || continue
+  if grep -Eq '\.agents/specs/(ai|console|harness|history|landing|mobile|onboarding|product)/' "$reference_file"; then
+    spec_fail \
+      stale-spec-reference \
+      "${reference_file#"$PROJECT_ROOT"/}" \
+      "reference points into a removed spec subdirectory" \
+      "replace it with the canonical flat priority path"
+  fi
+done <"$reference_scan"
+
+index_targets="$TMP_ROOT/index-targets"
+sed -n 's/.*](\([^)]*\.md\)).*/\1/p' "$SPEC_ROOT/readme.md" >"$index_targets"
+while IFS= read -r index_target; do
+  [ -n "$index_target" ] || continue
+  case "$index_target" in
+    http://*|https://*) continue ;;
+  esac
+  if [ ! -f "$SPEC_ROOT/$index_target" ]; then
+    spec_fail \
+      spec-index-reference \
+      .agents/specs/readme.md \
+      "catalog link $index_target does not resolve" \
+      "point the index at an existing flat spec file"
+  fi
+done <"$index_targets"
+
 delivery_list="$TMP_ROOT/delivery-files"
 find "$SPEC_ROOT" -maxdepth 1 -type f \
   -name '0[0-9][0-9]-*.md' -print |

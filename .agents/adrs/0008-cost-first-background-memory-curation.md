@@ -92,4 +92,4 @@ economic evidence; compilation alone is insufficient.
 - Memory constitution: `.agents/MEMORY.md`
 - Runtime architecture: `elos/ai/ARCHITECTURE.md`
 - Memory Nucleus architecture: `elos/memory-nucleus/README.md`
-- Curation delivery spec: `.agents/specs/013-background-memory-curation-loop.md`
+- Curation delivery spec: `.agents/specs/014-background-memory-curation-loop.md`

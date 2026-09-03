@@ -25,10 +25,10 @@ The specification catalog is flat, priority-ordered and mechanically checked.
 | 010 | SPEC-013 | implemented | [Flat priority spec catalog](010-flat-priority-spec-catalog.md) |
 | 011 | SPEC-014 | reserved | Spec-driven pull request evidence template |
 | 012 | SPEC-009 | ready | [First real Ana/PWA conversation and serving baseline](012-first-agentic-pwa-conversation.md) |
-| 013 | SPEC-012 | ready | [Durable background memory-curation loop](013-background-memory-curation-loop.md) |
-| 014 | SPEC-011 | ready | [Bounded Memory Nucleus serving context](014-bounded-nucleus-serving-context.md) |
+| 013 | SPEC-011 | ready | [Bounded Memory Nucleus serving context](013-bounded-nucleus-serving-context.md) |
+| 014 | SPEC-012 | ready | [Durable background memory-curation loop](014-background-memory-curation-loop.md) |
 
-The next durable delivery ID is `SPEC-014`. Priority `011` is reserved for it. The active product order is baseline conversation, background curation, shadow/parity, controlled A/B and canary, then scale.
+The next durable delivery ID is `SPEC-014`. Priority `011` is reserved for it. The current declared dependency order is baseline conversation, bounded serving context and background curation. The post-governance audit will rewrite it to the canonical baseline, background, shadow/parity, A/B/canary and scale sequence before product execution.
 
 ## Behavior contracts
 

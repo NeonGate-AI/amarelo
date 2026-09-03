@@ -48,7 +48,7 @@ Migrate every specification document into the root of `.agents/specs/`. Support 
 
 Treat the filename prefix as mutable catalog priority. Keep the frontmatter `id` as the durable delivery identity where one already exists, so PR, evidence and ADR references do not become ambiguous when priorities change. Behavior specs retain their semantic contract identity when present. Update every repository reference, workflow rule and mechanical checker atomically.
 
-Order active work around the canonical Memory Nucleus thesis: prove a real conversation seam with a serving baseline, curate asynchronously, validate memory projections in shadow mode, then run controlled A/B and canary stages. Completed foundation documents remain first as delivered prerequisites; the index identifies the next ready priority explicitly.
+Preserve the currently declared executable dependencies in this structural migration and reserve the final semantic reprioritization for the post-governance audit. That audit will rewrite the active contracts into the canonical sequence: serving baseline, asynchronous curation, shadow/parity, controlled A/B and canary, then scale.
 
 ## User Stories
 
@@ -67,7 +67,7 @@ This change owns:
 - removing all spec subdirectories, including `history/`;
 - preserving `readme.md`, `template.md` and `workflow.md` as unnumbered support documents;
 - defining filename priority separately from durable spec identity;
-- ordering current and planned work by dependency and canonical Memory Nucleus validation value;
+- ordering the current catalog by declared dependencies while documenting the canonical post-governance target sequence;
 - updating paths in specs, rules, context, ADRs, skills, checks and root instructions;
 - changing the spec checker to enforce the new catalog;
 - updating workflow language that currently treats filenames and implemented delivery documents as immutable chronology;
@@ -83,7 +83,7 @@ This change owns:
 - `readme.md`, `template.md` and `workflow.md` are the only unnumbered Markdown files allowed directly under `.agents/specs/`.
 - No directory is allowed below `.agents/specs/`.
 - Implemented and retrospective documents remain readable but no dedicated history directory or history-only naming rule remains.
-- The top of the catalog follows product dependencies and the PDF validation sequence; completed repository scaffolding follows the active product chain.
+- The first migration preserves declared product blockers; the later semantic audit may reorder priorities only after rewriting those contracts to the PDF validation sequence.
 - All path references are rewritten in the same commit as each move.
 - The checker validates unique priority ranks, flatness, allowed support files, delivery metadata and reference integrity without assuming priority equals spec ID.
 
@@ -118,7 +118,7 @@ The change uses repository metadata only and processes no user data. Any checker
 - [x] Every spec document filename matches `NNN-lowercase-kebab-case.md`.
 - [x] `readme.md`, `template.md` and `workflow.md` remain the only unnumbered support documents.
 - [x] Numeric priority prefixes are unique, and the reserved delivery gap is documented.
-- [x] Active priorities follow the canonical Memory Nucleus validation dependencies.
+- [x] Active priorities preserve their currently declared blockers and reserve the canonical semantic reordering for the post-governance audit.
 - [x] Durable delivery IDs and evidence links remain traceable after moves.
 - [x] No repository reference points to a removed spec path or legacy filename.
 - [x] The spec workflow and always-applied rule define mutable filename priority and a flat catalog.
