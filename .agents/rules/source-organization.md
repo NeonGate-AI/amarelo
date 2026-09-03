@@ -1,5 +1,5 @@
 ---
-version: 4
+version: 5
 extends: code-style.md
 name: Source Organization
 description: Source roots, module boundaries, file naming, barrels, and architectural source ownership.
@@ -43,6 +43,8 @@ Files under `cli/src/` are shell modules ending in `.sh`. Commands live under `c
 
 `cli/elo` is a thin launcher and contains no substantive CLI behavior.
 
+Executable repository/package automation enters through a POSIX `.sh` file. When structured data, typed contracts or non-trivial state make shell inappropriate, the `.sh` entrypoint may delegate to an owning TypeScript backend. The design-system token builder follows this shell-front/typed-backend form.
+
 ## 3. One primary artifact per module
 
 Each source module has one primary exported artifact or concern: one function, class, interface/type, schema, component, hook, command, adapter, port, agent, or equivalent behavior.
@@ -83,7 +85,7 @@ Use only suffixes defined here for project-created semantic modules. Add a suffi
 | `.port` | Application/architecture port | `memory-repository.port.ts` |
 | `.prompt` | Prompt artifact | `memory-extraction.prompt.ts` |
 | `.schema` | Runtime/schema definition | `memory.schema.ts` |
-| `.script` | Temporary executable audit/check script | `.audit/architecture.script.mjs` |
+| `.script` | Temporary executable audit/check script | `.audit/architecture.script.sh` |
 | `.server` | React server component/module | `logo.server.tsx` |
 | `.service` | Cohesive service | `projection.service.ts` |
 | `.state` | Initial/default state | `session.state.ts` |
@@ -145,7 +147,9 @@ AI-engineering assurance source belongs under the owner's `src/assurance/` area 
 
 `.audit/` is outside `.agents/`, product source roots, and CLI source. It is the temporary evidence/checking plane.
 
-Generated evidence is ignored. During an active migration, narrowly scoped checker `.mjs` files may be committed in `.audit/` so CI and reviewers can reproduce the audit. They must be deleted once their invariant is promoted into a durable mechanism.
+Generated evidence is ignored. During an active migration, narrowly scoped executable checker `.script.sh` files may be committed in `.audit/` so CI and reviewers can reproduce the audit. Executable repository audit/check scripts use POSIX shell and end in `.sh`; `.script.mjs` is not an allowed executable audit format. Package `scripts` must not execute `.mjs` automation; use a shell entrypoint and, when needed, an owning typed backend.
+
+Framework-owned `.mjs` configuration modules, including `postcss.config.mjs`, are not executable repository audit scripts and remain in the locations and formats required by their tools.
 
 Audit artifacts are not canonical engineering context. Promote durable conclusions into `.agents/context`, `rules`, `specs`, `adrs`, or `skills` before deleting them.
 
@@ -165,10 +169,12 @@ Preserve framework-aware frontend architecture while normalizing source roots:
 
 Turborepo/root task scripts own `dev`, `start`, `build`, `typecheck`, tests and workspace task graphs.
 
-Elo owns monorepo platform operations: bootstrap/setup, doctor, cleanup, environment preparation/validation, Git/Husky/Commitlint/lint-staged setup and thin audit-check entrypoints. `pnpm elo` bootstraps the local Elo environment through `cli/elo`.
+Elo owns monorepo platform operations: bootstrap, user-scoped direct-command setup, doctor, cleanup, environment preparation/validation, Git/Husky/Commitlint/lint-staged setup and thin audit-check entrypoints. The canonical repository binary remains `cli/elo`; `elo setup` installs a managed user launcher without publishing a global npm package or editing shell profiles.
 
-The `.mjs` checkers themselves live in `.audit/`, never under `cli/src/`.
+A local `pnpm install` invokes `elo setup` through `postinstall`. `pnpm postclone` is an explicit recovery alias because npm and pnpm do not define an automatic post-clone lifecycle. `pnpm elo` and `./cli/elo` remain compatibility/recovery entrypoints.
+
+The shell checkers themselves live in `.audit/`, never under `cli/src/`.
 
 ## 14. Mechanical enforcement
 
-Temporary `.audit` checkers and durable CI/harness mechanisms enforce filesystem/import invariants. Elo may expose a shell entrypoint that invokes an active audit checker, but Elo does not own the checker implementation.
+Executable `.audit/*.script.sh` checkers and durable CI/harness mechanisms enforce filesystem/import invariants. Elo exposes shell entrypoints that invoke active audit checkers, but Elo does not own their implementation or duplicate the repository task graph.
