@@ -68,6 +68,15 @@ export default defineConfig({
       '@': fileURLToPath(new URL('./src', import.meta.url))
     }
   },
-  server: developmentServer,
+  server: {
+    ...developmentServer,
+    proxy: {
+      '/api': {
+        changeOrigin: false,
+        rewrite: (requestPath) => requestPath.replace(/^\/api/u, ''),
+        target: 'http://127.0.0.1:3004'
+      }
+    }
+  },
   preview: developmentServer
 })

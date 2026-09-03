@@ -221,6 +221,9 @@ importers:
       '@phosphor-icons/react':
         specifier: ^2.1.10
         version: 2.1.10(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
+      '@repo/conversation-sdk':
+        specifier: workspace:*
+        version: link:../../packages/conversation-sdk
       '@repo/ds':
         specifier: workspace:*
         version: link:../../packages/design-system
@@ -255,6 +258,9 @@ importers:
       tailwindcss:
         specifier: 4.3.3
         version: 4.3.3
+      tsx:
+        specifier: 4.23.12
+        version: 4.23.12
       typescript:
         specifier: 5.9.2
         version: 5.9.2
