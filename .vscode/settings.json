@@ -40,7 +40,7 @@
     "console": "layout",
     "landing": "public",
     "onboarding": "path",
-    "skills": "jinja",
+    "skills": "skills",
     "react": "react-components",
     "adrs": "scripts",
     "rules": "rules",
@@ -59,14 +59,16 @@
     "ranking-evaluation": "coverage",
     "common": "internal",
     "workspaces": "sky",
-    "cli": "core",
+    "cli": "other",
     ".audit": "benchmark",
     "evaluation": "chart",
     "packages": "plastic",
     "architecture": "project",
     "memory-sdk": "sdk",
     "runtime": "rocket",
-    "product": "notification"
+    "product": "notification",
+    "state": "atom",
+    "atoms": "atom"
   },
 
   "flow-icons.files.associations": {
