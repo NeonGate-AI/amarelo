@@ -116,6 +116,17 @@ jobs:
                   raise RuntimeError(f'expected app source is missing: {old!r}')
               app = app.replace(old, new, 1)
           app_path.write_text(app, encoding='utf-8')
+
+          eval_path = Path(
+              'workspaces/apps/conversation-api/src/assurance/evals/'
+              'conversation-api/conversation-api.eval.ts'
+          )
+          evaluation = eval_path.read_text(encoding='utf-8')
+          old_message = "  message: 'Oi, Ana.',\n"
+          if old_message not in evaluation:
+              raise RuntimeError('expected contextual fixture message is missing')
+          evaluation = evaluation.replace(old_message, "  message: 'Oi!',\n", 1)
+          eval_path.write_text(evaluation, encoding='utf-8')
           PY
           pnpm install --lockfile-only
           pnpm install --frozen-lockfile
