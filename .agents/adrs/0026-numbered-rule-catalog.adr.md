@@ -14,7 +14,7 @@ Every durable rule is a direct `.agents/rules/NNN-lowercase-kebab-case.rule.md` 
 
 Assign the initial eleven identities in lexical slug order: `001` architecture, `002` code style, `003` context engineering, `004` import boundaries, `005` Markdown, `006` Memory Nucleus, `007` package ownership, `008` product safety and privacy, `009` React and Next.js, `010` source organization, and `011` spec-driven development.
 
-The prefix is a stable catalog identity, not enforcement precedence. Frontmatter `priority` continues to govern precedence. New rules receive one greater than the highest allocated identity. Retired identities are not reused or compacted, and canonical path changes update every repository reference atomically without compatibility aliases.
+The prefix is a stable catalog identity and never defines enforcement precedence. Existing rule metadata and authored policy remain authoritative. New rules receive one greater than the highest allocated identity. Retired identities are not reused or compacted, and canonical path changes update every repository reference atomically without compatibility aliases.
 
 ## Consequences
 

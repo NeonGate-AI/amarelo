@@ -505,8 +505,11 @@ mkdir -p \
 cp -R "$PROJECT_ROOT/cli" "$scaffold_root/cli"
 cp -R "$PROJECT_ROOT/.agents/prompts" "$scaffold_root/.agents/prompts"
 : >"$scaffold_root/.agents/adrs/0025-existing.adr.md"
+scaffold_rule_number=1
 for scaffold_rule in architecture code-style context-engineering import-boundaries markdown memory-nucleus package-ownership product-safety-and-privacy react-and-next source-organization spec-driven-development; do
-  : >"$scaffold_root/.agents/rules/$scaffold_rule.rule.md"
+  scaffold_rule_prefix=$(printf '%03d' "$scaffold_rule_number")
+  : >"$scaffold_root/.agents/rules/$scaffold_rule_prefix-$scaffold_rule.rule.md"
+  scaffold_rule_number=$((scaffold_rule_number + 1))
 done
 cat >"$scaffold_root/.agents/specs/030-existing.spec.md" <<'EOF'
 ---

@@ -117,7 +117,7 @@ if [ -f "$RULE_ROOT/readme.md" ]; then
 
   for phrase in \
     'stable catalog identity' \
-    'Frontmatter `priority` governs precedence' \
+    'never defines enforcement order or precedence' \
     'never reassigned, compacted, or reused' \
     'only unnumbered support document'
   do

@@ -31,7 +31,7 @@ Harness artifacts use semantic suffixes at their ownership boundary:
 - artifact templates: `<type>.prompt.md` under `.agents/prompts/`;
 - executable audit checkers: `lowercase-kebab-case.audit.sh` under `.audit/`.
 
-Context documents, skills, prompt templates, `.agents/rules/readme.md`, and the unnumbered spec support files `readme.md`, `template.md` and `workflow.md` keep their ordinary names. Rule prefixes are stable catalog identities; frontmatter `priority` governs precedence. Repository references must use the exact semantic filename; do not reintroduce unsuffixed ADR, rule, numbered-spec or audit-checker paths.
+Context documents, skills, prompt templates, `.agents/rules/readme.md`, and the unnumbered spec support files `readme.md`, `template.md` and `workflow.md` keep their ordinary names. Rule prefixes are stable catalog identities and never imply precedence; existing rule metadata and authored policy remain authoritative. Repository references must use the exact semantic filename; do not reintroduce unsuffixed ADR, rule, numbered-spec or audit-checker paths.
 
 ## Evidence is not canonical context
 

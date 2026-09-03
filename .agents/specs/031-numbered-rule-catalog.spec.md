@@ -56,7 +56,7 @@ The durable rule documents use semantic `.rule.md` suffixes but still have unnum
 
 ## Solution
 
-Assign the eleven current canonical rules stable three-digit catalog prefixes in lexical slug order, from `001` through `011`, while preserving their authored content and semantic slugs. Keep `.agents/rules/readme.md` as the unnumbered support document. Treat the prefix as durable catalog identity rather than enforcement precedence; the existing frontmatter `priority` field continues to express precedence.
+Assign the eleven current canonical rules stable three-digit catalog prefixes in lexical slug order, from `001` through `011`, while preserving their authored content and semantic slugs. Keep `.agents/rules/readme.md` as the unnumbered support document. Treat the prefix as durable catalog identity that never implies enforcement precedence; existing rule metadata and authored policy remain unchanged.
 
 Update every repository reference atomically, add a catalog table and lifecycle rules to the rules index, simplify Elo rule allocation around the fully numbered catalog, and add an executable rules audit that rejects unnumbered rules, duplicate or malformed identities, stale legacy paths, and index drift.
 
@@ -89,7 +89,7 @@ Update every repository reference atomically, add a catalog table and lifecycle 
   - `009` React and Next.js
   - `010` source organization
   - `011` spec-driven development
-- Prefixes are stable catalog identities, not mutable priorities. Rule frontmatter `priority` remains the source of enforcement precedence.
+- Prefixes are stable catalog identities and never define enforcement precedence; existing rule metadata and authored policy remain authoritative.
 - Existing identities are not reused. New rules receive one greater than the highest allocated prefix.
 - Rule content, frontmatter meaning, and applicability do not change in this migration.
 - No compatibility aliases remain at the old unnumbered paths; all consumers move in the same change.
@@ -117,7 +117,7 @@ Run `./cli/elo doctor --ci`, `./cli/elo check all`, Commitlint, lint, typecheck,
 
 - [ ] Every canonical rule except `readme.md` uses a unique `NNN-lowercase-kebab-case.rule.md` path.
 - [ ] The eleven existing rules map to `001`–`011` in lexical slug order without semantic content changes.
-- [ ] Prefixes are documented as stable identities, while frontmatter `priority` remains enforcement precedence.
+- [ ] Prefixes are documented as stable identities that never imply precedence, and existing rule metadata is preserved.
 - [ ] Every exact repository reference uses the numbered path and no old unnumbered rule path remains.
 - [ ] The rule index lists every numbered rule exactly once and documents addition, retirement, and non-reuse behavior.
 - [ ] `elo rule` allocates `012` for the next rule and fails closed on malformed, duplicate, or ambiguous catalogs.
