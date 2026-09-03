@@ -16,7 +16,7 @@ LAUNCHER="$PROJECT_ROOT/cli/elo"
 DESIGN_SYSTEM_ROOT="$PROJECT_ROOT/workspaces/packages/design-system"
 TOKEN_SCRIPT="$DESIGN_SYSTEM_ROOT/src/scripts/build-tokens.sh"
 TOKEN_BACKEND="$DESIGN_SYSTEM_ROOT/src/scripts/build-tokens.ts"
-TMP_ROOT="${TMPDIR:-/tmp}/amarelo-elo-platform.$"
+TMP_ROOT="${TMPDIR:-/tmp}/amarelo-elo-platform.$$"
 doctor_fifo_writer=
 umask 077
 mkdir "$TMP_ROOT" || {
