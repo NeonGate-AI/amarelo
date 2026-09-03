@@ -1,6 +1,6 @@
 ---
 version: 7
-extends: code-style.rule.md
+extends: 002-code-style.rule.md
 name: Source Organization
 description: Source roots, module boundaries, file naming, barrels, and architectural source ownership.
 alwaysApply: true
@@ -43,7 +43,7 @@ Files under `cli/src/` are shell modules ending in `.sh`. Commands live under `c
 
 `cli/elo` is a thin launcher and contains no substantive CLI behavior.
 
-Engineering artifact skeletons live only in `.agents/prompts/` and are consumed by Elo's scaffold command. They are not executable source and do not change the rule that runtime AI `.prompt.ts` modules live in their owning workspace source tree.
+Durable repository rules are direct `.agents/rules/NNN-lowercase-kebab-case.rule.md` children. Their numeric prefix is a stable catalog identity, while frontmatter `priority` controls precedence. Engineering artifact skeletons live only in `.agents/prompts/` and are consumed by Elo's scaffold command. They are not executable source and do not change the rule that runtime AI `.prompt.ts` modules live in their owning workspace source tree.
 
 Executable repository/package automation enters through a POSIX `.sh` file. When structured data, typed contracts or non-trivial state make shell inappropriate, the `.sh` entrypoint may delegate to an owning TypeScript backend. The design-system token builder follows this shell-front/typed-backend form.
 

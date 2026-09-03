@@ -109,8 +109,8 @@ document_title() {
 
 for required_file in \
   AGENTS.md \
-  .agents/rules/markdown.rule.md \
-  .agents/rules/spec-driven-development.rule.md \
+  .agents/rules/005-markdown.rule.md \
+  .agents/rules/011-spec-driven-development.rule.md \
   .agents/specs/readme.md \
   .agents/specs/template.md \
   .agents/specs/workflow.md \
@@ -150,8 +150,8 @@ grep -F '.agents/rules/*.rule.md' "$PROJECT_ROOT/AGENTS.md" >/dev/null 2>&1 ||
     "the engineering entrypoint does not load canonical rule suffixes" \
     "load alwaysApply rules from .agents/rules/*.rule.md"
 grep -Eq '^alwaysApply:[[:space:]]*true[[:space:]]*$' \
-  "$PROJECT_ROOT/.agents/rules/spec-driven-development.rule.md" ||
-  spec_fail always-apply-rule .agents/rules/spec-driven-development.rule.md \
+  "$PROJECT_ROOT/.agents/rules/011-spec-driven-development.rule.md" ||
+  spec_fail always-apply-rule .agents/rules/011-spec-driven-development.rule.md \
     "the spec-driven rule is not always applied" \
     "declare alwaysApply: true"
 

@@ -18,10 +18,10 @@ context:
   - .agents/context/architecture/overview.md
   - .agents/context/engineering/workflow-skills.md
 rules:
-  - .agents/rules/architecture.rule.md
-  - .agents/rules/markdown.rule.md
-  - .agents/rules/source-organization.rule.md
-  - .agents/rules/spec-driven-development.rule.md
+  - .agents/rules/001-architecture.rule.md
+  - .agents/rules/005-markdown.rule.md
+  - .agents/rules/010-source-organization.rule.md
+  - .agents/rules/011-spec-driven-development.rule.md
 adrs:
   - .agents/adrs/0022-posix-elo-control-plane.adr.md
   - .agents/adrs/0025-agent-artifact-prompt-templates.adr.md

@@ -72,8 +72,11 @@ cp -R "$PROJECT_ROOT/.agents/prompts" "$FIXTURE_ROOT/.agents/prompts" || {
 }
 
 : >"$FIXTURE_ROOT/.agents/adrs/0025-existing.adr.md"
+scaffold_rule_number=1
 for scaffold_rule in architecture code-style context-engineering import-boundaries markdown memory-nucleus package-ownership product-safety-and-privacy react-and-next source-organization spec-driven-development; do
-  : >"$FIXTURE_ROOT/.agents/rules/$scaffold_rule.rule.md"
+  scaffold_rule_prefix=$(printf '%03d' "$scaffold_rule_number")
+  : >"$FIXTURE_ROOT/.agents/rules/$scaffold_rule_prefix-$scaffold_rule.rule.md"
+  scaffold_rule_number=$((scaffold_rule_number + 1))
 done
 cat >"$FIXTURE_ROOT/.agents/specs/030-existing.spec.md" <<'SPEC'
 ---
@@ -222,6 +225,28 @@ if ! "$LAUNCHER" rule custom-rule >"$TMP_ROOT/custom-rule.out" 2>&1 ||
 then
   scaffold_fail cli/src/commands/scaffold.sh "elo rule did not accept a custom slug"
 fi
+
+: >"$FIXTURE_ROOT/.agents/rules/legacy.rule.md"
+"$LAUNCHER" rule blocked-rule >"$TMP_ROOT/malformed-rule.out" 2>&1
+malformed_rule_status=$?
+[ "$malformed_rule_status" -ne 0 ] ||
+  scaffold_fail cli/src/commands/scaffold.sh "an unnumbered rule catalog entry must fail allocation"
+[ ! -e "$FIXTURE_ROOT/.agents/rules/014-blocked-rule.rule.md" ] ||
+  scaffold_fail cli/src/commands/scaffold.sh "malformed rule allocation created a target"
+grep -F 'malformed rule filename' "$TMP_ROOT/malformed-rule.out" >/dev/null 2>&1 ||
+  scaffold_fail cli/src/commands/scaffold.sh "malformed rule failure did not explain the catalog error"
+rm -f "$FIXTURE_ROOT/.agents/rules/legacy.rule.md"
+
+: >"$FIXTURE_ROOT/.agents/rules/013-duplicate.rule.md"
+"$LAUNCHER" rule blocked-rule >"$TMP_ROOT/duplicate-rule.out" 2>&1
+duplicate_rule_status=$?
+[ "$duplicate_rule_status" -ne 0 ] ||
+  scaffold_fail cli/src/commands/scaffold.sh "a duplicate rule identity must fail allocation"
+[ ! -e "$FIXTURE_ROOT/.agents/rules/014-blocked-rule.rule.md" ] ||
+  scaffold_fail cli/src/commands/scaffold.sh "duplicate rule allocation created a target"
+grep -F 'Duplicate rule prefix: 013' "$TMP_ROOT/duplicate-rule.out" >/dev/null 2>&1 ||
+  scaffold_fail cli/src/commands/scaffold.sh "duplicate rule failure did not identify the prefix"
+rm -f "$FIXTURE_ROOT/.agents/rules/013-duplicate.rule.md"
 
 if ! "$LAUNCHER" skill custom-skill >"$TMP_ROOT/custom-skill.out" 2>&1 ||
   [ ! -f "$FIXTURE_ROOT/.agents/skills/custom-skill/SKILL.md" ]

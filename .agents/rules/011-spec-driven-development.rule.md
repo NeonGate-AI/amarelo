@@ -30,3 +30,4 @@ tags:
 - Every numbered spec is a direct child of `.agents/specs/` named `NNN-lowercase-kebab-case.spec.md`; only `readme.md`, `template.md` and `workflow.md` are unnumbered.
 - Filename priority and durable spec identity are separate. Priority ranks are unique, and reserved ranks must be declared in the catalog index.
 - Spec frontmatter and cross-references use the canonical `.rule.md`, `.adr.md` and `.spec.md` paths.
+- Every durable rule is a direct `.agents/rules/NNN-lowercase-kebab-case.rule.md` child; `readme.md` is the only unnumbered support document, and rule IDs are never reused or renumbered to express precedence.

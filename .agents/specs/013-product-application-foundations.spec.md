@@ -18,9 +18,9 @@ context:
   - .agents/context/workflows/
   - .agents/context/product/
 rules:
-  - .agents/rules/react-and-next.rule.md
-  - .agents/rules/product-safety-and-privacy.rule.md
-  - .agents/rules/package-ownership.rule.md
+  - .agents/rules/009-react-and-next.rule.md
+  - .agents/rules/008-product-safety-and-privacy.rule.md
+  - .agents/rules/007-package-ownership.rule.md
 adrs:
   - .agents/adrs/
 skills:

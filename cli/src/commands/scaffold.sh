@@ -60,18 +60,18 @@ elo_scaffold_next_prefix() {
 
 elo_scaffold_next_rule_prefix() {
   elo_scaffold_rule_max=0
-  elo_scaffold_rule_count=0
   elo_scaffold_rule_seen=' '
 
   for elo_scaffold_path in "$ELO_PROJECT_ROOT"/.agents/rules/*.rule.md; do
     [ -f "$elo_scaffold_path" ] || continue
-    elo_scaffold_rule_count=$((elo_scaffold_rule_count + 1))
     elo_scaffold_base=${elo_scaffold_path##*/}
+    if ! printf '%s
+' "$elo_scaffold_base" |
+      grep -Eq '^[0-9][0-9][0-9]-[a-z0-9]+(-[a-z0-9]+)*\.rule\.md$'
+    then
+      elo_die "Cannot allocate after malformed rule filename: $(elo_rel "$elo_scaffold_path")."
+    fi
     elo_scaffold_prefix=${elo_scaffold_base%%-*}
-    [ "${#elo_scaffold_prefix}" -eq 3 ] || continue
-    case "$elo_scaffold_prefix" in
-      *[!0-9]*) continue ;;
-    esac
     elo_scaffold_number=$(elo_scaffold_decimal "$elo_scaffold_prefix" 3 "Rule prefix")
     case "$elo_scaffold_rule_seen" in
       *" $elo_scaffold_number "*) elo_die "Duplicate rule prefix: $elo_scaffold_prefix" ;;
@@ -83,11 +83,9 @@ elo_scaffold_next_rule_prefix() {
   done
 
   elo_scaffold_next=$((elo_scaffold_rule_max + 1))
-  if [ "$elo_scaffold_next" -le "$elo_scaffold_rule_count" ]; then
-    elo_scaffold_next=$((elo_scaffold_rule_count + 1))
-  fi
   [ "$elo_scaffold_next" -le 999 ] || elo_die "Three-digit rule numbering is exhausted."
-  printf '%03d\n' "$elo_scaffold_next"
+  printf '%03d
+' "$elo_scaffold_next"
 }
 
 elo_scaffold_next_spec_id() {

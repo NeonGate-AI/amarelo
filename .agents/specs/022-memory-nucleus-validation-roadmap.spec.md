@@ -17,11 +17,11 @@ context:
   - .agents/context/workspaces/ai/conversation.md
   - .agents/context/workspaces/memory-nucleus/overview.md
 rules:
-  - .agents/rules/architecture.rule.md
-  - .agents/rules/markdown.rule.md
-  - .agents/rules/memory-nucleus.rule.md
-  - .agents/rules/product-safety-and-privacy.rule.md
-  - .agents/rules/spec-driven-development.rule.md
+  - .agents/rules/001-architecture.rule.md
+  - .agents/rules/005-markdown.rule.md
+  - .agents/rules/006-memory-nucleus.rule.md
+  - .agents/rules/008-product-safety-and-privacy.rule.md
+  - .agents/rules/011-spec-driven-development.rule.md
 adrs:
   - .agents/adrs/0003-authorization-before-retrieval.adr.md
   - .agents/adrs/0008-cost-first-background-memory-curation.adr.md

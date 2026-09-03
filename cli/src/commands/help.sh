@@ -27,7 +27,7 @@ Commands:
   🌱 env <setup|validate>                   Prepare or validate environment files
   🔧 git <setup|doctor|pre-commit|commit-msg>
                                              Manage repository Git integration
-  🧪 check <all|architecture|imports|memory|platform|skills|specs>
+  🧪 check <all|architecture|imports|memory|platform|rules|skills|specs>
                                              Run invariant checkers
 
 Global flags:

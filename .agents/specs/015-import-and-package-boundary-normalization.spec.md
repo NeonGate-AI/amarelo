@@ -16,10 +16,10 @@ targets:
 context:
   - .agents/context/workspaces/
 rules:
-  - .agents/rules/import-boundaries.rule.md
-  - .agents/rules/source-organization.rule.md
-  - .agents/rules/package-ownership.rule.md
-  - .agents/rules/react-and-next.rule.md
+  - .agents/rules/004-import-boundaries.rule.md
+  - .agents/rules/010-source-organization.rule.md
+  - .agents/rules/007-package-ownership.rule.md
+  - .agents/rules/009-react-and-next.rule.md
 adrs:
   - .agents/adrs/
 skills:

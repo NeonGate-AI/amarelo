@@ -14,7 +14,7 @@ tags:
 
 - Project-owned Markdown filenames are lowercase, except tool-mandated compatibility files such as root `AGENTS.md`.
 - ADRs under `.agents/adrs/` end in `.adr.md`.
-- Durable rules under `.agents/rules/` end in `.rule.md`.
+- Durable rules under `.agents/rules/` use `NNN-lowercase-kebab-case.rule.md`; `readme.md` is the only unnumbered support-file exception there.
 - Numbered specs under `.agents/specs/` use `NNN-lowercase-kebab-case.spec.md`; `readme.md`, `template.md` and `workflow.md` are the only unnumbered support-file exceptions there.
 - Engineering artifact templates under `.agents/prompts/` are exactly `adr.prompt.md`, `rule.prompt.md`, `skill.prompt.md` and `spec.prompt.md`.
 - Executable repository checkers under `.audit/` end in `.audit.sh`. Transient evidence may use other descriptive names but must not be tracked as a canonical checker.

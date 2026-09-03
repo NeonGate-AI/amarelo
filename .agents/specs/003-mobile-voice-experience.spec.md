@@ -16,8 +16,8 @@ context:
   - .agents/context/workflows/mobile.md
   - .agents/context/product/overview.md
 rules:
-  - .agents/rules/product-safety-and-privacy.rule.md
-  - .agents/rules/react-and-next.rule.md
+  - .agents/rules/008-product-safety-and-privacy.rule.md
+  - .agents/rules/009-react-and-next.rule.md
 adrs:
   - .agents/adrs/0001-shared-longitudinal-memory.adr.md
   - .agents/adrs/0005-orbz-web-component.adr.md

@@ -19,10 +19,10 @@ context:
   - .agents/context/workspaces/ai/overview.md
   - .agents/context/workspaces/ai/conversation.md
 rules:
-  - .agents/rules/architecture.rule.md
-  - .agents/rules/import-boundaries.rule.md
-  - .agents/rules/source-organization.rule.md
-  - .agents/rules/spec-driven-development.rule.md
+  - .agents/rules/001-architecture.rule.md
+  - .agents/rules/004-import-boundaries.rule.md
+  - .agents/rules/010-source-organization.rule.md
+  - .agents/rules/011-spec-driven-development.rule.md
 adrs:
   - .agents/adrs/0019-ai-orchestrator-topology.adr.md
   - .agents/adrs/0020-conversation-agent-port.adr.md

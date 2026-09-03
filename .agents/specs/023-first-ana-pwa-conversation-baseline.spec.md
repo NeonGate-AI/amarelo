@@ -19,11 +19,11 @@ context:
   - .agents/context/workspaces/ai/agents.md
   - .agents/context/workspaces/ai/conversation.md
 rules:
-  - .agents/rules/architecture.rule.md
-  - .agents/rules/context-engineering.rule.md
-  - .agents/rules/product-safety-and-privacy.rule.md
-  - .agents/rules/react-and-next.rule.md
-  - .agents/rules/spec-driven-development.rule.md
+  - .agents/rules/001-architecture.rule.md
+  - .agents/rules/003-context-engineering.rule.md
+  - .agents/rules/008-product-safety-and-privacy.rule.md
+  - .agents/rules/009-react-and-next.rule.md
+  - .agents/rules/011-spec-driven-development.rule.md
 adrs:
   - .agents/adrs/0004-product-agent-workspace.adr.md
   - .agents/adrs/0006-mobile-react-vite-pwa.adr.md

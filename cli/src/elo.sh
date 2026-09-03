@@ -110,14 +110,15 @@ case "$elo_command" in
       imports) elo_run_check import-boundaries ;;
       memory) elo_run_check memory-invariants ;;
       platform) elo_run_check elo-platform ;;
+      rules) elo_run_check rules ;;
       skills) elo_run_check workflow-skills ;;
       specs) elo_run_check specs ;;
       all)
-        for elo_check in elo-platform architecture specs workflow-skills import-boundaries memory-invariants; do
+        for elo_check in elo-platform architecture rules specs workflow-skills import-boundaries memory-invariants; do
           elo_run_check "$elo_check"
         done
         ;;
-      *) elo_usage_error "Usage: elo check <all|architecture|imports|memory|platform|skills|specs>" ;;
+      *) elo_usage_error "Usage: elo check <all|architecture|imports|memory|platform|rules|skills|specs>" ;;
     esac
     ;;
   --*)

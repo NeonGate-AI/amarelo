@@ -16,8 +16,8 @@ context:
   - .agents/context/architecture/boundaries/ai-memory-nucleus.md
   - .agents/context/workspaces/memory-nucleus/overview.md
 rules:
-  - .agents/rules/memory-nucleus.rule.md
-  - .agents/rules/product-safety-and-privacy.rule.md
+  - .agents/rules/006-memory-nucleus.rule.md
+  - .agents/rules/008-product-safety-and-privacy.rule.md
 adrs:
   - .agents/adrs/0001-shared-longitudinal-memory.adr.md
   - .agents/adrs/0003-authorization-before-retrieval.adr.md

@@ -15,8 +15,8 @@ targets:
 context:
   - .agents/context/architecture/overview.md
 rules:
-  - .agents/rules/markdown.rule.md
-  - .agents/rules/spec-driven-development.rule.md
+  - .agents/rules/005-markdown.rule.md
+  - .agents/rules/011-spec-driven-development.rule.md
 adrs:
   - .agents/adrs/0018-spec-driven-delivery.adr.md
 skills:
@@ -26,7 +26,7 @@ skills:
 evidence:
   - .agents/specs/readme.md canonical priority registry
   - .agents/specs/001-memory-nucleus-product-contract.spec.md through 007-plans-and-entitlements.spec.md
-  - .agents/specs/workflow.md and .agents/rules/spec-driven-development.rule.md unified numbered-spec model
+  - .agents/specs/workflow.md and .agents/rules/011-spec-driven-development.rule.md unified numbered-spec model
   - pull request 20 final diff and GitHub Actions CI on the final reviewed head
 ---
 

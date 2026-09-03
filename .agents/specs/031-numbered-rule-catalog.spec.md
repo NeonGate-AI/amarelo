@@ -2,7 +2,7 @@
 id: SPEC-031
 title: Enumerate the canonical rule catalog and reconcile the harness
 type: governance
-status: ready
+status: in-progress
 mode: prospective
 created: 2026-09-03
 updated: 2026-09-03
@@ -21,20 +21,21 @@ context:
   - .agents/context/architecture/overview.md
   - .agents/context/engineering/workflow-skills.md
 rules:
-  - .agents/rules/architecture.rule.md
-  - .agents/rules/code-style.rule.md
-  - .agents/rules/context-engineering.rule.md
-  - .agents/rules/import-boundaries.rule.md
-  - .agents/rules/markdown.rule.md
-  - .agents/rules/memory-nucleus.rule.md
-  - .agents/rules/package-ownership.rule.md
-  - .agents/rules/product-safety-and-privacy.rule.md
-  - .agents/rules/react-and-next.rule.md
-  - .agents/rules/source-organization.rule.md
-  - .agents/rules/spec-driven-development.rule.md
+  - .agents/rules/001-architecture.rule.md
+  - .agents/rules/002-code-style.rule.md
+  - .agents/rules/003-context-engineering.rule.md
+  - .agents/rules/004-import-boundaries.rule.md
+  - .agents/rules/005-markdown.rule.md
+  - .agents/rules/006-memory-nucleus.rule.md
+  - .agents/rules/007-package-ownership.rule.md
+  - .agents/rules/008-product-safety-and-privacy.rule.md
+  - .agents/rules/009-react-and-next.rule.md
+  - .agents/rules/010-source-organization.rule.md
+  - .agents/rules/011-spec-driven-development.rule.md
 adrs:
-  - .agents/adrs/0018-spec-driven-development.adr.md
+  - .agents/adrs/0018-spec-driven-delivery.adr.md
   - .agents/adrs/0025-agent-artifact-prompt-templates.adr.md
+  - .agents/adrs/0026-numbered-rule-catalog.adr.md
 skills:
   - .agents/skills/to-spec/SKILL.md
   - .agents/skills/to-tickets/SKILL.md
@@ -43,7 +44,8 @@ skills:
   - .agents/skills/writing-for-agents/SKILL.md
   - .agents/skills/code-review/SKILL.md
 evidence:
-  - pending
+  - .audit/rules.audit.sh
+  - https://github.com/NeonGate-AI/amarelo/issues/30
 ---
 
 # SPEC-031: Enumerate the canonical rule catalog and reconcile the harness

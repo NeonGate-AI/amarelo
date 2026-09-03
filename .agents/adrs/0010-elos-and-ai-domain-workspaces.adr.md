@@ -99,14 +99,14 @@ Ana, Nico, and Isa are called agents in technical language. They live under the 
 - Ana, Nico, and Isa implementation files live under `elos/ai/domains/conversation/src/agents/` and use agent terminology.
 - No global workflow directory or mandatory Clean Architecture layer tree is introduced.
 - Kernel imports no AI domain, and no provider, repository implementation, prompt, workflow, or domain policy resides in it.
-- Relevant source uses the repository filename and concern rules in `.agents/rules/code-style.rule.md` and `.agents/rules/source-organization.rule.md`.
+- Relevant source uses the repository filename and concern rules in `.agents/rules/002-code-style.rule.md` and `.agents/rules/010-source-organization.rule.md`.
 - Root install, lint, and build checks plus permitted domain-local offline evals pass. Reports state any unverified runtime behavior separately.
 
 ## Links
 
 - Repository architecture: `.agents/ARCHITECTURE.md`
-- Source organization: `.agents/rules/source-organization.rule.md`
-- AI runtime rules: `.agents/rules/context-engineering.rule.md`
+- Source organization: `.agents/rules/010-source-organization.rule.md`
+- AI runtime rules: `.agents/rules/003-context-engineering.rule.md`
 - Superseded decision: `.agents/decisions/0004-product-agent-workspace.md`
 - AI-wide instructions: `elos/ai/AGENTS.md`
 - AI architecture: `elos/ai/ARCHITECTURE.md`
