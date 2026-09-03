@@ -2,7 +2,7 @@
 id: SPEC-009
 title: Run the first real Ana PWA conversation and establish the serving baseline
 type: experiment
-status: ready
+status: in-progress
 mode: prospective
 created: 2026-09-03
 updated: 2026-09-03
