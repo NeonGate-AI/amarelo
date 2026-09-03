@@ -1,0 +1,27 @@
+{
+  "compilerOptions": {
+    "allowJs": false,
+    "allowImportingTsExtensions": true,
+    "baseUrl": ".",
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "noEmit": true,
+    "noUncheckedIndexedAccess": true,
+    "paths": {
+      "@context": ["../../ai/conversation/src/context/index.ts"],
+      "@contracts": ["../../ai/conversation/src/contracts/index.ts"],
+      "@memory": ["../../ai/conversation/src/memory/index.ts"],
+      "@ports": ["../../ai/conversation/src/ports/index.ts"],
+      "@routing": ["../../ai/conversation/src/routing/index.ts"],
+      "@runtime": ["../../ai/conversation/src/runtime/index.ts"]
+    },
+    "skipLibCheck": true,
+    "strict": true,
+    "target": "ES2022",
+    "types": ["node"]
+  },
+  "include": ["src/**/*.ts"]
+}
