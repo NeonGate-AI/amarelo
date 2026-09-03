@@ -32,6 +32,7 @@ trap audit_on_signal 1 2 15
 
 failures=0
 workspace_count=0
+conversation_workspace_count=0
 
 architecture_fail() {
   failures=$((failures + 1))
@@ -177,6 +178,17 @@ while IFS= read -r package_file; do
   workspace_relative=$(relative_path "$workspace_root")
   name=$(package_name "$package_file")
 
+  if [ "$name" = @ai/conversation ]; then
+    conversation_workspace_count=$((conversation_workspace_count + 1))
+    if [ "$workspace_relative" != workspaces/ai/orchestrator/conversation ]; then
+      architecture_fail \
+        conversation-topology \
+        "$workspace_relative" \
+        "@ai/conversation must live at workspaces/ai/orchestrator/conversation" \
+        "move the Conversation workspace to its canonical orchestrator path"
+    fi
+  fi
+
   case "$workspace_relative" in
     workspaces/ai/*)
       case "$name" in
@@ -257,12 +269,21 @@ while IFS= read -r package_file; do
   done <"$TMP_ROOT/exports"
 done <"$TMP_ROOT/workspaces"
 
+if [ "$conversation_workspace_count" -ne 1 ]; then
+  architecture_fail \
+    conversation-topology \
+    workspaces/ai/orchestrator/conversation \
+    "@ai/conversation must exist exactly once at its canonical orchestrator path" \
+    "move or deduplicate the Conversation workspace"
+fi
+
 for required_path in \
   AGENTS.md \
   .agents/skills/readme.md \
   .agents/context/product/strategy.md \
   cli/elo \
-  cli/src
+  cli/src \
+  workspaces/ai/orchestrator/conversation
 do
   [ -e "$PROJECT_ROOT/$required_path" ] ||
     architecture_fail \
@@ -278,7 +299,8 @@ for forbidden_path in \
   tooling \
   workspaces/memory-nucleus/apps \
   workspaces/memory-nucleus/packages \
-  workspaces/ai/conversation/src/agents
+  workspaces/ai/conversation \
+  workspaces/ai/orchestrator/conversation/src/agents
 do
   [ ! -e "$PROJECT_ROOT/$forbidden_path" ] ||
     architecture_fail \
@@ -286,6 +308,21 @@ do
       "$forbidden_path" \
       "obsolete/forbidden path exists" \
       "remove or migrate the path"
+done
+
+for ai_parent in \
+  workspaces/ai/agents \
+  workspaces/ai/orchestrator
+do
+  for forbidden_child in package.json src tsconfig.json; do
+    ai_parent_child="$ai_parent/$forbidden_child"
+    [ ! -e "$PROJECT_ROOT/$ai_parent_child" ] ||
+      architecture_fail \
+        ai-capability-parent \
+        "$ai_parent_child" \
+        "$ai_parent is a structural parent and cannot own $forbidden_child" \
+        "move ownership into a named child workspace"
+  done
 done
 
 for expected_dir in adrs context rules skills specs; do

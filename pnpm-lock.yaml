@@ -42,11 +42,11 @@ importers:
 
   workspaces/ai/agents/ana: {}
 
-  workspaces/ai/conversation:
+  workspaces/ai/orchestrator/conversation:
     dependencies:
       '@repo/memory-sdk':
         specifier: workspace:*
-        version: link:../../packages/memory-sdk
+        version: link:../../../packages/memory-sdk
     devDependencies:
       typescript:
         specifier: 5.9.2
