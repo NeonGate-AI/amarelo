@@ -270,38 +270,6 @@ jobs:
 
           scaffold_path = "cli/src/commands/scaffold.sh"
           scaffold = read(scaffold_path)
-          old_rule_allocator = """elo_scaffold_next_rule_prefix() {
-            elo_scaffold_rule_max=0
-            elo_scaffold_rule_count=0
-            elo_scaffold_rule_seen=' '
-
-            for elo_scaffold_path in "$ELO_PROJECT_ROOT"/.agents/rules/*.rule.md; do
-              [ -f "$elo_scaffold_path" ] || continue
-              elo_scaffold_rule_count=$((elo_scaffold_rule_count + 1))
-              elo_scaffold_base=${elo_scaffold_path##*/}
-              elo_scaffold_prefix=${elo_scaffold_base%%-*}
-              [ "${#elo_scaffold_prefix}" -eq 3 ] || continue
-              case "$elo_scaffold_prefix" in
-                *[!0-9]*) continue ;;
-              esac
-              elo_scaffold_number=$(elo_scaffold_decimal "$elo_scaffold_prefix" 3 "Rule prefix")
-              case "$elo_scaffold_rule_seen" in
-                *" $elo_scaffold_number "*) elo_die "Duplicate rule prefix: $elo_scaffold_prefix" ;;
-              esac
-              elo_scaffold_rule_seen="$elo_scaffold_rule_seen$elo_scaffold_number "
-              if [ "$elo_scaffold_number" -gt "$elo_scaffold_rule_max" ]; then
-                elo_scaffold_rule_max=$elo_scaffold_number
-              fi
-            done
-
-            elo_scaffold_next=$((elo_scaffold_rule_max + 1))
-            if [ "$elo_scaffold_next" -le "$elo_scaffold_rule_count" ]; then
-              elo_scaffold_next=$((elo_scaffold_rule_count + 1))
-            fi
-            [ "$elo_scaffold_next" -le 999 ] || elo_die "Three-digit rule numbering is exhausted."
-            printf '%03d\n' "$elo_scaffold_next"
-          }
-          """.replace("          ", "")
           new_rule_allocator = """elo_scaffold_next_rule_prefix() {
             elo_scaffold_rule_max=0
             elo_scaffold_rule_seen=' '
@@ -330,9 +298,10 @@ jobs:
             printf '%03d\n' "$elo_scaffold_next"
           }
           """.replace("          ", "")
-          if old_rule_allocator not in scaffold:
-              raise RuntimeError("old rule allocator is missing")
-          write(scaffold_path, scaffold.replace(old_rule_allocator, new_rule_allocator, 1))
+          allocator_start = scaffold.index("elo_scaffold_next_rule_prefix() {")
+          allocator_end = scaffold.index("\nelo_scaffold_next_spec_id()", allocator_start)
+          scaffold = scaffold[:allocator_start] + new_rule_allocator + scaffold[allocator_end:]
+          write(scaffold_path, scaffold)
 
           scaffold_audit_path = ".audit/elo-scaffold.audit.sh"
           scaffold_audit = read(scaffold_audit_path)
