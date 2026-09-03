@@ -1,3 +1,12 @@
 # Specs
 
-Specs define expected product/system behavior and executable contracts. They are current-state requirements, not historical decision logs. Update or delete obsolete specs in the same cycle as the implementation.
+Specs have two roles in this repository:
+
+- **Behavior specs** are living current-state contracts grouped by product or workspace area.
+- **Numbered delivery specs** define bounded engineering changes and follow `workflow.md`.
+
+Use `template.md` for every new numbered delivery spec. Implemented delivery specs become historical records and keep their original acceptance evidence. Pre-workflow work reconstructed after implementation lives under `history/` and is explicitly marked `mode: retrospective`.
+
+The workflow itself is defined only in `workflow.md`. Rules, context and ADRs remain separate sources of truth and should be referenced rather than copied into a spec.
+
+The next available numbered delivery spec after this bootstrap is `SPEC-007`.
