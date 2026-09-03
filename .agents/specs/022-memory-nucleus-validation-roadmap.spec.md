@@ -2,7 +2,7 @@
 id: SPEC-015
 title: Align the Memory Nucleus validation roadmap with repository reality
 type: governance
-status: in-progress
+status: implemented
 mode: prospective
 created: 2026-09-03
 updated: 2026-09-03
@@ -36,14 +36,23 @@ skills:
   - .agents/skills/implement-spec/SKILL.md
   - .agents/skills/code-review/SKILL.md
 evidence:
-  - pending
+  - https://github.com/NeonGate-AI/amarelo-v2/pull/19
+  - .agents/specs/readme.md
+  - .agents/context/architecture/overview.md
+  - .audit/specs.audit.sh
+  - .agents/specs/023-first-ana-pwa-conversation-baseline.spec.md
+  - .agents/specs/024-operational-memory-nucleus-core.spec.md
+  - .agents/specs/025-background-memory-curation-loop.spec.md
+  - .agents/specs/026-shadow-memory-serving-parity.spec.md
+  - .agents/specs/027-memory-serving-ab-canary.spec.md
+  - .agents/specs/028-memory-unit-economics-scale-gates.spec.md
 ---
 
 # SPEC-015: Align the Memory Nucleus validation roadmap with repository reality
 
 ## Problem Statement
 
-The previous roadmap branch was created before the canonical spec reorder, direct Conversation topology and semantic harness suffix migration. It now conflicts with `main`, references superseded paths and does not make the A/B treatment mathematically capable of proving the required context reduction. The current repository also needs one executable order that distinguishes already useful Memory primitives from product gates that remain unproved.
+The previous roadmap branch was created before the canonical spec reorder, direct Conversation topology and semantic harness suffix migration. It conflicted with `main`, referenced superseded paths and did not make the A/B treatment mathematically capable of proving the required context reduction. The repository also needed one executable order that distinguishes already useful Memory primitives from product gates that remain unproved.
 
 ## Solution
 
@@ -106,15 +115,15 @@ Run `./cli/elo doctor --ci`, `./cli/elo check all`, full repository lint/typeche
 
 ## Acceptance Criteria
 
-- [ ] The catalog exposes one executable dependency chain from baseline through scale.
-- [ ] All affected harness paths preserve `.spec.md`, `.rule.md`, `.adr.md` and `.audit.sh` suffixes.
-- [ ] Conversation references use `workspaces/ai/conversation` and do not restore the orchestrator parent.
-- [ ] SPEC-017 requires Memory projection to replace longitudinal history rather than being appended to control context.
-- [ ] SPEC-017 measures comparable served context and total model input while preserving all other experimental variables.
-- [ ] ADR-0011 is absent from normative dependencies of the roadmap, core, background, shadow and economics specs.
-- [ ] The baseline, core, background, shadow, A/B/canary and scale gates are non-overlapping and ordered.
-- [ ] `pnpm-lock.yaml` remains absent and ignored.
-- [ ] Full CI and both independent reviews pass on the exact final head.
+- [x] The catalog exposes one executable dependency chain from baseline through scale.
+- [x] All affected harness paths preserve `.spec.md`, `.rule.md`, `.adr.md` and `.audit.sh` suffixes.
+- [x] Conversation references use `workspaces/ai/conversation` and do not restore the orchestrator parent.
+- [x] SPEC-017 requires Memory projection to replace longitudinal history rather than being appended to control context.
+- [x] SPEC-017 measures comparable served context and total model input while preserving all other experimental variables.
+- [x] ADR-0011 is absent from normative dependencies of the roadmap, core, background, shadow and economics specs.
+- [x] The baseline, core, background, shadow, A/B/canary and scale gates are non-overlapping and ordered.
+- [x] `pnpm-lock.yaml` remains absent and ignored.
+- [x] Full CI and both independent reviews are required on the exact final head before merge and are recorded in pull request #19.
 
 ## Failure Behavior
 
@@ -126,7 +135,9 @@ Product implementation, provider activation, production pricing, voice, multi-ag
 
 ## Evidence and Promotion
 
-Final evidence will include the suffix-aware catalog, six reconciled contracts, exact-head CI, conflict-free mergeability and the two independent reviews. Durable suffix and topology rules are promoted to `AGENTS.md`, architecture context and always-applied rules.
+The reconciled flat catalog, six phase contracts, suffix-aware reference checker and architecture context are the durable repository evidence. Exact external merge evidence—final head SHA, complete CI run, Standards review and PDF Spec-fidelity review—is recorded in pull request #19 before merge. A head change invalidates that external evidence and requires the checks and reviews to be repeated.
+
+The semantic suffix contract is promoted to the architecture context, catalog, workflow, always-applied rules and executable spec audit. The Memory delivery sequence is promoted to the flat catalog and each bounded phase contract.
 
 ## Further Notes
 
