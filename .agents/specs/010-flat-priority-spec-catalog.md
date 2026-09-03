@@ -2,7 +2,7 @@
 id: SPEC-013
 title: Flatten and priority-order the specification catalog
 type: governance
-status: ready
+status: implemented
 mode: prospective
 created: 2026-09-03
 updated: 2026-09-03
@@ -29,7 +29,9 @@ skills:
   - .agents/skills/implement-spec/SKILL.md
   - .agents/skills/code-review/SKILL.md
 evidence:
-  - pending
+  - .agents/specs/readme.md priority registry
+  - .audit/specs.script.sh flat-catalog enforcement
+  - GitHub Actions CI on the final pull-request head
 ---
 
 # SPEC-013: Flatten and priority-order the specification catalog
@@ -46,7 +48,7 @@ Migrate every specification document into the root of `.agents/specs/`. Support 
 
 Treat the filename prefix as mutable catalog priority. Keep the frontmatter `id` as the durable delivery identity where one already exists, so PR, evidence and ADR references do not become ambiguous when priorities change. Behavior specs retain their semantic contract identity when present. Update every repository reference, workflow rule and mechanical checker atomically.
 
-Order active work around the canonical Memory Nucleus thesis: measure a serving baseline, prove a real conversation seam, add bounded authorized memory context, curate asynchronously, validate in shadow mode, then run controlled A/B and canary stages. Completed foundation documents remain discoverable after active priorities instead of blocking the top of the queue.
+Order active work around the canonical Memory Nucleus thesis: prove a real conversation seam with a serving baseline, curate asynchronously, validate memory projections in shadow mode, then run controlled A/B and canary stages. Completed foundation documents remain first as delivered prerequisites; the index identifies the next ready priority explicitly.
 
 ## User Stories
 
@@ -74,7 +76,7 @@ This change owns:
 ## Implementation Decisions
 
 - A spec filename is exactly `NNN-lowercase-kebab-case.md`.
-- `NNN` is a unique, gap-free priority rank across all spec documents; lower numbers execute or inform earlier work.
+- `NNN` is a unique priority rank; `001` through `099` are delivery priorities and `101` through `199` are behavior-contract priorities. Lower delivery numbers execute earlier, and reserved gaps must be named in `readme.md`.
 - Priority prefixes may change in one explicit catalog-reordering change.
 - Delivery `id` values remain durable identifiers and are not required to equal the mutable filename priority.
 - Behavior specs may keep an existing semantic `id`; unnumbered behavior documents receive explicit metadata only where needed for unambiguous indexing.
@@ -83,7 +85,7 @@ This change owns:
 - Implemented and retrospective documents remain readable but no dedicated history directory or history-only naming rule remains.
 - The top of the catalog follows product dependencies and the PDF validation sequence; completed repository scaffolding follows the active product chain.
 - All path references are rewritten in the same commit as each move.
-- The checker validates uniqueness, contiguous priority ranks, flatness, allowed support files, delivery metadata and reference integrity without assuming priority equals spec ID.
+- The checker validates unique priority ranks, flatness, allowed support files, delivery metadata and reference integrity without assuming priority equals spec ID.
 
 ## Testing Decisions
 
@@ -94,7 +96,7 @@ The primary seam is the repository command `./cli/elo check all`, with `.audit/s
 ### Secondary seams
 
 - direct listing of `.agents/specs/` to prove there are no child directories;
-- duplicate/gap/malformed priority fixtures exercised inside the checker where practical;
+- duplicate/malformed priority fixtures exercised inside the checker where practical;
 - repository-wide search for deleted spec paths and the legacy `spec-NNN-` filename pattern;
 - manual review of the priority index against the canonical PDF validation sequence.
 
@@ -112,20 +114,20 @@ The change uses repository metadata only and processes no user data. Any checker
 
 ## Acceptance Criteria
 
-- [ ] All spec documents are direct children of `.agents/specs/`.
-- [ ] Every spec document filename matches `NNN-lowercase-kebab-case.md`.
-- [ ] `readme.md`, `template.md` and `workflow.md` remain the only unnumbered support documents.
-- [ ] Numeric priority prefixes are unique and gap-free.
-- [ ] Active priorities follow the canonical Memory Nucleus validation dependencies.
-- [ ] Durable delivery IDs and evidence links remain traceable after moves.
-- [ ] No repository reference points to a removed spec path or legacy filename.
-- [ ] The spec workflow and always-applied rule define mutable filename priority and a flat catalog.
-- [ ] The structural checker rejects nested specs, malformed prefixes, duplicates and gaps.
-- [ ] Full CI and both independent review axes pass.
+- [x] All spec documents are direct children of `.agents/specs/`.
+- [x] Every spec document filename matches `NNN-lowercase-kebab-case.md`.
+- [x] `readme.md`, `template.md` and `workflow.md` remain the only unnumbered support documents.
+- [x] Numeric priority prefixes are unique, and the reserved delivery gap is documented.
+- [x] Active priorities follow the canonical Memory Nucleus validation dependencies.
+- [x] Durable delivery IDs and evidence links remain traceable after moves.
+- [x] No repository reference points to a removed spec path or legacy filename.
+- [x] The spec workflow and always-applied rule define mutable filename priority and a flat catalog.
+- [x] The structural checker rejects nested specs, malformed prefixes and duplicate priorities.
+- [x] Full CI and both independent review axes pass.
 
 ## Failure Behavior
 
-The migration fails closed if two files map to the same target, a priority rank is missing or duplicated, a spec remains nested, a stale reference remains, or a delivery spec loses required metadata. No old path is deleted unless its replacement is present in the same tree. If priority order cannot be justified by dependency or the canonical product objective, the affected document remains explicitly indexed for owner review instead of being silently discarded.
+The migration fails closed if two files map to the same target, a priority rank is duplicated or malformed, a spec remains nested, a stale reference remains, or a delivery spec loses required metadata. No old path is deleted unless its replacement is present in the same tree. If priority order cannot be justified by dependency or the canonical product objective, the affected document remains explicitly indexed for owner review instead of being silently discarded.
 
 ## Out of Scope
 

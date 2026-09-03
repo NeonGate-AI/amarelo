@@ -118,4 +118,4 @@ The canonical commercial KPI is variable AI cost per active family divided by or
 - Product constitution: `.agents/PRODUCT.md`
 - Strategy and unit economics: `.agents/STRATEGY.md`
 - Runtime rules: `.agents/rules/ai-runtime.md`
-- Memory and RAG spec: `.agents/specs/ai/memory-curation-and-rag.md`
+- Memory and RAG spec: `.agents/specs/101-memory-nucleus.md`

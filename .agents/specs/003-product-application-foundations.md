@@ -27,10 +27,10 @@ skills:
   - .agents/skills/
 evidence:
   - https://github.com/NeonGate-AI/amarelo-v2/pull/1
-  - .agents/specs/landing/product-narrative.md
-  - .agents/specs/onboarding/account-and-elo-entry.md
-  - .agents/specs/console/memory-control.md
-  - .agents/specs/mobile/voice-experience.md
+  - .agents/specs/106-product-narrative.md
+  - .agents/specs/104-account-and-elo-entry.md
+  - .agents/specs/105-memory-control.md
+  - .agents/specs/103-mobile-voice-experience.md
   - workspaces/apps/
 ---
 

@@ -170,7 +170,7 @@ Promotion:
 - workflow procedure to `.agents/specs/workflow.md`;
 - durable constraint to `.agents/rules/spec-driven-development.md`;
 - consequential tradeoff to ADR 0018;
-- historical delivery context to `.agents/specs/history/`;
+- historical delivery context to `.agents/specs/`;
 - mechanical contract to the Elo spec checker.
 
 ## Further Notes

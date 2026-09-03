@@ -79,4 +79,4 @@ query or embedding job is active without a later accepted decision.
 - Architecture map: `.agents/ARCHITECTURE.md`
 - Runtime memory design: `elos/memory-nucleus/docs/MEMORY.md`
 - Memory Nucleus boundary: `.agents/decisions/0012-memory-nucleus-layout.md`
-- Workflow spec: `.agents/specs/ai/memory-curation-and-rag.md`
+- Memory behavior spec: `.agents/specs/101-memory-nucleus.md`

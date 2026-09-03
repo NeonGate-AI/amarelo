@@ -120,7 +120,7 @@ Global store (Zustand, Redux)    → Complex client state shared app-wide
 
 ### Amarelo mobile PWA
 
-`apps/mobile` deliberately uses Jotai for state shared across the one-screen PWA. Treat `.agents/specs/mobile/voice-experience.md` as the state contract.
+`apps/mobile` deliberately uses Jotai for state shared across the one-screen PWA. Treat `.agents/specs/103-mobile-voice-experience.md` as the state contract.
 
 - Keep mutable facts in source atoms, projections in derived atoms, and transitions or side effects in write-only action atoms.
 - Prefer `useAtomValue` and `useSetAtom` when a component only reads or writes.
