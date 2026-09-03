@@ -35,7 +35,7 @@ The specification catalog is flat, priority-ordered and mechanically checked.
 | 019 | SPEC-008 | implemented | [Conversation runtime](019-conversation-runtime.spec.md) |
 | 020 | SPEC-013 | implemented | [Flat priority spec catalog](020-flat-priority-spec-catalog.spec.md) |
 | 021 | SPEC-014 | implemented | [Spec-driven pull request evidence](021-spec-driven-pull-request-evidence.spec.md) |
-| 022 | SPEC-015 | in-progress | [Canonical Memory Nucleus validation roadmap](022-memory-nucleus-validation-roadmap.spec.md) |
+| 022 | SPEC-015 | implemented | [Canonical Memory Nucleus validation roadmap](022-memory-nucleus-validation-roadmap.spec.md) |
 | 023 | SPEC-009 | ready | [First Ana/PWA conversation and serving baseline](023-first-ana-pwa-conversation-baseline.spec.md) |
 | 024 | SPEC-016 | ready | [Operational Memory Nucleus core](024-operational-memory-nucleus-core.spec.md) |
 | 025 | SPEC-012 | ready | [Background memory curation loop](025-background-memory-curation-loop.spec.md) |
