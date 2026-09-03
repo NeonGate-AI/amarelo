@@ -3,7 +3,6 @@ packages:
   - workspaces/packages/*
   - workspaces/ai/*
   - workspaces/ai/agents/*
-  - workspaces/ai/orchestrator/*
   - workspaces/memory-nucleus
 overrides:
   lightningcss: 1.30.1
