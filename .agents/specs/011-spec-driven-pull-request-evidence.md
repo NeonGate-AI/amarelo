@@ -2,7 +2,7 @@
 id: SPEC-014
 title: Enforce spec-driven pull request evidence
 type: governance
-status: ready
+status: implemented
 mode: prospective
 created: 2026-09-03
 updated: 2026-09-03
@@ -29,7 +29,9 @@ skills:
   - .agents/skills/implement-spec/SKILL.md
   - .agents/skills/code-review/SKILL.md
 evidence:
-  - pending
+  - .github/pull_request_template.md
+  - .audit/specs.script.sh template-contract enforcement
+  - GitHub Actions CI on the final pull-request head
 ---
 
 # SPEC-014: Enforce spec-driven pull request evidence
@@ -114,19 +116,19 @@ The template contains placeholders only and no production, personal or credentia
 
 ## Acceptance Criteria
 
-- [ ] GitHub's recognized `.github/pull_request_template.md` exists.
-- [ ] The legacy `.github/pr_template.md` placeholder is removed.
-- [ ] The template links the durable spec without duplicating it.
-- [ ] Outcome, scope, rollback, dependencies and merge order are explicit.
-- [ ] Acceptance criteria map to reproducible evidence.
-- [ ] CI, merge-base and reviewed head are recorded.
-- [ ] Standards and Spec-fidelity reviews are independent and separately recorded.
-- [ ] Safety/privacy applicability requires evidence or a concrete non-applicability reason.
-- [ ] Memory ROI applicability records quality, context tokens, cost and latency.
-- [ ] Promotion and temporary evidence cleanup are explicit.
-- [ ] The final merge checklist requires implemented spec, green CI, no conflicts and reviews on the final head.
-- [ ] The workflow and checker enforce the durable template contract.
-- [ ] Full CI and both review axes pass.
+- [x] GitHub's recognized `.github/pull_request_template.md` exists.
+- [x] The legacy `.github/pr_template.md` placeholder is removed.
+- [x] The template links the durable spec without duplicating it.
+- [x] Outcome, scope, rollback, dependencies and merge order are explicit.
+- [x] Acceptance criteria map to reproducible evidence.
+- [x] CI, merge-base and reviewed head are recorded.
+- [x] Standards and Spec-fidelity reviews are independent and separately recorded.
+- [x] Safety/privacy applicability requires evidence or a concrete non-applicability reason.
+- [x] Memory ROI applicability records quality, context tokens, cost and latency.
+- [x] Promotion and temporary evidence cleanup are explicit.
+- [x] The final merge checklist requires implemented spec, green CI, no conflicts and reviews on the final head.
+- [x] The workflow and checker enforce the durable template contract.
+- [x] Full CI and both review axes pass.
 
 ## Failure Behavior
 

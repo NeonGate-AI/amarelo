@@ -23,12 +23,12 @@ The specification catalog is flat, priority-ordered and mechanically checked.
 | 008 | SPEC-007 | implemented | [AI orchestrator topology](008-orchestrator-topology.md) |
 | 009 | SPEC-008 | implemented | [Conversation runtime](009-conversation-runtime.md) |
 | 010 | SPEC-013 | implemented | [Flat priority spec catalog](010-flat-priority-spec-catalog.md) |
-| 011 | SPEC-014 | reserved | Spec-driven pull request evidence template |
+| 011 | SPEC-014 | implemented | [Spec-driven pull request evidence](011-spec-driven-pull-request-evidence.md) |
 | 012 | SPEC-009 | ready | [First real Ana/PWA conversation and serving baseline](012-first-agentic-pwa-conversation.md) |
 | 013 | SPEC-011 | ready | [Bounded Memory Nucleus serving context](013-bounded-nucleus-serving-context.md) |
 | 014 | SPEC-012 | ready | [Durable background memory-curation loop](014-background-memory-curation-loop.md) |
 
-The next durable delivery ID is `SPEC-014`. Priority `011` is reserved for it. The current declared dependency order is baseline conversation, bounded serving context and background curation. The post-governance audit will rewrite it to the canonical baseline, background, shadow/parity, A/B/canary and scale sequence before product execution.
+The next durable delivery ID is `SPEC-015`. The current declared dependency order is baseline conversation, bounded serving context and background curation. The post-governance audit will rewrite it to the canonical baseline, background, shadow/parity, A/B/canary and scale sequence before product execution.
 
 ## Behavior contracts
 
