@@ -2,7 +2,7 @@
 id: SPEC-007
 title: Move Conversation under the AI orchestrator topology
 type: refactor
-status: in-progress
+status: implemented
 mode: prospective
 created: 2026-09-03
 updated: 2026-09-03
@@ -31,9 +31,9 @@ skills:
   - https://github.com/NeonGate-AI/skills/tree/main/skills/engineering/tdd
 evidence:
   - https://github.com/NeonGate-AI/amarelo-v2/issues/3
-  - commit f019af4fe5c6052f8c962c1c1f7f3a23b354608d
-  - commit 37c3f3f42a07b6b06ac5f9f308a2c6d58b26bcc0
-  - clean repository CI pending
+  - https://github.com/NeonGate-AI/amarelo-v2/pull/4
+  - commit b7881cea99c0ca154de8671e64866a4fc5d00c68
+  - CI run 176 success
 ---
 
 # SPEC-007: Move Conversation under the AI orchestrator topology
@@ -126,20 +126,20 @@ No product data, transcripts, model calls or personal memory are required. The m
 
 ## Acceptance Criteria
 
-- [ ] Conversation exists at `workspaces/ai/orchestrator/conversation`.
-- [ ] `workspaces/ai/conversation` no longer exists.
-- [ ] The package remains named `@ai/conversation` with the same public exports.
-- [ ] `workspaces/ai/orchestrator/` owns no package, `src/` or TypeScript configuration.
-- [ ] pnpm discovers `workspaces/ai/orchestrator/*` and no longer depends on the retired direct path.
-- [ ] The lockfile contains one Conversation importer at the canonical path.
-- [ ] Existing Conversation contracts compile without behavioral changes.
-- [ ] AI context describes agents and orchestrators as separate capability families.
-- [ ] Architecture rules and checks protect the new topology and reject the obsolete path.
-- [ ] ADR 0019 records the naming and ownership decision.
-- [ ] Memory Nucleus remains accessible to AI only through `@repo/memory-sdk`.
-- [ ] No LangChain agent, provider, Fastify route, PWA API call, queue or worker behavior is added.
-- [ ] Full repository CI passes.
-- [ ] Durable harness paths agree with the resulting repository.
+- [x] Conversation exists at `workspaces/ai/orchestrator/conversation`.
+- [x] `workspaces/ai/conversation` no longer exists.
+- [x] The package remains named `@ai/conversation` with the same public exports.
+- [x] `workspaces/ai/orchestrator/` owns no package, `src/` or TypeScript configuration.
+- [x] pnpm discovers `workspaces/ai/orchestrator/*` and no longer depends on the retired direct path.
+- [x] The lockfile contains one Conversation importer at the canonical path.
+- [x] Existing Conversation contracts compile without behavioral changes.
+- [x] AI context describes agents and orchestrators as separate capability families.
+- [x] Architecture rules and checks protect the new topology and reject the obsolete path.
+- [x] ADR 0019 records the naming and ownership decision.
+- [x] Memory Nucleus remains accessible to AI only through `@repo/memory-sdk`.
+- [x] No LangChain agent, provider, Fastify route, PWA API call, queue or worker behavior is added.
+- [x] Full repository CI passes.
+- [x] Durable harness paths agree with the resulting repository.
 
 ## Failure Behavior
 
@@ -164,22 +164,22 @@ No product data, transcripts, model calls or personal memory are required. The m
 
 ## Evidence and Promotion
 
-Current evidence:
+Evidence:
 
 - implementation issue #3;
-- spec branch `refactor/spec-007-orchestrator-topology`;
-- topology implementation commit `f019af4fe5c6052f8c962c1c1f7f3a23b354608d`;
-- generated lockfile commit `37c3f3f42a07b6b06ac5f9f308a2c6d58b26bcc0`;
-- clean repository validation is the remaining closure gate.
+- pull request #4;
+- current-main application commit `b7881cea99c0ca154de8671e64866a4fc5d00c68`;
+- CI run #176 completed successfully after incorporating the current `main` skills commit;
+- the pull request records separate Standards and Spec reviews.
 
 Promotion:
 
-- topology vocabulary to AI workspace context;
-- permanent ownership constraints to architecture rules;
-- the naming tradeoff to ADR 0019;
-- mechanically enforceable paths to the architecture checker;
-- final acceptance evidence back into this delivery spec.
+- topology vocabulary was promoted to AI workspace context;
+- permanent ownership constraints were promoted to architecture rules;
+- the naming tradeoff was recorded in ADR 0019;
+- mechanically enforceable paths were promoted to the architecture checker;
+- this delivery spec records the final acceptance evidence.
 
 ## Further Notes
 
-This is the expand/migrate/contract prefactor for the executable agentic workflow. Later specs may depend on the canonical path, but this spec does not implement those behaviors.
+This was the expand/migrate/contract prefactor for the executable agentic workflow. Later specs may depend on the canonical path, but this spec does not implement those behaviors.
