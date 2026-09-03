@@ -4,13 +4,17 @@ This is the canonical engineering-agent entry point for the monorepo.
 
 Before modifying project code, load every `.agents/rules/*.md` rule whose frontmatter declares `alwaysApply: true`. Then load only the additional context required for the active area.
 
+## Delivery workflow
+
+Before changing repository behavior, load `.agents/specs/workflow.md` and the active numbered delivery spec. Implementation starts only from a spec whose status is `ready`; the first implementation change moves it to `in-progress`.
+
 ## Navigate
 
-- Understand the system or a workspace → `.agents/context/`
-- Obey durable constraints → `.agents/rules/`
-- Satisfy required behavior → `.agents/specs/`
-- Understand consequential decisions → `.agents/adrs/`
-- Follow a reusable engineering procedure → `.agents/skills/`
+- Understand the system or a workspace -> `.agents/context/`
+- Obey durable constraints -> `.agents/rules/`
+- Satisfy required behavior -> `.agents/specs/`
+- Understand consequential decisions -> `.agents/adrs/`
+- Follow a reusable engineering procedure -> `.agents/skills/`
 
 Start from `.agents/context/workspaces/<area>/` when an area manifest exists. Follow referenced scoped rules/specs/ADRs instead of loading the whole harness.
 

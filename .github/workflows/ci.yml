@@ -6,6 +6,11 @@ on:
       - main
       - develop
       - refactor/**
+      - feat/**
+      - fix/**
+      - docs/**
+      - chore/**
+      - test/**
   pull_request:
     branches:
       - main
@@ -49,6 +54,9 @@ jobs:
       - name: Architecture audit
         run: ./cli/elo check architecture
 
+      - name: Spec workflow audit
+        run: ./cli/elo check specs
+
       - name: Import boundaries audit
         run: ./cli/elo check imports
 
@@ -58,7 +66,7 @@ jobs:
       - name: Audit hygiene
         shell: bash
         run: |
-          tracked="$(git ls-files '.audit/**' | grep -Ev '^\.audit/(\.gitkeep|architecture\.script\.mjs|elo-platform\.script\.mjs|import-boundaries\.script\.mjs|memory-invariants\.script\.mjs)$' || true)"
+          tracked="$(git ls-files '.audit/**' | grep -Ev '^\.audit/(\.gitkeep|architecture\.script\.mjs|elo-platform\.script\.mjs|import-boundaries\.script\.mjs|memory-invariants\.script\.mjs|specs\.script\.mjs)$' || true)"
           if [ -n "$tracked" ]; then
             echo 'Unexpected tracked .audit evidence:'
             echo "$tracked"

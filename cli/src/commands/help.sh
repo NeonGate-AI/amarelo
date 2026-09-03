@@ -1,7 +1,7 @@
 #!/usr/bin/env sh
 set -eu
 cat <<'EOF'
-Elo — Amarelo monorepo platform CLI
+Elo - Amarelo monorepo platform CLI
 
 Usage:
   pnpm elo                         Bootstrap/install the local Elo environment
@@ -11,7 +11,7 @@ Usage:
   ./cli/elo changelog <product> [--path <file>] [--editor <command>]
   ./cli/elo env <setup|validate>
   ./cli/elo git <setup|doctor|pre-commit|commit-msg>
-  ./cli/elo check <architecture|imports|memory|platform>
+  ./cli/elo check <architecture|imports|memory|platform|specs>
   ./cli/elo help
 
 Ownership:
