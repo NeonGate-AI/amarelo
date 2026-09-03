@@ -1,0 +1,42 @@
+name: Repair SPEC-009 SDK executor
+
+on:
+  push:
+    branches:
+      - experiment/spec-009-first-ana-conversation-baseline
+    paths:
+      - .github/workflows/spec-009-sdk-ana-repair.yml
+
+permissions:
+  contents: write
+
+jobs:
+  repair:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: experiment/spec-009-first-ana-conversation-baseline
+          fetch-depth: 0
+
+      - name: Repair YAML block indentation
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 <<'PY'
+          from pathlib import Path
+
+          path = Path('.github/workflows/spec-009-sdk-ana.yml')
+          content = path.read_text(encoding='utf-8')
+          old = 'git commit -m "feat(conversation): add SDK and Ana model seam\n\nSpec: SPEC-009"'
+          new = 'git commit -m "feat(conversation): add SDK and Ana model seam" -m "Spec: SPEC-009"'
+          if old not in content:
+              raise RuntimeError('invalid commit block was not found')
+          path.write_text(content.replace(old, new, 1), encoding='utf-8')
+          PY
+          git rm -f .github/workflows/spec-009-sdk-ana-repair.yml
+          git config user.name "Jonatas Sales"
+          git config user.email "sykes.echo@proton.me"
+          git add -A
+          git commit -m "fix(ci): repair SPEC-009 SDK executor"
+          git push origin HEAD:experiment/spec-009-first-ana-conversation-baseline
