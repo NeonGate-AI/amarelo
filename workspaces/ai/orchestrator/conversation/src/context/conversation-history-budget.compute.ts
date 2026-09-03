@@ -32,7 +32,10 @@ export function estimateConversationMessageTokens(content: string): number {
 export function selectConversationHistory(
   input: SelectConversationHistoryInput
 ): ConversationHistorySelection {
-  if (!Number.isInteger(input.contextTokenBudget) || input.contextTokenBudget < 1) {
+  if (
+    !Number.isInteger(input.contextTokenBudget) ||
+    input.contextTokenBudget < 1
+  ) {
     throw new RangeError('contextTokenBudget must be a positive integer')
   }
 

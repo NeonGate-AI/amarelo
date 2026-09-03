@@ -10,5 +10,7 @@ export interface ConversationMemoryContext {
 }
 
 export abstract class MemoryContextPort {
-  abstract retrieve(input: MemorySearchInput): Promise<ConversationMemoryContext>
+  abstract retrieve(
+    input: MemorySearchInput
+  ): Promise<ConversationMemoryContext>
 }

@@ -25,11 +25,7 @@ export type ConversationMessageRole = z.infer<
 
 export const ConversationMessageSchema = z
   .object({
-    content: z
-      .string()
-      .trim()
-      .min(1)
-      .max(MAX_CONVERSATION_MESSAGE_CHARACTERS),
+    content: z.string().trim().min(1).max(MAX_CONVERSATION_MESSAGE_CHARACTERS),
     role: ConversationMessageRoleSchema
   })
   .strict()
@@ -44,19 +40,13 @@ export const ConversationTurnInputSchema = z
       .array(ConversationMessageSchema)
       .max(MAX_CONVERSATION_HISTORY_MESSAGES)
       .default([]),
-    message: z
-      .string()
-      .trim()
-      .min(1)
-      .max(MAX_CONVERSATION_MESSAGE_CHARACTERS),
+    message: z.string().trim().min(1).max(MAX_CONVERSATION_MESSAGE_CHARACTERS),
     purpose: ConversationPurposeSchema,
     requestId: ConversationIdentifierSchema
   })
   .strict()
 
-export type ConversationTurnInput = z.input<
-  typeof ConversationTurnInputSchema
->
+export type ConversationTurnInput = z.input<typeof ConversationTurnInputSchema>
 export type ValidatedConversationTurnInput = z.output<
   typeof ConversationTurnInputSchema
 >

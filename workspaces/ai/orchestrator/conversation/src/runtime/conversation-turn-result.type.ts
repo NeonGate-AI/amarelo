@@ -2,10 +2,7 @@ import type { AgentId } from '@contracts'
 import type { ConversationModelUsage } from '@ports'
 import type { ConversationRoutingDecision } from '@routing'
 
-export type ConversationMemoryStatus =
-  | 'retrieved'
-  | 'skipped'
-  | 'unavailable'
+export type ConversationMemoryStatus = 'retrieved' | 'skipped' | 'unavailable'
 
 export interface ConversationContextDiagnostics {
   readonly budgetExceededByCurrentMessage: boolean

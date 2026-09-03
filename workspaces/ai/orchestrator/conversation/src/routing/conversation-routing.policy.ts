@@ -49,10 +49,7 @@ function routingDecision(
 export function routeConversationTurn(
   message: string
 ): ConversationRoutingDecision {
-  const normalized = message
-    .normalize('NFKC')
-    .trim()
-    .toLocaleLowerCase('pt-BR')
+  const normalized = message.normalize('NFKC').trim().toLocaleLowerCase('pt-BR')
 
   if (REFLEX_PATTERN.test(normalized)) {
     return routingDecision('reflex', REFLEX_BUDGET, 'brief-social-turn')
@@ -71,9 +68,5 @@ export function routeConversationTurn(
     )
   }
 
-  return routingDecision(
-    'contextual',
-    CONTEXTUAL_BUDGET,
-    'default-contextual'
-  )
+  return routingDecision('contextual', CONTEXTUAL_BUDGET, 'default-contextual')
 }

@@ -4,10 +4,7 @@ import type {
 } from '@repo/memory-sdk'
 
 import type { AgentId, ConversationTurnInput } from '@contracts'
-import {
-  type ConversationMemoryContext,
-  MemoryContextPort
-} from '@memory'
+import { type ConversationMemoryContext, MemoryContextPort } from '@memory'
 import {
   ConversationAgentPort,
   type ConversationAgentInvocation,

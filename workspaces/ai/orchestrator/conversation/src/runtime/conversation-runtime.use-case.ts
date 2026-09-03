@@ -137,8 +137,7 @@ export class ConversationRuntime {
     return Object.freeze({
       agentId: input.agentId,
       context: Object.freeze({
-        budgetExceededByCurrentMessage:
-          history.budgetExceededByCurrentMessage,
+        budgetExceededByCurrentMessage: history.budgetExceededByCurrentMessage,
         budgetTokens: routing.budget.contextTokens,
         estimatedTokens: history.estimatedTokens,
         estimatorVersion: history.estimatorVersion,
