@@ -32,6 +32,39 @@ jobs:
           export CI=true
           pnpm install --frozen-lockfile
           python3 .github/spec-009-baseline.py
+          python3 <<'PY'
+          from pathlib import Path
+
+          path = Path(
+              'workspaces/apps/conversation-api/src/assurance/evals/'
+              'pre-memory-baseline/pre-memory-baseline.fixtures.ts'
+          )
+          content = path.read_text(encoding='utf-8')
+          old = '''export const PRE_MEMORY_BASELINE_REQUEST: ConversationTurnRequest =
+            Object.freeze({
+              agentId: 'ana',
+              asOf: PRE_MEMORY_BASELINE_GENERATED_AT,
+              conversationId: 'spec-009-baseline-conversation-1',
+              history: Object.freeze([]),
+              message: 'Oi!',
+              purpose: 'conversation.support',
+              requestId: 'spec-009-baseline-request-1'
+            })
+          '''
+          new = '''export const PRE_MEMORY_BASELINE_REQUEST: ConversationTurnRequest = {
+            agentId: 'ana',
+            asOf: PRE_MEMORY_BASELINE_GENERATED_AT,
+            conversationId: 'spec-009-baseline-conversation-1',
+            history: [],
+            message: 'Oi!',
+            purpose: 'conversation.support',
+            requestId: 'spec-009-baseline-request-1'
+          }
+          '''
+          if old not in content:
+              raise RuntimeError('baseline request fixture source is missing')
+          path.write_text(content.replace(old, new, 1), encoding='utf-8')
+          PY
           pnpm --filter conversation-api exec node --import tsx src/assurance/evals/pre-memory-baseline/pre-memory-baseline.eval.ts --write
           pnpm exec biome check --write workspaces/apps/conversation-api
           git rm -f .github/spec-009-baseline.py
