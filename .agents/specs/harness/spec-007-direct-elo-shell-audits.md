@@ -1,6 +1,6 @@
 ---
 id: SPEC-007
-title: Make Elo directly invokable and migrate audit automation to POSIX shell
+title: Make Elo directly invokable and migrate executable MJS automation to shell
 type: feature
 status: in-progress
 mode: prospective
@@ -11,6 +11,7 @@ owners:
 targets:
   - Elo CLI
   - audit checkers
+  - design-system token build
   - package lifecycle
   - continuous integration
   - engineering harness
@@ -18,6 +19,7 @@ context:
   - AGENTS.md
   - cli/readme.md
   - package.json
+  - workspaces/packages/design-system/package.json
   - .github/workflows/ci.yml
 rules:
   - .agents/rules/architecture.md
@@ -37,64 +39,64 @@ evidence:
   - pending
 ---
 
-# SPEC-007: Make Elo directly invokable and migrate audit automation to POSIX shell
+# SPEC-007: Make Elo directly invokable and migrate executable MJS automation to shell
 
 ## Problem Statement
 
-The repository already owns a POSIX-shell Elo CLI, but developers still normally enter it through `pnpm elo` or `./cli/elo`. A fresh local install does not establish a direct `elo <command>` entrypoint on the developer's existing user PATH. The current no-argument behavior also starts bootstrap work instead of presenting a safe, discoverable interface, and an unknown command falls through to help without a reliable usage-error status.
+The repository already owns a POSIX-shell Elo CLI, but developers normally enter it through `pnpm elo` or `./cli/elo`. A fresh install does not establish `elo <command>` on the developer's existing user `PATH`. Elo without arguments also starts bootstrap work instead of presenting a safe discovery interface, and unknown-command behavior does not consistently return a usage-error status.
 
-The engineering harness additionally keeps five executable repository audits as `.mjs` programs even though their operational entrypoint is Elo and the repository has standardized CLI/platform automation on shell. This leaves two automation models and makes the source-organization rule describe JavaScript audit scripts as a special case.
+Six executable automations still use `.mjs`: five repository invariant checkers under `.audit/` and the design-system token builder. This leaves more than one executable scripting convention even though repository-platform automation is already owned by shell. The design-token transformation is non-trivial and should not be flattened into fragile shell text processing.
 
 ## Solution
 
-Add an idempotent `elo setup` command that installs a small, managed launcher into a user-owned binary directory selected from an explicit override, `PNPM_HOME`, `XDG_BIN_HOME`, or `~/.local/bin`. Run that setup from the package `postinstall` lifecycle, expose an explicit `postclone` package script because npm and pnpm do not provide a standard automatic post-clone lifecycle, and keep CI/non-interactive installs free from host PATH mutation.
+Add an idempotent `elo setup` command that writes a small managed launcher into a user-owned binary directory selected from an explicit override, `PNPM_HOME`, `XDG_BIN_HOME`, or `~/.local/bin`. Invoke setup from `postinstall`; expose an explicit `postclone` package script because npm and pnpm do not provide an automatic post-clone lifecycle; and skip user-home mutation in CI.
 
-Harden Elo's dispatch contract so no arguments show help, usage errors exit with status 2, version/help are directly available, and `check all` composes the invariant checks. Preserve Turborepo ownership of repository task graphs.
+Harden Elo so no arguments show help, help/version have direct contracts, unknown commands return status 2, and `check all` composes every invariant checker without taking task-graph ownership from Turborepo.
 
-Replace the five executable `.audit/*.script.mjs` checkers with POSIX `.audit/*.script.sh` implementations, update Elo and CI dispatch, and promote the resulting shell-only audit convention into the durable source-organization rule. Framework-owned `.mjs` configuration files are not executable repository scripts and remain unchanged.
+Replace the five `.audit/*.script.mjs` programs with executable POSIX `.audit/*.script.sh` programs. Replace the design-system `.mjs` entrypoint with a POSIX shell entrypoint while retaining the token transformation as an erasable TypeScript backend executed by the repository's required Node.js 24 runtime. Framework-owned `.mjs` configuration modules remain unchanged.
 
 ## User Stories
 
-1. As a developer after cloning and installing dependencies, I want to type `elo doctor` or `elo check all`, so that I do not need to remember a package-manager prefix.
-2. As a developer running Elo without arguments, I want safe help output rather than an implicit install, so that command discovery has no side effects.
-3. As a CI maintainer, I want the same shell checkers invoked through Elo locally and in CI, so that there is one reproducible audit path.
-4. As a harness maintainer, I want executable audit automation expressed as POSIX shell, so that Elo's platform automation no longer depends on separate `.mjs` scripts.
-5. As a repository maintainer, I want lifecycle setup to be idempotent and user-scoped, so that installs never require `sudo`, overwrite an unrelated command, or edit shell profiles.
-6. As a reviewer, I want framework configuration distinguished from executable automation, so that required `postcss.config.mjs` files are not renamed mechanically.
+1. As a developer after dependency installation, I want to type `elo doctor` or `elo check all` without a package-manager prefix.
+2. As a developer invoking Elo without arguments, I want side-effect-free help instead of an implicit bootstrap.
+3. As a CI maintainer, I want local and CI invariant checks to execute the same shell entrypoints.
+4. As a design-system maintainer, I want token generation to enter through shell without losing the typed implementation appropriate for JSON traversal and serialization.
+5. As a repository maintainer, I want setup to be user-scoped, idempotent and collision-safe.
+6. As a framework maintainer, I want required configuration modules such as `postcss.config.mjs` excluded from mechanical renaming.
 
 ## Scope
 
 This change owns:
 
-- direct user-scoped installation of the `elo` launcher;
-- package lifecycle wiring for `postinstall` and an explicit `postclone` script;
-- safe no-argument, unknown-command, help, version and aggregate-check behavior;
-- conversion of all five executable `.audit/*.script.mjs` files to POSIX `.sh` checkers;
-- preservation of the current platform, architecture, import-boundary, memory and spec-workflow assertions;
-- CI audit dispatch and hygiene updates;
-- CLI and durable harness documentation for the new contract;
-- shell contract validation using temporary directories and no external network.
+- direct user-scoped installation of the Elo launcher;
+- `postinstall` wiring and an explicit `postclone` recovery script;
+- safe no-argument, help, version, unknown-command and aggregate-check behavior;
+- conversion of all five `.audit/*.script.mjs` programs to POSIX shell;
+- conversion of `build-tokens.mjs` to a shell entrypoint plus TypeScript backend;
+- preservation of current platform, architecture, import, memory, spec and generated-token behavior;
+- CI, documentation and durable source-organization updates;
+- deterministic shell contract fixtures that do not use product data or external network access.
 
 ## Implementation Decisions
 
-- `cli/elo` remains the canonical repository binary and `cli/src/` remains shell-only.
-- `elo setup` installs a generated launcher rather than publishing or globally installing an npm package.
-- The destination order is `--bin-dir`/`ELO_BIN_DIR`, `PNPM_HOME`, `XDG_BIN_HOME`, then `$HOME/.local/bin`.
-- Setup creates directories and files only inside the selected user-owned destination. It never invokes `sudo`, edits a shell profile or changes the process PATH.
-- A managed marker distinguishes the Elo launcher from unrelated executables. Manual setup fails on an unmanaged collision; lifecycle setup warns and skips rather than breaking dependency installation.
-- Setup is idempotent and replaces only a previously managed launcher using a temporary file and atomic rename in the destination directory.
-- The generated launcher targets the checkout that installed it. A later clone or moved checkout reruns setup; the most recent successful setup owns the user launcher.
-- `postinstall` performs user launcher setup. `postclone` is a documented explicit package script because Git has no npm/pnpm post-clone lifecycle event.
-- CI and explicitly disabled environments skip user launcher installation without failing dependency installation.
-- Shell audit scripts use standard Unix/POSIX utilities, preserve quoted argument boundaries and do not use `eval`.
-- Elo remains a control plane. `dev`, `start`, `build`, `typecheck`, tests and workspace task graphs remain direct root/Turborepo responsibilities.
-- Framework-owned `.mjs` files such as `postcss.config.mjs` remain in place because they are configuration modules, not executable audit scripts.
+- `cli/elo` remains the canonical repository binary; substantive CLI code remains under `cli/src/` as POSIX shell.
+- `elo setup` generates a launcher rather than publishing or globally installing an npm package.
+- Destination precedence is `--bin-dir` or `ELO_BIN_DIR`, then `PNPM_HOME`, `XDG_BIN_HOME`, and `$HOME/.local/bin`.
+- Setup never invokes `sudo`, edits a shell profile, changes the current process `PATH`, or silently overwrites an unrelated command.
+- A managed marker controls replacement. Setup writes a temporary file in the destination and atomically renames it.
+- Manual setup fails on an unmanaged collision. Lifecycle setup warns and skips so dependency installation is not broken.
+- The generated launcher targets the checkout that installed it. A moved checkout requires setup from a valid checkout.
+- `postinstall` is the automatic local setup event. `postclone` is an explicit package script because Git/npm/pnpm expose no automatic post-clone lifecycle.
+- CI and `ELO_SETUP_DISABLED` skip launcher installation.
+- Audit scripts preserve allowlists, quoted argument boundaries, deterministic exit codes and no-`eval` execution.
+- Design-token shell code only selects build/watch execution and delegates JSON/reference/serialization logic to `build-tokens.ts`.
+- The TypeScript backend uses only erasable syntax supported by the required Node.js 24 runtime and keeps explicit `.ts` import extensions.
+- Turborepo/root scripts remain the owners of `dev`, `start`, `build`, `typecheck`, tests and workspace task graphs.
+- Framework-owned `.mjs` configuration files remain in their required locations and formats.
 
 ## Testing Decisions
 
-### Primary seam
-
-The primary public seam is:
+The primary direct-command seam is:
 
 ```text
 ELO_BIN_DIR=<temporary-directory> ./cli/elo setup
@@ -102,83 +104,68 @@ ELO_BIN_DIR=<temporary-directory> ./cli/elo setup
 <temporary-directory>/elo check platform
 ```
 
-It must prove that setup creates a usable direct command without writing outside the fixture directory.
+The fixture must prove creation, direct execution, idempotence, unmanaged-collision protection, CI skipping and no writes outside the selected temporary destination.
 
-### Secondary seams
+Secondary seams are:
 
-- `./cli/elo` returns help and status 0 without bootstrap side effects.
-- Unknown commands and invalid subcommands return status 2.
-- `./cli/elo check all` runs every audit in deterministic order and stops on the first failure.
-- Every committed shell entrypoint passes `sh -n`.
-- No executable `.audit/*.script.mjs` remains tracked.
-- Package lifecycle scripts contain the exact setup and Git-adapter delegations expected by the platform audit.
+- `./cli/elo` prints help and exits 0 without bootstrap effects;
+- unknown commands and invalid subcommands exit 2;
+- `./cli/elo check all` runs all five checks in deterministic order;
+- every committed shell entrypoint passes `/bin/sh -n`;
+- no executable `.mjs` remains in `.audit/`, package `scripts`, or a `src/scripts/` execution path;
+- all framework `.config.mjs` files remain valid;
+- `pnpm --filter @repo/ds build` generates the same token JSON and CSS contract;
+- existing repository validation remains green.
 
-### Fixtures and privacy
-
-CLI installation tests use a `mktemp` directory, an isolated `ELO_BIN_DIR`, controlled environment variables and generated fake collisions. They do not read product data, contact a registry, start Docker or modify the developer's shell configuration.
-
-### Required validation
-
-- Elo platform audit, including direct-launcher contract checks.
-- Architecture audit.
-- Spec workflow audit.
-- Import boundaries audit.
-- Memory invariants audit.
-- POSIX syntax validation for tracked shell files.
-- Existing lint, typecheck, tests, database validation, AI evals, build and Git-hook smoke tests in CI.
+Fixtures use `mktemp`, controlled environment variables and generated collisions. They do not contact registries, start Docker, read product data or edit user shell configuration.
 
 ## Acceptance Criteria
 
-- [ ] `SPEC-007` is approved as `ready` before implementation and transitions through `in-progress` to `implemented` with stable evidence.
+- [ ] `SPEC-007` transitioned from approved `ready` to `in-progress` before executable implementation.
 - [ ] `elo setup` installs an idempotent managed launcher in the selected user-owned binary directory.
-- [ ] Setup never uses `sudo`, edits shell profiles or overwrites an unmanaged `elo` command implicitly.
-- [ ] Local `pnpm install` invokes direct-command setup through `postinstall`; CI can skip it safely.
-- [ ] The root exposes an explicit `postclone` script and documentation states that npm/pnpm have no automatic post-clone lifecycle.
+- [ ] Setup never uses `sudo`, edits shell profiles or implicitly replaces an unmanaged `elo` command.
+- [ ] Local `pnpm install` invokes setup through `postinstall`; CI can skip it safely.
+- [ ] The root exposes an explicit `postclone` script and documentation states that it is not an automatic npm/pnpm lifecycle.
 - [ ] After setup, `elo <command>` works without a `pnpm` prefix.
-- [ ] Elo with no arguments shows help without mutating the repository or installing dependencies.
-- [ ] Unknown commands and invalid subcommands return exit status 2.
-- [ ] Elo exposes `--version` and `check all` without taking ownership of Turborepo task graphs.
+- [ ] Elo without arguments shows help without mutation; usage errors return status 2.
+- [ ] Elo exposes `--version` and `check all` without duplicating Turborepo task graphs.
 - [ ] All five executable `.audit/*.script.mjs` checkers are replaced by executable POSIX `.audit/*.script.sh` checkers.
-- [ ] Existing audit contracts for platform, architecture, imports, memory and specs remain green.
-- [ ] Framework configuration modules ending in `.mjs` remain unchanged.
-- [ ] CI, audit hygiene, CLI help and durable source-organization documentation use the shell checker names and direct Elo contract.
-- [ ] Existing repository validation completes successfully on the pull-request head.
+- [ ] `build-tokens.mjs` is replaced by an executable shell entrypoint and a typed backend with equivalent generated artifacts.
+- [ ] Package scripts do not execute `.mjs` automation.
+- [ ] Framework-owned `.config.mjs` modules remain unchanged.
+- [ ] CI, audit hygiene, CLI help and durable source-organization documentation use the new contract.
+- [ ] Existing lint, typecheck, tests, database validation, AI evals, build and Git-hook smoke validation pass on the pull-request head.
+- [ ] The spec closes as `implemented` with stable commit, issue, pull-request and CI evidence.
 
 ## Failure Behavior
 
-- Missing write permission or an unavailable destination fails manual setup with an actionable error.
-- An existing unmanaged `elo` file is never replaced without an explicit future migration decision.
-- Lifecycle setup treats CI, a disabled install flag, a missing home directory or an unmanaged collision as a non-fatal skip with a warning.
-- An installed launcher whose checkout no longer exists exits with guidance to rerun `./cli/elo setup` from a valid checkout.
-- Any failed audit causes `check all` to return non-zero immediately.
-- Any shell syntax failure, remaining executable `.script.mjs`, lifecycle-contract drift or task-runner ownership violation fails the platform audit and CI.
-- The branch can be abandoned without changing application runtime behavior; the change is confined to repository platform automation and documentation.
+- Missing permissions or an unavailable destination fail manual setup with an actionable error.
+- Lifecycle setup treats CI, an explicit disable flag, a missing home directory and unmanaged collisions as non-fatal skips with warnings.
+- A launcher whose configured checkout is unavailable exits with guidance to rerun local setup.
+- An invalid Elo command or subcommand exits 2.
+- `check all` stops at the first failing invariant and returns non-zero.
+- Invalid shell syntax, executable MJS drift, lifecycle drift, token-build drift or task-runner ownership drift fail the platform audit/CI.
+- Token parsing, references and serialization retain explicit errors from the typed backend.
+- Abandoning the branch changes no product runtime, database or persisted product data.
 
 ## Out of Scope
 
-- Renaming framework-owned `postcss.config.mjs` files.
-- Publishing Elo to the npm registry or installing a global npm package.
-- Editing `.bashrc`, `.zshrc`, fish configuration or any other shell profile.
-- Adding `sudo`-based installation.
-- Adding build, dev, lint, format, typecheck, test or eval task graphs to Elo.
-- Changing application, AI, Memory Nucleus, database or Docker runtime behavior.
-- Promising macOS or Windows support without an explicit CI matrix.
+- Renaming `postcss.config.mjs` or other framework-owned configuration modules.
+- Implementing JSON traversal or token serialization directly in shell.
+- Publishing Elo to npm, globally installing a package, adding auto-update, invoking `sudo`, or editing shell profiles.
+- Adding product build/dev/test/eval task graphs to Elo.
+- Changing application, AI, Memory Nucleus, database, Docker or deployment behavior.
+- Promising macOS/Windows support without an explicit CI matrix.
 - Adding destructive reset commands or deleting persistent data.
 
 ## Evidence and Promotion
 
-Evidence will be recorded from implementation commits, derived GitHub issues, the pull request, direct launcher contract checks and the full CI run.
+Implementation evidence will include the spec/ADR commits, derived issues #6, #7, #8 and #12, direct-launcher fixtures, shell syntax checks, design-token build output, the pull request and its full CI run.
 
-Durable conclusions will be promoted to:
-
-- `cli/readme.md` for developer-facing command and installation behavior;
-- `.agents/rules/source-organization.md` for executable audit-script ownership and naming;
-- `.agents/adrs/0019-posix-elo-control-plane.md` for the installation and shell-control-plane tradeoff;
-- `package.json` for lifecycle entrypoints;
-- `.github/workflows/ci.yml` for reproducible validation.
+Durable conclusions are promoted to `cli/readme.md`, `.agents/rules/source-organization.md`, `.agents/adrs/0019-posix-elo-control-plane.md`, `package.json`, the design-system package manifest and `.github/workflows/ci.yml`.
 
 ## Further Notes
 
-The owner approved this bounded change in the engineering request on 2026-09-03. The attached technical research supports a thin shell control plane and preserving pnpm/Turborepo as the workspace engine. This spec narrows direct installation to a small user-scoped launcher rather than a globally published CLI package.
+The owner approved this bounded change on 2026-09-03. The attached research supports a thin shell control plane while retaining pnpm/Turborepo and typed backends for non-trivial behavior. The implementation therefore removes executable `.mjs` entrypoints without turning JSON transformation into a shell application.
 
-There is no standard `postclone` lifecycle in npm or pnpm. The first `pnpm install` after cloning is therefore the automatic setup event through `postinstall`; `pnpm postclone` remains an explicit, named recovery/setup entrypoint.
+There is no standard automatic `postclone` lifecycle in npm or pnpm. The first `pnpm install` after cloning is the automatic setup event through `postinstall`; `pnpm postclone` remains an explicit recovery command.
