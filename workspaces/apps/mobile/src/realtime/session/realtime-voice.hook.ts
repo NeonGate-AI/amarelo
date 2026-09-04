@@ -2,11 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 
 import { checkCalendarAvailability } from '../calendar'
 
-export type RealtimeVoiceStatus =
-  | 'connected'
-  | 'connecting'
-  | 'error'
-  | 'idle'
+export type RealtimeVoiceStatus = 'connected' | 'connecting' | 'error' | 'idle'
 
 const SESSION_ENDPOINT = '/api/v1/realtime/session'
 
@@ -159,7 +155,7 @@ function handleRealtimeEvent(
 }
 
 export function useRealtimeVoice() {
-  const audioRef = useRef<HTMLAudioElement>(null)
+  const audioElementRef = useRef<HTMLAudioElement | null>(null)
   const channelRef = useRef<RTCDataChannel | null>(null)
   const peerConnectionRef = useRef<RTCPeerConnection | null>(null)
   const microphoneStreamRef = useRef<MediaStream | null>(null)
@@ -171,14 +167,18 @@ export function useRealtimeVoice() {
     channelRef.current?.close()
     channelRef.current = null
 
-    microphoneStreamRef.current?.getTracks().forEach((track) => track.stop())
+    microphoneStreamRef.current?.getTracks().forEach((track) => {
+      track.stop()
+    })
     microphoneStreamRef.current = null
 
     peerConnectionRef.current?.close()
     peerConnectionRef.current = null
 
-    if (audioRef.current !== null) {
-      audioRef.current.srcObject = null
+    if (audioElementRef.current !== null) {
+      audioElementRef.current.pause()
+      audioElementRef.current.srcObject = null
+      audioElementRef.current = null
     }
   }, [])
 
@@ -207,10 +207,14 @@ export function useRealtimeVoice() {
       const peerConnection = new RTCPeerConnection()
       peerConnectionRef.current = peerConnection
 
+      const audioElement = document.createElement('audio')
+      audioElement.autoplay = true
+      audioElementRef.current = audioElement
+
       peerConnection.addEventListener('track', (event) => {
         const remoteStream = event.streams.at(0)
-        if (audioRef.current !== null && remoteStream !== undefined) {
-          audioRef.current.srcObject = remoteStream
+        if (audioElementRef.current !== null && remoteStream !== undefined) {
+          audioElementRef.current.srcObject = remoteStream
         }
       })
 
@@ -287,7 +291,6 @@ export function useRealtimeVoice() {
   useEffect(() => cleanup, [cleanup])
 
   return {
-    audioRef,
     error,
     start,
     status,
