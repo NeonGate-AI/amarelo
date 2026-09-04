@@ -2,7 +2,7 @@
 id: SPEC-032
 title: Add a minimal Realtime 2 WebRTC voice agent
 type: feature
-status: in-progress
+status: implemented
 mode: prospective
 created: 2026-09-03
 updated: 2026-09-03
@@ -32,7 +32,10 @@ skills:
   - .agents/skills/implement/SKILL.md
   - .agents/skills/code-review/SKILL.md
 evidence:
-  - pending
+  - workspaces/apps/conversation-api/src/assurance/evals/realtime-session/realtime-session.eval.ts
+  - workspaces/apps/mobile/src/assurance/evals/realtime-voice/realtime-voice.eval.ts
+  - https://github.com/NeonGate-AI/amarelo/actions/runs/33826236576
+  - https://github.com/NeonGate-AI/amarelo/pull/59
 ---
 
 # SPEC-032: Add a minimal Realtime 2 WebRTC voice agent
@@ -101,17 +104,17 @@ Run the focused `conversation-api` tests/typecheck, Mobile tests/typecheck/build
 
 ## Acceptance Criteria
 
-- [ ] Mobile can opt into a minimal `gpt-realtime-2` WebRTC voice agent without adding a second app.
-- [ ] Browser microphone input is added to `RTCPeerConnection` and model audio output is attached from the remote track.
-- [ ] The browser creates an `oai-events` data channel and uses it for Realtime client/server events.
-- [ ] The server endpoint uses `OPENAI_API_KEY` and posts to `https://api.openai.com/v1/realtime/calls` with plain multipart string fields named exactly `sdp` and `session`; no multipart file upload is used.
-- [ ] The serialized session uses `type: realtime` and model `gpt-realtime-2`.
-- [ ] `check_calendar(date, time)` is registered with `session.update`, executed against synthetic deterministic availability, returned as `function_call_output`, and followed by `response.create`.
-- [ ] Stop/unmount cleanup closes media tracks, data channel and peer connection and detaches remote audio.
-- [ ] Provider/session failures are visible to the developer without exposing the API key or raw internal stack details to the browser.
-- [ ] No audio, transcript, Realtime content or tool data is persisted or runtime-cached.
-- [ ] Setup/run documentation states the required environment variables and commands.
-- [ ] Focused tests, typechecks and Mobile build pass.
+- [x] Mobile can opt into a minimal `gpt-realtime-2` WebRTC voice agent without adding a second app.
+- [x] Browser microphone input is added to `RTCPeerConnection` and model audio output is attached from the remote track.
+- [x] The browser creates an `oai-events` data channel and uses it for Realtime client/server events.
+- [x] The server endpoint uses `OPENAI_API_KEY` and posts to `https://api.openai.com/v1/realtime/calls` with plain multipart string fields named exactly `sdp` and `session`; no multipart file upload is used.
+- [x] The serialized session uses `type: realtime` and model `gpt-realtime-2`.
+- [x] `check_calendar(date, time)` is registered with `session.update`, executed against synthetic deterministic availability, returned as `function_call_output`, and followed by `response.create`.
+- [x] Stop/unmount cleanup closes media tracks, data channel and peer connection and detaches remote audio.
+- [x] Provider/session failures are visible to the developer without exposing the API key or raw internal stack details to the browser.
+- [x] No audio, transcript, Realtime content or tool data is persisted or runtime-cached.
+- [x] Setup/run documentation states the required environment variables and commands.
+- [x] Focused tests, typechecks and Mobile build pass.
 
 ## Failure Behavior
 
@@ -123,7 +126,7 @@ Production authentication/authorization, billing and entitlement enforcement, re
 
 ## Evidence and Promotion
 
-Expected evidence is the server injection test for the exact multipart exchange, Mobile deterministic tool tests, typechecks/build, final diff review, and optional local WebRTC smoke. Proven transport constraints may be promoted into Mobile/conversation-api context after validation; no new architectural rule or ADR is required unless implementation reveals a broader ownership decision.
+The exact implementation head passed repository audits, lint, typecheck, test/eval, Memory PostgreSQL validation, AI eval, production build, and Git-hook smoke tests in CI run `33826236576`. The focused server eval proves the exact multipart WebRTC exchange and safe failure mapping, while the Mobile eval proves deterministic calendar behavior, the WebRTC/data-channel seam, opt-in gating, captions, and absence of persistence/API-key leakage in the client surface. A live provider/microphone smoke was not executed in CI and remains optional local validation because CI cannot establish a real browser media path. No new architectural rule or ADR was required.
 
 ## Further Notes
 
