@@ -45,7 +45,7 @@ The specification catalog is flat, priority-ordered and mechanically checked.
 | 029 | SPEC-029 | implemented | [Canonical local engineering workflow skills](029-canonical-local-workflow-skills.spec.md) |
 | 030 | SPEC-030 | implemented | [Agent artifact scaffolding](030-agent-artifact-scaffolding.spec.md) |
 | 031 | SPEC-031 | implemented | [Numbered canonical rule catalog](031-numbered-rule-catalog.spec.md) |
-| 032 | SPEC-032 | in-progress | [Realtime 2 WebRTC voice agent](032-realtime-2-webrtc-voice-agent.spec.md) |
+| 032 | SPEC-032 | implemented | [Realtime 2 WebRTC voice agent](032-realtime-2-webrtc-voice-agent.spec.md) |
 
 The next unallocated durable delivery ID is `SPEC-033`.
 
