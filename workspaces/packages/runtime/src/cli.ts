@@ -273,7 +273,8 @@ async function deleteCypressResources(): Promise<void> {
     `job/${cypressJob}`,
     `configmap/${cypressConfigMap}`,
     '--ignore-not-found=true',
-    '--wait=true'
+    '--wait=true',
+    '--timeout=300s'
   ])
 }
 

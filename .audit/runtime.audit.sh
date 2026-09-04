@@ -316,6 +316,8 @@ else
     runtime_fail cli/src/commands/runtime.sh "elo runtime down did not stop Deployments"
   grep -F 'kubectl --namespace amarelo-runtime get pods' "$command_log" >/dev/null 2>&1 ||
     runtime_fail cli/src/commands/runtime.sh "elo runtime down did not wait for zero owned pods"
+  grep -F 'kubectl --namespace amarelo-runtime delete job/amarelo-cypress configmap/amarelo-cypress-suite --ignore-not-found=true --wait=true --timeout=300s' "$command_log" >/dev/null 2>&1 ||
+    runtime_fail cli/src/commands/runtime.sh "elo runtime down did not bound Cypress resource cleanup"
 fi
 
 printf 'generated runtime environment\n' >"$TMP_ROOT/runtime.env"

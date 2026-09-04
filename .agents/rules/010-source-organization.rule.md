@@ -1,5 +1,5 @@
 ---
-version: 7
+version: 8
 extends: 002-code-style.rule.md
 name: Source Organization
 description: Source roots, module boundaries, file naming, barrels, and architectural source ownership.
