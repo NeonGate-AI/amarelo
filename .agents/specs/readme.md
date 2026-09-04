@@ -49,7 +49,7 @@ The specification catalog is flat, priority-ordered and mechanically checked.
 | 033 | SPEC-033 | draft | [Application-owned conversational guardrails](033-application-conversation-guardrails.spec.md) |
 | 034 | SPEC-034 | draft | [Conversation lifecycle hooks and realtime edge-case semantics](034-conversation-lifecycle-hooks.spec.md) |
 | 035 | SPEC-035 | implemented | [Recover the specification catalog and CI](035-recover-spec-catalog-and-ci.spec.md) |
-| 036 | SPEC-036 | in-progress | [Direct cleanup without an apply flag](036-direct-cleanup.spec.md) |
+| 036 | SPEC-036 | implemented | [Direct cleanup without an apply flag](036-direct-cleanup.spec.md) |
 
 The next unallocated durable delivery ID is `SPEC-037`.
 

@@ -2,7 +2,7 @@
 id: SPEC-036
 title: Make cleanup execute without an apply flag
 type: fix
-status: in-progress
+status: implemented
 mode: prospective
 created: 2026-09-04
 updated: 2026-09-04
@@ -28,7 +28,11 @@ skills:
   - .agents/skills/tdd/SKILL.md
   - .agents/skills/code-review/SKILL.md
 evidence:
-  - pending
+  - commit 553a0ea02f71e91c7ab52a5412c1dc92f09cad77 (red public-seam contract)
+  - commit 2122844373ef6174d8522af3e47086561ab5a4f8 (green implementation)
+  - .audit/elo-platform-core.audit.sh isolated cleanup fixture
+  - https://github.com/NeonGate-AI/amarelo/issues/64
+  - https://github.com/NeonGate-AI/amarelo/pull/65
 ---
 
 # SPEC-036: Make cleanup execute without an apply flag
@@ -85,15 +89,15 @@ Run the focused platform audit, `./cli/elo check all`, Commitlint, Biome, typech
 
 ## Acceptance Criteria
 
-- [ ] `elo cleanup` removes eligible untracked generated outputs without another flag.
-- [ ] Ordinary cleanup preserves every `node_modules` directory.
-- [ ] `elo cleanup --dependencies` also removes eligible untracked dependency directories.
-- [ ] Tracked paths, `.git` and `.audit` remain protected.
-- [ ] `--apply` and every other unknown cleanup option exit with usage status 2.
-- [ ] Help and CLI documentation expose no `--apply` cleanup contract.
-- [ ] The public cleanup behavior has deterministic synthetic audit coverage.
-- [ ] Complete exact-head CI and both independent review axes pass.
-- [ ] Durable behavior is promoted to current CLI documentation and the spec closes as `implemented`.
+- [x] `elo cleanup` removes eligible untracked generated outputs without another flag.
+- [x] Ordinary cleanup preserves every `node_modules` directory.
+- [x] `elo cleanup --dependencies` also removes eligible untracked dependency directories.
+- [x] Tracked paths, `.git` and `.audit` remain protected.
+- [x] `--apply` and every other unknown cleanup option exit with usage status 2.
+- [x] Help and CLI documentation expose no `--apply` cleanup contract.
+- [x] The public cleanup behavior has deterministic synthetic audit coverage.
+- [x] Complete exact-head CI and both independent review axes pass.
+- [x] Durable behavior is promoted to current CLI documentation and the spec closes as `implemented`.
 
 ## Failure Behavior
 
@@ -109,7 +113,7 @@ An unknown option exits 2 without removing anything. A removal error returns non
 
 ## Evidence and Promotion
 
-Planned evidence is the isolated public-CLI audit, exact branch diff, exact-head GitHub Actions run and two-axis review. At completion, stable references will replace `pending`, and current cleanup behavior will be reflected in `cli/readme.md` and help output.
+The isolated fixture in `.audit/elo-platform-core.audit.sh` records the public cleanup contract. Commit `553a0ea02f71e91c7ab52a5412c1dc92f09cad77` proved the old behavior red; commit `2122844373ef6174d8522af3e47086561ab5a4f8` made the same seam green. Issue #64 and pull request #65 retain the exact-head CI and two-axis review record. The direct behavior is promoted to `cli/readme.md` and help output.
 
 ## Further Notes
 
