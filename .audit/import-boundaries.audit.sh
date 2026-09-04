@@ -330,6 +330,9 @@ sort -u "$TMP_ROOT/directories" >"$TMP_ROOT/directories.sorted"
 
 while IFS= read -r directory; do
   [ -n "$directory" ] || continue
+  case "$directory" in
+    */cypress/e2e) continue ;;
+  esac
   : >"$TMP_ROOT/direct-files"
   has_nested=false
 

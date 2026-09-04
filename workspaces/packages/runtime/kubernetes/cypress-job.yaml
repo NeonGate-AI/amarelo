@@ -1,0 +1,55 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: amarelo-cypress
+  namespace: amarelo-runtime
+  labels:
+    app.kubernetes.io/name: cypress
+    app.kubernetes.io/part-of: amarelo
+spec:
+  activeDeadlineSeconds: 600
+  backoffLimit: 0
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: cypress
+        app.kubernetes.io/part-of: amarelo
+    spec:
+      automountServiceAccountToken: false
+      restartPolicy: Never
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: cypress
+          image: cypress/included:15.19.0
+          imagePullPolicy: IfNotPresent
+          command:
+            - cypress
+          args:
+            - run
+            - --headless
+            - --config-file
+            - /e2e/cypress.config.cjs
+            - --spec
+            - /e2e/runtime.cy.js
+          resources:
+            requests:
+              cpu: 250m
+              memory: 512Mi
+            limits:
+              cpu: "1"
+              memory: 2Gi
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+          volumeMounts:
+            - name: suite
+              mountPath: /e2e
+              readOnly: true
+      volumes:
+        - name: suite
+          configMap:
+            name: amarelo-cypress-suite

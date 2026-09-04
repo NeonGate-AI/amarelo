@@ -75,6 +75,9 @@ case "$elo_command" in
   cleanup)
     exec "$CLI_DIR/commands/cleanup.sh" "$@"
     ;;
+  runtime)
+    exec "$CLI_DIR/commands/runtime.sh" "$@"
+    ;;
   changelog)
     exec "$CLI_DIR/commands/changelog.sh" "$@"
     ;;
