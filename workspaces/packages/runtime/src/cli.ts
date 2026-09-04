@@ -8,7 +8,6 @@ const runtimeDirectory = resolve(dirname(fileURLToPath(import.meta.url)), '..')
 const projectRoot = resolve(runtimeDirectory, '../../..')
 const kubernetesDirectory = resolve(runtimeDirectory, 'kubernetes')
 const namespaceFile = resolve(kubernetesDirectory, 'namespace.yaml')
-const dockerfile = resolve(runtimeDirectory, 'Dockerfile.dev')
 const cypressDirectory = resolve(runtimeDirectory, 'cypress')
 const cypressConfigFile = resolve(cypressDirectory, 'cypress.config.cjs')
 const cypressSpecFile = resolve(cypressDirectory, 'e2e/runtime.cy.js')
@@ -19,12 +18,37 @@ const environmentFile = process.env.AMARELO_RUNTIME_ENV_FILE
   ? resolve(process.env.AMARELO_RUNTIME_ENV_FILE)
   : resolve(runtimeDirectory, '.env')
 const runtimeNamespace = 'amarelo-runtime'
-const defaultApplicationImage = 'amarelo-dev-workspace:local'
 const applicationWorkloads = [
   'landing',
   'console',
   'onboarding',
-  'mobile'
+  'mobile',
+  'chatterbox'
+] as const
+const applicationContainers = [
+  {
+    dockerfile: resolve(projectRoot, 'workspaces/apps/landing/Dockerfile'),
+    workload: 'landing'
+  },
+  {
+    dockerfile: resolve(projectRoot, 'workspaces/apps/console/Dockerfile'),
+    workload: 'console'
+  },
+  {
+    dockerfile: resolve(projectRoot, 'workspaces/apps/onboarding/Dockerfile'),
+    workload: 'onboarding'
+  },
+  {
+    dockerfile: resolve(projectRoot, 'workspaces/apps/mobile/Dockerfile'),
+    workload: 'mobile'
+  },
+  {
+    dockerfile: resolve(
+      projectRoot,
+      'workspaces/microservices/chatterbox/Dockerfile'
+    ),
+    workload: 'chatterbox'
+  }
 ] as const
 const deploymentWorkloads = ['redis', ...applicationWorkloads] as const
 
@@ -87,23 +111,28 @@ function isRuntimeAction(value: string): value is RuntimeAction {
 
 async function runtimeUp(): Promise<void> {
   assertKubectlIsAvailable()
-  const applicationImage =
-    process.env.AMARELO_RUNTIME_IMAGE ?? defaultApplicationImage
+  const imagePrefix = configuredImagePrefix()
+  const images = applicationContainers.map((container) => ({
+    ...container,
+    image: applicationImage(container.workload, imagePrefix)
+  }))
 
-  if (applicationImage === defaultApplicationImage) {
+  if (imagePrefix === undefined) {
     assertDockerIsAvailable()
-    await runCommand('docker', [
-      'build',
-      '--file',
-      dockerfile,
-      '--tag',
-      applicationImage,
-      projectRoot
-    ])
-    await loadLocalImage(applicationImage)
+    for (const container of images) {
+      await runCommand('docker', [
+        'build',
+        '--file',
+        container.dockerfile,
+        '--tag',
+        container.image,
+        projectRoot
+      ])
+      await loadLocalImage(container.image)
+    }
   } else {
     console.info(
-      `[runtime] Usando imagem configurada ${applicationImage}; build local ignorado.`
+      `[runtime] Usando imagens configuradas em ${imagePrefix}; builds locais ignorados.`
     )
   }
 
@@ -112,14 +141,14 @@ async function runtimeUp(): Promise<void> {
   await applyRuntimeEnvironment()
   await runCommand('kubectl', ['apply', '--kustomize', kubernetesDirectory])
 
-  for (const workload of applicationWorkloads) {
+  for (const container of images) {
     await runCommand('kubectl', [
       'set',
       'image',
       '--namespace',
       runtimeNamespace,
-      `deployment/${workload}`,
-      `${workload}=${applicationImage}`
+      `deployment/${container.workload}`,
+      `${container.workload}=${container.image}`
     ])
   }
 
@@ -160,8 +189,22 @@ async function runtimeUp(): Promise<void> {
   ])
 
   console.info(
-    '[runtime] Kubernetes reconciliado: PostgreSQL, Redis, landing, console, onboarding e mobile estão prontos.'
+    '[runtime] Kubernetes reconciliado: PostgreSQL, Redis, landing, console, onboarding, mobile e Chatterbox estão prontos.'
   )
+}
+
+function configuredImagePrefix(): string | undefined {
+  const value = process.env.AMARELO_RUNTIME_IMAGE_PREFIX?.trim()
+  if (value === undefined || value.length === 0) return undefined
+  return value.replace(/\/+$/u, '')
+}
+
+function applicationImage(
+  workload: (typeof applicationWorkloads)[number],
+  imagePrefix: string | undefined
+): string {
+  const localImage = `amarelo-${workload}:local`
+  return imagePrefix === undefined ? localImage : `${imagePrefix}/${workload}:local`
 }
 
 async function runtimeDown(): Promise<void> {
@@ -447,7 +490,7 @@ async function loadLocalImage(image: string): Promise<void> {
   }
 
   throw new Error(
-    `O contexto ${context} não expõe um carregador local conhecido. Defina AMARELO_RUNTIME_IMAGE para uma imagem acessível pelo cluster.`
+    `O contexto ${context} não expõe um carregador local conhecido. Defina AMARELO_RUNTIME_IMAGE_PREFIX para imagens acessíveis pelo cluster.`
   )
 }
 
@@ -552,6 +595,7 @@ async function ensureLocalEnvironment(): Promise<void> {
     'CONSOLE_PORT=3001',
     'ONBOARDING_PORT=3002',
     'MOBILE_PORT=3003',
+    'CHATTERBOX_PORT=3004',
     ''
   ].join('\n')
 

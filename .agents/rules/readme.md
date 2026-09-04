@@ -32,3 +32,4 @@ Prefer small rules with one clear concern. When a rule can be checked mechanical
 | 009 | [React and Next.js](009-react-and-next.rule.md) |
 | 010 | [Source organization](010-source-organization.rule.md) |
 | 011 | [Spec-driven development](011-spec-driven-development.rule.md) |
+| 012 | [Container ownership](012-container-ownership.rule.md) |

@@ -33,6 +33,7 @@ trap audit_on_signal 1 2 15
 failures=0
 workspace_count=0
 conversation_workspace_count=0
+chatterbox_workspace_count=0
 
 architecture_fail() {
   failures=$((failures + 1))
@@ -189,6 +190,17 @@ while IFS= read -r package_file; do
     fi
   fi
 
+  if [ "$name" = chatterbox ]; then
+    chatterbox_workspace_count=$((chatterbox_workspace_count + 1))
+    if [ "$workspace_relative" != workspaces/microservices/chatterbox ]; then
+      architecture_fail \
+        chatterbox-topology \
+        "$workspace_relative" \
+        "chatterbox must live at workspaces/microservices/chatterbox" \
+        "move Chatterbox to its canonical Microservices path"
+    fi
+  fi
+
   case "$workspace_relative" in
     workspaces/ai/*)
       case "$name" in
@@ -277,13 +289,22 @@ if [ "$conversation_workspace_count" -ne 1 ]; then
     "move or deduplicate the Conversation workspace"
 fi
 
+if [ "$chatterbox_workspace_count" -ne 1 ]; then
+  architecture_fail \
+    chatterbox-topology \
+    workspaces/microservices/chatterbox \
+    "chatterbox must exist exactly once at its canonical Microservices path" \
+    "move or deduplicate the Chatterbox workspace"
+fi
+
 for required_path in \
   AGENTS.md \
   .agents/skills/readme.md \
   .agents/context/product/strategy.md \
   cli/elo \
   cli/src \
-  workspaces/ai/conversation
+  workspaces/ai/conversation \
+  workspaces/microservices/chatterbox
 do
   [ -e "$PROJECT_ROOT/$required_path" ] ||
     architecture_fail \
@@ -321,6 +342,25 @@ for ai_parent in workspaces/ai/agents; do
         "move ownership into a named child workspace"
   done
 done
+
+for microservices_parent in workspaces/microservices; do
+  for forbidden_child in package.json src tsconfig.json; do
+    microservices_parent_child="$microservices_parent/$forbidden_child"
+    [ ! -e "$PROJECT_ROOT/$microservices_parent_child" ] ||
+      architecture_fail \
+        microservices-capability-parent \
+        "$microservices_parent_child" \
+        "$microservices_parent is a structural parent and cannot own $forbidden_child" \
+        "move ownership into a named child workspace"
+  done
+done
+
+grep -F 'workspaces/microservices/*' "$PROJECT_ROOT/pnpm-workspace.yaml" >/dev/null 2>&1 ||
+  architecture_fail \
+    chatterbox-topology \
+    pnpm-workspace.yaml \
+    "Microservices workspace glob is missing" \
+    "discover direct Microservices children through workspaces/microservices/*"
 
 if grep -F 'workspaces/ai/orchestrator/*' "$PROJECT_ROOT/pnpm-workspace.yaml" >/dev/null 2>&1; then
   architecture_fail \

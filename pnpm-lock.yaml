@@ -139,7 +139,7 @@ importers:
         specifier: ^5
         version: 5.9.2
 
-  workspaces/apps/conversation-api:
+  workspaces/microservices/chatterbox:
     dependencies:
       '@ai/ana':
         specifier: workspace:*

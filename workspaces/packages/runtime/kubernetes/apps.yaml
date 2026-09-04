@@ -35,21 +35,13 @@ spec:
       terminationGracePeriodSeconds: 15
       containers:
         - name: landing
-          image: amarelo-dev-workspace:local
+          image: amarelo-landing:local
           imagePullPolicy: IfNotPresent
           envFrom:
             - configMapRef:
                 name: amarelo-runtime-config
             - secretRef:
                 name: amarelo-runtime-environment
-          command:
-            - /bin/sh
-            - -c
-          args:
-            - |
-              export DATABASE_URL="postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}"
-              export REDIS_URL="redis://default:${REDIS_PASSWORD}@redis:6379/0"
-              exec pnpm --filter landing dev
           ports:
             - name: http
               containerPort: 3000
@@ -120,21 +112,13 @@ spec:
       terminationGracePeriodSeconds: 15
       containers:
         - name: console
-          image: amarelo-dev-workspace:local
+          image: amarelo-console:local
           imagePullPolicy: IfNotPresent
           envFrom:
             - configMapRef:
                 name: amarelo-runtime-config
             - secretRef:
                 name: amarelo-runtime-environment
-          command:
-            - /bin/sh
-            - -c
-          args:
-            - |
-              export DATABASE_URL="postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}"
-              export REDIS_URL="redis://default:${REDIS_PASSWORD}@redis:6379/0"
-              exec pnpm --filter console dev
           ports:
             - name: http
               containerPort: 3001
@@ -205,21 +189,13 @@ spec:
       terminationGracePeriodSeconds: 15
       containers:
         - name: onboarding
-          image: amarelo-dev-workspace:local
+          image: amarelo-onboarding:local
           imagePullPolicy: IfNotPresent
           envFrom:
             - configMapRef:
                 name: amarelo-runtime-config
             - secretRef:
                 name: amarelo-runtime-environment
-          command:
-            - /bin/sh
-            - -c
-          args:
-            - |
-              export DATABASE_URL="postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}"
-              export REDIS_URL="redis://default:${REDIS_PASSWORD}@redis:6379/0"
-              exec pnpm --filter onboarding dev
           ports:
             - name: http
               containerPort: 3002
@@ -290,21 +266,13 @@ spec:
       terminationGracePeriodSeconds: 15
       containers:
         - name: mobile
-          image: amarelo-dev-workspace:local
+          image: amarelo-mobile:local
           imagePullPolicy: IfNotPresent
           envFrom:
             - configMapRef:
                 name: amarelo-runtime-config
             - secretRef:
                 name: amarelo-runtime-environment
-          command:
-            - /bin/sh
-            - -c
-          args:
-            - |
-              export DATABASE_URL="postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}"
-              export REDIS_URL="redis://default:${REDIS_PASSWORD}@redis:6379/0"
-              exec pnpm --filter mobile exec vite --host 0.0.0.0 --strictPort --port 3003
           ports:
             - name: http
               containerPort: 3003
@@ -321,6 +289,83 @@ spec:
               path: /
               port: http
             initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 6
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: "1"
+              memory: 1Gi
+          securityContext:
+            runAsNonRoot: true
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: chatterbox
+  labels:
+    app.kubernetes.io/name: chatterbox
+    app.kubernetes.io/part-of: amarelo
+spec:
+  selector:
+    app.kubernetes.io/name: chatterbox
+  ports:
+    - name: http
+      port: 3004
+      targetPort: http
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: chatterbox
+  labels:
+    app.kubernetes.io/name: chatterbox
+    app.kubernetes.io/part-of: amarelo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: chatterbox
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: chatterbox
+        app.kubernetes.io/part-of: amarelo
+    spec:
+      automountServiceAccountToken: false
+      terminationGracePeriodSeconds: 15
+      containers:
+        - name: chatterbox
+          image: amarelo-chatterbox:local
+          imagePullPolicy: IfNotPresent
+          envFrom:
+            - configMapRef:
+                name: amarelo-runtime-config
+            - secretRef:
+                name: amarelo-runtime-environment
+          ports:
+            - name: http
+              containerPort: 3004
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            timeoutSeconds: 5
+            failureThreshold: 24
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 15
             periodSeconds: 10
             timeoutSeconds: 5
             failureThreshold: 6

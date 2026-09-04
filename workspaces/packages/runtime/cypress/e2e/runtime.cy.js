@@ -2,7 +2,8 @@ const services = [
   { name: 'landing', url: 'http://landing:3000' },
   { name: 'console', url: 'http://console:3001' },
   { name: 'onboarding', url: 'http://onboarding:3002' },
-  { name: 'mobile', url: 'http://mobile:3003' }
+  { name: 'mobile', url: 'http://mobile:3003' },
+  { name: 'chatterbox health', url: 'http://chatterbox:3004/health' }
 ]
 
 describe('Amarelo Kubernetes runtime', () => {

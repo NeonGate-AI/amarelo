@@ -1,0 +1,11 @@
+.git
+.agents
+.audit
+.turbo
+**/.env
+**/.env.*
+**/.next
+**/.turbo
+**/dist
+**/node_modules
+**/*.log

@@ -528,33 +528,33 @@ else
       platform_fail cli/src/commands/cleanup.sh "direct cleanup preserved an eligible tsbuildinfo output"
     [ -f "$cleanup_root/workspaces/example/dist/keep" ] ||
       platform_fail cli/src/commands/cleanup.sh "direct cleanup removed a tracked path"
-    [ -f "$cleanup_root/workspaces/example/node_modules/keep" ] ||
-      platform_fail cli/src/commands/cleanup.sh "ordinary cleanup removed dependencies"
+    [ ! -e "$cleanup_root/workspaces/example/node_modules" ] ||
+      platform_fail cli/src/commands/cleanup.sh "direct cleanup preserved an eligible node_modules directory"
     [ -f "$cleanup_root/.audit/keep" ] ||
       platform_fail cli/src/commands/cleanup.sh "direct cleanup modified .audit"
     grep -F 'removed workspaces/example/.next' "$TMP_ROOT/cleanup.out" >/dev/null 2>&1 ||
       platform_fail cli/src/commands/cleanup.sh "direct cleanup did not report removed paths"
   fi
 
-  mkdir -p "$cleanup_root/workspaces/example/out"
+  mkdir -p "$cleanup_root/workspaces/example/out" \
+    "$cleanup_root/workspaces/example/node_modules"
   printf 'generated\n' >"$cleanup_root/workspaces/example/out/keep"
-  "$cleanup_launcher" cleanup --apply >"$TMP_ROOT/cleanup-apply.out" 2>&1
-  cleanup_apply_status=$?
-  [ "$cleanup_apply_status" -eq 2 ] ||
-    platform_fail cli/src/commands/cleanup.sh "retired --apply must exit with status 2"
-  [ -f "$cleanup_root/workspaces/example/out/keep" ] ||
-    platform_fail cli/src/commands/cleanup.sh "invalid cleanup options must fail before mutation"
-
-  if ! "$cleanup_launcher" cleanup --dependencies >"$TMP_ROOT/cleanup-dependencies.out" 2>&1; then
-    platform_fail cli/src/commands/cleanup.sh "dependency cleanup failed"
-  elif [ -e "$cleanup_root/workspaces/example/node_modules" ]; then
-    platform_fail cli/src/commands/cleanup.sh "--dependencies preserved an eligible node_modules directory"
-  fi
+  printf 'dependency\n' >"$cleanup_root/workspaces/example/node_modules/keep"
+  for retired_option in --apply --dependencies; do
+    "$cleanup_launcher" cleanup "$retired_option" >"$TMP_ROOT/cleanup-option.out" 2>&1
+    cleanup_option_status=$?
+    [ "$cleanup_option_status" -eq 2 ] ||
+      platform_fail cli/src/commands/cleanup.sh "$retired_option must exit with status 2"
+    [ -f "$cleanup_root/workspaces/example/out/keep" ] ||
+      platform_fail cli/src/commands/cleanup.sh "invalid cleanup options must fail before mutation"
+    [ -f "$cleanup_root/workspaces/example/node_modules/keep" ] ||
+      platform_fail cli/src/commands/cleanup.sh "invalid cleanup options must preserve dependencies"
+  done
 
   if ! "$cleanup_launcher" cleanup --help >"$TMP_ROOT/cleanup-help.out" 2>&1; then
     platform_fail cli/src/commands/cleanup.sh "cleanup help failed"
-  elif grep -F -- '--apply' "$TMP_ROOT/cleanup-help.out" >/dev/null 2>&1; then
-    platform_fail cli/src/commands/cleanup.sh "cleanup help still advertises --apply"
+  elif grep -Eq -- '--apply|--dependencies' "$TMP_ROOT/cleanup-help.out"; then
+    platform_fail cli/src/commands/cleanup.sh "cleanup help advertises a retired option"
   fi
 fi
 

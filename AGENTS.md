@@ -42,6 +42,7 @@ Context documents, skills, prompt templates, `.agents/rules/readme.md`, and the 
 - Personal memory is private by default; authorization precedes retrieval or exposure.
 - Product AI agents live under `workspaces/ai/agents/`; `.agents/` is the engineering harness.
 - Conversation lives directly at `workspaces/ai/conversation/` and preserves the framework-neutral `@ai/conversation` package boundary.
+- `workspaces/microservices/` is a structural parent for deployable network services; Chatterbox lives at `workspaces/microservices/chatterbox/` as the Fastify transport/provider boundary.
 - `workspaces/ai/agents/` is a structural capability parent; a generic coordination parent requires demonstrated multiple-runtime ownership and a new ADR.
 - Memory Nucleus remains a single workspace with semantic Clean Architecture dependency direction.
 - AI consumers access Memory Nucleus through its approved public boundary, not workspace internals.

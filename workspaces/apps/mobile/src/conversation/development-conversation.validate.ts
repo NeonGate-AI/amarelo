@@ -43,7 +43,7 @@ export function validateDevelopmentConversationConfiguration(
   }
 
   return Object.freeze({
-    baseUrl: validateBaseUrl(environment.VITE_CONVERSATION_API_URL),
+    baseUrl: validateBaseUrl(environment.VITE_CHATTERBOX_URL),
     enabled: true
   })
 }

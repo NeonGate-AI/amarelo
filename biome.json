@@ -13,7 +13,6 @@
       "!**/.turbo",
       "!**/dist",
       "!**/node_modules",
-      "!**/.mastra",
       "!**/next-env.d.ts"
     ]
   },

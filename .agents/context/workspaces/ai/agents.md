@@ -11,7 +11,7 @@ Ana owns:
 - explicit formatting of routing and Memory projections as delimited, untrusted context;
 - validation of the injected model result and normalized usage metadata.
 
-Ana does not read credentials or environment configuration, construct a provider, select a deployment model, own HTTP transport, retrieve Memory directly, or expose a tool surface. `AnaChatModelPort` is injected. The Node composition boundary in `conversation-api` currently adapts LangChain/OpenAI to that port.
+Ana does not read credentials or environment configuration, construct a provider, select a deployment model, own HTTP transport, retrieve Memory directly, or expose a tool surface. `AnaChatModelPort` is injected. The Node composition boundary in Chatterbox currently adapts LangChain/OpenAI to that port.
 
 The deterministic Ana eval uses a recording model double and makes zero external calls. Future named agents follow the same dependency direction: named agent → `@ai/conversation` public port. Conversation never imports a named agent package.
 
