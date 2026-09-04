@@ -424,15 +424,7 @@ while IFS= read -r reference_file; do
 done <"$reference_files"
 
 next_id_declarations="$TMP_ROOT/next-id-declarations"
-grep -E '^The next unallocated durable delivery ID is `SPEC-[0-9][0-9][0-9]`\.
-
-if [ "$failures" -gt 0 ]; then
-  printf 'Spec workflow FAIL (%s)\n' "$failures" >&2
-  exit 1
-fi
-
-printf 'Spec workflow PASS - %s numbered specs\n' "$spec_count"
- \
+grep -E '^The next unallocated durable delivery ID is `SPEC-[0-9][0-9][0-9]`\.$' \
   "$SPEC_ROOT/readme.md" >"$next_id_declarations" || true
 next_id_count=$(awk 'END { print NR + 0 }' "$next_id_declarations")
 
