@@ -104,6 +104,21 @@ if grep -F 'Docker Compose' "$RUNTIME_ROOT/readme.md" >/dev/null 2>&1; then
   runtime_fail workspaces/packages/runtime/readme.md "current runtime documentation still requires Docker Compose"
 fi
 
+active_compose_references=$(
+  grep -R -I -n -E 'docker[[:space:]]+compose|compose\.yaml' \
+    "$PROJECT_ROOT/workspaces" \
+    "$PROJECT_ROOT/cli" \
+    "$PROJECT_ROOT/.github" \
+    --exclude-dir=node_modules \
+    --exclude-dir=.next \
+    --exclude-dir=.turbo 2>/dev/null ||
+    true
+)
+if [ -n "$active_compose_references" ]; then
+  runtime_fail repository "active implementation or documentation still references Docker Compose"
+  printf '%s\n' "$active_compose_references" >&2
+fi
+
 fake_bin="$TMP_ROOT/bin"
 command_log="$TMP_ROOT/commands.log"
 mkdir "$fake_bin"
