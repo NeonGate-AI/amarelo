@@ -10,6 +10,7 @@ describe('Amarelo Kubernetes runtime', () => {
     it(`${service.name} responds through its ClusterIP Service`, () => {
       cy.request({
         failOnStatusCode: false,
+        followRedirect: false,
         retryOnNetworkFailure: true,
         retryOnStatusCodeFailure: true,
         url: service.url

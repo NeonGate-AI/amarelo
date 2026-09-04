@@ -147,6 +147,8 @@ if [ -f "$CYPRESS_SPEC" ]; then
   done
   [ "$(grep -Eo 'https?://' "$CYPRESS_SPEC" | wc -l | tr -d ' ')" -eq 4 ] ||
     runtime_fail workspaces/packages/runtime/cypress/e2e/runtime.cy.js "Cypress suite must contain only the four in-cluster service URLs"
+  grep -F 'followRedirect: false' "$CYPRESS_SPEC" >/dev/null 2>&1 ||
+    runtime_fail workspaces/packages/runtime/cypress/e2e/runtime.cy.js "Cypress suite must not follow redirects out of the cluster"
 fi
 
 if ! "$PROJECT_ROOT/cli/elo" --help >"$TMP_ROOT/elo-help.out" 2>&1; then
