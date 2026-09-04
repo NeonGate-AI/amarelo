@@ -90,11 +90,7 @@ async function runtimeUp(): Promise<void> {
   await ensureLocalEnvironment()
   await runCommand('kubectl', ['apply', '--filename', namespaceFile])
   await applyRuntimeEnvironment()
-  await runCommand('kubectl', [
-    'apply',
-    '--kustomize',
-    kubernetesDirectory
-  ])
+  await runCommand('kubectl', ['apply', '--kustomize', kubernetesDirectory])
 
   for (const workload of applicationWorkloads) {
     await runCommand('kubectl', [
@@ -344,11 +340,7 @@ async function applyRuntimeEnvironment(): Promise<void> {
     )
   }
 
-  await runCommand(
-    'kubectl',
-    ['apply', '--filename', '-'],
-    result.stdout
-  )
+  await runCommand('kubectl', ['apply', '--filename', '-'], result.stdout)
 }
 
 async function ensureLocalEnvironment(): Promise<void> {
@@ -380,9 +372,7 @@ async function ensureLocalEnvironment(): Promise<void> {
       flag: 'wx',
       mode: 0o600
     })
-    console.info(
-      `[runtime] Credenciais locais criadas em ${environmentFile}.`
-    )
+    console.info(`[runtime] Credenciais locais criadas em ${environmentFile}.`)
   } catch (error) {
     if (!isAlreadyExistsError(error)) {
       throw error
