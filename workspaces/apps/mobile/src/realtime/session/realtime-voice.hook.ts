@@ -48,6 +48,12 @@ interface RealtimeFunctionCall {
   readonly callId: string
 }
 
+interface RealtimeTranscriptCallbacks {
+  readonly append: (delta: string) => void
+  readonly replace: (transcript: string) => void
+  readonly reset: () => void
+}
+
 function asRecord(value: unknown): Record<string, unknown> | null {
   return typeof value === 'object' && value !== null
     ? (value as Record<string, unknown>)
@@ -99,13 +105,38 @@ function executeCalendarFunctionCall(
   )
 }
 
-function handleRealtimeEvent(channel: RTCDataChannel, data: unknown): void {
+function handleRealtimeEvent(
+  channel: RTCDataChannel,
+  data: unknown,
+  transcript: RealtimeTranscriptCallbacks
+): void {
   if (typeof data !== 'string') return
 
   let event: Record<string, unknown> | null = null
   try {
     event = asRecord(JSON.parse(data))
   } catch {
+    return
+  }
+
+  if (event?.type === 'response.created') {
+    transcript.reset()
+    return
+  }
+
+  if (
+    event?.type === 'response.output_audio_transcript.delta' &&
+    typeof event.delta === 'string'
+  ) {
+    transcript.append(event.delta)
+    return
+  }
+
+  if (
+    event?.type === 'response.output_audio_transcript.done' &&
+    typeof event.transcript === 'string'
+  ) {
+    transcript.replace(event.transcript)
     return
   }
 
@@ -134,6 +165,7 @@ export function useRealtimeVoice() {
   const microphoneStreamRef = useRef<MediaStream | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [status, setStatus] = useState<RealtimeVoiceStatus>('idle')
+  const [transcript, setTranscript] = useState('')
 
   const cleanup = useCallback(() => {
     channelRef.current?.close()
@@ -165,6 +197,7 @@ export function useRealtimeVoice() {
     cleanup()
     setError(null)
     setStatus('connecting')
+    setTranscript('')
 
     try {
       if (navigator.mediaDevices?.getUserMedia === undefined) {
@@ -198,7 +231,11 @@ export function useRealtimeVoice() {
       const channel = peerConnection.createDataChannel('oai-events')
       channelRef.current = channel
       channel.addEventListener('message', (event) =>
-        handleRealtimeEvent(channel, event.data)
+        handleRealtimeEvent(channel, event.data, {
+          append: (delta) => setTranscript((current) => current + delta),
+          replace: setTranscript,
+          reset: () => setTranscript('')
+        })
       )
       channel.addEventListener('open', () => {
         try {
@@ -244,6 +281,7 @@ export function useRealtimeVoice() {
     cleanup()
     setError(null)
     setStatus('idle')
+    setTranscript('')
   }, [cleanup])
 
   useEffect(() => cleanup, [cleanup])
@@ -253,6 +291,7 @@ export function useRealtimeVoice() {
     error,
     start,
     status,
-    stop
+    stop,
+    transcript
   }
 }
