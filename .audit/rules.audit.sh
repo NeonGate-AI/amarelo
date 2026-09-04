@@ -87,6 +87,7 @@ cat >"$TMP_ROOT/required" <<'CATALOG'
 009|react-and-next
 010|source-organization
 011|spec-driven-development
+012|container-ownership
 CATALOG
 
 while IFS='|' read -r number slug; do

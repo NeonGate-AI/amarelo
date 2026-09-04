@@ -2,11 +2,9 @@
 set -eu
 . "$ELO_CLI_DIR/core/common.sh"
 
-include_dependencies=false
 for arg in "$@"; do
   case "$arg" in
-    --dependencies) include_dependencies=true ;;
-    --help|-h) echo 'Usage: elo cleanup [--dependencies]'; exit 0 ;;
+    --help|-h) echo 'Usage: elo cleanup'; exit 0 ;;
     *) echo "Unknown cleanup option: $arg" >&2; exit 2 ;;
   esac
 done
@@ -34,6 +32,4 @@ for name in .next .turbo dist coverage build out .cache storybook-static .mastra
 done
 find "$ELO_PROJECT_ROOT" \( -name .git -o -name .audit -o -name node_modules \) -prune -o -type f -name '*.tsbuildinfo' -print | while IFS= read -r target; do remove_target "$target"; done
 
-if [ "$include_dependencies" = true ]; then
-  find "$ELO_PROJECT_ROOT" \( -name .git -o -name .audit \) -prune -o -type d -name node_modules -print | while IFS= read -r target; do remove_target "$target"; done
-fi
+find "$ELO_PROJECT_ROOT" \( -name .git -o -name .audit \) -prune -o -type d -name node_modules -prune -print | while IFS= read -r target; do remove_target "$target"; done

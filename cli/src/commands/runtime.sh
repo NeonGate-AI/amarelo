@@ -27,4 +27,4 @@ case "$1" in
 esac
 
 elo_log "runtime action=$runtime_action"
-exec pnpm --dir "$ELO_PROJECT_ROOT" --filter @repo/runtime start -- "$runtime_action"
+exec corepack pnpm --dir "$ELO_PROJECT_ROOT" --filter @repo/runtime start -- "$runtime_action"

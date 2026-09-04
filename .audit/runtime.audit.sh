@@ -70,26 +70,26 @@ if [ -f "$KUBERNETES_ROOT/kustomization.yaml" ]; then
   elif ! kubectl kustomize "$KUBERNETES_ROOT" >"$TMP_ROOT/rendered.yaml" 2>"$TMP_ROOT/render.err"; then
     runtime_fail workspaces/packages/runtime/kubernetes/kustomization.yaml "kubectl could not render the Kustomize base"
   else
-    for resource_name in amarelo-runtime postgres redis landing console onboarding mobile; do
+    for resource_name in amarelo-runtime postgres redis landing console onboarding mobile chatterbox; do
       grep -F "name: $resource_name" "$TMP_ROOT/rendered.yaml" >/dev/null 2>&1 ||
         runtime_fail workspaces/packages/runtime/kubernetes "rendered resources omit $resource_name"
     done
-    [ "$(grep -c '^kind: Deployment$' "$TMP_ROOT/rendered.yaml")" -eq 5 ] ||
-      runtime_fail workspaces/packages/runtime/kubernetes "runtime must render five Deployments"
+    [ "$(grep -c '^kind: Deployment$' "$TMP_ROOT/rendered.yaml")" -eq 6 ] ||
+      runtime_fail workspaces/packages/runtime/kubernetes "runtime must render six Deployments"
     [ "$(grep -c '^kind: StatefulSet$' "$TMP_ROOT/rendered.yaml")" -eq 1 ] ||
       runtime_fail workspaces/packages/runtime/kubernetes "runtime must render one StatefulSet"
-    [ "$(grep -c '^kind: Service$' "$TMP_ROOT/rendered.yaml")" -eq 6 ] ||
-      runtime_fail workspaces/packages/runtime/kubernetes "runtime must render six Services"
+    [ "$(grep -c '^kind: Service$' "$TMP_ROOT/rendered.yaml")" -eq 7 ] ||
+      runtime_fail workspaces/packages/runtime/kubernetes "runtime must render seven Services"
     [ "$(grep -c '^kind: PersistentVolumeClaim$' "$TMP_ROOT/rendered.yaml")" -eq 1 ] ||
       runtime_fail workspaces/packages/runtime/kubernetes "runtime must render one retained PostgreSQL claim"
     if grep -Eq '^kind: Secret$|POSTGRES_PASSWORD:[[:space:]]*[^|[:space:]]|REDIS_PASSWORD:[[:space:]]*[^|[:space:]]' "$TMP_ROOT/rendered.yaml"; then
       runtime_fail workspaces/packages/runtime/kubernetes "tracked manifests must not contain a Secret payload"
     fi
-    [ "$(grep -c 'automountServiceAccountToken: false' "$TMP_ROOT/rendered.yaml")" -eq 6 ] ||
+    [ "$(grep -c 'automountServiceAccountToken: false' "$TMP_ROOT/rendered.yaml")" -eq 7 ] ||
       runtime_fail workspaces/packages/runtime/kubernetes "every workload must disable service-account token mounting"
-    [ "$(grep -c 'readinessProbe:' "$TMP_ROOT/rendered.yaml")" -eq 6 ] ||
+    [ "$(grep -c 'readinessProbe:' "$TMP_ROOT/rendered.yaml")" -eq 7 ] ||
       runtime_fail workspaces/packages/runtime/kubernetes "every workload must declare readiness"
-    [ "$(grep -c 'livenessProbe:' "$TMP_ROOT/rendered.yaml")" -eq 6 ] ||
+    [ "$(grep -c 'livenessProbe:' "$TMP_ROOT/rendered.yaml")" -eq 7 ] ||
       runtime_fail workspaces/packages/runtime/kubernetes "every workload must declare liveness"
   fi
 fi
@@ -103,6 +103,33 @@ else
     runtime_fail workspaces/packages/runtime/src/cli.ts "runtime entrypoint still owns Docker Compose behavior"
   fi
 fi
+
+[ ! -e "$RUNTIME_ROOT/Dockerfile.dev" ] ||
+  runtime_fail workspaces/packages/runtime/Dockerfile.dev "runtime must not own a generic application Dockerfile"
+
+for project_container in \
+  landing:workspaces/apps/landing \
+  console:workspaces/apps/console \
+  onboarding:workspaces/apps/onboarding \
+  mobile:workspaces/apps/mobile \
+  chatterbox:workspaces/microservices/chatterbox
+do
+  workload=${project_container%%:*}
+  project_path=${project_container#*:}
+  require_file "$PROJECT_ROOT/$project_path/Dockerfile"
+  require_file "$PROJECT_ROOT/$project_path/.env.template"
+  grep -F "$project_path/Dockerfile" "$RUNTIME_CLI" >/dev/null 2>&1 ||
+    runtime_fail workspaces/packages/runtime/src/cli.ts "runtime does not select $workload project Dockerfile"
+  grep -F "amarelo-$workload:local" "$KUBERNETES_ROOT/apps.yaml" >/dev/null 2>&1 ||
+    runtime_fail workspaces/packages/runtime/kubernetes/apps.yaml "runtime manifest does not declare the $workload image"
+done
+
+if grep -Eq '^[[:space:]]*(OPENAI_API_KEY|[^=]*(TOKEN|SECRET)[^=]*)=' "$PROJECT_ROOT/workspaces/apps/mobile/.env.template"; then
+  runtime_fail workspaces/apps/mobile/.env.template "browser template must not declare credentials"
+fi
+
+grep -F 'path: /health' "$KUBERNETES_ROOT/apps.yaml" >/dev/null 2>&1 ||
+  runtime_fail workspaces/packages/runtime/kubernetes/apps.yaml "Chatterbox must expose health probes"
 
 if grep -F 'Docker Compose' "$RUNTIME_ROOT/readme.md" >/dev/null 2>&1; then
   runtime_fail workspaces/packages/runtime/readme.md "current runtime documentation still requires Docker Compose"
@@ -140,13 +167,14 @@ if [ -f "$CYPRESS_SPEC" ]; then
     http://landing:3000 \
     http://console:3001 \
     http://onboarding:3002 \
-    http://mobile:3003
+    http://mobile:3003 \
+    http://chatterbox:3004/health
   do
     grep -F "$service_url" "$CYPRESS_SPEC" >/dev/null 2>&1 ||
       runtime_fail workspaces/packages/runtime/cypress/e2e/runtime.cy.js "Cypress suite omits $service_url"
   done
-  [ "$(grep -Eo 'https?://' "$CYPRESS_SPEC" | wc -l | tr -d ' ')" -eq 4 ] ||
-    runtime_fail workspaces/packages/runtime/cypress/e2e/runtime.cy.js "Cypress suite must contain only the four in-cluster service URLs"
+  [ "$(grep -Eo 'https?://' "$CYPRESS_SPEC" | wc -l | tr -d ' ')" -eq 5 ] ||
+    runtime_fail workspaces/packages/runtime/cypress/e2e/runtime.cy.js "Cypress suite must contain only the five in-cluster service URLs"
   grep -F 'followRedirect: false' "$CYPRESS_SPEC" >/dev/null 2>&1 ||
     runtime_fail workspaces/packages/runtime/cypress/e2e/runtime.cy.js "Cypress suite must not follow redirects out of the cluster"
 fi
@@ -225,7 +253,7 @@ runtime_command() {
   AMARELO_RUNTIME_FAIL_MATCH="${AMARELO_RUNTIME_FAIL_MATCH:-}" \
   AMARELO_RUNTIME_NAMESPACE_ABSENT="${AMARELO_RUNTIME_NAMESPACE_ABSENT:-}" \
   AMARELO_RUNTIME_PODS_REMAINING="${AMARELO_RUNTIME_PODS_REMAINING:-}" \
-    pnpm --dir "$PROJECT_ROOT" --filter @repo/runtime start -- "$@"
+    corepack pnpm --dir "$PROJECT_ROOT" --filter @repo/runtime start -- "$@"
 }
 
 elo_runtime_command() {
@@ -243,10 +271,20 @@ if ! runtime_command up >"$TMP_ROOT/up.out" 2>&1; then
   runtime_fail workspaces/packages/runtime/src/cli.ts "controlled Kubernetes up command failed"
   sed 's/^/  /' "$TMP_ROOT/up.out" >&2
 else
-  grep -F 'docker build ' "$command_log" >/dev/null 2>&1 ||
-    runtime_fail workspaces/packages/runtime/src/cli.ts "up did not build the default application image"
-  grep -F 'kind load docker-image --name amarelo amarelo-dev-workspace:local' "$command_log" >/dev/null 2>&1 ||
-    runtime_fail workspaces/packages/runtime/src/cli.ts "up did not load the default image into the detected kind cluster"
+  for project_container in \
+    landing:workspaces/apps/landing \
+    console:workspaces/apps/console \
+    onboarding:workspaces/apps/onboarding \
+    mobile:workspaces/apps/mobile \
+    chatterbox:workspaces/microservices/chatterbox
+  do
+    workload=${project_container%%:*}
+    project_path=${project_container#*:}
+    grep -F "docker build --file $PROJECT_ROOT/$project_path/Dockerfile --tag amarelo-$workload:local $PROJECT_ROOT" "$command_log" >/dev/null 2>&1 ||
+      runtime_fail workspaces/packages/runtime/src/cli.ts "up did not build the $workload project image"
+    grep -F "kind load docker-image --name amarelo amarelo-$workload:local" "$command_log" >/dev/null 2>&1 ||
+      runtime_fail workspaces/packages/runtime/src/cli.ts "up did not load the $workload image into the detected kind cluster"
+  done
   grep -F 'kubectl apply --filename' "$command_log" >/dev/null 2>&1 ||
     runtime_fail workspaces/packages/runtime/src/cli.ts "up did not establish the runtime namespace"
   grep -F 'kubectl apply --kustomize' "$command_log" >/dev/null 2>&1 ||
@@ -296,7 +334,7 @@ PATH="$fake_bin:$PATH" \
 AMARELO_RUNTIME_AUDIT_LOG="$command_log" \
 AMARELO_RUNTIME_ENV_FILE="$TMP_ROOT/runtime.env" \
 AMARELO_RUNTIME_FAIL_MATCH='apply --kustomize' \
-  pnpm --dir "$PROJECT_ROOT" --filter @repo/runtime start -- up >"$TMP_ROOT/failure.out" 2>&1
+  corepack pnpm --dir "$PROJECT_ROOT" --filter @repo/runtime start -- up >"$TMP_ROOT/failure.out" 2>&1
 failure_status=$?
 [ "$failure_status" -ne 0 ] ||
   runtime_fail workspaces/packages/runtime/src/cli.ts "kubectl reconciliation failure must propagate non-zero"

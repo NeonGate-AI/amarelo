@@ -18,7 +18,7 @@ Commands:
   🚀 bootstrap                             Install and configure a checkout
   🔗 setup [--bin-dir <directory>]         Install the user-scoped launcher
   🩺 doctor [--ci]                         Diagnose repository prerequisites
-  🧹 cleanup [--dependencies]              Remove generated state
+  🧹 cleanup                               Remove generated state and dependencies
   ☸️  runtime <up|down|prune|e2e>           Manage the Kubernetes runtime
   📝 changelog <product> [options]          Prepare a product changelog
   🧱 adr [name]                             Create the next empty ADR

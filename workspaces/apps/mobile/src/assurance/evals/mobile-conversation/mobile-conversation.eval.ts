@@ -23,7 +23,7 @@ async function evaluateConfigurationGate() {
   assert.deepEqual(
     validateDevelopmentConversationConfiguration({
       VITE_AMARELO_TEXT_DRIVER: 'false',
-      VITE_CONVERSATION_API_URL: 'javascript:private'
+      VITE_CHATTERBOX_URL: 'javascript:private'
     }),
     { enabled: false }
   )
@@ -36,14 +36,14 @@ async function evaluateConfigurationGate() {
   assert.deepEqual(
     validateDevelopmentConversationConfiguration({
       VITE_AMARELO_TEXT_DRIVER: 'true',
-      VITE_CONVERSATION_API_URL: 'https://conversation.example/'
+      VITE_CHATTERBOX_URL: 'https://chatterbox.example/'
     }),
-    { baseUrl: 'https://conversation.example', enabled: true }
+    { baseUrl: 'https://chatterbox.example', enabled: true }
   )
   assert.throws(() =>
     validateDevelopmentConversationConfiguration({
       VITE_AMARELO_TEXT_DRIVER: 'true',
-      VITE_CONVERSATION_API_URL: 'javascript:private'
+      VITE_CHATTERBOX_URL: 'javascript:private'
     })
   )
 }

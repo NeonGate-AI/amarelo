@@ -2,7 +2,7 @@
 id: SPEC-039
 title: Establish the Chatterbox Microservice workspace
 type: migration
-status: ready
+status: in-progress
 mode: prospective
 created: 2026-09-04
 updated: 2026-09-04
@@ -12,6 +12,9 @@ targets:
   - workspaces/microservices/chatterbox
   - pnpm workspace discovery
   - current architecture context
+context:
+  - .agents/context/workspaces/microservices/overview.md
+  - .agents/context/architecture/overview.md
 rules:
   - .agents/rules/001-architecture.rule.md
   - .agents/rules/004-import-boundaries.rule.md
@@ -100,3 +103,7 @@ Invalid environment values fail safely at startup. Missing provider credentials 
 ## Evidence and Promotion
 
 This active spec will record the exact focused commands, audits, final head, and two-axis review. Promote the stable workspace vocabulary to Microservices context and the hard boundary to ADR-0030.
+
+## Further Notes
+
+The owner approved the Chatterbox identity, Microservices topology, and execution on 2026-09-04.

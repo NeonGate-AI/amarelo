@@ -13,6 +13,9 @@ targets:
   - workspaces/packages/runtime
   - browser assurance
   - test data lifecycle
+context:
+  - .agents/context/workspaces/microservices/overview.md
+  - .agents/context/workflows/mobile.md
 rules:
   - .agents/rules/003-context-engineering.rule.md
   - .agents/rules/008-product-safety-and-privacy.rule.md
@@ -92,3 +95,7 @@ An unavailable runtime, nondeterministic fixture, unsafe data source, or unresol
 ## Evidence and Promotion
 
 This draft becomes `ready` only after the owner approves the first suites, critical journeys, and seed decision. Its implementation will promote proven test conventions to the relevant package docs, runtime context, and durable checks.
+
+## Further Notes
+
+This document captures the approved testing direction while preserving the owner's request not to create test suites or a seed yet.

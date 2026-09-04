@@ -1,0 +1,40 @@
+# syntax=docker/dockerfile:1.7
+
+FROM node:24-bookworm-slim
+
+ENV COREPACK_HOME=/pnpm/corepack
+ENV PNPM_HOME=/pnpm
+ENV PATH=/pnpm:$PATH
+
+RUN corepack enable \
+  && mkdir -p /pnpm /workspace \
+  && chown -R node:node /pnpm /workspace
+
+USER node
+WORKDIR /workspace
+RUN corepack install --global pnpm@10.32.1
+
+COPY --chown=node:node package.json pnpm-lock.yaml pnpm-workspace.yaml turbo.json ./
+COPY --chown=node:node workspaces/ai/agents/ana/package.json ./workspaces/ai/agents/ana/package.json
+COPY --chown=node:node workspaces/ai/conversation/package.json ./workspaces/ai/conversation/package.json
+COPY --chown=node:node workspaces/ai/knowledge/package.json ./workspaces/ai/knowledge/package.json
+COPY --chown=node:node workspaces/memory-nucleus/package.json ./workspaces/memory-nucleus/package.json
+COPY --chown=node:node workspaces/microservices/chatterbox/package.json ./workspaces/microservices/chatterbox/package.json
+COPY --chown=node:node workspaces/apps/console/package.json ./workspaces/apps/console/package.json
+COPY --chown=node:node workspaces/apps/landing/package.json ./workspaces/apps/landing/package.json
+COPY --chown=node:node workspaces/apps/mobile/package.json ./workspaces/apps/mobile/package.json
+COPY --chown=node:node workspaces/apps/onboarding/package.json ./workspaces/apps/onboarding/package.json
+COPY --chown=node:node workspaces/packages/conversation-sdk/package.json ./workspaces/packages/conversation-sdk/package.json
+COPY --chown=node:node workspaces/packages/design-system/package.json ./workspaces/packages/design-system/package.json
+COPY --chown=node:node workspaces/packages/memory-sdk/package.json ./workspaces/packages/memory-sdk/package.json
+COPY --chown=node:node workspaces/packages/evaluation/package.json ./workspaces/packages/evaluation/package.json
+COPY --chown=node:node workspaces/packages/observability/package.json ./workspaces/packages/observability/package.json
+COPY --chown=node:node workspaces/packages/react/package.json ./workspaces/packages/react/package.json
+COPY --chown=node:node workspaces/packages/runtime/package.json ./workspaces/packages/runtime/package.json
+
+RUN pnpm install --frozen-lockfile
+COPY --chown=node:node . .
+RUN pnpm --filter @repo/ds build
+
+EXPOSE 3000
+CMD ["pnpm", "--filter", "landing", "dev"]

@@ -74,7 +74,7 @@ export default defineConfig({
       '/api': {
         changeOrigin: false,
         rewrite: (requestPath) => requestPath.replace(/^\/api/u, ''),
-        target: 'http://127.0.0.1:3004'
+        target: process.env.CHATTERBOX_URL ?? 'http://127.0.0.1:3004'
       }
     }
   },

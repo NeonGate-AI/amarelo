@@ -2,7 +2,7 @@
 id: SPEC-040
 title: Make runtime application containers project-owned
 type: migration
-status: ready
+status: in-progress
 mode: prospective
 created: 2026-09-04
 updated: 2026-09-04
@@ -13,6 +13,9 @@ targets:
   - workspaces/microservices/chatterbox
   - workspaces/packages/runtime
   - Kubernetes local runtime
+context:
+  - .agents/context/workspaces/packages/overview.md
+  - workspaces/packages/runtime/readme.md
 rules:
   - .agents/rules/001-architecture.rule.md
   - .agents/rules/005-markdown.rule.md
@@ -101,3 +104,7 @@ A missing Dockerfile/template, unavailable image loader, failed image build/load
 ## Evidence and Promotion
 
 Record exact audit/typecheck/render commands and final review evidence at completion. Promote durable ownership to ADR-0031, Rule 012, runtime context, and runtime documentation.
+
+## Further Notes
+
+The shared generic runtime image is retired only for Amarelo-owned application workloads; infrastructure and third-party test images remain platform-owned.

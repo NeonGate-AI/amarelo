@@ -2,7 +2,7 @@
 id: SPEC-041
 title: Make cleanup remove node_modules directly
 type: fix
-status: ready
+status: in-progress
 mode: prospective
 created: 2026-09-04
 updated: 2026-09-04
@@ -12,6 +12,9 @@ targets:
   - Elo CLI
   - repository cleanup
   - engineering harness
+context:
+  - cli/readme.md
+  - .agents/context/engineering/workflow-skills.md
 rules:
   - .agents/rules/005-markdown.rule.md
   - .agents/rules/010-source-organization.rule.md
@@ -91,3 +94,7 @@ Unknown syntax exits 2 before cleanup begins. A delete failure propagates a non-
 ## Evidence and Promotion
 
 Record focused audit output, final head, and review result on completion. CLI documentation and the active cleanup contract supersede only the current behavior of SPEC-036.
+
+## Further Notes
+
+This spec changes only the direct cleanup contract and intentionally does not include runtime-prune behavior.
