@@ -368,10 +368,11 @@ while IFS= read -r path; do
       "align H1 with the durable ID" ;;
   esac
 
-  grep -F "($base)" "$SPEC_ROOT/readme.md" >/dev/null 2>&1 ||
-    spec_fail missing-index-entry "$file" \
-      "numbered spec is not linked from the catalog" \
-      "add the exact semantic filename"
+  index_entry_count=$(grep -F -c "($base)" "$SPEC_ROOT/readme.md" || true)
+  [ "$index_entry_count" -eq 1 ] ||
+    spec_fail catalog-index-cardinality "$file" \
+      "numbered spec must have exactly one catalog link; found $index_entry_count" \
+      "keep one canonical catalog row for the exact semantic filename"
 done <"$spec_files"
 
 index_targets="$TMP_ROOT/index-targets"
@@ -422,13 +423,25 @@ while IFS= read -r reference_file; do
   fi
 done <"$reference_files"
 
-if [ -s "$numbers" ]; then
+next_id_declarations="$TMP_ROOT/next-id-declarations"
+grep -E '^The next unallocated durable delivery ID is `SPEC-[0-9][0-9][0-9]`\.$' \
+  "$SPEC_ROOT/readme.md" >"$next_id_declarations" || true
+next_id_count=$(awk 'END { print NR + 0 }' "$next_id_declarations")
+
+if [ "$next_id_count" -ne 1 ]; then
+  spec_fail next-spec-id-cardinality .agents/specs/readme.md \
+    "catalog must declare exactly one next durable ID; found $next_id_count" \
+    "keep one canonical next-ID declaration"
+elif [ -s "$numbers" ]; then
   max_id=$(sort -n "$numbers" | tail -n 1)
   next_id=$(awk -v value="$max_id" 'BEGIN { printf "SPEC-%03d", value + 1 }')
-  grep -F "$next_id" "$SPEC_ROOT/readme.md" >/dev/null 2>&1 ||
+  declared_next_id=$(sed -n \
+    's/^The next unallocated durable delivery ID is `\(SPEC-[0-9][0-9][0-9]\)`\.$/\1/p' \
+    "$next_id_declarations")
+  [ "$declared_next_id" = "$next_id" ] ||
     spec_fail next-spec-id .agents/specs/readme.md \
-      "next available durable ID should be $next_id" \
-      "update the catalog"
+      "next available durable ID should be $next_id, found ${declared_next_id:-<missing>}" \
+      "update the canonical next-ID declaration"
 fi
 
 if [ "$failures" -gt 0 ]; then

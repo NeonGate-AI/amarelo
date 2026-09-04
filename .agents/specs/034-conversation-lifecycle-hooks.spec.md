@@ -1,5 +1,5 @@
 ---
-id: SPEC-033
+id: SPEC-034
 title: Define conversation lifecycle hooks and realtime edge-case semantics
 type: feature
 status: draft
@@ -39,7 +39,7 @@ evidence:
   - pending
 ---
 
-# SPEC-033: Define conversation lifecycle hooks and realtime edge-case semantics
+# SPEC-034: Define conversation lifecycle hooks and realtime edge-case semantics
 
 ## Problem Statement
 
@@ -55,7 +55,7 @@ Add provider-neutral lifecycle references, transitions, interceptor seams, obser
 
 A newer final user turn supersedes publication of the previous active response. Interruption stops output but does not pretend that an already dispatched durable effect rolled back. Reconnect creates a new session epoch, duplicate effect requests resolve through idempotency, and results from stale turns remain diagnostic or reconcilable evidence without becoming the active response.
 
-Hooks coordinate reactions. Guardrails from SPEC-032 remain the policy authority and cannot be bypassed by a hook.
+Hooks coordinate reactions. Guardrails from SPEC-033 remain the policy authority and cannot be bypassed by a hook.
 
 ## User Stories
 
@@ -71,7 +71,7 @@ Hooks coordinate reactions. Guardrails from SPEC-032 remain the policy authority
 - Define monotonic turn sequencing within a session epoch.
 - Define typed lifecycle transitions for turn acceptance, supersession, response start, response interruption, effect dispatch, effect settlement, reconnect, and session end.
 - Define blocking lifecycle interceptors separately from non-authoritative observers.
-- Invoke SPEC-032 guardrails from required pre-transition seams without changing their decisions.
+- Invoke SPEC-033 guardrails from required pre-transition seams without changing their decisions.
 - Define interruption, cancellation, supersession, late-result, reconnect, duplicate-delivery, and cleanup semantics.
 - Require idempotency keys and authoritative receipts for durable effects.
 - Prevent stale results from being published to the active response.
@@ -203,7 +203,7 @@ A durable effect can be dispatched only when:
 - the input is final;
 - the host session and actor context remain valid;
 - the effect has an idempotency key;
-- the applicable SPEC-032 guardrail allows or confirms it.
+- the applicable SPEC-033 guardrail allows or confirms it.
 
 After dispatch, interruption or session loss does not automatically cancel the effect. The owning capability returns one of:
 
@@ -333,7 +333,7 @@ Run relevant Conversation unit tests, API integration tests, adapter contract te
 - [ ] A completed stale durable effect preserves its authoritative receipt for reconciliation.
 - [ ] Required interceptor failures reject before transition or dispatch.
 - [ ] Observer failures are isolated and cannot mutate committed state.
-- [ ] Hooks cannot override SPEC-032 guardrail decisions.
+- [ ] Hooks cannot override SPEC-033 guardrail decisions.
 - [ ] Provider-native event types do not enter the Conversation public domain contract.
 - [ ] UI states are projections of canonical lifecycle state rather than lifecycle authorities.
 - [ ] Session end releases transport-owned resources and rejects new work.
