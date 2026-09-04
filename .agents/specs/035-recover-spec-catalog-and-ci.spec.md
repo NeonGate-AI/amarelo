@@ -2,7 +2,7 @@
 id: SPEC-035
 title: Recover the specification catalog and CI
 type: fix
-status: in-progress
+status: implemented
 mode: prospective
 created: 2026-09-04
 updated: 2026-09-04
@@ -29,7 +29,9 @@ skills:
   - .agents/skills/code-review/SKILL.md
   - .agents/skills/writing-for-agents/SKILL.md
 evidence:
-  - pending
+  - .agents/specs/readme.md canonical SPEC-032 through SPEC-035 mapping
+  - .audit/specs.audit.sh catalog-link cardinality and computed next-ID gates
+  - https://github.com/NeonGate-AI/amarelo/pull/63 exact-head CI and two-axis review record
 ---
 
 # SPEC-035: Recover the specification catalog and CI
@@ -93,15 +95,15 @@ The fix uses repository metadata and synthetic shell state only. It reads, write
 
 ## Acceptance Criteria
 
-- [ ] Realtime 2 WebRTC uniquely retains priority `032` and durable ID `SPEC-032`.
-- [ ] Application guardrails uniquely use priority `033` and durable ID `SPEC-033`.
-- [ ] Conversation lifecycle hooks uniquely use priority `034` and durable ID `SPEC-034`.
-- [ ] The catalog contains one row per numbered spec and exactly one next-ID declaration for `SPEC-036`.
-- [ ] Every affected repository reference resolves to its canonical semantic filename and durable identity.
-- [ ] The specification audit rejects a missing, duplicate or stale next-ID declaration.
-- [ ] The complete repository CI passes on the exact final head.
-- [ ] Both independent review axes pass with zero unresolved blocking findings on that head.
-- [ ] Durable conclusions are recorded in the catalog, recovery spec and mechanical checker.
+- [x] Realtime 2 WebRTC uniquely retains priority `032` and durable ID `SPEC-032`.
+- [x] Application guardrails uniquely use priority `033` and durable ID `SPEC-033`.
+- [x] Conversation lifecycle hooks uniquely use priority `034` and durable ID `SPEC-034`.
+- [x] The catalog contains one row per numbered spec and exactly one next-ID declaration for `SPEC-036`.
+- [x] Every affected repository reference resolves to its canonical semantic filename and durable identity.
+- [x] The specification audit rejects a missing, duplicate or stale next-ID declaration.
+- [x] The complete repository CI passes on the exact final head.
+- [x] Both independent review axes pass with zero unresolved blocking findings on that head.
+- [x] Durable conclusions are recorded in the catalog, recovery spec and mechanical checker.
 
 ## Failure Behavior
 
@@ -119,7 +121,7 @@ If another commit reaches `main` before merge, the branch must be refreshed and 
 
 ## Evidence and Promotion
 
-Planned evidence includes the canonical catalog, the hardened `.audit/specs.audit.sh`, the exact rename/reference diff, GitHub Actions CI and the two-axis final review. At completion, stable repository paths and the PR record replace `pending`; no transient audit output is committed.
+The canonical catalog preserves Realtime as `SPEC-032`, assigns guardrails and lifecycle to `SPEC-033` and `SPEC-034`, records this recovery as `SPEC-035`, and publishes `SPEC-036` as the next ID. The hardened `.audit/specs.audit.sh` enforces one catalog link per spec plus one exact computed next-ID declaration. PR #63 records the exact rename/reference diff, final-head GitHub Actions CI and independent Standards and Spec-fidelity reviews. No transient audit output is committed.
 
 ## Further Notes
 
