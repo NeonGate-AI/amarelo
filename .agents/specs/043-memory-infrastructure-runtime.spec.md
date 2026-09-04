@@ -31,7 +31,13 @@ skills:
   - .agents/skills/implement/SKILL.md
   - .agents/skills/code-review/SKILL.md
 evidence:
-  - pending implementation
+  - workspaces/packages/runtime/kubernetes/neo4j.yaml
+  - workspaces/packages/runtime/kubernetes/redis-queue.yaml
+  - workspaces/packages/runtime/kubernetes/redis-cache.yaml
+  - workspaces/packages/runtime/kubernetes/object-storage.yaml
+  - workspaces/packages/runtime/src/cli.ts
+  - .audit/runtime.audit.sh
+  - closure pending Docker-backed doctor and database gate
 ---
 
 # SPEC-043: Establish the Memory infrastructure runtime topology
@@ -113,19 +119,19 @@ operator check and is not misrepresented by controlled command evidence.
 
 ## Acceptance Criteria
 
-- [ ] The runtime exposes persistent Neo4j as the selected canonical Memory
+- [x] The runtime exposes persistent Neo4j as the selected canonical Memory
   graph dependency.
-- [ ] Redis Queue and Redis Cache are separate workloads, Services and secret
+- [x] Redis Queue and Redis Cache are separate workloads, Services and secret
   keys; only Redis Queue is persistent.
-- [ ] Object storage is a persistent independent workload for large immutable
+- [x] Object storage is a persistent independent workload for large immutable
   artifacts.
-- [ ] Runtime startup waits for every new Deployment and StatefulSet rollout.
-- [ ] Ordinary shutdown preserves stateful claims; prune removes the namespace
+- [x] Runtime startup waits for every new Deployment and StatefulSet rollout.
+- [x] Ordinary shutdown preserves stateful claims; prune removes the namespace
   and its claims.
-- [ ] No tracked manifest or environment template contains a real credential.
-- [ ] Active runtime context and prospective Memory specs no longer describe
+- [x] No tracked manifest or environment template contains a real credential.
+- [x] Active runtime context and prospective Memory specs no longer describe
   PostgreSQL as canonical Memory storage; historical evidence remains intact.
-- [ ] The Harness and active Memory specs agree on Neo4j, outbox, BullMQ,
+- [x] The Harness and active Memory specs agree on Neo4j, outbox, BullMQ,
   idempotent workers, synchronous guardrails and Testcontainers boundaries.
 - [ ] Required validation and both review axes pass on the final head.
 
@@ -146,9 +152,13 @@ must never destroy canonical Memory.
 
 ## Evidence and Promotion
 
-At completion, the Kubernetes manifests, runtime lifecycle audit and generated
-environment contract provide stable evidence. Target architecture and current
-implementation gaps are promoted to Memory/runtime context and rules.
+The Kubernetes manifests, runtime lifecycle audit and generated environment
+contract provide stable evidence. `kubectl kustomize` and the controlled
+lifecycle audit pass with the expected 6 Deployments, 4 StatefulSets, 10
+Services and 4 PVCs. Target architecture and current implementation gaps were
+promoted to Memory/runtime context and rules. Closure remains pending because
+this execution environment has neither a Docker CLI nor daemon, so the complete
+repository environment gate cannot pass here.
 
 ## Further Notes
 

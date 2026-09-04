@@ -30,7 +30,12 @@ skills:
   - .agents/skills/implement/SKILL.md
   - .agents/skills/code-review/SKILL.md
 evidence:
-  - pending implementation
+  - workspaces/microservices/chatterbox/src/assurance/tests/health/chatterbox-health.test.ts
+  - workspaces/microservices/chatterbox/vitest.config.ts
+  - workspaces/microservices/chatterbox/package.json
+  - .audit/runtime.audit.sh
+  - Docker-independent repository validation passed on 2026-09-04
+  - closure pending Docker-backed doctor and database gate
 ---
 
 # SPEC-042: Establish the layered test platform foundation
@@ -110,15 +115,15 @@ runtime and architecture audits, and the complete repository validation.
 
 ## Acceptance Criteria
 
-- [ ] Chatterbox uses Vitest as its package test runner.
-- [ ] `GET /health` is verified through `app.inject()` without binding a port or
+- [x] Chatterbox uses Vitest as its package test runner.
+- [x] `GET /health` is verified through `app.inject()` without binding a port or
   contacting an external dependency.
-- [ ] The Fastify instance is closed after the test.
-- [ ] Existing eval commands remain available and green.
-- [ ] The Harness records Testcontainers for real infrastructure adapters, two
+- [x] The Fastify instance is closed after the test.
+- [x] Existing eval commands remain available and green.
+- [x] The Harness records Testcontainers for real infrastructure adapters, two
   physical Redis test instances, sparse Cypress coverage and scoped synthetic
   seeds.
-- [ ] Runtime E2E still starts and waits for containers before Cypress.
+- [x] Runtime E2E still starts and waits for containers before Cypress.
 - [ ] Required validation and both review axes pass on the final head.
 
 ## Failure Behavior
@@ -137,9 +142,12 @@ blocks an infrastructure suite; it must not be converted into mocked evidence.
 
 ## Evidence and Promotion
 
-At completion, stable evidence will name the Vitest test/configuration, package
-commands and runtime audit. The source convention and layered responsibilities
-are promoted to rules and workspace context.
+The Vitest test/configuration, package command and runtime audit are stable
+evidence. The source convention and layered responsibilities were promoted to
+rules and workspace context. Chatterbox tests, evals, typecheck, repository
+lint, audits, full typecheck, evals and build pass. Closure remains pending
+because this execution environment has neither a Docker CLI nor daemon, so
+`elo doctor --ci` and the existing PostgreSQL container eval cannot pass here.
 
 ## Further Notes
 
