@@ -298,7 +298,13 @@ function readCommand(command: string, arguments_: string[]): string {
 function runtimeNamespaceExists(): boolean {
   const result = spawnSync(
     'kubectl',
-    ['get', 'namespace', runtimeNamespace, '--output=name'],
+    [
+      'get',
+      'namespace',
+      runtimeNamespace,
+      '--ignore-not-found',
+      '--output=name'
+    ],
     {
       cwd: runtimeDirectory,
       encoding: 'utf8'

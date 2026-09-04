@@ -105,13 +105,9 @@ if grep -F 'Docker Compose' "$RUNTIME_ROOT/readme.md" >/dev/null 2>&1; then
 fi
 
 active_compose_references=$(
-  grep -R -I -n -E 'docker[[:space:]]+compose|compose\.yaml' \
-    "$PROJECT_ROOT/workspaces" \
-    "$PROJECT_ROOT/cli" \
-    "$PROJECT_ROOT/.github" \
-    --exclude-dir=node_modules \
-    --exclude-dir=.next \
-    --exclude-dir=.turbo 2>/dev/null ||
+  git -C "$PROJECT_ROOT" grep -n -E \
+    'docker[[:space:]]+compose|compose\.yaml' \
+    -- workspaces cli .github 2>/dev/null ||
     true
 )
 if [ -n "$active_compose_references" ]; then
@@ -139,7 +135,11 @@ fi
 case "$*" in
   *"apply --filename -"*) cat >/dev/null ;;
   "config current-context") printf 'kind-amarelo\n' ;;
-  "get namespace amarelo-runtime"*) printf 'namespace/amarelo-runtime\n' ;;
+  "get namespace amarelo-runtime"*)
+    if [ "${AMARELO_RUNTIME_NAMESPACE_ABSENT:-}" != true ]; then
+      printf 'namespace/amarelo-runtime\n'
+    fi
+    ;;
   *"create secret generic"*) printf 'apiVersion: v1\nkind: Secret\nmetadata:\n  name: amarelo-runtime-environment\n' ;;
 esac
 exit 0
@@ -160,6 +160,7 @@ runtime_command() {
   PATH="$fake_bin:$PATH" \
   AMARELO_RUNTIME_AUDIT_LOG="$command_log" \
   AMARELO_RUNTIME_ENV_FILE="$TMP_ROOT/runtime.env" \
+  AMARELO_RUNTIME_NAMESPACE_ABSENT="${AMARELO_RUNTIME_NAMESPACE_ABSENT:-}" \
     pnpm --dir "$PROJECT_ROOT" --filter @repo/runtime start -- "$@"
 }
 
@@ -189,6 +190,17 @@ else
     runtime_fail workspaces/packages/runtime/src/cli.ts "down did not stop every StatefulSet"
   if grep -F 'delete namespace' "$command_log" >/dev/null 2>&1; then
     runtime_fail workspaces/packages/runtime/src/cli.ts "down must preserve namespace and PostgreSQL state"
+  fi
+fi
+
+: >"$command_log"
+if ! AMARELO_RUNTIME_NAMESPACE_ABSENT=true runtime_command down >"$TMP_ROOT/down-absent.out" 2>&1; then
+  runtime_fail workspaces/packages/runtime/src/cli.ts "down must be idempotent when the namespace is absent"
+else
+  grep -F 'kubectl get namespace amarelo-runtime --ignore-not-found --output=name' "$command_log" >/dev/null 2>&1 ||
+    runtime_fail workspaces/packages/runtime/src/cli.ts "down did not use an idempotent namespace lookup"
+  if grep -F ' scale ' "$command_log" >/dev/null 2>&1; then
+    runtime_fail workspaces/packages/runtime/src/cli.ts "down scaled workloads after detecting an absent namespace"
   fi
 fi
 
