@@ -2,7 +2,7 @@
 id: SPEC-040
 title: Staging-first repository delivery flow
 type: governance
-status: ready
+status: in-progress
 mode: prospective
 created: 2026-09-04
 updated: 2026-09-04
@@ -25,7 +25,10 @@ skills:
   - .agents/skills/code-review/SKILL.md
   - .agents/skills/writing-for-agents/SKILL.md
 evidence:
-  - pending
+  - staging branch created from main commit 7a9c349c4f4e65d43ee2a5d19498a8cf52a12e26
+  - GitHub issue #73 owns versioned policy and Actions changes
+  - GitHub issue #74 owns repository settings and final enforcement evidence
+  - pending CI and repository-settings evidence
 ---
 
 # SPEC-040: Staging-first repository delivery flow
@@ -105,7 +108,7 @@ No product, user, conversation, memory, or sensitive data is used. Verification 
 
 ## Acceptance Criteria
 
-- [ ] `staging` exists and was created from the current `main` head without rewriting either branch.
+- [x] `staging` exists and was created from the current `main` head without rewriting either branch.
 - [ ] CI validates pushes and pull requests for `staging` and `main`, and no longer names the absent `develop` branch.
 - [ ] Pull requests into `main` fail unless their source branch is exactly `staging`.
 - [ ] Canonical delivery documentation directs ordinary implementation PRs to `staging` and reserves `main` for promotion.
@@ -131,9 +134,14 @@ No product, user, conversation, memory, or sensitive data is used. Verification 
 
 ## Evidence and Promotion
 
-Planned stable evidence:
+Stable evidence captured so far:
 
-- the `staging` branch reference and its bootstrap commit;
+- `staging` was created from `main` commit `7a9c349c4f4e65d43ee2a5d19498a8cf52a12e26`;
+- issue #73 owns the versioned vertical slice;
+- issue #74 owns the settings-dependent completion gate.
+
+Pending stable evidence:
+
 - the pull-request diff for CI filters, the source guard, and canonical workflow language;
 - GitHub Actions runs from the integration and promotion seams;
 - repository metadata or reviewed settings confirming the final default branch and branch protections.
