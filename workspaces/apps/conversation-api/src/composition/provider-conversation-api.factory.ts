@@ -12,7 +12,7 @@ export function createProviderConversationApi(
 ): FastifyInstance {
   const model = new ChatOpenAI({
     apiKey: configuration.OPENAI_API_KEY,
-    maxRetries: 2,
+    maxRetries: 0,
     model: configuration.AI_CONVERSATION_MODEL,
     temperature: 0,
     timeout: configuration.CONVERSATION_API_MODEL_TIMEOUT_MS
