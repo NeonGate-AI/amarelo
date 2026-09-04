@@ -25,7 +25,9 @@ Every code-bearing application, package, workspace, agent, or development subsys
 
 If a directory has a `package.json`, ordinary first-party implementation code must live under its `src/` directory unless a framework/tool requires another location.
 
-Allowed non-source-root examples include `package.json`, `tsconfig.json`, framework configs, `turbo.json`, Docker/Compose files, lockfiles, `public/`, and README entrypoints.
+Allowed non-source-root examples include `package.json`, `tsconfig.json`, framework configs, `turbo.json`, container manifests, lockfiles, `public/`, and README entrypoints.
+
+Cypress is a runner-owned exception: package configuration may use `cypress.config.*`, executable browser specs live under the conventional `cypress/e2e/*.cy.js` tree, and those specs do not participate in package barrel exports. Their imports remain subject to boundary checks.
 
 Next.js applications use `src/app/` when compatible with the current app. Vite/React applications use `src/`.
 

@@ -569,7 +569,7 @@ while IFS= read -r package_file; do
     is_source_file "$path" || continue
     local_path=${path#"$workspace_root"/}
     case "$local_path" in
-      src/*) continue ;;
+      src/*|cypress/e2e/*.cy.js) continue ;;
     esac
     if is_allowed_workspace_config "$local_path"; then
       continue
