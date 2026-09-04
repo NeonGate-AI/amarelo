@@ -11,8 +11,7 @@ const STATUS_LABELS = {
 } as const
 
 export function RealtimeVoiceView() {
-  const { audioRef, error, start, status, stop, transcript } =
-    useRealtimeVoice()
+  const { error, start, status, stop, transcript } = useRealtimeVoice()
   const active = status === 'connected' || status === 'connecting'
   const orbState = status === 'connected' ? 'listening' : 'idle'
 
@@ -103,8 +102,6 @@ export function RealtimeVoiceView() {
           Encerrar
         </SmoothButton>
       </div>
-
-      <audio aria-hidden="true" autoPlay className="hidden" ref={audioRef} />
     </main>
   )
 }
