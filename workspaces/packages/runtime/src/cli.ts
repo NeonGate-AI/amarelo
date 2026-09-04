@@ -1,6 +1,6 @@
 import { spawn, spawnSync } from 'node:child_process'
 import { randomBytes } from 'node:crypto'
-import { access, writeFile } from 'node:fs/promises'
+import { access, rm, writeFile } from 'node:fs/promises'
 import { dirname, resolve } from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
 
@@ -9,6 +9,12 @@ const projectRoot = resolve(runtimeDirectory, '../../..')
 const kubernetesDirectory = resolve(runtimeDirectory, 'kubernetes')
 const namespaceFile = resolve(kubernetesDirectory, 'namespace.yaml')
 const dockerfile = resolve(runtimeDirectory, 'Dockerfile.dev')
+const cypressDirectory = resolve(runtimeDirectory, 'cypress')
+const cypressConfigFile = resolve(cypressDirectory, 'cypress.config.cjs')
+const cypressSpecFile = resolve(cypressDirectory, 'e2e/runtime.cy.js')
+const cypressJobFile = resolve(kubernetesDirectory, 'cypress-job.yaml')
+const cypressConfigMap = 'amarelo-cypress-suite'
+const cypressJob = 'amarelo-cypress'
 const environmentFile = process.env.AMARELO_RUNTIME_ENV_FILE
   ? resolve(process.env.AMARELO_RUNTIME_ENV_FILE)
   : resolve(runtimeDirectory, '.env')
@@ -22,7 +28,15 @@ const applicationWorkloads = [
 ] as const
 const deploymentWorkloads = ['redis', ...applicationWorkloads] as const
 
-const runtimeActions = ['up', 'down', 'logs', 'ps', 'config'] as const
+const runtimeActions = [
+  'up',
+  'down',
+  'prune',
+  'e2e',
+  'logs',
+  'ps',
+  'config'
+] as const
 type RuntimeAction = (typeof runtimeActions)[number]
 
 export async function runRuntimeCli(
@@ -48,6 +62,12 @@ export async function runRuntimeCli(
       return 0
     case 'down':
       await runtimeDown()
+      return 0
+    case 'prune':
+      await runtimePrune()
+      return 0
+    case 'e2e':
+      await runtimeE2e()
       return 0
     case 'logs':
       await runtimeLogs()
@@ -151,6 +171,7 @@ async function runtimeDown(): Promise<void> {
     return
   }
 
+  await deleteCypressResources()
   await runCommand('kubectl', [
     '--namespace',
     runtimeNamespace,
@@ -167,8 +188,25 @@ async function runtimeDown(): Promise<void> {
     '--all',
     '--replicas=0'
   ])
+  await waitForNoRuntimePods()
   console.info(
-    '[runtime] Workloads parados; namespace, configuração e dados do PostgreSQL foram preservados.'
+    '[runtime] Todos os containers foram parados; namespace, configuração e dados do PostgreSQL foram preservados.'
+  )
+}
+
+async function runtimePrune(): Promise<void> {
+  assertKubectlIsAvailable()
+  await runCommand('kubectl', [
+    'delete',
+    'namespace',
+    runtimeNamespace,
+    '--ignore-not-found=true',
+    '--wait=true',
+    '--timeout=300s'
+  ])
+  await rm(environmentFile, { force: true })
+  console.info(
+    '[runtime] Namespace, workloads, volumes, Secrets e ambiente local foram removidos.'
   )
 }
 
@@ -200,6 +238,144 @@ async function runtimePs(): Promise<void> {
 async function runtimeConfig(): Promise<void> {
   assertKubectlIsAvailable()
   await runCommand('kubectl', ['kustomize', kubernetesDirectory])
+}
+
+async function runtimeE2e(): Promise<void> {
+  await runtimeUp()
+  await deleteCypressResources()
+  await applyCypressSuite()
+  await runCommand('kubectl', ['apply', '--filename', cypressJobFile])
+
+  try {
+    await waitForCypressJob()
+    await runCommand('kubectl', [
+      '--namespace',
+      runtimeNamespace,
+      'logs',
+      `job/${cypressJob}`
+    ])
+  } catch (error) {
+    printCypressLogs()
+    throw error
+  }
+
+  await deleteCypressResources()
+  console.info(
+    '[runtime] Cypress headless passou; o runtime base permanece disponível.'
+  )
+}
+
+async function deleteCypressResources(): Promise<void> {
+  await runCommand('kubectl', [
+    '--namespace',
+    runtimeNamespace,
+    'delete',
+    `job/${cypressJob}`,
+    `configmap/${cypressConfigMap}`,
+    '--ignore-not-found=true',
+    '--wait=true'
+  ])
+}
+
+async function applyCypressSuite(): Promise<void> {
+  const result = spawnSync(
+    'kubectl',
+    [
+      '--namespace',
+      runtimeNamespace,
+      'create',
+      'configmap',
+      cypressConfigMap,
+      `--from-file=cypress.config.cjs=${cypressConfigFile}`,
+      `--from-file=runtime.cy.js=${cypressSpecFile}`,
+      '--dry-run=client',
+      '--output=yaml'
+    ],
+    {
+      cwd: runtimeDirectory,
+      encoding: 'utf8'
+    }
+  )
+
+  if (result.error || result.status !== 0) {
+    throw new Error(
+      result.stderr?.trim() ||
+        'Não foi possível renderizar a suíte Cypress para o cluster.'
+    )
+  }
+
+  await runCommand('kubectl', ['apply', '--filename', '-'], result.stdout)
+}
+
+async function waitForCypressJob(): Promise<void> {
+  for (let attempt = 0; attempt < 300; attempt += 1) {
+    const status = readOptionalCommand('kubectl', [
+      '--namespace',
+      runtimeNamespace,
+      'get',
+      'job',
+      cypressJob,
+      '--output=jsonpath={.status.succeeded}:{.status.failed}'
+    ])
+    const [succeeded = '0', failed = '0'] = status.split(':')
+
+    if (Number(succeeded) > 0) {
+      return
+    }
+    if (Number(failed) > 0) {
+      throw new Error('O Job Cypress falhou; os recursos foram preservados.')
+    }
+    await pause(2_000)
+  }
+
+  throw new Error(
+    'O Job Cypress não terminou em 600 segundos; os recursos foram preservados.'
+  )
+}
+
+async function waitForNoRuntimePods(): Promise<void> {
+  for (let attempt = 0; attempt < 150; attempt += 1) {
+    const pods = readOptionalCommand('kubectl', [
+      '--namespace',
+      runtimeNamespace,
+      'get',
+      'pods',
+      '--selector',
+      'app.kubernetes.io/part-of=amarelo',
+      '--field-selector=status.phase!=Succeeded,status.phase!=Failed',
+      '--output=name'
+    ])
+    if (!pods) {
+      return
+    }
+    await pause(2_000)
+  }
+
+  throw new Error(
+    'Os containers do runtime não terminaram dentro de 300 segundos.'
+  )
+}
+
+function printCypressLogs(): void {
+  const result = spawnSync(
+    'kubectl',
+    ['--namespace', runtimeNamespace, 'logs', `job/${cypressJob}`],
+    {
+      cwd: runtimeDirectory,
+      stdio: 'inherit'
+    }
+  )
+  if (result.error || result.status !== 0) {
+    console.warn(
+      '[runtime] Os logs do Job Cypress ainda não estão disponíveis.'
+    )
+  }
+}
+
+async function pause(milliseconds: number): Promise<void> {
+  await new Promise<void>((resolvePromise) => {
+    setTimeout(resolvePromise, milliseconds)
+  })
 }
 
 function assertKubectlIsAvailable(): void {
@@ -275,24 +451,33 @@ async function loadLocalImage(image: string): Promise<void> {
 }
 
 function readCommand(command: string, arguments_: string[]): string {
-  const result = spawnSync(command, arguments_, {
-    cwd: runtimeDirectory,
-    encoding: 'utf8'
-  })
-  if (result.error || result.status !== 0) {
-    const detail = result.stderr.trim()
-    throw new Error(
-      detail || `Falha ao executar ${command} ${arguments_.join(' ')}.`
-    )
-  }
-
-  const output = result.stdout.trim()
+  const output = readOptionalCommand(command, arguments_)
   if (!output) {
     throw new Error(
       `O comando ${command} ${arguments_.join(' ')} não retornou um valor.`
     )
   }
   return output
+}
+
+function readOptionalCommand(
+  command: string,
+  arguments_: string[]
+): string {
+  const result = spawnSync(command, arguments_, {
+    cwd: runtimeDirectory,
+    encoding: 'utf8'
+  })
+  if (result.error) {
+    throw result.error
+  }
+  if (result.status !== 0) {
+    const detail = result.stderr?.trim()
+    throw new Error(
+      detail || `Falha ao executar ${command} ${arguments_.join(' ')}.`
+    )
+  }
+  return result.stdout.trim()
 }
 
 function runtimeNamespaceExists(): boolean {
@@ -443,7 +628,7 @@ async function runCommand(
 function printUsage(message: string): void {
   console.error(`[runtime] ${message}`)
   console.error(
-    'Uso: pnpm --filter @repo/runtime start -- <up|down|logs|ps|config>'
+    'Uso: pnpm --filter @repo/runtime start -- <up|down|prune|e2e|logs|ps|config>'
   )
 }
 

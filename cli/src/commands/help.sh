@@ -19,6 +19,7 @@ Commands:
   🔗 setup [--bin-dir <directory>]         Install the user-scoped launcher
   🩺 doctor [--ci]                         Diagnose repository prerequisites
   🧹 cleanup [--dependencies]              Remove generated state
+  ☸️  runtime <up|down|prune|e2e>           Manage the Kubernetes runtime
   📝 changelog <product> [options]          Prepare a product changelog
   🧱 adr [name]                             Create the next empty ADR
   📏 rule [name]                            Create the next empty rule
@@ -41,7 +42,7 @@ First checkout:
   ./cli/elo setup    Recover before the direct command is available
 
 Ownership:
-  Elo        bootstrap, setup, doctor, cleanup, env, Git and audit entrypoints
+  Elo        bootstrap, setup, doctor, cleanup, runtime, env, Git and audits
   Turborepo  dev, start, build, typecheck, tests and workspace task graphs
   .audit/    executable POSIX shell invariant checkers
 
