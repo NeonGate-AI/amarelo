@@ -1,0 +1,193 @@
+name: Promote SPEC-009 exact head
+
+on:
+  push:
+    branches:
+      - experiment/spec-009-first-ana-conversation-baseline
+    paths:
+      - .github/workflows/spec-009-promotion-gate.yml
+
+permissions:
+  actions: read
+  contents: write
+  pull-requests: write
+  statuses: read
+
+jobs:
+  promote:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: experiment/spec-009-first-ana-conversation-baseline
+          fetch-depth: 0
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: Validate and publish the final branch head
+        id: publish
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          export CI=true
+          pnpm install --frozen-lockfile
+
+          for generator in \
+            .github/spec-009-sdk-ana.py \
+            .github/spec-009-conversation-api.py \
+            .github/spec-009-mobile.py \
+            .github/spec-009-baseline.py
+          do
+            if [ -f "$generator" ]; then
+              python3 "$generator"
+            fi
+          done
+          if [ -f .github/spec-009-finalize.py ]; then
+            python3 .github/spec-009-finalize.py
+          fi
+
+          pnpm install --lockfile-only
+          pnpm install --frozen-lockfile
+          pnpm exec biome check --write workspaces cli turbo.json
+          pnpm --filter conversation-api baseline
+
+          rm -f .github/spec-009-*.py
+          rm -f .github/workflows/spec-009-*.yml
+
+          git diff --check
+          ./cli/elo doctor --ci
+          ./cli/elo check all
+          pnpm exec biome check workspaces cli
+          pnpm exec turbo run typecheck
+          pnpm exec turbo run test
+          pnpm --filter @nucleus/memory run test:database
+          pnpm --filter @nucleus/memory \
+            --filter @repo/memory-sdk \
+            --filter @ai/knowledge \
+            --filter @ai/conversation \
+            --filter @ai/ana \
+            --filter @repo/conversation-sdk \
+            --filter conversation-api run eval
+          pnpm exec turbo run build
+          sh .husky/pre-commit
+          printf 'chore(ci): validate commit hook\n' > .audit/commit-message.txt
+          sh .husky/commit-msg .audit/commit-message.txt
+          rm -f .audit/commit-message.txt
+
+          git config user.name "Jonatas Sales"
+          git config user.email "sykes.echo@proton.me"
+          git add -A
+          git commit -m "chore(conversation): publish the SPEC-009 exact head" -m "Spec: SPEC-009"
+          final_head=$(git rev-parse HEAD)
+          git push origin HEAD:experiment/spec-009-first-ana-conversation-baseline
+          printf 'head=%s\n' "$final_head" >> "$GITHUB_OUTPUT"
+
+      - name: Wait for official pull-request CI and deployments
+        id: gates
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          FINAL_HEAD: ${{ steps.publish.outputs.head }}
+        run: |
+          set -euo pipefail
+
+          ci_run_id=
+          for attempt in $(seq 1 90); do
+            run_json=$(gh api \
+              "repos/$GITHUB_REPOSITORY/actions/runs?head_sha=$FINAL_HEAD&event=pull_request&per_page=20")
+            ci_run_id=$(printf '%s' "$run_json" | jq -r \
+              '[.workflow_runs[] | select(.path == ".github/workflows/ci.yml")] | sort_by(.created_at) | last | .id // empty')
+            status=$(printf '%s' "$run_json" | jq -r \
+              '[.workflow_runs[] | select(.path == ".github/workflows/ci.yml")] | sort_by(.created_at) | last | .status // empty')
+            conclusion=$(printf '%s' "$run_json" | jq -r \
+              '[.workflow_runs[] | select(.path == ".github/workflows/ci.yml")] | sort_by(.created_at) | last | .conclusion // empty')
+            if [ "$status" = completed ]; then
+              [ "$conclusion" = success ] || {
+                printf 'Official CI failed: run=%s conclusion=%s\n' "$ci_run_id" "$conclusion" >&2
+                exit 1
+              }
+              break
+            fi
+            sleep 10
+          done
+          [ -n "$ci_run_id" ] || {
+            printf 'Official pull-request CI did not start for %s\n' "$FINAL_HEAD" >&2
+            exit 1
+          }
+          final_ci_status=$(gh api "repos/$GITHUB_REPOSITORY/actions/runs/$ci_run_id" --jq .status)
+          final_ci_conclusion=$(gh api "repos/$GITHUB_REPOSITORY/actions/runs/$ci_run_id" --jq .conclusion)
+          [ "$final_ci_status" = completed ] && [ "$final_ci_conclusion" = success ] || {
+            printf 'Official CI did not complete successfully.\n' >&2
+            exit 1
+          }
+
+          deployment_state=pending
+          for attempt in $(seq 1 90); do
+            deployment_state=$(gh api "repos/$GITHUB_REPOSITORY/commits/$FINAL_HEAD/status" --jq .state)
+            case "$deployment_state" in
+              success) break ;;
+              failure|error)
+                printf 'Deployment status failed for %s\n' "$FINAL_HEAD" >&2
+                exit 1
+                ;;
+            esac
+            sleep 10
+          done
+          [ "$deployment_state" = success ] || {
+            printf 'Deployment statuses did not become successful for %s\n' "$FINAL_HEAD" >&2
+            exit 1
+          }
+
+          printf 'ci_run_id=%s\n' "$ci_run_id" >> "$GITHUB_OUTPUT"
+
+      - name: Record exact-head gate evidence
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          FINAL_HEAD: ${{ steps.publish.outputs.head }}
+          CI_RUN_ID: ${{ steps.gates.outputs.ci_run_id }}
+        run: |
+          set -euo pipefail
+          cat > /tmp/spec-009-pr.md <<EOF
+          ## Delivery contract
+
+          - Spec: \`.agents/specs/023-first-ana-pwa-conversation-baseline.spec.md\` — \`SPEC-009\`
+          - Status: \`implemented\`
+          - Type: \`experiment\`
+          - Issues: closes #32, closes #33, closes #34, closes #35
+          - Owner authorization: implement ready specs one by one and merge each conflict-free, exact-head green PR
+
+          ## Outcome
+
+          Establish the first deterministic Ana serving denominator: a browser-safe SDK, Fastify composition root, framework-neutral ConversationRuntime, injected Ana model boundary, bounded Mobile development driver, and a content-free pre-Memory baseline.
+
+          ## Validation
+
+          - Fixed merge base: \`e02c98d274639846a94f3c3c451fe8586962a97f\`
+          - Exact implementation head: \`$FINAL_HEAD\`
+          - Official CI run: \`$CI_RUN_ID\` — success
+          - Full local-equivalent gate: Elo doctor, all audits, lint, typecheck, tests, PostgreSQL validation, serving evals, build, and hooks — success
+          - Commit deployment status: success
+          - Temporary executor and generator files: absent from final diff
+
+          ## Safety and privacy
+
+          The text driver is disabled by default and is limited to the owner-approved development/test seam. Conversation content and request state are not persisted or service-worker cached. Baseline artifacts contain hashes and metrics only; prompts, responses, transcripts, raw Memory, credentials, and raw provider failures are excluded.
+
+          ## Review gate
+
+          - [ ] Independent Standards review passes on \`$FINAL_HEAD\`
+          - [ ] Independent Spec-fidelity review passes on \`$FINAL_HEAD\`
+          - [ ] No unresolved review thread remains
+          - [ ] Branch remains current and conflict-free
+
+          The PR is ready for exact-head independent review. It is not authorized for merge until both review axes pass.
+          EOF
+          gh pr edit 36 --body-file /tmp/spec-009-pr.md
+          gh pr ready 36 || true
