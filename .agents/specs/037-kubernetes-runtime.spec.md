@@ -2,7 +2,7 @@
 id: SPEC-037
 title: Migrate the local container runtime to Kubernetes
 type: migration
-status: ready
+status: in-progress
 mode: prospective
 created: 2026-09-04
 updated: 2026-09-04
