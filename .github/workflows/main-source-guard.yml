@@ -1,0 +1,27 @@
+name: Main source guard
+
+on:
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  only-staging:
+    name: Main accepts only staging
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Validate pull request source branch
+        shell: bash
+        env:
+          SOURCE_BRANCH: ${{ github.head_ref }}
+        run: |
+          if [ "$SOURCE_BRANCH" != "staging" ]; then
+            echo "::error title=Invalid source branch::Pull requests into main must originate from staging. Received: $SOURCE_BRANCH"
+            exit 1
+          fi
+
+          echo "Valid production promotion: staging -> main"
