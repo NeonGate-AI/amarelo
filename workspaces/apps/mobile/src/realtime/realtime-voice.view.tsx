@@ -11,7 +11,8 @@ const STATUS_LABELS = {
 } as const
 
 export function RealtimeVoiceView() {
-  const { audioRef, error, start, status, stop } = useRealtimeVoice()
+  const { audioRef, error, start, status, stop, transcript } =
+    useRealtimeVoice()
   const active = status === 'connected' || status === 'connecting'
   const orbState = status === 'connected' ? 'listening' : 'idle'
 
@@ -57,6 +58,15 @@ export function RealtimeVoiceView() {
           </p>
         </div>
 
+        <p
+          aria-live="polite"
+          className="mt-5 mb-0 min-h-12 w-full max-w-sm text-base leading-6 text-foreground"
+        >
+          {transcript.length > 0
+            ? transcript
+            : 'A fala da Ana aparecerá aqui como legenda.'}
+        </p>
+
         {error === null ? null : (
           <p
             aria-live="assertive"
@@ -94,7 +104,7 @@ export function RealtimeVoiceView() {
         </SmoothButton>
       </div>
 
-      <audio aria-hidden="true" autoPlay ref={audioRef} />
+      <audio aria-hidden="true" autoPlay className="hidden" ref={audioRef} />
     </main>
   )
 }
