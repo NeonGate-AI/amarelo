@@ -53,8 +53,9 @@ The specification catalog is flat, priority-ordered and mechanically checked.
 | 037 | SPEC-037 | implemented | [Kubernetes local runtime migration](037-kubernetes-runtime.spec.md) |
 | 038 | SPEC-038 | implemented | [Elo Kubernetes runtime commands](038-elo-kubernetes-runtime.spec.md) |
 | 039 | SPEC-039 | ready | [Memory integrity and poisoning assurance](039-memory-integrity-and-poisoning-assurance.spec.md) |
+| 040 | SPEC-040 | ready | [Staging-first repository delivery flow](040-staging-delivery-flow.spec.md) |
 
-The next unallocated durable delivery ID is `SPEC-040`.
+The next unallocated durable delivery ID is `SPEC-041`.
 
 The executable Memory Nucleus chain is:
 
@@ -62,6 +63,6 @@ The executable Memory Nucleus chain is:
 
 SPEC-039 is a required assurance gate before user-visible canary exposure. It does not replace the earlier core, background or shadow phases; it converts observed integrity failures into evals and hidden holdouts before canary.
 
-Each implementation PR starts from the `main` produced by its prerequisite. A later phase cannot merge until the preceding gate is proved on the exact reviewed head.
+Each implementation PR starts from the `staging` produced by its prerequisite. A later phase cannot merge until the preceding gate is proved on the exact reviewed head. Production promotion occurs only through a `staging -> main` pull request after the required gates pass.
 
 Use `template.md` and `workflow.md` for every new numbered spec. Rules, context and ADRs remain separate sources of truth and must be referenced by their canonical numbered semantic filenames.
