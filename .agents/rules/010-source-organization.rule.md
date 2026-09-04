@@ -173,7 +173,7 @@ Preserve framework-aware frontend architecture while normalizing source roots:
 
 Turborepo/root task scripts own `dev`, `start`, `build`, `typecheck`, tests and workspace task graphs.
 
-Elo owns monorepo platform operations: bootstrap, user-scoped direct-command setup, doctor, cleanup, environment preparation/validation, Git/Husky/Commitlint/lint-staged setup and thin audit-check entrypoints. The canonical repository binary remains `cli/elo`; `elo setup` installs a managed user launcher without publishing a global npm package or editing shell profiles.
+Elo owns monorepo platform operations: bootstrap, user-scoped direct-command setup, doctor, cleanup, the thin Kubernetes runtime lifecycle adapter, environment preparation/validation, Git/Husky/Commitlint/lint-staged setup and thin audit-check entrypoints. Structured Kubernetes lifecycle and Cypress Job behavior remains package-owned behind the POSIX adapter. The canonical repository binary remains `cli/elo`; `elo setup` installs a managed user launcher without publishing a global npm package or editing shell profiles.
 
 A local `pnpm install` invokes `elo setup` through `postinstall`. `pnpm postclone` is an explicit recovery alias because npm and pnpm do not define an automatic post-clone lifecycle. `pnpm elo` and `./cli/elo` remain compatibility/recovery entrypoints.
 

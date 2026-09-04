@@ -41,6 +41,10 @@ elo bootstrap
 elo setup
 elo doctor
 elo cleanup
+elo runtime up
+elo runtime down
+elo runtime prune
+elo runtime e2e
 elo adr [lowercase-kebab-name]
 elo rule [lowercase-kebab-name]
 elo skill [lowercase-kebab-name]
@@ -56,13 +60,15 @@ elo check all
 
 `elo cleanup` immediately removes eligible untracked generated outputs. Dependency directories remain intact unless `--dependencies` is supplied. The command protects tracked paths, `.git`, and `.audit`; the former `--apply` gate is not supported.
 
+`elo runtime` exposes exactly four Kubernetes lifecycle actions. `up` reconciles the namespace and waits for PostgreSQL, Redis and the four apps; `down` removes transient Cypress resources, scales all base workloads to zero and waits for their pods to terminate while preserving PostgreSQL; `prune` waits for deletion of the complete `amarelo-runtime` namespace and then removes the generated runtime `.env`; `e2e` runs `up` before an in-cluster headless Cypress Job and leaves the base runtime up. Invalid or extra runtime arguments return status 2 before delegation.
+
 The artifact commands render the four canonical empty templates in `.agents/prompts/`. ADRs, rules, and specs receive their next repository number; rule numbers are stable catalog identities rather than precedence; specs also receive the next durable `SPEC-###` ID. Skills preserve `.agents/skills/<name>/SKILL.md`. Generation never overwrites an existing target or updates approval/catalog state automatically.
 
 The generated user launcher delegates to the checkout that most recently completed setup. After moving or deleting that checkout, run `./cli/elo setup` from a valid checkout.
 
 ## Ownership
 
-Elo owns repository-platform operations: bootstrap, direct-command setup, doctor, cleanup, environment validation, Git/Husky/Commitlint/lint-staged setup, and thin invariant-check entrypoints.
+Elo owns repository-platform operations: bootstrap, direct-command setup, doctor, cleanup, the thin Kubernetes runtime lifecycle adapter, environment validation, Git/Husky/Commitlint/lint-staged setup, and invariant-check entrypoints.
 
 `pnpm dev`, `pnpm start`, `pnpm build`, `pnpm typecheck`, and `pnpm test` remain direct Turborepo task-graph entrypoints and are intentionally not duplicated by Elo.
 

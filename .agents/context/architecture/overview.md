@@ -42,7 +42,7 @@ workspaces/
 
 `agents/` is a structural AI capability parent, not a package. Named product agents own independent workspaces beneath it. Conversation and Knowledge are direct concrete AI workspaces; package identities, public ports and exports express their boundaries without a generic single-child coordinator directory.
 
-Memory Nucleus is one workspace, not a nested mini-monorepo. Clean Architecture dependency direction is `infrastructure → application → domain`. AI consumes Memory Nucleus only through `@repo/memory-sdk`. `@repo/runtime` owns the repository-managed local Kubernetes resources and orchestration adapter; namespace `amarelo-runtime` is its resource boundary. Local runtime manifests do not imply a production deployment contract.
+Memory Nucleus is one workspace, not a nested mini-monorepo. Clean Architecture dependency direction is `infrastructure → application → domain`. AI consumes Memory Nucleus only through `@repo/memory-sdk`. `@repo/runtime` owns the repository-managed local Kubernetes resources and structured orchestration backend; namespace `amarelo-runtime` is its resource boundary. Elo exposes the thin `runtime up|down|prune|e2e` control-plane adapter, while the package owns readiness, termination, wipe and in-cluster Cypress semantics. Local runtime manifests do not imply a production deployment contract.
 
 ## Harness filename contract
 

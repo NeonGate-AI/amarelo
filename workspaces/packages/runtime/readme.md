@@ -26,21 +26,26 @@ Os quatro apps usam a mesma imagem `amarelo-dev-workspace:local`, construída pe
 
 Docker Desktop e Rancher Desktop usam a imagem local diretamente. Em outro cluster, defina `AMARELO_RUNTIME_IMAGE` com uma imagem acessível pelo registry; nesse modo o build local é ignorado.
 
-## Uso durante a migração
+## Uso
 
-Até a promoção dos comandos Elo em SPEC-038, use o entrypoint do pacote:
+A interface pública pertence ao Elo:
 
 ```sh
-pnpm --filter @repo/runtime start -- up
-pnpm --filter @repo/runtime start -- ps
-pnpm --filter @repo/runtime start -- logs
-pnpm --filter @repo/runtime start -- config
-pnpm --filter @repo/runtime start -- down
+elo runtime up
+elo runtime down
+elo runtime prune
+elo runtime e2e
 ```
 
-`up` gera `.env` com modo `0600` quando necessário, constrói ou seleciona a imagem, aplica o Secret local e a base Kustomize, restaura uma réplica por workload e aguarda todos os rollouts. `down` escala Deployments e StatefulSets para zero, preservando namespace, configuração, Secret e o PVC do PostgreSQL.
+`up` gera `.env` com modo `0600` quando necessário, constrói ou seleciona a imagem, aplica o Secret local e a base Kustomize, restaura uma réplica por workload e aguarda os cinco Deployments e o StatefulSet.
 
-As credenciais nunca aparecem nos manifests rastreados. Para valores próprios, copie `.env.example` para `.env` e substitua os placeholders antes de iniciar.
+`down` remove recursos Cypress transitórios, escala Deployments e StatefulSets para zero e espera os pods terminarem. O namespace, a configuração, o Secret e o PVC do PostgreSQL permanecem. Repetir o comando com o namespace ausente é seguro.
+
+`prune` é destrutivo: espera a remoção do namespace `amarelo-runtime` — incluindo workloads, Services, ConfigMap, Secret e PVC — e só então remove o arquivo de ambiente local. O cluster, imagens em registry e caches de imagem do Docker/kind/minikube não pertencem a esse boundary e são preservados.
+
+`e2e` sempre executa `up` primeiro. Depois cria uma suíte ConfigMap e um Job efêmero com `cypress/included:15.19.0`, executa `cypress run --headless` contra os quatro Services e transmite o log. Sucesso remove os recursos transitórios e mantém o runtime base no ar. Falha ou timeout retorna status diferente de zero e preserva Job/ConfigMap para diagnóstico até o próximo `e2e`, `down` ou `prune`.
+
+As credenciais nunca aparecem nos manifests rastreados. Para valores próprios, copie `.env.example` para `.env` e substitua os placeholders antes de iniciar. Sintaxe inválida de `elo runtime` falha antes de invocar pnpm, Docker ou kubectl.
 
 ## Acesso pelo host
 

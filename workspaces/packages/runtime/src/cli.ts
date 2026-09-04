@@ -460,10 +460,7 @@ function readCommand(command: string, arguments_: string[]): string {
   return output
 }
 
-function readOptionalCommand(
-  command: string,
-  arguments_: string[]
-): string {
+function readOptionalCommand(command: string, arguments_: string[]): string {
   const result = spawnSync(command, arguments_, {
     cwd: runtimeDirectory,
     encoding: 'utf8'
