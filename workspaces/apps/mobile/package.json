@@ -10,7 +10,7 @@
     "preview": "vite preview --host 127.0.0.1 --strictPort --port 3003",
     "start": "vite preview --host 127.0.0.1 --strictPort --port 3003",
     "clean": "rm -rf dist",
-    "test": "node --import tsx src/assurance/evals/mobile-conversation/mobile-conversation.eval.ts"
+    "test": "node --import tsx src/assurance/evals/mobile-conversation/mobile-conversation.eval.ts && node --import tsx src/assurance/evals/realtime-voice/realtime-voice.eval.ts"
   },
   "dependencies": {
     "@phosphor-icons/react": "^2.1.10",
