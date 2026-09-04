@@ -51,11 +51,10 @@ async function evaluateRealtimeSourceBoundary() {
   assert.equal(hook.includes("type: 'function_call_output'"), true)
   assert.equal(hook.includes("type: 'response.create'"), true)
   assert.equal(hook.includes("'/api/v1/realtime/session'"), true)
-  assert.equal(view.includes('<audio'), true)
-  assert.equal(
-    app.includes("VITE_AMARELO_REALTIME_VOICE === 'true'"),
-    true
-  )
+  assert.equal(hook.includes("document.createElement('audio')"), true)
+  assert.equal(hook.includes('audioElement.autoplay = true'), true)
+  assert.equal(view.includes('aria-live="polite"'), true)
+  assert.equal(app.includes("VITE_AMARELO_REALTIME_VOICE === 'true'"), true)
 
   for (const source of [hook, view]) {
     assert.equal(
