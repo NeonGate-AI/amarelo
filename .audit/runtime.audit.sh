@@ -15,6 +15,10 @@ RUNTIME_ROOT="$PROJECT_ROOT/workspaces/packages/runtime"
 KUBERNETES_ROOT="$RUNTIME_ROOT/kubernetes"
 RUNTIME_CLI="$RUNTIME_ROOT/src/cli.ts"
 RUNTIME_ENV="$RUNTIME_ROOT/.env"
+ELO_RUNTIME_COMMAND="$PROJECT_ROOT/cli/src/commands/runtime.sh"
+CYPRESS_JOB="$KUBERNETES_ROOT/cypress-job.yaml"
+CYPRESS_CONFIG="$RUNTIME_ROOT/cypress/cypress.config.cjs"
+CYPRESS_SPEC="$RUNTIME_ROOT/cypress/e2e/runtime.cy.js"
 TMP_ROOT="${TMPDIR:-/tmp}/amarelo-runtime-audit.$$"
 had_runtime_env=false
 mkdir "$TMP_ROOT" || {
@@ -104,6 +108,53 @@ if grep -F 'Docker Compose' "$RUNTIME_ROOT/readme.md" >/dev/null 2>&1; then
   runtime_fail workspaces/packages/runtime/readme.md "current runtime documentation still requires Docker Compose"
 fi
 
+for public_runtime_file in \
+  "$ELO_RUNTIME_COMMAND" \
+  "$CYPRESS_JOB" \
+  "$CYPRESS_CONFIG" \
+  "$CYPRESS_SPEC"
+do
+  require_file "$public_runtime_file"
+done
+
+if [ -f "$ELO_RUNTIME_COMMAND" ]; then
+  /bin/sh -n "$ELO_RUNTIME_COMMAND" ||
+    runtime_fail cli/src/commands/runtime.sh "public runtime adapter is not valid POSIX shell"
+  grep -F '<up|down|prune|e2e>' "$ELO_RUNTIME_COMMAND" >/dev/null 2>&1 ||
+    runtime_fail cli/src/commands/runtime.sh "public adapter does not expose the exact runtime command family"
+fi
+
+if [ -f "$CYPRESS_JOB" ]; then
+  grep -F 'image: cypress/included:15.19.0' "$CYPRESS_JOB" >/dev/null 2>&1 ||
+    runtime_fail workspaces/packages/runtime/kubernetes/cypress-job.yaml "Cypress image is not pinned"
+  grep -F -- '--headless' "$CYPRESS_JOB" >/dev/null 2>&1 ||
+    runtime_fail workspaces/packages/runtime/kubernetes/cypress-job.yaml "Cypress Job is not explicitly headless"
+  grep -F 'automountServiceAccountToken: false' "$CYPRESS_JOB" >/dev/null 2>&1 ||
+    runtime_fail workspaces/packages/runtime/kubernetes/cypress-job.yaml "Cypress Job must disable service-account token mounting"
+  grep -F 'backoffLimit: 0' "$CYPRESS_JOB" >/dev/null 2>&1 ||
+    runtime_fail workspaces/packages/runtime/kubernetes/cypress-job.yaml "Cypress Job must report its first failed run"
+fi
+
+if [ -f "$CYPRESS_SPEC" ]; then
+  for service_url in \
+    http://landing:3000 \
+    http://console:3001 \
+    http://onboarding:3002 \
+    http://mobile:3003
+  do
+    grep -F "$service_url" "$CYPRESS_SPEC" >/dev/null 2>&1 ||
+      runtime_fail workspaces/packages/runtime/cypress/e2e/runtime.cy.js "Cypress suite omits $service_url"
+  done
+  [ "$(grep -Eo 'https?://' "$CYPRESS_SPEC" | wc -l | tr -d ' ')" -eq 4 ] ||
+    runtime_fail workspaces/packages/runtime/cypress/e2e/runtime.cy.js "Cypress suite must contain only the four in-cluster service URLs"
+fi
+
+if ! "$PROJECT_ROOT/cli/elo" --help >"$TMP_ROOT/elo-help.out" 2>&1; then
+  runtime_fail cli/src/commands/help.sh "Elo help failed while checking runtime commands"
+elif ! grep -F 'runtime <up|down|prune|e2e>' "$TMP_ROOT/elo-help.out" >/dev/null 2>&1; then
+  runtime_fail cli/src/commands/help.sh "Elo help does not expose the exact runtime command family"
+fi
+
 active_compose_references=$(
   git -C "$PROJECT_ROOT" grep -n -E \
     'docker[[:space:]]+compose|compose\.yaml' \
@@ -140,7 +191,15 @@ case "$*" in
       printf 'namespace/amarelo-runtime\n'
     fi
     ;;
+  *"get pods"*)
+    if [ "${AMARELO_RUNTIME_PODS_REMAINING:-}" = true ]; then
+      printf 'pod/runtime-still-terminating\n'
+    fi
+    ;;
+  *"get job amarelo-cypress"*) printf '%s\n' "${AMARELO_RUNTIME_CYPRESS_STATUS:-1:0}" ;;
   *"create secret generic"*) printf 'apiVersion: v1\nkind: Secret\nmetadata:\n  name: amarelo-runtime-environment\n' ;;
+  *"create configmap amarelo-cypress-suite"*) printf 'apiVersion: v1\nkind: ConfigMap\nmetadata:\n  name: amarelo-cypress-suite\n' ;;
+  *"logs"*"job/amarelo-cypress"*) printf 'Cypress headless PASS\n' ;;
 esac
 exit 0
 EOF
@@ -160,8 +219,22 @@ runtime_command() {
   PATH="$fake_bin:$PATH" \
   AMARELO_RUNTIME_AUDIT_LOG="$command_log" \
   AMARELO_RUNTIME_ENV_FILE="$TMP_ROOT/runtime.env" \
+  AMARELO_RUNTIME_CYPRESS_STATUS="${AMARELO_RUNTIME_CYPRESS_STATUS:-}" \
+  AMARELO_RUNTIME_FAIL_MATCH="${AMARELO_RUNTIME_FAIL_MATCH:-}" \
   AMARELO_RUNTIME_NAMESPACE_ABSENT="${AMARELO_RUNTIME_NAMESPACE_ABSENT:-}" \
+  AMARELO_RUNTIME_PODS_REMAINING="${AMARELO_RUNTIME_PODS_REMAINING:-}" \
     pnpm --dir "$PROJECT_ROOT" --filter @repo/runtime start -- "$@"
+}
+
+elo_runtime_command() {
+  PATH="$fake_bin:$PATH" \
+  AMARELO_RUNTIME_AUDIT_LOG="$command_log" \
+  AMARELO_RUNTIME_CYPRESS_STATUS="${AMARELO_RUNTIME_CYPRESS_STATUS:-}" \
+  AMARELO_RUNTIME_ENV_FILE="$TMP_ROOT/runtime.env" \
+  AMARELO_RUNTIME_FAIL_MATCH="${AMARELO_RUNTIME_FAIL_MATCH:-}" \
+  AMARELO_RUNTIME_NAMESPACE_ABSENT="${AMARELO_RUNTIME_NAMESPACE_ABSENT:-}" \
+  AMARELO_RUNTIME_PODS_REMAINING="${AMARELO_RUNTIME_PODS_REMAINING:-}" \
+    "$PROJECT_ROOT/cli/elo" runtime "$@"
 }
 
 if ! runtime_command up >"$TMP_ROOT/up.out" 2>&1; then
@@ -225,6 +298,82 @@ AMARELO_RUNTIME_FAIL_MATCH='apply --kustomize' \
 failure_status=$?
 [ "$failure_status" -ne 0 ] ||
   runtime_fail workspaces/packages/runtime/src/cli.ts "kubectl reconciliation failure must propagate non-zero"
+
+: >"$command_log"
+if ! elo_runtime_command up >"$TMP_ROOT/elo-up.out" 2>&1; then
+  runtime_fail cli/src/commands/runtime.sh "elo runtime up failed"
+elif ! grep -F 'kubectl rollout status' "$command_log" >/dev/null 2>&1; then
+  runtime_fail cli/src/commands/runtime.sh "elo runtime up did not delegate the complete readiness path"
+fi
+
+: >"$command_log"
+if ! elo_runtime_command down >"$TMP_ROOT/elo-down.out" 2>&1; then
+  runtime_fail cli/src/commands/runtime.sh "elo runtime down failed"
+else
+  grep -F 'kubectl --namespace amarelo-runtime scale deployment --all --replicas=0' "$command_log" >/dev/null 2>&1 ||
+    runtime_fail cli/src/commands/runtime.sh "elo runtime down did not stop Deployments"
+  grep -F 'kubectl --namespace amarelo-runtime get pods' "$command_log" >/dev/null 2>&1 ||
+    runtime_fail cli/src/commands/runtime.sh "elo runtime down did not wait for zero owned pods"
+fi
+
+printf 'generated runtime environment\n' >"$TMP_ROOT/runtime.env"
+: >"$command_log"
+if ! elo_runtime_command prune >"$TMP_ROOT/elo-prune.out" 2>&1; then
+  runtime_fail cli/src/commands/runtime.sh "elo runtime prune failed"
+else
+  grep -F 'kubectl delete namespace amarelo-runtime --ignore-not-found=true --wait=true --timeout=300s' "$command_log" >/dev/null 2>&1 ||
+    runtime_fail workspaces/packages/runtime/src/cli.ts "prune did not wait for namespace deletion"
+  [ ! -e "$TMP_ROOT/runtime.env" ] ||
+    runtime_fail workspaces/packages/runtime/src/cli.ts "prune did not remove the generated runtime environment"
+fi
+
+printf 'must survive failed prune\n' >"$TMP_ROOT/runtime.env"
+: >"$command_log"
+AMARELO_RUNTIME_FAIL_MATCH='delete namespace' elo_runtime_command prune >"$TMP_ROOT/prune-failure.out" 2>&1
+prune_failure_status=$?
+[ "$prune_failure_status" -ne 0 ] ||
+  runtime_fail workspaces/packages/runtime/src/cli.ts "namespace deletion failure must make prune fail"
+[ -f "$TMP_ROOT/runtime.env" ] ||
+  runtime_fail workspaces/packages/runtime/src/cli.ts "failed prune removed local state before cluster deletion completed"
+rm -f "$TMP_ROOT/runtime.env"
+
+: >"$command_log"
+if ! elo_runtime_command e2e >"$TMP_ROOT/elo-e2e.out" 2>&1; then
+  runtime_fail cli/src/commands/runtime.sh "elo runtime e2e failed"
+else
+  up_line=$(grep -n -F 'kubectl apply --kustomize' "$command_log" | sed -n '1s/:.*//p')
+  cypress_line=$(grep -n -F 'kubectl apply --filename' "$command_log" | grep -F 'cypress-job.yaml' | sed -n '1s/:.*//p')
+  if [ -z "$up_line" ] || [ -z "$cypress_line" ] || [ "$up_line" -ge "$cypress_line" ]; then
+    runtime_fail workspaces/packages/runtime/src/cli.ts "e2e did not complete runtime up before creating Cypress"
+  fi
+  grep -F 'kubectl --namespace amarelo-runtime get job amarelo-cypress' "$command_log" >/dev/null 2>&1 ||
+    runtime_fail workspaces/packages/runtime/src/cli.ts "e2e did not observe the Cypress Job result"
+  grep -F 'kubectl --namespace amarelo-runtime logs job/amarelo-cypress' "$command_log" >/dev/null 2>&1 ||
+    runtime_fail workspaces/packages/runtime/src/cli.ts "e2e did not emit Cypress logs"
+fi
+
+: >"$command_log"
+AMARELO_RUNTIME_CYPRESS_STATUS='0:1' elo_runtime_command e2e >"$TMP_ROOT/e2e-failure.out" 2>&1
+e2e_failure_status=$?
+[ "$e2e_failure_status" -ne 0 ] ||
+  runtime_fail workspaces/packages/runtime/src/cli.ts "failed Cypress Job must make runtime e2e fail"
+[ "$(grep -c -F 'kubectl --namespace amarelo-runtime delete job/amarelo-cypress configmap/amarelo-cypress-suite' "$command_log")" -eq 1 ] ||
+  runtime_fail workspaces/packages/runtime/src/cli.ts "failed Cypress resources must remain after the initial stale-resource cleanup"
+
+for invalid_runtime_arguments in '' 'unknown' 'up extra'; do
+  : >"$command_log"
+  if [ -z "$invalid_runtime_arguments" ]; then
+    "$PROJECT_ROOT/cli/elo" runtime >"$TMP_ROOT/invalid-runtime.out" 2>&1
+  else
+    # Intentional field splitting exercises one or two public arguments.
+    elo_runtime_command $invalid_runtime_arguments >"$TMP_ROOT/invalid-runtime.out" 2>&1
+  fi
+  invalid_runtime_status=$?
+  [ "$invalid_runtime_status" -eq 2 ] ||
+    runtime_fail cli/src/commands/runtime.sh "invalid runtime syntax must exit with status 2"
+  [ ! -s "$command_log" ] ||
+    runtime_fail cli/src/commands/runtime.sh "invalid runtime syntax mutated the runtime"
+done
 
 if [ "$failures" -gt 0 ]; then
   printf 'Runtime audit FAIL (%s)\n' "$failures" >&2

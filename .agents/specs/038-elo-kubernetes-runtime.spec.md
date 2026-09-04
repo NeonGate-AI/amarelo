@@ -2,7 +2,7 @@
 id: SPEC-038
 title: Expose the Kubernetes runtime lifecycle through Elo
 type: feature
-status: ready
+status: in-progress
 mode: prospective
 created: 2026-09-04
 updated: 2026-09-04
