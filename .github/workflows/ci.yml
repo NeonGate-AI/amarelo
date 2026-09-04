@@ -96,7 +96,7 @@ jobs:
         run: pnpm --filter @nucleus/memory run test:database
 
       - name: Evaluate AI
-        run: pnpm --filter @nucleus/memory --filter @repo/memory-sdk --filter @ai/knowledge run eval
+        run: pnpm --filter @nucleus/memory --filter @repo/memory-sdk --filter @ai/knowledge --filter @ai/ana --filter conversation-api run eval
 
       - name: Build
         run: pnpm exec turbo run build
