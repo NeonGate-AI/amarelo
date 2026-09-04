@@ -2,7 +2,7 @@
 id: SPEC-038
 title: Expose the Kubernetes runtime lifecycle through Elo
 type: feature
-status: in-progress
+status: implemented
 mode: prospective
 created: 2026-09-04
 updated: 2026-09-04
@@ -36,7 +36,17 @@ skills:
   - .agents/skills/tdd/SKILL.md
   - .agents/skills/code-review/SKILL.md
 evidence:
-  - pending
+  - commit bf3e2dcf8fdca1865dfa1388a49efc173175e9d1 (red public lifecycle contract)
+  - commit 74e8d7f58e36d845e89ae92fc0367207bd075521 (core Elo and Cypress implementation)
+  - commit b56ba85f738a06139582ac66d927051648a92825 (in-cluster redirect finding resolved)
+  - commit 7ce2457ac07a87e1f7c4f98e63cc9f46a5bcca8f (green exact implementation head)
+  - .audit/runtime.audit.sh public lifecycle and Cypress fixtures
+  - https://github.com/NeonGate-AI/amarelo/actions/runs/33857118764
+  - https://github.com/NeonGate-AI/amarelo/actions/runs/33860226552
+  - https://github.com/NeonGate-AI/amarelo/actions/runs/33860222104
+  - https://github.com/NeonGate-AI/amarelo/issues/69
+  - https://github.com/NeonGate-AI/amarelo/issues/70
+  - https://github.com/NeonGate-AI/amarelo/pull/71
 ---
 
 # SPEC-038: Expose the Kubernetes runtime lifecycle through Elo
@@ -97,19 +107,19 @@ Run `./cli/elo runtime` contract fixtures, `./cli/elo check runtime`, `./cli/elo
 
 ## Acceptance Criteria
 
-- [ ] Elo help and CLI documentation expose exactly `runtime up|down|prune|e2e`.
-- [ ] Missing, unknown and extra runtime arguments exit 2 before any runtime mutation.
-- [ ] `elo runtime up` restores every owned workload and returns only after all six are ready.
-- [ ] `elo runtime down` reaches zero owned pods while preserving namespace and PostgreSQL state, including an idempotent absent-namespace path.
-- [ ] `elo runtime prune` idempotently deletes the complete namespace-owned runtime state and generated environment file, and propagates deletion failure before local cleanup.
-- [ ] `elo runtime e2e` executes `up` first, runs pinned Cypress headlessly inside the namespace against all four application Services and leaves the base runtime up.
-- [ ] Cypress success removes transient test resources; failure/timeout returns non-zero, emits available logs and retains failed resources for diagnosis.
-- [ ] Kubernetes and command failures return non-zero with actionable, secret-safe diagnostics.
-- [ ] No tracked secret, external test URL, root Cypress dependency or second orchestrator is introduced.
-- [ ] Deterministic audit coverage exercises the four public commands, destructive boundary and Cypress success/failure seams.
-- [ ] CLI/runtime documentation and durable ownership context match the implemented lifecycle.
-- [ ] Complete exact-head CI and both independent review axes pass.
-- [ ] Stable evidence is promoted and the spec closes as `implemented`.
+- [x] Elo help and CLI documentation expose exactly `runtime up|down|prune|e2e`.
+- [x] Missing, unknown and extra runtime arguments exit 2 before any runtime mutation.
+- [x] `elo runtime up` restores every owned workload and returns only after all six are ready.
+- [x] `elo runtime down` reaches zero owned pods while preserving namespace and PostgreSQL state, including an idempotent absent-namespace path.
+- [x] `elo runtime prune` idempotently deletes the complete namespace-owned runtime state and generated environment file, and propagates deletion failure before local cleanup.
+- [x] `elo runtime e2e` executes `up` first, runs pinned Cypress headlessly inside the namespace against all four application Services and leaves the base runtime up.
+- [x] Cypress success removes transient test resources; failure/timeout returns non-zero, emits available logs and retains failed resources for diagnosis.
+- [x] Kubernetes and command failures return non-zero with actionable, secret-safe diagnostics.
+- [x] No tracked secret, external test URL, root Cypress dependency or second orchestrator is introduced.
+- [x] Deterministic audit coverage exercises the four public commands, destructive boundary and Cypress success/failure seams.
+- [x] CLI/runtime documentation and durable ownership context match the implemented lifecycle.
+- [x] Complete exact-head CI and both independent review axes pass.
+- [x] Stable evidence is promoted and the spec closes as `implemented`.
 
 ## Failure Behavior
 
@@ -126,7 +136,7 @@ Invalid public syntax exits 2 before invoking pnpm, Docker or kubectl. An `up` f
 
 ## Evidence and Promotion
 
-Planned evidence is the red/green public CLI fixture, rendered Cypress Job invariants, lifecycle failure tests, exact diff, exact-head CI and two-axis review. At completion, public command usage will be promoted to Elo/runtime documentation and source-ownership context; ADR-0029 remains the canonical decision record.
+Commit `bf3e2dcf8fdca1865dfa1388a49efc173175e9d1` established the red public lifecycle contract in run 33857118764. The implementation series culminated in green exact-head PR and push runs 33860226552 and 33860222104 on `7ce2457ac07a87e1f7c4f98e63cc9f46a5bcca8f`. Issues #69/#70 and pull request #71 retain ticket, review and merge evidence. Public usage is promoted to Elo/runtime documentation and source-ownership context; ADR-0029 remains the canonical decision record.
 
 ## Further Notes
 
