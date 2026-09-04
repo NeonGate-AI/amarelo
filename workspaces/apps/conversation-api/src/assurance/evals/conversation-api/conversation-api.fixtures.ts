@@ -57,13 +57,18 @@ export class RecordingLangChainModel implements LangChainChatModelInvoker {
 }
 
 export function createTestConversationApi(options: {
+  readonly createRealtimeCall?: (sdp: string) => Promise<string>
   readonly model: RecordingAnaModel
   readonly nowMs?: () => number
 }): FastifyInstance {
   const runtime = new ConversationRuntime({
     agents: [new AnaConversationAgent({ model: options.model })]
   })
-  return createConversationApi({ nowMs: options.nowMs, runtime })
+  return createConversationApi({
+    createRealtimeCall: options.createRealtimeCall,
+    nowMs: options.nowMs,
+    runtime
+  })
 }
 
 export function createSequenceClock(...values: number[]): () => number {
