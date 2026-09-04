@@ -1,0 +1,24 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: amarelo-runtime-config
+  labels:
+    app.kubernetes.io/name: runtime-config
+    app.kubernetes.io/part-of: amarelo
+data:
+  AI_VOICE_MODEL: gpt-4o-mini-tts
+  AI_VOICE_NAME: coral
+  CHOKIDAR_USEPOLLING: "true"
+  NEXT_PUBLIC_CONSOLE_URL: http://localhost:3001
+  NEXT_PUBLIC_ONBOARDING_URL: http://localhost:3002
+  NEXT_PUBLIC_WORKOS_REDIRECT_URI: http://localhost:3002/callback
+  NEXT_TELEMETRY_DISABLED: "1"
+  OPENAI_API_KEY: ""
+  WATCHPACK_POLLING: "true"
+  WORKOS_API_KEY: ""
+  WORKOS_CLIENT_ID: ""
+  WORKOS_COOKIE_DOMAIN: ""
+  WORKOS_COOKIE_MAX_AGE: "2592000"
+  WORKOS_COOKIE_NAME: wos-session
+  WORKOS_COOKIE_PASSWORD: ""
+  WORKOS_COOKIE_SAMESITE: lax

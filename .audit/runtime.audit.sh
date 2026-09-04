@@ -123,6 +123,7 @@ if [ -n "${AMARELO_RUNTIME_FAIL_MATCH:-}" ]; then
 fi
 case "$*" in
   "config current-context") printf 'kind-amarelo\n' ;;
+  "get namespace amarelo-runtime"*) printf 'namespace/amarelo-runtime\n' ;;
   *"create secret generic"*) printf 'apiVersion: v1\nkind: Secret\nmetadata:\n  name: amarelo-runtime-environment\n' ;;
 esac
 exit 0
