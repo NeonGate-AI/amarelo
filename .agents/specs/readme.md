@@ -53,7 +53,7 @@ The specification catalog is flat, priority-ordered and mechanically checked.
 | 037 | SPEC-037 | implemented | [Kubernetes local runtime migration](037-kubernetes-runtime.spec.md) |
 | 038 | SPEC-038 | implemented | [Elo Kubernetes runtime commands](038-elo-kubernetes-runtime.spec.md) |
 | 039 | SPEC-039 | ready | [Memory integrity and poisoning assurance](039-memory-integrity-and-poisoning-assurance.spec.md) |
-| 040 | SPEC-040 | ready | [Staging-first repository delivery flow](040-staging-delivery-flow.spec.md) |
+| 040 | SPEC-040 | in-progress | [Staging-first repository delivery flow](040-staging-delivery-flow.spec.md) |
 
 The next unallocated durable delivery ID is `SPEC-041`.
 
