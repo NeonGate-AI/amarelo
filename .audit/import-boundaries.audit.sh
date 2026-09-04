@@ -228,10 +228,12 @@ find "$WORKSPACE_ROOT" \
 
 : >"$TMP_ROOT/source-files"
 : >"$TMP_ROOT/package-files"
+: >"$TMP_ROOT/tsconfig-files"
 while IFS= read -r path; do
   [ -n "$path" ] || continue
   case "$path" in
     */package.json) printf '%s\n' "$path" >>"$TMP_ROOT/package-files" ;;
+    */tsconfig.json) printf '%s\n' "$path" >>"$TMP_ROOT/tsconfig-files" ;;
   esac
   if is_source_file "$path"; then
     printf '%s\n' "$path" >>"$TMP_ROOT/source-files"
@@ -247,6 +249,19 @@ while IFS= read -r package_file; do
       "package imports use the forbidden # prefix; first-party absolute aliases use @"
   fi
 done <"$TMP_ROOT/package-files"
+
+while IFS= read -r config_file; do
+  [ -n "$config_file" ] || continue
+  case "$config_file" in
+    "$WORKSPACE_ROOT/ai/conversation/tsconfig.json") continue ;;
+  esac
+  if grep -F 'conversation/src/' "$config_file" >/dev/null 2>&1; then
+    import_fail \
+      cross-package-source-alias \
+      "$(relative_path "$config_file")" \
+      "TypeScript paths must not remap @ai/conversation private source; consume its declared package exports"
+  fi
+done <"$TMP_ROOT/tsconfig-files"
 
 while IFS= read -r path; do
   [ -n "$path" ] || continue
@@ -382,5 +397,6 @@ fi
 
 printf 'Import boundaries PASS\n'
 printf '@ absolute aliases: PASS\n'
+printf 'cross-package source aliases: PASS\n'
 printf 'cross-directory barrel imports: PASS\n'
 printf 'leaf index.ts coverage: PASS\n'

@@ -1,0 +1,68 @@
+{
+  "baselineId": "spec-009-ana-reflex-v1",
+  "correlation": {
+    "conversationIdHash": "sha256:b66aaa64e0e1aa134eb68919554032da3f4b2509d28f00f13958fd80136e43c3",
+    "requestId": "spec-009-baseline-request-1"
+  },
+  "economics": {
+    "cost": {
+      "currency": "USD",
+      "inputMicrousd": 10,
+      "outputMicrousd": 6,
+      "status": "calculated",
+      "totalMicrousd": 16,
+      "unit": "micro-usd"
+    },
+    "rateSnapshot": {
+      "effectiveAt": "2026-09-03T00:00:00.000Z",
+      "id": "synthetic-chat-model-rate-v1",
+      "inputMicrousdPerMillionTokens": 250000,
+      "modelId": "synthetic-chat-model",
+      "outputMicrousdPerMillionTokens": 750000,
+      "providerId": "synthetic-provider"
+    }
+  },
+  "fixture": {
+    "id": "ana-reflex-synthetic-v1",
+    "requestHash": "sha256:53b90ec53526ff9be8e753e6d8f7df9e8edf54c672410ba4649f94ff81fb23cd",
+    "responseHash": "sha256:6d17fb778d8c9e3ddbd927c9c8deb7cd709484cb8d50beb8faa21c051d32ffc2",
+    "version": "1"
+  },
+  "generatedAt": "2026-09-03T12:00:00.000Z",
+  "quality": {
+    "checks": {
+      "noClinicalClaim": true,
+      "nonEmpty": true,
+      "supportiveBoundary": true
+    },
+    "evaluatorVersion": "ana-support-deterministic-v1",
+    "result": "pass"
+  },
+  "runtime": {
+    "agentId": "ana",
+    "instructionVersion": "ana-support-v1",
+    "memoryStatus": "skipped",
+    "modelId": "synthetic-chat-model",
+    "providerId": "synthetic-provider",
+    "routingLane": "reflex",
+    "routingPolicyVersion": "conversation-routing-deterministic-v1"
+  },
+  "schemaVersion": "spec-009-pre-memory-baseline-v1",
+  "usage": {
+    "estimated": {
+      "contextTokens": 5,
+      "estimatorVersion": "conversation-history-codepoint-quarter-v1"
+    },
+    "firstTokenLatency": {
+      "status": "unavailable"
+    },
+    "modelCalls": 1,
+    "providerReported": {
+      "inputTokens": 40,
+      "outputTokens": 8,
+      "status": "available",
+      "totalTokens": 48
+    },
+    "totalLatencyMs": 25
+  }
+}

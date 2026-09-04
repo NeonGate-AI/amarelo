@@ -1,8 +1,12 @@
 import { useAtomValue, useSetAtom } from 'jotai'
 import { useEffect } from 'react'
 
-import { ConversationScreen } from './ui'
-import { PwaLifecycle } from './ui'
+import { validateDevelopmentConversationConfiguration } from '@/conversation'
+import {
+  ConversationScreen,
+  DevelopmentConversationView,
+  PwaLifecycle
+} from '@/ui'
 import { type ColorTheme, resolvedThemeAtom, setSystemThemeAtom } from './state'
 
 function useThemeBridge() {
@@ -42,10 +46,17 @@ function useThemeBridge() {
 
 export function App() {
   useThemeBridge()
+  const configuration = validateDevelopmentConversationConfiguration(
+    import.meta.env
+  )
 
   return (
     <>
-      <ConversationScreen />
+      {configuration.enabled ? (
+        <DevelopmentConversationView configuration={configuration} />
+      ) : (
+        <ConversationScreen />
+      )}
       <PwaLifecycle />
     </>
   )

@@ -8,6 +8,17 @@
   },
   "scripts": {
     "build": "tsc --noEmit",
+    "eval": "node --import tsx src/assurance/evals/ana-agent/ana-agent.eval.ts",
+    "test": "node --import tsx src/assurance/evals/ana-agent/ana-agent.eval.ts",
     "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@ai/conversation": "workspace:*",
+    "zod": "4.4.3"
+  },
+  "devDependencies": {
+    "@types/node": "24.13.3",
+    "tsx": "4.23.12",
+    "typescript": "5.9.2"
   }
 }

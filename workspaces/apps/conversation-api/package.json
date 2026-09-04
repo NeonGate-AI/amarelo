@@ -1,0 +1,32 @@
+{
+  "name": "conversation-api",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "build": "tsc --noEmit",
+    "dev": "tsx watch src/server/conversation-api.server.ts",
+    "start": "tsx src/server/conversation-api.server.ts",
+    "test": "node --import tsx src/assurance/evals/conversation-api/conversation-api.eval.ts && node --import tsx src/assurance/evals/pre-memory-baseline/pre-memory-baseline.eval.ts",
+    "typecheck": "tsc --noEmit",
+    "eval": "node --import tsx src/assurance/evals/pre-memory-baseline/pre-memory-baseline.eval.ts",
+    "eval:baseline": "node --import tsx src/assurance/evals/pre-memory-baseline/pre-memory-baseline.eval.ts"
+  },
+  "dependencies": {
+    "@ai/ana": "workspace:*",
+    "@ai/conversation": "workspace:*",
+    "@langchain/core": "1.2.9",
+    "@langchain/openai": "1.5.11",
+    "@repo/conversation-sdk": "workspace:*",
+    "fastify": "5.12.1",
+    "zod": "4.4.3"
+  },
+  "devDependencies": {
+    "@types/node": "24.13.3",
+    "tsx": "4.23.12",
+    "typescript": "5.9.2"
+  }
+}

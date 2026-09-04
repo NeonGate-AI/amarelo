@@ -1,4 +1,4 @@
-import type { ConversationMessage } from '@contracts'
+import type { ConversationMessage } from '../contracts'
 
 export const CONVERSATION_HISTORY_TOKEN_ESTIMATOR_VERSION =
   'conversation-history-codepoint-quarter-v1' as const

@@ -1,4 +1,4 @@
-import type { AgentId } from '@contracts'
+import type { AgentId } from '../contracts'
 
 export class DuplicateConversationAgentError extends Error {
   readonly agentId: AgentId

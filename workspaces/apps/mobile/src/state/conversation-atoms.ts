@@ -8,7 +8,7 @@ export type ThemePreference = ColorTheme | 'system'
 
 export interface CaptionContent {
   accessible: string
-  lines: readonly [string, string, string]
+  lines: readonly string[]
 }
 
 const DEFAULT_VOLUME = 68
