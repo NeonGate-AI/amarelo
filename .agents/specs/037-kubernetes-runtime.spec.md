@@ -2,7 +2,7 @@
 id: SPEC-037
 title: Migrate the local container runtime to Kubernetes
 type: migration
-status: in-progress
+status: implemented
 mode: prospective
 created: 2026-09-04
 updated: 2026-09-04
@@ -37,7 +37,15 @@ skills:
   - .agents/skills/tdd/SKILL.md
   - .agents/skills/code-review/SKILL.md
 evidence:
-  - pending
+  - commit 932086e2780ee87b884e120792a55d31379308c2 (red Kubernetes migration contract)
+  - commit 3f5c1d2ee04a71d45bcf4ea1aedf8392bfd34d64 (core Kubernetes implementation)
+  - commit 1b7612acfb858348c33ad64a247771922a67063f (green exact implementation head)
+  - .audit/runtime.audit.sh manifest and orchestration fixture
+  - https://github.com/NeonGate-AI/amarelo/actions/runs/33855123569
+  - https://github.com/NeonGate-AI/amarelo/actions/runs/33855119268
+  - https://github.com/NeonGate-AI/amarelo/issues/66
+  - https://github.com/NeonGate-AI/amarelo/issues/67
+  - https://github.com/NeonGate-AI/amarelo/pull/68
 ---
 
 # SPEC-037: Migrate the local container runtime to Kubernetes
@@ -103,18 +111,18 @@ Run the focused runtime audit, `./cli/elo doctor --ci`, `./cli/elo check all`, C
 
 ## Acceptance Criteria
 
-- [ ] Docker Compose is absent from the active runtime and documentation.
-- [ ] The Kustomize base renders the namespace, configuration, PostgreSQL, Redis and four application workloads/services.
-- [ ] PostgreSQL uses retained persistent storage while Redis remains ephemeral.
-- [ ] Workloads have readiness/liveness checks, bounded resources, graceful termination and no application service-account token.
-- [ ] Runtime start builds or selects the application image, applies a generated Secret, reconciles resources, restores replicas and waits for readiness.
-- [ ] Runtime stop brings every owned workload to zero replicas without deleting PostgreSQL storage.
-- [ ] Missing tools, context, image loading, apply, scale or rollout failures return non-zero with actionable diagnostics.
-- [ ] No tracked resource contains a runtime credential or Kubernetes Secret payload.
-- [ ] The dedicated runtime audit validates manifest rendering and orchestration behavior and runs through `elo check all`.
-- [ ] Runtime and architecture documentation explain Kubernetes ownership, portability and local-versus-production limits.
-- [ ] Complete exact-head CI and both independent review axes pass.
-- [ ] Stable evidence is promoted and the spec closes as `implemented`.
+- [x] Docker Compose is absent from the active runtime and documentation.
+- [x] The Kustomize base renders the namespace, configuration, PostgreSQL, Redis and four application workloads/services.
+- [x] PostgreSQL uses retained persistent storage while Redis remains ephemeral.
+- [x] Workloads have readiness/liveness checks, bounded resources, graceful termination and no application service-account token.
+- [x] Runtime start builds or selects the application image, applies a generated Secret, reconciles resources, restores replicas and waits for readiness.
+- [x] Runtime stop brings every owned workload to zero replicas without deleting PostgreSQL storage.
+- [x] Missing tools, context, image loading, apply, scale or rollout failures return non-zero with actionable diagnostics.
+- [x] No tracked resource contains a runtime credential or Kubernetes Secret payload.
+- [x] The dedicated runtime audit validates manifest rendering and orchestration behavior and runs through `elo check all`.
+- [x] Runtime and architecture documentation explain Kubernetes ownership, portability and local-versus-production limits.
+- [x] Complete exact-head CI and both independent review axes pass.
+- [x] Stable evidence is promoted and the spec closes as `implemented`.
 
 ## Failure Behavior
 
@@ -131,7 +139,7 @@ Missing Docker, `kubectl`, an active context, or a required local-cluster loader
 
 ## Evidence and Promotion
 
-Planned evidence is the red/green runtime audit, rendered resource inventory, exact diff, exact-head CI and two-axis review. At completion, Kubernetes ownership and tradeoffs will be promoted to ADR-0029, architecture/package context and current runtime documentation.
+Commit `932086e2780ee87b884e120792a55d31379308c2` established the red Kubernetes migration contract. The implementation series culminating in `1b7612acfb858348c33ad64a247771922a67063f` made the runtime audit and both exact-head CI runs green. Issue #66, issue #67 and pull request #68 retain ticket, review and merge evidence. Kubernetes ownership and tradeoffs are promoted to ADR-0029, architecture/package context and current runtime documentation.
 
 ## Further Notes
 
