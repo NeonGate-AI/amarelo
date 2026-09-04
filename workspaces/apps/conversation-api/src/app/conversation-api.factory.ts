@@ -21,6 +21,7 @@ import Fastify, {
 const CONVERSATION_BODY_LIMIT_BYTES = 512 * 1024
 
 export interface ConversationApiFactoryOptions {
+  readonly createRealtimeCall?: (sdp: string) => Promise<string>
   readonly logger?: boolean
   readonly nowMs?: () => number
   readonly runtime: Pick<ConversationRuntime, 'execute'>
@@ -99,6 +100,12 @@ export function createConversationApi(
     logger: options.logger ?? false
   })
 
+  app.addContentTypeParser(
+    'application/sdp',
+    { parseAs: 'string' },
+    (_request, body, done) => done(null, body)
+  )
+
   app.setErrorHandler((error: FastifyError, request, reply) => {
     if (error.code === 'FST_ERR_CTP_BODY_TOO_LARGE') {
       return reply
@@ -147,6 +154,47 @@ export function createConversationApi(
   )
 
   app.get('/health', async () => ({ status: 'ok' as const }))
+
+  app.post('/v1/realtime/session', async (request, reply) => {
+    const sdp = typeof request.body === 'string' ? request.body : ''
+    if (sdp.trim().length === 0) {
+      return reply
+        .status(400)
+        .send(
+          safeError(
+            'invalid_request',
+            'A oferta WebRTC não é válida.',
+            requestCorrelationId(request)
+          )
+        )
+    }
+
+    if (options.createRealtimeCall === undefined) {
+      return reply
+        .status(503)
+        .send(
+          safeError(
+            'model_unavailable',
+            'A conversa por voz não está disponível.',
+            requestCorrelationId(request)
+          )
+        )
+    }
+
+    try {
+      const answerSdp = await options.createRealtimeCall(sdp)
+      return reply.type('application/sdp').status(200).send(answerSdp)
+    } catch (error) {
+      const mapped = sendUnexpectedError(
+        error,
+        request,
+        502,
+        'model_unavailable',
+        'Não foi possível iniciar a conversa por voz.'
+      )
+      return reply.status(mapped.statusCode).send(mapped.payload)
+    }
+  })
 
   app.post('/v1/conversation/turn', async (request, reply) => {
     const parsed = ConversationTurnRequestSchema.safeParse(request.body)

@@ -2,6 +2,7 @@ import { useAtomValue, useSetAtom } from 'jotai'
 import { useEffect } from 'react'
 
 import { validateDevelopmentConversationConfiguration } from '@/conversation'
+import { RealtimeVoiceView } from '@/realtime'
 import {
   ConversationScreen,
   DevelopmentConversationView,
@@ -49,10 +50,14 @@ export function App() {
   const configuration = validateDevelopmentConversationConfiguration(
     import.meta.env
   )
+  const realtimeVoiceEnabled =
+    import.meta.env.VITE_AMARELO_REALTIME_VOICE === 'true'
 
   return (
     <>
-      {configuration.enabled ? (
+      {realtimeVoiceEnabled ? (
+        <RealtimeVoiceView />
+      ) : configuration.enabled ? (
         <DevelopmentConversationView configuration={configuration} />
       ) : (
         <ConversationScreen />
