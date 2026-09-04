@@ -44,7 +44,7 @@ evidence:
 
 Shadow can prove that a projection is safe and promising, but the old treatment description allowed Memory to be appended to the baseline history. An additive treatment cannot prove a 50–70% reduction and makes token, quality and cost comparisons structurally invalid.
 
-A second prerequisite is now explicit: before any user-visible canary, Memory serving must prove resistance to semantically strong false memories, unresolved conflicts, lifecycle resurrection and configured-store isolation through SPEC-039. Authorization parity alone does not establish retrieval integrity.
+A second prerequisite is now explicit: before any user-visible canary, Memory serving must prove resistance to semantically strong false memories, unresolved conflicts, lifecycle resurrection and configured-store isolation through SPEC-043. Authorization parity alone does not establish retrieval integrity.
 
 ## Solution
 
@@ -65,7 +65,7 @@ TREATMENT
 + every other comparable context component
 ```
 
-The authorized projection **replaces** the longitudinal history that control would have sent. It cannot be merely added to control. Run a synthetic/internal canary first, then a small stable A/B cohort with server-owned assignment, immediate kill switch and automatic rollback gates. Canary activation is blocked until SPEC-039's adversarial integrity gate passes, including hidden eval evidence.
+The authorized projection **replaces** the longitudinal history that control would have sent. It cannot be merely added to control. Run a synthetic/internal canary first, then a small stable A/B cohort with server-owned assignment, immediate kill switch and automatic rollback gates. Canary activation is blocked until SPEC-043's adversarial integrity gate passes, including hidden eval evidence.
 
 ## User Stories
 
@@ -81,7 +81,7 @@ The authorized projection **replaces** the longitudinal history that control wou
 - Treatment composition that substitutes Memory projection for longitudinal history.
 - Minimal recent buffer with explicit version, size and purpose.
 - Server-owned eligibility, sticky assignment and synthetic/internal canary.
-- SPEC-039 integrity/poisoning gate before canary exposure.
+- SPEC-043 integrity/poisoning gate before canary exposure.
 - Correlated experiment ledger, kill switch and automatic rollback.
 - Comparable served-context and total-model-input metrics.
 - Bounded exposure progression; no broad rollout.
@@ -98,7 +98,7 @@ The authorized projection **replaces** the longitudinal history that control wou
 - `totalModelInputTokens` is recorded separately to prevent savings from being hidden in another prompt category.
 - Quality, critical Recall@k, temporal correctness, poisoning/integrity, leakage/consent, latency, calls and cost remain paired and comparable.
 - Canary precedes A/B; assignment is server-owned, sticky and purpose-aware.
-- SPEC-039 hidden adversarial evals must pass before canary exposure is enabled.
+- SPEC-043 hidden adversarial evals must pass before canary exposure is enabled.
 - Kill switch defaults to control. Any unauthorized leakage, consent violation, integrity regression or lifecycle resurrection triggers immediate rollback.
 - Advancement requires 50–70% comparable context reduction, Recall@k above 90%, zero unauthorized leakage/consent violations, zero policy-ineligible poisoning in projection, no lifecycle resurrection, no quality regression and Memory ROI above 3x; above 5x remains the target.
 
@@ -110,7 +110,7 @@ A public Conversation experiment test drives identical versioned fixtures throug
 
 ### Secondary seams
 
-Control equivalence, prohibited additive treatment, recent-buffer versioning, assignment stability, client tampering, allowlist, kill switch, rollback thresholds, isolation, SPEC-039 poisoning/integrity evidence and insufficient-sample handling.
+Control equivalence, prohibited additive treatment, recent-buffer versioning, assignment stability, client tampering, allowlist, kill switch, rollback thresholds, isolation, SPEC-043 poisoning/integrity evidence and insufficient-sample handling.
 
 ### Fixtures and privacy
 
@@ -118,7 +118,7 @@ Synthetic/internal authorized cohorts only. Experiment telemetry excludes raw pr
 
 ### Required validation
 
-Context-plan tests, assignment/kill-switch/rollback tests, authorization adversarial evals, SPEC-039 hidden integrity/poisoning gate, paired quality/Recall/temporal/cost report, full CI and dual review.
+Context-plan tests, assignment/kill-switch/rollback tests, authorization adversarial evals, SPEC-043 hidden integrity/poisoning gate, paired quality/Recall/temporal/cost report, full CI and dual review.
 
 ## Acceptance Criteria
 
@@ -127,7 +127,7 @@ Context-plan tests, assignment/kill-switch/rollback tests, authorization adversa
 - [ ] Treatment replaces longitudinal history with authorized and integrity-eligible Memory projection plus only a minimal versioned recent buffer.
 - [ ] A test rejects any treatment that appends Memory to the complete control context.
 - [ ] Reports record comparable served context and total model input separately.
-- [ ] SPEC-039 hidden adversarial integrity evals pass before canary exposure.
+- [ ] SPEC-043 hidden adversarial integrity evals pass before canary exposure.
 - [ ] Canary precedes A/B and uses an explicit allowlist/exposure ceiling.
 - [ ] Assignment is server-owned, stable and cannot be selected by the browser.
 - [ ] Kill switch returns all requests to control without deploy.
@@ -140,7 +140,7 @@ Context-plan tests, assignment/kill-switch/rollback tests, authorization adversa
 
 ## Failure Behavior
 
-Missing assignment or configuration defaults to control. Authorization or integrity uncertainty prevents treatment. Additive treatment fails validation. Missing paired versions, missing SPEC-039 evidence or insufficient samples yields hold. Any privacy or integrity incident kills treatment. Quality, recall, temporal, poisoning, lifecycle, latency, error or cost regression crossing its gate triggers hold or rollback.
+Missing assignment or configuration defaults to control. Authorization or integrity uncertainty prevents treatment. Additive treatment fails validation. Missing paired versions, missing SPEC-043 evidence or insufficient samples yields hold. Any privacy or integrity incident kills treatment. Quality, recall, temporal, poisoning, lifecycle, latency, error or cost regression crossing its gate triggers hold or rollback.
 
 ## Out of Scope
 
@@ -148,8 +148,8 @@ Global rollout, billing, plan entitlements, clinical claims, vector activation, 
 
 ## Evidence and Promotion
 
-Evidence will include exact context-plan diffs, additive-treatment rejection, assignment/tamper/kill-switch tests, SPEC-039 hidden integrity evidence, canary and A/B reports, explicit decision, exact-head CI and both reviews. Only proven treatment and gates are promoted.
+Evidence will include exact context-plan diffs, additive-treatment rejection, assignment/tamper/kill-switch tests, SPEC-043 hidden integrity evidence, canary and A/B reports, explicit decision, exact-head CI and both reviews. Only proven treatment and gates are promoted.
 
 ## Further Notes
 
-Blocked by SPEC-011 shadow go/no-go and SPEC-039 Memory integrity/poisoning assurance. It blocks SPEC-018 scale gates.
+Blocked by SPEC-011 shadow go/no-go and SPEC-043 Memory integrity/poisoning assurance. It blocks SPEC-018 scale gates.

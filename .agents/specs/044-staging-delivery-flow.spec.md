@@ -1,5 +1,5 @@
 ---
-id: SPEC-040
+id: SPEC-044
 title: Staging-first repository delivery flow
 type: governance
 status: in-progress
@@ -31,7 +31,7 @@ evidence:
   - pending CI and repository-settings evidence
 ---
 
-# SPEC-040: Staging-first repository delivery flow
+# SPEC-044: Staging-first repository delivery flow
 
 ## Problem Statement
 

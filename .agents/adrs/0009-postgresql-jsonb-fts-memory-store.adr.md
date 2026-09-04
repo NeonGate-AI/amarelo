@@ -1,12 +1,12 @@
 ---
 id: ADR-0009
 title: Use PostgreSQL JSONB and FTS for initial memory persistence and RAG
-status: accepted
+status: superseded
 date: 2026-08-27
 deciders:
   - product-owner
 supersedes: []
-superseded-by: null
+superseded-by: ADR-0033
 ---
 
 # ADR-0009: Use PostgreSQL JSONB and FTS for initial memory persistence and RAG

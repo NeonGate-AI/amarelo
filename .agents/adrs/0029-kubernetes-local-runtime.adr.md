@@ -1,5 +1,9 @@
 # ADR 0029: Use Kubernetes for the repository-managed local runtime
 
+> Runtime data topology was later expanded by ADR-0033 and ADR-0034. The
+> PostgreSQL/single-Redis inventory below records the state when this Kubernetes
+> orchestration decision was accepted.
+
 ## Status
 
 Accepted on 2026-09-04.

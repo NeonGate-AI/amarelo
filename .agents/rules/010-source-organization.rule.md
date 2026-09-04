@@ -29,6 +29,12 @@ Allowed non-source-root examples include `package.json`, `tsconfig.json`, framew
 
 Cypress is a runner-owned exception: package configuration may use `cypress.config.*`, executable browser specs live under the conventional `cypress/e2e/*.cy.js` tree, and those specs do not participate in package barrel exports. Their imports remain subject to boundary checks.
 
+Vitest is a runner-owned exception: package configuration may use
+`vitest.config.*`, executable tests live under the owning workspace's
+`src/assurance/tests/**/*.test.ts` tree, and test files/directories do not
+participate in package barrel exports. Tests import public directory or package
+boundaries and never become production exports.
+
 Next.js applications use `src/app/` when compatible with the current app. Vite/React applications use `src/`.
 
 The embedded Elo CLI is a repository development subsystem. Its executable binary is `cli/elo`; implementation lives under `cli/src/` and is POSIX shell. JavaScript/TypeScript implementation modules do not belong under `cli/src/`.
@@ -93,6 +99,7 @@ Use only suffixes defined here for project-created semantic modules. Add a suffi
 | `.server` | React server component/module | `logo.server.tsx` |
 | `.service` | Cohesive service | `projection.service.ts` |
 | `.state` | Initial/default state | `session.state.ts` |
+| `.test` | Executable Vitest test | `chatterbox-health.test.ts` |
 | `.type` | One type/interface contract | `memory.type.ts` |
 | `.usage` | Usage/accounting derivation | `memory-curation.usage.ts` |
 | `.use-case` | Application use case | `retrieve-memory.use-case.ts` |

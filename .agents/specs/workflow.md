@@ -36,10 +36,10 @@ Reproducible output showing what was verified. Temporary output lives in `.audit
 **Promotion**  
 Moving a proven durable conclusion to the correct context, rule, ADR, spec or mechanical check without duplicating ownership.
 
-**Integration**  
+**Integration**
 Merging an implemented and reviewed delivery branch into `staging`, the repository's default branch and the base for subsequent work.
 
-**Production promotion**  
+**Production promotion**
 Merging `staging` into `main` through a dedicated pull request after the integrated head passes the required release gates.
 
 ## Catalog layout
@@ -177,4 +177,4 @@ Urgent work still begins with a minimal owner-approved `type: fix` spec. It name
 
 ## Workflow evolution
 
-The staging-first branch model is owned by [SPEC-040](040-staging-delivery-flow.spec.md). Changing this lifecycle requires its own numbered governance spec and, when the tradeoff is consequential, an ADR. Mechanical checks validate document contracts but do not replace owner approval or semantic review.
+The staging-first branch model is owned by [SPEC-044](044-staging-delivery-flow.spec.md). Changing this lifecycle requires its own numbered governance spec and, when the tradeoff is consequential, an ADR. Mechanical checks validate document contracts but do not replace owner approval or semantic review.
