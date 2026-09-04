@@ -47,6 +47,7 @@ The specification catalog is flat, priority-ordered and mechanically checked.
 | 031 | SPEC-031 | implemented | [Numbered canonical rule catalog](031-numbered-rule-catalog.spec.md) |
 | 032 | SPEC-032 | draft | [Application-owned conversational guardrails](032-application-conversation-guardrails.spec.md) |
 | 033 | SPEC-033 | draft | [Conversation lifecycle hooks and realtime edge-case semantics](033-conversation-lifecycle-hooks.spec.md) |
+| 035 | SPEC-035 | ready | [Recover the specification catalog and CI](035-recover-spec-catalog-and-ci.spec.md) |
 
 The next unallocated durable delivery ID is `SPEC-034`.
 | 032 | SPEC-032 | implemented | [Realtime 2 WebRTC voice agent](032-realtime-2-webrtc-voice-agent.spec.md) |
