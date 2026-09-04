@@ -18,7 +18,7 @@ Commands:
   🚀 bootstrap                             Install and configure a checkout
   🔗 setup [--bin-dir <directory>]         Install the user-scoped launcher
   🩺 doctor [--ci]                         Diagnose repository prerequisites
-  🧹 cleanup [--apply] [--dependencies]    Inspect or remove generated state
+  🧹 cleanup [--dependencies]              Remove generated state
   📝 changelog <product> [options]          Prepare a product changelog
   🧱 adr [name]                             Create the next empty ADR
   📏 rule [name]                            Create the next empty rule

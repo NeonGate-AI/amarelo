@@ -495,6 +495,68 @@ elif ! grep -F '🔎 doctor module initialized' "$TMP_ROOT/doctor-logs.err" >/de
   platform_fail cli/src/commands/doctor.sh "a dispatched command must observe ELO_LOGS=true"
 fi
 
+cleanup_root="$TMP_ROOT/cleanup-checkout"
+cleanup_launcher="$cleanup_root/cli/elo"
+if ! mkdir -p \
+  "$cleanup_root/workspaces/example/.next" \
+  "$cleanup_root/workspaces/example/.turbo" \
+  "$cleanup_root/workspaces/example/dist" \
+  "$cleanup_root/workspaces/example/node_modules" \
+  "$cleanup_root/.audit" ||
+  ! cp -R "$PROJECT_ROOT/cli" "$cleanup_root/cli" ||
+  ! git -C "$cleanup_root" init -q
+then
+  platform_fail cli/src/commands/cleanup.sh "cannot prepare the isolated cleanup fixture"
+else
+  printf 'generated\n' >"$cleanup_root/workspaces/example/.next/output"
+  printf 'generated\n' >"$cleanup_root/workspaces/example/.turbo/output"
+  printf 'tracked\n' >"$cleanup_root/workspaces/example/dist/keep"
+  printf 'dependency\n' >"$cleanup_root/workspaces/example/node_modules/keep"
+  printf 'protected\n' >"$cleanup_root/.audit/keep"
+  printf 'generated\n' >"$cleanup_root/workspaces/example/cache.tsbuildinfo"
+  git -C "$cleanup_root" add workspaces/example/dist/keep
+
+  if ! "$cleanup_launcher" cleanup >"$TMP_ROOT/cleanup.out" 2>&1; then
+    platform_fail cli/src/commands/cleanup.sh "direct cleanup failed"
+  else
+    [ ! -e "$cleanup_root/workspaces/example/.next" ] ||
+      platform_fail cli/src/commands/cleanup.sh "direct cleanup preserved an eligible .next output"
+    [ ! -e "$cleanup_root/workspaces/example/.turbo" ] ||
+      platform_fail cli/src/commands/cleanup.sh "direct cleanup preserved an eligible .turbo output"
+    [ ! -e "$cleanup_root/workspaces/example/cache.tsbuildinfo" ] ||
+      platform_fail cli/src/commands/cleanup.sh "direct cleanup preserved an eligible tsbuildinfo output"
+    [ -f "$cleanup_root/workspaces/example/dist/keep" ] ||
+      platform_fail cli/src/commands/cleanup.sh "direct cleanup removed a tracked path"
+    [ -f "$cleanup_root/workspaces/example/node_modules/keep" ] ||
+      platform_fail cli/src/commands/cleanup.sh "ordinary cleanup removed dependencies"
+    [ -f "$cleanup_root/.audit/keep" ] ||
+      platform_fail cli/src/commands/cleanup.sh "direct cleanup modified .audit"
+    grep -F 'removed workspaces/example/.next' "$TMP_ROOT/cleanup.out" >/dev/null 2>&1 ||
+      platform_fail cli/src/commands/cleanup.sh "direct cleanup did not report removed paths"
+  fi
+
+  mkdir -p "$cleanup_root/workspaces/example/out"
+  printf 'generated\n' >"$cleanup_root/workspaces/example/out/keep"
+  "$cleanup_launcher" cleanup --apply >"$TMP_ROOT/cleanup-apply.out" 2>&1
+  cleanup_apply_status=$?
+  [ "$cleanup_apply_status" -eq 2 ] ||
+    platform_fail cli/src/commands/cleanup.sh "retired --apply must exit with status 2"
+  [ -f "$cleanup_root/workspaces/example/out/keep" ] ||
+    platform_fail cli/src/commands/cleanup.sh "invalid cleanup options must fail before mutation"
+
+  if ! "$cleanup_launcher" cleanup --dependencies >"$TMP_ROOT/cleanup-dependencies.out" 2>&1; then
+    platform_fail cli/src/commands/cleanup.sh "dependency cleanup failed"
+  elif [ -e "$cleanup_root/workspaces/example/node_modules" ]; then
+    platform_fail cli/src/commands/cleanup.sh "--dependencies preserved an eligible node_modules directory"
+  fi
+
+  if ! "$cleanup_launcher" cleanup --help >"$TMP_ROOT/cleanup-help.out" 2>&1; then
+    platform_fail cli/src/commands/cleanup.sh "cleanup help failed"
+  elif grep -F -- '--apply' "$TMP_ROOT/cleanup-help.out" >/dev/null 2>&1; then
+    platform_fail cli/src/commands/cleanup.sh "cleanup help still advertises --apply"
+  fi
+fi
+
 scaffold_root="$TMP_ROOT/scaffold-checkout"
 scaffold_launcher="$scaffold_root/cli/elo"
 mkdir -p \
