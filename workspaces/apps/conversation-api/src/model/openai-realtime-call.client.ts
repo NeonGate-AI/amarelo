@@ -1,0 +1,42 @@
+const OPENAI_REALTIME_CALL_URL = 'https://api.openai.com/v1/realtime/calls'
+
+const REALTIME_SESSION = JSON.stringify({
+  audio: {
+    output: {
+      voice: 'marin'
+    }
+  },
+  model: 'gpt-realtime-2',
+  type: 'realtime'
+})
+
+export interface OpenAiRealtimeCallInput {
+  readonly apiKey: string
+  readonly fetchImplementation?: typeof fetch
+  readonly sdp: string
+}
+
+export async function createOpenAiRealtimeCall(
+  input: OpenAiRealtimeCallInput
+): Promise<string> {
+  const formData = new FormData()
+  formData.set('sdp', input.sdp)
+  formData.set('session', REALTIME_SESSION)
+
+  const response = await (input.fetchImplementation ?? fetch)(
+    OPENAI_REALTIME_CALL_URL,
+    {
+      body: formData,
+      headers: {
+        Authorization: `Bearer ${input.apiKey}`
+      },
+      method: 'POST'
+    }
+  )
+
+  if (!response.ok) {
+    throw new Error('OpenAI Realtime call failed.')
+  }
+
+  return response.text()
+}
