@@ -1,0 +1,143 @@
+name: Validate completed SPEC-009
+
+on:
+  push:
+    branches:
+      - experiment/spec-009-first-ana-conversation-baseline
+    paths:
+      - .github/workflows/spec-009-validation-executor.yml
+
+permissions:
+  contents: write
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: experiment/spec-009-first-ana-conversation-baseline
+          fetch-depth: 0
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: Normalize, validate, and publish
+        shell: bash
+        run: |
+          set -euo pipefail
+          export CI=true
+          pnpm install --frozen-lockfile
+
+          for generator in \
+            .github/spec-009-sdk-ana.py \
+            .github/spec-009-conversation-api.py \
+            .github/spec-009-mobile.py \
+            .github/spec-009-baseline.py
+          do
+            if [ -f "$generator" ]; then
+              python3 "$generator"
+            fi
+          done
+          if [ -f .github/spec-009-finalize.py ]; then
+            python3 .github/spec-009-finalize.py
+          fi
+
+          python3 <<'PY'
+          import re
+          from pathlib import Path
+
+          app_dir = Path('workspaces/apps/conversation-api/src/app')
+          generator = Path(
+              'workspaces/apps/conversation-api/src/assurance/baselines/pre-memory/'
+              'pre-memory-baseline.generate.ts'
+          )
+          if generator.exists():
+              content = generator.read_text(encoding='utf-8')
+              factory_name = None
+              model_property = 'model'
+              route = '/v1/conversation/turn'
+              for source_path in app_dir.glob('*.ts'):
+                  source = source_path.read_text(encoding='utf-8')
+                  match = re.search(
+                      r'export\s+(?:async\s+)?function\s+(\w*ConversationApi\w*)\s*\(([^)]*)\)',
+                      source,
+                  )
+                  if match:
+                      factory_name = match.group(1)
+                      parameter = match.group(2)
+                      if ':' in parameter:
+                          type_name = parameter.split(':', 1)[1].strip()
+                          type_match = re.search(
+                              rf'(?:interface|type)\s+{re.escape(type_name)}[^{{]*{{(.*?)}}',
+                              source,
+                              re.DOTALL,
+                          )
+                          if type_match:
+                              property_match = re.search(
+                                  r'readonly\s+(\w+)\??:\s*AnaChatModelPort',
+                                  type_match.group(1),
+                              )
+                              if property_match:
+                                  model_property = property_match.group(1)
+                      route_match = re.search(
+                          r"['\"](/[^'\"]*conversation/turn)['\"]",
+                          source,
+                      )
+                      if route_match:
+                          route = route_match.group(1)
+                      break
+              if factory_name is None:
+                  raise RuntimeError('public Conversation API factory was not found')
+              content = re.sub(
+                  r"import \{ \w*ConversationApi\w* \} from '@app'",
+                  f"import {{ {factory_name} }} from '@app'",
+                  content,
+                  count=1,
+              )
+              content = re.sub(
+                  r'const app = await \w*ConversationApi\w*\(\{\s*\w+\s*:\s*model\s*\}|\{\s*model\s*\}\)',
+                  f'const app = await {factory_name}({{ {model_property}: model }})',
+                  content,
+                  count=1,
+              )
+              content = content.replace("url: '/v1/conversation/turn'", f"url: '{route}'")
+              generator.write_text(content, encoding='utf-8')
+          PY
+
+          pnpm install --lockfile-only
+          pnpm install --frozen-lockfile
+          pnpm exec biome check --write workspaces cli turbo.json
+          pnpm --filter conversation-api baseline
+
+          rm -f .github/spec-009-*.py
+          rm -f .github/workflows/spec-009-*.yml
+
+          git diff --check
+          ./cli/elo doctor --ci
+          ./cli/elo check all
+          pnpm exec biome check workspaces cli
+          pnpm exec turbo run typecheck
+          pnpm exec turbo run test
+          pnpm --filter @nucleus/memory run test:database
+          pnpm --filter @nucleus/memory \
+            --filter @repo/memory-sdk \
+            --filter @ai/knowledge \
+            --filter @ai/conversation \
+            --filter @ai/ana \
+            --filter @repo/conversation-sdk \
+            --filter conversation-api run eval
+          pnpm exec turbo run build
+          sh .husky/pre-commit
+          printf 'chore(ci): validate commit hook\n' > .audit/commit-message.txt
+          sh .husky/commit-msg .audit/commit-message.txt
+          rm -f .audit/commit-message.txt
+
+          git config user.name "Jonatas Sales"
+          git config user.email "sykes.echo@proton.me"
+          git add -A
+          git commit -m "fix(conversation): finalize the first Ana baseline" -m "Spec: SPEC-009"
+          git push origin HEAD:experiment/spec-009-first-ana-conversation-baseline
