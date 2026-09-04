@@ -140,7 +140,7 @@ Use synthetic tenants, subjects, evidence, memories and false memories only. No 
 - [ ] No strategy passes by improving Recall while increasing unauthorized leakage, consent violation or lifecycle resurrection above zero.
 - [ ] Hidden adversarial evals pass before SPEC-017 canary exposure can advance.
 - [ ] Full CI and both reviews pass on the exact final head.
-- [ ] Proven invariants are promoted to the appropriate harness rule/context/check only after validation.
+- [ ] Measured thresholds and implementation-specific invariants are promoted only after validation; decision-level assurance requirements remain governed by ADR-0030 and the Memory Nucleus rule.
 
 ## Failure Behavior
 
@@ -152,7 +152,7 @@ User-visible rollout, production pricing, vector activation, graph-database adop
 
 ## Evidence and Promotion
 
-Evidence will include versioned adversarial fixtures, deterministic eval artifacts, configured-store isolation results, cost/latency comparisons, hidden holdout results, exact-head CI and both reviews. Only observed invariants are promoted to `.agents/rules/006-memory-nucleus.rule.md`, Memory context or later canary/economics gates.
+This harness change promotes the durable decision-level assurance requirements in ADR-0030, the Memory Nucleus rule and workspace context. Implementation evidence will include versioned adversarial fixtures, deterministic eval artifacts, configured-store isolation results, cost/latency comparisons, hidden holdout results, exact-head CI and both reviews. Measured thresholds, mitigation mechanics and implementation-specific invariants are promoted to the harness only after those validations succeed.
 
 ## Further Notes
 
