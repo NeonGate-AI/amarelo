@@ -50,7 +50,13 @@ const applicationContainers = [
     workload: 'chatterbox'
   }
 ] as const
-const deploymentWorkloads = ['redis', ...applicationWorkloads] as const
+const deploymentWorkloads = ['redis-cache', ...applicationWorkloads] as const
+const statefulWorkloads = [
+  'postgres',
+  'neo4j',
+  'redis-queue',
+  'object-storage'
+] as const
 
 const runtimeActions = [
   'up',
@@ -179,17 +185,19 @@ async function runtimeUp(): Promise<void> {
       '--timeout=300s'
     ])
   }
-  await runCommand('kubectl', [
-    'rollout',
-    'status',
-    '--namespace',
-    runtimeNamespace,
-    'statefulset/postgres',
-    '--timeout=300s'
-  ])
+  for (const workload of statefulWorkloads) {
+    await runCommand('kubectl', [
+      'rollout',
+      'status',
+      '--namespace',
+      runtimeNamespace,
+      `statefulset/${workload}`,
+      '--timeout=300s'
+    ])
+  }
 
   console.info(
-    '[runtime] Kubernetes reconciliado: PostgreSQL, Redis, landing, console, onboarding, mobile e Chatterbox estão prontos.'
+    '[runtime] Kubernetes reconciliado: PostgreSQL, Neo4j, Redis Queue, Redis Cache, object storage e aplicações estão prontos.'
   )
 }
 
@@ -204,7 +212,9 @@ function applicationImage(
   imagePrefix: string | undefined
 ): string {
   const localImage = `amarelo-${workload}:local`
-  return imagePrefix === undefined ? localImage : `${imagePrefix}/${workload}:local`
+  return imagePrefix === undefined
+    ? localImage
+    : `${imagePrefix}/${workload}:local`
 }
 
 async function runtimeDown(): Promise<void> {
@@ -233,7 +243,7 @@ async function runtimeDown(): Promise<void> {
   ])
   await waitForNoRuntimePods()
   console.info(
-    '[runtime] Todos os containers foram parados; namespace, configuração e dados do PostgreSQL foram preservados.'
+    '[runtime] Todos os containers foram parados; namespace, configuração e claims stateful foram preservados.'
   )
 }
 
@@ -589,8 +599,17 @@ async function ensureLocalEnvironment(): Promise<void> {
     'POSTGRES_USER=amarelo',
     `POSTGRES_PASSWORD=${randomBytes(32).toString('base64url')}`,
     'POSTGRES_PORT=5432',
-    `REDIS_PASSWORD=${randomBytes(32).toString('base64url')}`,
-    'REDIS_PORT=6379',
+    `NEO4J_AUTH=neo4j/${randomBytes(32).toString('base64url')}`,
+    'NEO4J_HTTP_PORT=7474',
+    'NEO4J_BOLT_PORT=7687',
+    `REDIS_QUEUE_PASSWORD=${randomBytes(32).toString('base64url')}`,
+    'REDIS_QUEUE_PORT=6379',
+    `REDIS_CACHE_PASSWORD=${randomBytes(32).toString('base64url')}`,
+    'REDIS_CACHE_PORT=6379',
+    'MINIO_ROOT_USER=amarelo-local',
+    `MINIO_ROOT_PASSWORD=${randomBytes(32).toString('base64url')}`,
+    'OBJECT_STORAGE_API_PORT=9000',
+    'OBJECT_STORAGE_CONSOLE_PORT=9001',
     'LANDING_PORT=3000',
     'CONSOLE_PORT=3001',
     'ONBOARDING_PORT=3002',

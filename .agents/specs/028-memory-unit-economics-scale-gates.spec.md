@@ -65,7 +65,7 @@ Join context reduction, calls, escalation, recall, relevance, temporal correctne
 - Dashboard/report with cohort, time, provider/model/rate and fixture versions.
 - Separation of provider-reported and estimated usage.
 - Serving cost avoided, Memory processing cost, net cost, ROI and AI COGS calculations.
-- SPEC-039 poisoning/integrity metrics and mitigation overhead.
+- SPEC-043 poisoning/integrity metrics and mitigation overhead.
 - Quality, privacy, retrieval, temporal, integrity, latency and queue/reliability gates.
 - Explicit scale/hold/rollback decision and redacted evidence retention.
 
@@ -77,7 +77,7 @@ Join context reduction, calls, escalation, recall, relevance, temporal correctne
 - Memory ROI above 3x is the healthy minimum; above 5x is the target.
 - Net Memory Cost is ideally negative.
 - Scale requires 50–70% context reduction, critical Recall@k above 90%, strong-model escalation below 5%, zero leakage/consent violations, zero policy-ineligible poison projection, no lifecycle resurrection and no quality regression.
-- Dashboard integrity metrics include `poison_at_1`, `poison_projection_rate`, `answer_corruption_rate`, `utility_retained_under_attack` and abstention rate from SPEC-039 fixtures.
+- Dashboard integrity metrics include `poison_at_1`, `poison_projection_rate`, `answer_corruption_rate`, `utility_retained_under_attack` and abstention rate from SPEC-043 fixtures.
 - Deterministic eligibility and any model-assisted detector are costed separately; model-assisted mitigation cannot hide its token, latency or retry overhead inside aggregate Memory cost.
 - AI COGS target is 10% and ceiling is 20% only against an explicitly authorized revenue scenario.
 - Prices in the canonical PDF are scenarios, not approved plans or entitlements.
@@ -88,7 +88,7 @@ Join context reduction, calls, escalation, recall, relevance, temporal correctne
 
 ### Primary seam
 
-A deterministic report test ingests versioned baseline artifacts and SPEC-016 ledger records from background, shadow, SPEC-039 assurance and A/B fixtures and verifies aggregates, gates and decision output end to end.
+A deterministic report test ingests versioned baseline artifacts and SPEC-016 ledger records from background, shadow, SPEC-043 assurance and A/B fixtures and verifies aggregates, gates and decision output end to end.
 
 ### Secondary seams
 
@@ -100,7 +100,7 @@ Synthetic fixtures and redacted experiment aggregates only. No raw prompt, trans
 
 ### Required validation
 
-Formula/gate tests, reconciliation fixtures, SPEC-039 metric ingestion, mitigation cost attribution, redaction/isolation tests, public dashboard/report snapshot, full CI and dual review.
+Formula/gate tests, reconciliation fixtures, SPEC-043 metric ingestion, mitigation cost attribution, redaction/isolation tests, public dashboard/report snapshot, full CI and dual review.
 
 ## Acceptance Criteria
 
@@ -110,7 +110,7 @@ Formula/gate tests, reconciliation fixtures, SPEC-039 metric ingestion, mitigati
 - [ ] Avoided serving cost comes from comparable measured control/treatment usage.
 - [ ] Missing provider usage, pricing or infrastructure cost remains explicitly unknown.
 - [ ] Dashboard reports context reduction, calls/turn, strong-model escalation, Recall@k, irrelevant rate, temporal errors, poisoning/integrity metrics, leakage, consent, latency, backlog and failures.
-- [ ] `poison_at_1`, `poison_projection_rate`, `answer_corruption_rate`, `utility_retained_under_attack` and abstention rate are traceable to versioned SPEC-039 fixtures.
+- [ ] `poison_at_1`, `poison_projection_rate`, `answer_corruption_rate`, `utility_retained_under_attack` and abstention rate are traceable to versioned SPEC-043 fixtures.
 - [ ] Any model-assisted integrity mitigation reports separate token, latency and attributable cost deltas.
 - [ ] Scale requires 50–70% context reduction, Recall@k above 90%, strong-model escalation below 5%, no quality regression, zero leakage/consent violations, zero policy-ineligible poison projection and no lifecycle resurrection.
 - [ ] Memory ROI must exceed 3x to pass; above 5x is reported as target achievement.
@@ -131,8 +131,8 @@ Approving product prices or plans, billing, global autoscaling, finance accounti
 
 ## Evidence and Promotion
 
-Evidence will include deterministic economics/reconciliation fixtures, SPEC-039 integrity metric ingestion, mitigation cost accounting, redaction tests, A/B-linked dashboard output, explicit decision, exact-head CI and both reviews. Stable metric definitions are promoted only after measurement.
+Evidence will include deterministic economics/reconciliation fixtures, SPEC-043 integrity metric ingestion, mitigation cost accounting, redaction tests, A/B-linked dashboard output, explicit decision, exact-head CI and both reviews. Stable metric definitions are promoted only after measurement.
 
 ## Further Notes
 
-Blocked by SPEC-017. SPEC-017 itself is blocked by SPEC-039 before canary exposure. This phase decides whether to scale; it does not assume scale is the successful outcome.
+Blocked by SPEC-017. SPEC-017 itself is blocked by SPEC-043 before canary exposure. This phase decides whether to scale; it does not assume scale is the successful outcome.

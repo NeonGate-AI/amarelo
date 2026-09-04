@@ -1,5 +1,5 @@
 ---
-id: SPEC-039
+id: SPEC-043
 title: Add Memory integrity and poisoning assurance before canary
 type: experiment
 status: ready
@@ -37,7 +37,7 @@ evidence:
   - pending
 ---
 
-# SPEC-039: Add Memory integrity and poisoning assurance before canary
+# SPEC-043: Add Memory integrity and poisoning assurance before canary
 
 ## Problem Statement
 

@@ -1,40 +1,55 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: redis
+  name: redis-queue
   labels:
-    app.kubernetes.io/name: redis
+    app.kubernetes.io/name: redis-queue
     app.kubernetes.io/part-of: amarelo
 spec:
   selector:
-    app.kubernetes.io/name: redis
+    app.kubernetes.io/name: redis-queue
   ports:
     - name: redis
       port: 6379
       targetPort: redis
 ---
-apiVersion: apps/v1
-kind: Deployment
+apiVersion: v1
+kind: PersistentVolumeClaim
 metadata:
-  name: redis
+  name: redis-queue-data
   labels:
-    app.kubernetes.io/name: redis
+    app.kubernetes.io/name: redis-queue
     app.kubernetes.io/part-of: amarelo
 spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: redis-queue
+  labels:
+    app.kubernetes.io/name: redis-queue
+    app.kubernetes.io/part-of: amarelo
+spec:
+  serviceName: redis-queue
   replicas: 1
   selector:
     matchLabels:
-      app.kubernetes.io/name: redis
+      app.kubernetes.io/name: redis-queue
   template:
     metadata:
       labels:
-        app.kubernetes.io/name: redis
+        app.kubernetes.io/name: redis-queue
         app.kubernetes.io/part-of: amarelo
     spec:
       automountServiceAccountToken: false
-      terminationGracePeriodSeconds: 15
+      terminationGracePeriodSeconds: 30
       containers:
-        - name: redis
+        - name: redis-queue
           image: redis:8-alpine
           imagePullPolicy: IfNotPresent
           envFrom:
@@ -44,7 +59,7 @@ spec:
             - /bin/sh
             - -c
           args:
-            - exec redis-server --save '' --appendonly no --requirepass "$REDIS_PASSWORD"
+            - exec redis-server --appendonly yes --appendfsync everysec --requirepass "$REDIS_QUEUE_PASSWORD"
           ports:
             - name: redis
               containerPort: 6379
@@ -53,7 +68,7 @@ spec:
               command:
                 - /bin/sh
                 - -c
-                - redis-cli --no-auth-warning -a "$REDIS_PASSWORD" ping | grep -q PONG
+                - redis-cli --no-auth-warning -a "$REDIS_QUEUE_PASSWORD" ping | grep -q PONG
             initialDelaySeconds: 3
             periodSeconds: 5
             timeoutSeconds: 5
@@ -63,7 +78,7 @@ spec:
               command:
                 - /bin/sh
                 - -c
-                - redis-cli --no-auth-warning -a "$REDIS_PASSWORD" ping | grep -q PONG
+                - redis-cli --no-auth-warning -a "$REDIS_QUEUE_PASSWORD" ping | grep -q PONG
             initialDelaySeconds: 15
             periodSeconds: 10
             timeoutSeconds: 5
@@ -80,3 +95,10 @@ spec:
             capabilities:
               drop:
                 - ALL
+          volumeMounts:
+            - name: redis-queue-data
+              mountPath: /data
+      volumes:
+        - name: redis-queue-data
+          persistentVolumeClaim:
+            claimName: redis-queue-data

@@ -25,7 +25,9 @@ rules:
 adrs:
   - .agents/adrs/0003-authorization-before-retrieval.adr.md
   - .agents/adrs/0008-cost-first-background-memory-curation.adr.md
-  - .agents/adrs/0009-postgresql-jsonb-fts-memory-store.adr.md
+  - .agents/adrs/0033-neo4j-canonical-memory-graph.adr.md
+  - .agents/adrs/0034-memory-outbox-and-redis-isolation.adr.md
+  - .agents/adrs/0035-vitest-fastify-testcontainers-strategy.adr.md
   - .agents/adrs/0012-memory-nucleus-layout.adr.md
   - .agents/adrs/0015-memory-nucleus-mvp-clean-architecture.adr.md
   - .agents/adrs/0016-shared-memory-sdk-observability-evaluation.adr.md
@@ -46,7 +48,7 @@ The current curation use case is a useful bounded job body, but the repository d
 
 ## Solution
 
-Commit authorized conversation evidence and an outbox event in PostgreSQL, publish a reference-only versioned job to one durable queue, and process it in a long-lived Node worker. The worker rechecks authorization/consent, loads evidence, invokes existing curation logic and submits eligible candidates to deterministic acceptance. Queue payloads contain identifiers and correlation metadata, never transcript or memory text.
+Commit authorized conversation evidence and an outbox event in one Neo4j transaction, publish a reference-only versioned BullMQ job to the dedicated Redis Queue instance, and process it in a long-lived Node worker. The worker rechecks authorization/consent, loads evidence, invokes existing curation logic and submits eligible candidates to deterministic acceptance. Queue payloads contain identifiers and correlation metadata, never transcript or memory text.
 
 Advance to shadow only when a versioned load fixture proves controlled backlog, queue age, throughput, terminal outcomes, known cost per completed job and strong-model escalation below 5%.
 
@@ -74,9 +76,12 @@ Advance to shadow only when a versioned load fixture proves controlled backlog, 
 
 ## Implementation Decisions
 
-- PostgreSQL commits evidence and outbox atomically; no unsafe database/queue dual write.
+- Neo4j commits evidence and outbox atomically; no unsafe graph/queue dual write.
 - Delivery is at least once; source claims, fingerprints, fencing and activation idempotency produce exactly-once effects.
-- Redis/BullMQ or an equivalent is replaceable infrastructure, not the source of truth.
+- BullMQ uses the physically separate Redis Queue service. Redis Cache is prohibited for job delivery and neither Redis role is a source of truth.
+- The dispatcher uses stable `jobId = eventId` and marks the outbox event published only after enqueue succeeds; this is eventual delivery, not a distributed transaction.
+- Every worker defines a stable effect key and remains safe under duplicate delivery.
+- Critical authorization, consent, request validation and safety guardrails remain synchronous; workers revalidate authority before protected work.
 - The model proposes candidates only; deterministic policy decides activation.
 - Cheap/batch extraction is default. Strong-model reasoning requires an explicit bounded escalation policy and remains below 5% of eligible jobs in the maturity fixture.
 - Retryable infrastructure/provider failures use bounded exponential backoff; denial, revocation and invalid payload are terminal safe outcomes.
@@ -87,7 +92,7 @@ Advance to shadow only when a versioned load fixture proves controlled backlog, 
 
 ### Primary seam
 
-A PostgreSQL/broker-backed synthetic system test commits evidence, publishes the outbox, processes the job and observes one active governed memory exactly once through the public Memory boundary.
+A Neo4j/BullMQ-backed synthetic system test commits evidence, publishes the outbox, processes the job and observes one active governed memory exactly once through the public Memory boundary.
 
 ### Secondary seams
 
@@ -99,13 +104,14 @@ Synthetic tenant-isolated evidence only. Queue payloads, logs and snapshots excl
 
 ### Required validation
 
-PostgreSQL and broker integration tests, restart/idempotency/revoke/retry tests, Memory curation evals, Conversation regression, 100-job load report, full CI and dual review.
+Vitest plus Testcontainers integration tests with Neo4j and an isolated Redis Queue container, restart/idempotency/revoke/retry tests, Memory curation evals, Conversation regression, 100-job load report, full CI and dual review.
 
 ## Acceptance Criteria
 
 - [ ] Evidence and outbox are committed atomically before publication.
+- [ ] The publisher uses `eventId` as BullMQ `jobId` and records publication only after acknowledged enqueue.
 - [ ] The serving response does not wait for extraction.
-- [ ] Exactly one durable Memory curation queue and one long-lived Node worker are introduced.
+- [ ] Exactly one initial durable Memory processing queue and one long-lived Node worker are introduced; job names may represent extraction, embedding, consolidation, linking, summarization, retention and notifications.
 - [ ] Queue payloads contain no transcript or Memory content.
 - [ ] Authorization and consent are rechecked before protected load, inference and activation.
 - [ ] Duplicate delivery produces one active-memory effect and equivalent facts consolidate without lost provenance.
@@ -124,7 +130,7 @@ Evidence failure prevents outbox creation. Publication failure leaves a retryabl
 
 ## Out of Scope
 
-Memory serving in Conversation, shadow comparison, A/B flags, multiple independent queues, vector retrieval, production scale, pricing, billing and voice.
+Memory serving in Conversation, shadow comparison, A/B flags, additional queue partitions, vector serving activation, production scale, pricing, billing and voice.
 
 ## Evidence and Promotion
 

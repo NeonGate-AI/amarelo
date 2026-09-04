@@ -55,17 +55,18 @@ The specification catalog is flat, priority-ordered and mechanically checked.
 | 039 | SPEC-039 | implemented | [Chatterbox Microservice workspace](039-chatterbox-microservice-workspace.spec.md) |
 | 040 | SPEC-040 | implemented | [Project-owned runtime application containers](040-project-owned-container-images.spec.md) |
 | 041 | SPEC-041 | implemented | [Direct cleanup of node_modules](041-cleanup-removes-node-modules.spec.md) |
-| 042 | SPEC-042 | draft | [Layered test platform foundation](042-layered-test-platform-foundation.spec.md) |.
-| 039 | SPEC-043 | ready | [Memory integrity and poisoning assurance](039-memory-integrity-and-poisoning-assurance.spec.md) |
-| 040 | SPEC-044 | in-progress | [Staging-first repository delivery flow](040-staging-delivery-flow.spec.md) |
+| 042 | SPEC-042 | implemented | [Layered test platform foundation](042-layered-test-platform-foundation.spec.md) |
+| 043 | SPEC-043 | ready | [Memory integrity and poisoning assurance](043-memory-integrity-and-poisoning-assurance.spec.md) |
+| 044 | SPEC-044 | in-progress | [Staging-first repository delivery flow](044-staging-delivery-flow.spec.md) |
+| 045 | SPEC-045 | implemented | [Memory infrastructure runtime topology](045-memory-infrastructure-runtime.spec.md) |
 
-The next unallocated durable delivery ID is `SPEC-041`.
+The next unallocated durable delivery ID is `SPEC-046`.
 
 The executable Memory Nucleus chain is:
 
-`SPEC-009 baseline → SPEC-016 core → SPEC-012 background → SPEC-011 shadow/parity → SPEC-039 integrity/poisoning assurance → SPEC-017 A/B and canary → SPEC-018 scale`.
+`SPEC-009 baseline → SPEC-016 core → SPEC-012 background → SPEC-011 shadow/parity → SPEC-043 integrity/poisoning assurance → SPEC-017 A/B and canary → SPEC-018 scale`.
 
-SPEC-039 is a required assurance gate before user-visible canary exposure. It does not replace the earlier core, background or shadow phases; it converts observed integrity failures into evals and hidden holdouts before canary.
+SPEC-043 is a required assurance gate before user-visible canary exposure. It does not replace the earlier core, background or shadow phases; it converts observed integrity failures into evals and hidden holdouts before canary.
 
 Each implementation PR starts from the `staging` produced by its prerequisite. A later phase cannot merge until the preceding gate is proved on the exact reviewed head. Production promotion occurs only through a `staging -> main` pull request after the required gates pass.
 

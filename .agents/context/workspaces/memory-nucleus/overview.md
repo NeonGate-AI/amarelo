@@ -7,3 +7,23 @@ Its production Clean Architecture layers are `src/domain/`, `src/application/` a
 Core invariants: transcript ≠ memory; candidate ≠ canonical memory; authorization precedes exposure; authorization ≠ integrity eligibility; integrity/provenance eligibility precedes ranking/projection; ranking signals order only eligible records; unresolved conflicts preserve uncertainty; explicit store identity is consistent across lifecycle paths; retrieval ≠ projection; Memory ≠ Knowledge RAG; model proposes, deterministic infrastructure decides.
 
 Memory assurance follows `failure → spec → eval → fix → invariant → hidden eval → canary`. User-visible canary exposure is not allowed to advance from retrieval parity alone: adversarial false-memory fixtures without prompt-injection instructions, lifecycle resurrection cases and configured-store isolation must pass first. Normal deterministic retrieval remains zero-LLM; model-assisted integrity detection is experimental, supplemental and cost-accounted.
+
+## Selected infrastructure direction
+
+Neo4j is the selected canonical graph for evidence metadata, episodic records,
+semantic assertions, relationships, lifecycle, longitudinal projections,
+full-text/vector indexes and transactional outbox events. Large immutable
+artifacts such as audio and original documents live in authorized object
+storage; the graph owns their governed references and provenance.
+
+BullMQ runs on a dedicated persistent Redis Queue service. Redis Cache is a
+physically separate, disposable cache-aside service for context snapshots,
+retrieval cache, session state and TTL data. An outbox dispatcher publishes a
+reference-only job after the Neo4j transaction commits, using `eventId` as the
+stable job ID. Delivery is at least once and workers are idempotent. Critical
+guardrails remain synchronous and protected workers revalidate current
+authority.
+
+The repository's PostgreSQL adapter is current reference/migration code, not
+proof that the selected Neo4j production boundary exists. SPEC-016 owns the
+future adapter and SPEC-012 owns the future dispatcher/worker path.

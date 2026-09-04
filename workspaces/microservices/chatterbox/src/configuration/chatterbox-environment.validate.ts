@@ -19,9 +19,7 @@ const ChatterboxEnvironmentSchema = z.object({
   OPENAI_API_KEY: OptionalNonEmptyString
 })
 
-export type ChatterboxEnvironment = z.output<
-  typeof ChatterboxEnvironmentSchema
->
+export type ChatterboxEnvironment = z.output<typeof ChatterboxEnvironmentSchema>
 
 export function validateChatterboxEnvironment(
   environment: NodeJS.ProcessEnv
