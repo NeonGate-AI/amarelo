@@ -23,7 +23,7 @@ function textFromContent(content: AIMessage['content']): string {
   }
 
   const parts: string[] = []
-  for (const part of content as unknown[]) {
+  for (const part of content) {
     if (typeof part === 'string') {
       parts.push(part)
       continue
