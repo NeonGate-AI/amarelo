@@ -16,6 +16,8 @@ The install lifecycle configures the direct user-scoped `elo` command when a sup
 
 ```text
 workspaces/apps/      user-facing products/runtimes
+workspaces/microservices/
+                      deployable network APIs, beginning with Chatterbox
 workspaces/ai/        Conversation, Knowledge and future product Agents
 workspaces/memory-nucleus/
                       longitudinal memory: Domain → Application → Infrastructure

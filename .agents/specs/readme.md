@@ -53,8 +53,12 @@ The specification catalog is flat, priority-ordered and mechanically checked.
 | 037 | SPEC-037 | implemented | [Kubernetes local runtime migration](037-kubernetes-runtime.spec.md) |
 
 | 038 | SPEC-038 | implemented | [Elo Kubernetes runtime commands](038-elo-kubernetes-runtime.spec.md) |
+| 039 | SPEC-039 | ready | [Chatterbox Microservice workspace](039-chatterbox-microservice-workspace.spec.md) |
+| 040 | SPEC-040 | ready | [Project-owned runtime application containers](040-project-owned-container-images.spec.md) |
+| 041 | SPEC-041 | ready | [Direct cleanup of node_modules](041-cleanup-removes-node-modules.spec.md) |
+| 042 | SPEC-042 | draft | [Layered test platform foundation](042-layered-test-platform-foundation.spec.md) |
 
-The next unallocated durable delivery ID is `SPEC-039`.
+The next unallocated durable delivery ID is `SPEC-043`.
 
 The executable Memory Nucleus chain is:
 
