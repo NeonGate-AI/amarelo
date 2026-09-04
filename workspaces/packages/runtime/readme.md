@@ -1,6 +1,6 @@
 # Runtime local
 
-`@repo/runtime` representa o ambiente local completo do Amarelo em Kubernetes. A base Kustomize vive em `kubernetes/` e pertence ao namespace `amarelo-runtime`. Docker continua responsável apenas por construir a imagem OCI local; Docker Compose não faz parte do runtime ativo.
+`@repo/runtime` representa o ambiente local completo do Amarelo em Kubernetes. A base Kustomize vive em `kubernetes/` e pertence ao namespace `amarelo-runtime`. Docker continua responsável apenas por construir a imagem OCI local; não existe um segundo orquestrador ativo.
 
 ## Serviços
 

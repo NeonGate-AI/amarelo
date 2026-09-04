@@ -122,6 +122,7 @@ if [ -n "${AMARELO_RUNTIME_FAIL_MATCH:-}" ]; then
   esac
 fi
 case "$*" in
+  *"apply --filename -"*) cat >/dev/null ;;
   "config current-context") printf 'kind-amarelo\n' ;;
   "get namespace amarelo-runtime"*) printf 'namespace/amarelo-runtime\n' ;;
   *"create secret generic"*) printf 'apiVersion: v1\nkind: Secret\nmetadata:\n  name: amarelo-runtime-environment\n' ;;
@@ -149,6 +150,7 @@ runtime_command() {
 
 if ! runtime_command up >"$TMP_ROOT/up.out" 2>&1; then
   runtime_fail workspaces/packages/runtime/src/cli.ts "controlled Kubernetes up command failed"
+  sed 's/^/  /' "$TMP_ROOT/up.out" >&2
 else
   grep -F 'docker build ' "$command_log" >/dev/null 2>&1 ||
     runtime_fail workspaces/packages/runtime/src/cli.ts "up did not build the default application image"
