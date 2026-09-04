@@ -228,6 +228,7 @@ for audit_name in \
   elo-platform \
   import-boundaries \
   memory-invariants \
+  runtime \
   specs
 do
   audit_path="$PROJECT_ROOT/.audit/$audit_name.script.sh"

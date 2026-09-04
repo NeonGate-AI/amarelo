@@ -89,11 +89,6 @@ fi
 
 if elo_has docker; then
   pass docker "$(docker --version 2>/dev/null || true)"
-  if docker compose version >/dev/null 2>&1; then
-    pass docker-compose "$(docker compose version 2>/dev/null | sed -n '1p')"
-  else
-    fail docker-compose "not available" "Install/enable Docker Compose v2."
-  fi
   if docker info >/dev/null 2>&1; then
     pass docker-daemon reachable
   else
@@ -101,8 +96,25 @@ if elo_has docker; then
   fi
 else
   fail docker "not available" "Install Docker."
-  fail docker-compose "not available" "Install/enable Docker Compose v2."
   fail docker-daemon unreachable "Start the Docker daemon after installing Docker."
+fi
+
+if elo_has kubectl; then
+  kubectl_version=$(
+    kubectl version --client 2>/dev/null |
+      sed -n '1p'
+  )
+  pass kubectl "$kubectl_version"
+  if [ "$ci" = false ]; then
+    kubernetes_context=$(kubectl config current-context 2>/dev/null || true)
+    if [ -n "$kubernetes_context" ]; then
+      pass kubernetes-context "$kubernetes_context"
+    else
+      fail kubernetes-context "not configured" "Select an active Kubernetes context."
+    fi
+  fi
+else
+  fail kubectl "not available" "Install kubectl."
 fi
 
 if [ ! -f "$ELO_PROJECT_ROOT/pnpm-lock.yaml" ]; then
@@ -130,7 +142,7 @@ fi
   pass memory-schema schema.sql ||
   fail memory-schema missing "Restore the Memory Nucleus schema."
 
-for audit_name in architecture elo-platform import-boundaries memory-invariants specs; do
+for audit_name in architecture elo-platform import-boundaries memory-invariants runtime specs; do
   audit_path="$ELO_PROJECT_ROOT/.audit/$audit_name.audit.sh"
   if [ -f "$audit_path" ]; then
     pass "$audit_name-audit" ".audit/$audit_name.audit.sh"

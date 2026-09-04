@@ -4,10 +4,6 @@ import { resolve } from 'node:path'
 import { pathToFileURL } from 'node:url'
 
 const projectRoot = resolve(import.meta.dirname, '../../../../../..')
-const composeFile = resolve(
-  projectRoot,
-  'workspaces/packages/runtime/compose.yaml'
-)
 const schemaFile = resolve(
   projectRoot,
   'workspaces/memory-nucleus/src/infrastructure/database/schema.sql'
@@ -16,59 +12,106 @@ const adversarialFile = resolve(
   projectRoot,
   'workspaces/memory-nucleus/src/infrastructure/database/tests/postgres-adversarial.sql'
 )
-const environment = {
-  ...process.env,
-  COMPOSE_PROJECT_NAME: 'amarelo-memory-validation',
-  POSTGRES_DB: 'amarelo_memory_validation',
-  POSTGRES_PASSWORD: 'local-validation-only',
-  POSTGRES_PORT: '55432',
-  POSTGRES_USER: 'amarelo',
-  REDIS_PASSWORD: 'not-used-by-memory-validation'
-}
+const postgresDatabase = 'amarelo_memory_validation'
+const postgresPassword = 'local-validation-only'
+const postgresUser = 'amarelo'
+const containerName = `amarelo-memory-validation-${process.pid}`
 
-function compose(arguments_: string[], input?: string): void {
-  const result = spawnSync(
-    'docker',
-    ['compose', '--file', composeFile, ...arguments_],
-    {
-      cwd: projectRoot,
-      encoding: 'utf8',
-      env: environment,
-      input,
-      stdio: input ? ['pipe', 'inherit', 'inherit'] : 'inherit'
-    }
-  )
+function docker(arguments_: string[], input?: string): void {
+  const result = spawnSync('docker', arguments_, {
+    cwd: projectRoot,
+    encoding: 'utf8',
+    input,
+    stdio: input ? ['pipe', 'inherit', 'inherit'] : 'inherit'
+  })
 
   if (result.error) throw result.error
-  if (result.status !== 0)
-    throw new Error(`docker compose ${arguments_.join(' ')} failed`)
+  if (result.status !== 0) {
+    throw new Error(`docker ${arguments_.join(' ')} failed`)
+  }
+}
+
+function dockerSucceeds(arguments_: string[]): boolean {
+  const result = spawnSync('docker', arguments_, {
+    cwd: projectRoot,
+    stdio: 'ignore'
+  })
+  return !result.error && result.status === 0
+}
+
+function waitForPostgres(): void {
+  for (let attempt = 0; attempt < 60; attempt += 1) {
+    if (
+      dockerSucceeds([
+        'exec',
+        containerName,
+        'pg_isready',
+        '--username',
+        postgresUser,
+        '--dbname',
+        postgresDatabase,
+        '--host',
+        '127.0.0.1'
+      ])
+    ) {
+      return
+    }
+    Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, 500)
+  }
+  throw new Error('PostgreSQL validation container did not become ready')
+}
+
+function removeValidationContainer(): void {
+  spawnSync('docker', ['rm', '--force', containerName], {
+    cwd: projectRoot,
+    stdio: 'ignore'
+  })
 }
 
 export function runPostgresMemoryEval(): void {
+  let containerStarted = false
   try {
-    compose(['up', '--detach', '--wait', 'postgres'])
+    docker([
+      'run',
+      '--detach',
+      '--rm',
+      '--name',
+      containerName,
+      '--env',
+      `POSTGRES_DB=${postgresDatabase}`,
+      '--env',
+      `POSTGRES_PASSWORD=${postgresPassword}`,
+      '--env',
+      `POSTGRES_USER=${postgresUser}`,
+      'postgres:17-alpine'
+    ])
+    containerStarted = true
+    waitForPostgres()
+
     const sql = [
       readFileSync(schemaFile, 'utf8'),
       readFileSync(adversarialFile, 'utf8')
     ].join('\n')
-    compose(
+    docker(
       [
         'exec',
-        '--no-TTY',
-        'postgres',
+        '--interactive',
+        containerName,
         'psql',
         '--set',
         'ON_ERROR_STOP=1',
         '--username',
-        environment.POSTGRES_USER,
+        postgresUser,
         '--dbname',
-        environment.POSTGRES_DB
+        postgresDatabase
       ],
       sql
     )
     console.log('Memory Nucleus PostgreSQL validation PASS')
   } finally {
-    compose(['down', '--volumes', '--remove-orphans'])
+    if (containerStarted) {
+      removeValidationContainer()
+    }
   }
 }
 
