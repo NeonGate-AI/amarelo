@@ -1,5 +1,5 @@
 ---
-id: SPEC-043
+id: SPEC-045
 title: Establish the Memory infrastructure runtime topology
 type: feature
 status: in-progress
@@ -40,7 +40,7 @@ evidence:
   - closure pending Docker-backed doctor and database gate
 ---
 
-# SPEC-043: Establish the Memory infrastructure runtime topology
+# SPEC-045: Establish the Memory infrastructure runtime topology
 
 ## Problem Statement
 

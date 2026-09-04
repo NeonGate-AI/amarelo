@@ -79,5 +79,5 @@ approved scenario contract.
 ## Links
 
 - Test delivery: `.agents/specs/042-layered-test-platform-foundation.spec.md`
-- Memory infrastructure: `.agents/specs/043-memory-infrastructure-runtime.spec.md`
+- Memory infrastructure: `.agents/specs/045-memory-infrastructure-runtime.spec.md`
 - Superseded sequencing: `.agents/adrs/0032-test-platform-sequencing.adr.md`

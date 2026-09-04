@@ -51,20 +51,23 @@ The specification catalog is flat, priority-ordered and mechanically checked.
 | 035 | SPEC-035 | implemented | [Recover the specification catalog and CI](035-recover-spec-catalog-and-ci.spec.md) |
 | 036 | SPEC-036 | implemented | [Direct cleanup without an apply flag](036-direct-cleanup.spec.md) |
 | 037 | SPEC-037 | implemented | [Kubernetes local runtime migration](037-kubernetes-runtime.spec.md) |
-
 | 038 | SPEC-038 | implemented | [Elo Kubernetes runtime commands](038-elo-kubernetes-runtime.spec.md) |
 | 039 | SPEC-039 | implemented | [Chatterbox Microservice workspace](039-chatterbox-microservice-workspace.spec.md) |
 | 040 | SPEC-040 | implemented | [Project-owned runtime application containers](040-project-owned-container-images.spec.md) |
 | 041 | SPEC-041 | implemented | [Direct cleanup of node_modules](041-cleanup-removes-node-modules.spec.md) |
 | 042 | SPEC-042 | in-progress | [Layered test platform foundation](042-layered-test-platform-foundation.spec.md) |
-| 043 | SPEC-043 | in-progress | [Memory infrastructure runtime topology](043-memory-infrastructure-runtime.spec.md) |
+| 043 | SPEC-043 | ready | [Memory integrity and poisoning assurance](043-memory-integrity-and-poisoning-assurance.spec.md) |
+| 044 | SPEC-044 | in-progress | [Staging-first repository delivery flow](044-staging-delivery-flow.spec.md) |
+| 045 | SPEC-045 | in-progress | [Memory infrastructure runtime topology](045-memory-infrastructure-runtime.spec.md) |
 
-The next unallocated durable delivery ID is `SPEC-044`.
+The next unallocated durable delivery ID is `SPEC-046`.
 
 The executable Memory Nucleus chain is:
 
-`SPEC-009 baseline → SPEC-016 core → SPEC-012 background → SPEC-011 shadow/parity → SPEC-017 A/B and canary → SPEC-018 scale`.
+`SPEC-009 baseline → SPEC-016 core → SPEC-012 background → SPEC-011 shadow/parity → SPEC-043 integrity/poisoning assurance → SPEC-017 A/B and canary → SPEC-018 scale`.
 
-Each implementation PR starts from the `main` produced by its prerequisite. A later phase cannot merge until the preceding gate is proved on the exact reviewed head.
+SPEC-043 is a required assurance gate before user-visible canary exposure. It does not replace the earlier core, background or shadow phases; it converts observed integrity failures into evals and hidden holdouts before canary.
+
+Each implementation PR starts from the `staging` produced by its prerequisite. A later phase cannot merge until the preceding gate is proved on the exact reviewed head. Production promotion occurs only through a `staging -> main` pull request after the required gates pass.
 
 Use `template.md` and `workflow.md` for every new numbered spec. Rules, context and ADRs remain separate sources of truth and must be referenced by their canonical numbered semantic filenames.
