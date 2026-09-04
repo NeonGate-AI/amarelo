@@ -2,6 +2,8 @@ import assert from 'node:assert/strict'
 import { readFile } from 'node:fs/promises'
 import path from 'node:path'
 
+import { ConversationClientError } from '@repo/conversation-sdk'
+
 import {
   type ConversationSessionEvent,
   ConversationSessionService,
@@ -91,6 +93,34 @@ async function evaluateSafeFailure() {
   assert.equal(JSON.stringify(failed).includes(secret), false)
 }
 
+async function evaluateTimeoutFailure() {
+  const client = new DeferredConversationClient()
+  const events: ConversationSessionEvent[] = []
+  const session = new ConversationSessionService({
+    client,
+    onEvent: (event) => events.push(event)
+  })
+  const request = createMobileTurnRequest('mobile-timeout-request')
+
+  const execution = session.submit(request)
+  client.reject(
+    0,
+    new ConversationClientError({
+      code: 'timeout',
+      message: 'A conversa excedeu o tempo de resposta.',
+      requestId: request.requestId
+    })
+  )
+  await execution
+
+  const failed = events.at(-1)
+  assert.equal(failed?.type, 'failed')
+  if (failed?.type === 'failed') {
+    assert.equal(failed.failure.code, 'timeout')
+    assert.equal(failed.failure.requestId, request.requestId)
+  }
+}
+
 async function evaluateCancellation() {
   const client = new DeferredConversationClient()
   const events: ConversationSessionEvent[] = []
@@ -167,6 +197,7 @@ async function evaluateEphemeralSourceBoundary() {
 await evaluateConfigurationGate()
 await evaluateSuccessfulTurn()
 await evaluateSafeFailure()
+await evaluateTimeoutFailure()
 await evaluateCancellation()
 await evaluateOverlappingTurns()
 await evaluateEphemeralSourceBoundary()
