@@ -1,18 +1,18 @@
 # Product agents context
 
-`workspaces/ai/agents/` is the parent directory for independently declared runtime/product agent workspaces. It is not itself a package and it is not the engineering `.agents/` harness. The parent directory must not own a `package.json`, `tsconfig.json`, or `src/`; those belong to each named agent workspace.
+`workspaces/ai/agents/` is the structural parent for independently declared runtime/product-agent workspaces. It is not a package and it is not the engineering `.agents/` harness. The parent owns no `package.json`, `tsconfig.json`, or `src/`; each named agent owns those artifacts inside `workspaces/ai/agents/<agent>/`.
 
-Each product agent owns its package and source boundary:
+Ana is the first executable product agent at `workspaces/ai/agents/ana/`, published internally as `@ai/ana`. She implements the framework-neutral `ConversationAgentPort` owned by `@ai/conversation`.
 
-```text
-workspaces/ai/agents/<agent>/
-  package.json
-  tsconfig.json
-  src/
-```
+Ana owns:
 
-Ana is the first scaffold at `workspaces/ai/agents/ana/`, with package name `@ai/ana` and implementation under `workspaces/ai/agents/ana/src/`. The scaffold establishes Ana's product-agent identity and package/source boundary only; it does not claim provider wiring, orchestration, tools, prompts, or production runtime behavior that has not been implemented.
+- the versioned PT-BR instruction artifact `ANA_SYSTEM_PROMPT`;
+- conversion of the validated Conversation invocation into a bounded model request;
+- explicit formatting of routing and Memory projections as delimited, untrusted context;
+- validation of the injected model result and normalized usage metadata.
 
-`pnpm-workspace.yaml` must include `workspaces/ai/agents/*` so every named agent is an independent Turborepo/pnpm workspace.
+Ana does not read credentials or environment configuration, construct a provider, select a deployment model, own HTTP transport, retrieve Memory directly, or expose a tool surface. `AnaChatModelPort` is injected. The Node composition boundary in `conversation-api` currently adapts LangChain/OpenAI to that port.
 
-Product agents may later consume approved Memory Nucleus capabilities through `@repo/memory-sdk`; they must not import Memory Nucleus internals.
+The deterministic Ana eval uses a recording model double and makes zero external calls. Future named agents follow the same dependency direction: named agent → `@ai/conversation` public port. Conversation never imports a named agent package.
+
+`pnpm-workspace.yaml` includes `workspaces/ai/agents/*`, so each named agent remains an independent pnpm/Turborepo workspace. Product agents may receive approved Memory projections from Conversation; they never import Memory Nucleus internals.
