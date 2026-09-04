@@ -95,7 +95,7 @@ if [ ! -f "$RUNTIME_CLI" ]; then
 else
   grep -F "'kubectl'" "$RUNTIME_CLI" >/dev/null 2>&1 ||
     runtime_fail workspaces/packages/runtime/src/cli.ts "runtime entrypoint does not invoke kubectl"
-  if grep -Eq 'composeActions|[[:space:]]compose[[:space:]' "$RUNTIME_CLI"; then
+  if grep -Eq 'composeActions|[[:space:]]compose[[:space:]]' "$RUNTIME_CLI"; then
     runtime_fail workspaces/packages/runtime/src/cli.ts "runtime entrypoint still owns Docker Compose behavior"
   fi
 fi

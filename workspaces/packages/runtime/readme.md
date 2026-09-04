@@ -1,35 +1,57 @@
 # Runtime local
 
-`pnpm runtime` sobe o ambiente de desenvolvimento inteiro em primeiro plano e agrega os logs. Na primeira execução, o CLI cria `workspaces/packages/runtime/.env` com senhas locais aleatórias e permissões restritas. Esse arquivo não é versionado.
+`@repo/runtime` representa o ambiente local completo do Amarelo em Kubernetes. A base Kustomize vive em `kubernetes/` e pertence ao namespace `amarelo-runtime`. Docker continua responsável apenas por construir a imagem OCI local; Docker Compose não faz parte do runtime ativo.
 
 ## Serviços
 
-| Serviço | Endereço local | Papel |
+| Recurso | Endereço interno | Papel |
 |---|---|---|
-| landing | `http://localhost:3000` | Narrativa pública em Next.js |
-| console | `http://localhost:3001` | Console de memória em Next.js |
-| onboarding | `http://localhost:3002` | Autenticação e onboarding em Next.js |
-| mobile | `http://localhost:3003` | PWA React/Vite atual, sem integração com IA ou memória |
-| postgres | `localhost:5432` | Persistência canônica local, com suporte nativo a colunas relacionais, JSONB e FTS |
-| redis | `localhost:6379` | Cache efêmero para experimentos de escopo exato, rate limit e hints de entitlement |
+| landing | `http://landing:3000` | Narrativa pública em Next.js |
+| console | `http://console:3001` | Console de memória em Next.js |
+| onboarding | `http://onboarding:3002` | Autenticação e onboarding em Next.js |
+| mobile | `http://mobile:3003` | PWA React/Vite |
+| postgres | `postgres:5432` | Persistência canônica local com suporte relacional, JSONB e FTS |
+| redis | `redis:6379` | Cache efêmero reconstruível |
 
-PostgreSQL é o armazenamento canônico aceito. O volume `postgres-data` preserva os dados entre reinicializações. `pgvector` não é instalado nem ativado; ele continua condicionado a evidência offline futura. Neon permanece uma opção gerenciada substituível, sem dependência no runtime local.
+PostgreSQL 17 executa em StatefulSet e usa o claim `postgres-data`, preservado quando os workloads são parados. `pgvector` não é instalado nem ativado. Redis 8 usa armazenamento efêmero: não é memória longitudinal, banco canônico, ledger de entitlement nem substituto do PostgreSQL.
 
-Redis não é memória longitudinal, não é banco canônico, não persiste dados e não representa o LangCache gerenciado. Ele existe apenas para experimentos locais de cache, rate limit e hints reconstruíveis de entitlement. O ledger canônico futuro de uso, minutos e cobrança permanece no PostgreSQL; Redis nunca decide sozinho se uma pessoa tem acesso. Nenhum app consome `DATABASE_URL` ou `REDIS_URL` ainda; o Compose apenas injeta essas variáveis para a integração futura. Este pacote também não cria schemas ou migrações e não implementa adaptadores PostgreSQL/Redis.
+Os quatro apps usam a mesma imagem `amarelo-dev-workspace:local`, construída pelo `Dockerfile.dev` com o `pnpm-lock.yaml` e instalação congelada. Cada app continua sendo um Deployment e Service independente.
 
-## Uso
+## Pré-requisitos
 
-É necessário ter Docker Engine com Docker Compose v2.
+- Node.js 24 e pnpm 10.32.1;
+- Docker Engine para a imagem local;
+- `kubectl` com um contexto Kubernetes ativo;
+- `kind` ou `minikube` quando o contexto correspondente precisar receber a imagem local.
 
-```bash
-pnpm runtime
-pnpm runtime -- ps
-pnpm runtime -- logs
-pnpm runtime -- down
+Docker Desktop e Rancher Desktop usam a imagem local diretamente. Em outro cluster, defina `AMARELO_RUNTIME_IMAGE` com uma imagem acessível pelo registry; nesse modo o build local é ignorado.
+
+## Uso durante a migração
+
+Até a promoção dos comandos Elo em SPEC-038, use o entrypoint do pacote:
+
+```sh
+pnpm --filter @repo/runtime start -- up
+pnpm --filter @repo/runtime start -- ps
+pnpm --filter @repo/runtime start -- logs
+pnpm --filter @repo/runtime start -- config
+pnpm --filter @repo/runtime start -- down
 ```
 
-O comando padrão executa `docker compose up --build --remove-orphans` sem modo detached. `Ctrl+C` encerra os serviços com os períodos de graça configurados. `down` remove containers e a rede, mas preserva o volume do PostgreSQL.
+`up` gera `.env` com modo `0600` quando necessário, constrói ou seleciona a imagem, aplica o Secret local e a base Kustomize, restaura uma réplica por workload e aguarda todos os rollouts. `down` escala Deployments e StatefulSets para zero, preservando namespace, configuração, Secret e o PVC do PostgreSQL.
 
-Os quatro apps e PostgreSQL/Redis são publicados somente em `127.0.0.1`. O código-fonte é montado no container para hot reload; dependências e saídas de build usam volumes nomeados para não misturar artefatos Linux com o host. O serviço one-shot `workspace-prepare` instala o grafo reproduzível de dependências com o `pnpm-lock.yaml` versionado e `--frozen-lockfile`, depois gera os tokens do design system antes dos apps.
+As credenciais nunca aparecem nos manifests rastreados. Para valores próprios, copie `.env.example` para `.env` e substitua os placeholders antes de iniciar.
 
-Para escolher outras portas ou credenciais locais, copie `.env.example` para `.env` antes de iniciar. Use senhas URL-safe porque as URLs de conexão são montadas diretamente a partir dessas variáveis.
+## Acesso pelo host
+
+Os Services são `ClusterIP` para manter a base independente da distribuição local. Quando precisar abrir uma aplicação no host, use um port-forward explícito, por exemplo:
+
+```sh
+kubectl --namespace amarelo-runtime port-forward service/mobile 3003:3003
+```
+
+A exposição de produção, incluindo ingress, TLS e DNS, não é definida por esta base local.
+
+## Limites
+
+Este pacote não provisiona cluster, registry, ingress, TLS, autoscaling, backup, restauração ou segredo gerenciado. Renderização client-side e processos falsos do harness verificam o contrato de recursos e comandos, mas não são apresentados como validação de um cluster de produção.

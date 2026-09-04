@@ -6,3 +6,4 @@ resources:
   - config-map.yaml
   - postgres.yaml
   - redis.yaml
+  - apps.yaml
