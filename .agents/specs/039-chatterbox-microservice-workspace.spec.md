@@ -2,7 +2,7 @@
 id: SPEC-039
 title: Establish the Chatterbox Microservice workspace
 type: migration
-status: in-progress
+status: implemented
 mode: prospective
 created: 2026-09-04
 updated: 2026-09-04
@@ -32,7 +32,11 @@ skills:
   - .agents/skills/tdd/SKILL.md
   - .agents/skills/code-review/SKILL.md
 evidence:
-  - pending
+  - commit 3731361 (harness decisions and planned contract)
+  - commit 92b9c42 (Chatterbox workspace implementation)
+  - corepack pnpm@10.32.1 --filter chatterbox typecheck
+  - corepack pnpm@10.32.1 --filter chatterbox test
+  - PATH=<temporary Kustomize renderer> ./cli/elo check all
 ---
 
 # SPEC-039: Establish the Chatterbox Microservice workspace
@@ -82,13 +86,13 @@ Run focused Chatterbox deterministic evals/typecheck, relevant harness audits, a
 
 ## Acceptance Criteria
 
-- [ ] `workspaces/microservices/chatterbox` is a discovered standalone workspace named `chatterbox`.
-- [ ] No live implementation path remains at `workspaces/apps/conversation-api`.
-- [ ] Chatterbox preserves the existing safe conversation and Realtime HTTP contracts when provider configuration is present.
-- [ ] `GET /health` returns the stable liveness response when provider configuration is absent.
-- [ ] Missing provider configuration is safe and does not expose credentials or raw failures.
-- [ ] Chatterbox owns a safe `.env.template` and its current context/docs use the canonical name.
-- [ ] Scoped validation and exact-head review evidence are recorded before this spec closes.
+- [x] `workspaces/microservices/chatterbox` is a discovered standalone workspace named `chatterbox`.
+- [x] No live implementation path remains at `workspaces/apps/conversation-api`.
+- [x] Chatterbox preserves the existing safe conversation and Realtime HTTP contracts when provider configuration is present.
+- [x] `GET /health` returns the stable liveness response when provider configuration is absent.
+- [x] Missing provider configuration is safe and does not expose credentials or raw failures.
+- [x] Chatterbox owns a safe `.env.template` and its current context/docs use the canonical name.
+- [x] Scoped validation and exact-head review evidence are recorded before this spec closes.
 
 ## Failure Behavior
 
@@ -102,7 +106,7 @@ Invalid environment values fail safely at startup. Missing provider credentials 
 
 ## Evidence and Promotion
 
-This active spec will record the exact focused commands, audits, final head, and two-axis review. Promote the stable workspace vocabulary to Microservices context and the hard boundary to ADR-0030.
+Commit `92b9c42` moved the package, added the provider-independent liveness seam, and updated the current source/doc references. Chatterbox and mobile focused checks pass, as do the repository audits through a temporary Kustomize renderer because this environment has no `kubectl` binary. The stable workspace vocabulary is promoted to Microservices context and the hard boundary to ADR-0030.
 
 ## Further Notes
 

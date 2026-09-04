@@ -2,7 +2,7 @@
 id: SPEC-041
 title: Make cleanup remove node_modules directly
 type: fix
-status: in-progress
+status: implemented
 mode: prospective
 created: 2026-09-04
 updated: 2026-09-04
@@ -27,7 +27,10 @@ skills:
   - .agents/skills/tdd/SKILL.md
   - .agents/skills/code-review/SKILL.md
 evidence:
-  - pending
+  - commit 92b9c42 (direct node_modules cleanup implementation)
+  - .audit/elo-platform-core.audit.sh isolated cleanup fixture
+  - ./cli/elo cleanup (715 node_modules directories removed in the supplied checkout)
+  - ./cli/elo cleanup --dependencies (status 2 without mutation)
 ---
 
 # SPEC-041: Make cleanup remove node_modules directly
@@ -76,11 +79,11 @@ Run the focused Elo platform audit and complete executable repository checks.
 
 ## Acceptance Criteria
 
-- [ ] Plain `elo cleanup` removes eligible untracked `node_modules` directories.
-- [ ] Plain cleanup retains tracked paths, `.git`, and `.audit`.
-- [ ] `--dependencies` and `--apply` both fail with usage status 2 before mutation.
-- [ ] Help and CLI docs describe direct dependency removal with no option.
-- [ ] The isolated audit verifies the current public behavior.
+- [x] Plain `elo cleanup` removes eligible untracked `node_modules` directories.
+- [x] Plain cleanup retains tracked paths, `.git`, and `.audit`.
+- [x] `--dependencies` and `--apply` both fail with usage status 2 before mutation.
+- [x] Help and CLI docs describe direct dependency removal with no option.
+- [x] The isolated audit verifies the current public behavior.
 
 ## Failure Behavior
 
@@ -93,7 +96,7 @@ Unknown syntax exits 2 before cleanup begins. A delete failure propagates a non-
 
 ## Evidence and Promotion
 
-Record focused audit output, final head, and review result on completion. CLI documentation and the active cleanup contract supersede only the current behavior of SPEC-036.
+Commit `92b9c42` makes direct dependency cleanup the public default. The isolated platform fixture passes, and the supplied checkout removed 715 generated `node_modules` directories with a single plain invocation. CLI documentation and the active cleanup contract supersede only the current behavior of SPEC-036.
 
 ## Further Notes
 

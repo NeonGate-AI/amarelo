@@ -2,7 +2,7 @@
 id: SPEC-040
 title: Make runtime application containers project-owned
 type: migration
-status: in-progress
+status: implemented
 mode: prospective
 created: 2026-09-04
 updated: 2026-09-04
@@ -32,7 +32,10 @@ skills:
   - .agents/skills/tdd/SKILL.md
   - .agents/skills/code-review/SKILL.md
 evidence:
-  - pending
+  - commit 3731361 (container ownership ADR and rule)
+  - commit 92b9c42 (project Dockerfiles and runtime wiring)
+  - .audit/runtime.audit.sh controlled build/load/deployment fixture
+  - PATH=<temporary Kustomize renderer> ./cli/elo check all
 ---
 
 # SPEC-040: Make runtime application containers project-owned
@@ -83,13 +86,13 @@ Run the runtime audit, shell syntax checks, Kustomize rendering when available, 
 
 ## Acceptance Criteria
 
-- [ ] Every declared Amarelo application workload owns a Dockerfile and `.env.template` at its workspace root.
-- [ ] The generic runtime `Dockerfile.dev` no longer builds or starts application workloads.
-- [ ] Runtime up builds and loads a distinct image for landing, console, onboarding, mobile, and Chatterbox.
-- [ ] Kubernetes renders a Chatterbox Deployment/Service with `/health` readiness and liveness checks.
-- [ ] Cypress runtime availability checks include Chatterbox health without gaining non-critical browser scenarios.
-- [ ] Templates contain no credentials or browser-exposed server secrets.
-- [ ] Runtime documentation, context, and executable checks match the new ownership model.
+- [x] Every declared Amarelo application workload owns a Dockerfile and `.env.template` at its workspace root.
+- [x] The generic runtime `Dockerfile.dev` no longer builds or starts application workloads.
+- [x] Runtime up builds and loads a distinct image for landing, console, onboarding, mobile, and Chatterbox.
+- [x] Kubernetes renders a Chatterbox Deployment/Service with `/health` readiness and liveness checks.
+- [x] Cypress runtime availability checks include Chatterbox health without gaining non-critical browser scenarios.
+- [x] Templates contain no credentials or browser-exposed server secrets.
+- [x] Runtime documentation, context, and executable checks match the new ownership model.
 
 ## Failure Behavior
 
@@ -103,7 +106,7 @@ A missing Dockerfile/template, unavailable image loader, failed image build/load
 
 ## Evidence and Promotion
 
-Record exact audit/typecheck/render commands and final review evidence at completion. Promote durable ownership to ADR-0031, Rule 012, runtime context, and runtime documentation.
+Commit `92b9c42` gives each declared Amarelo workload its own image source and lets the runtime orchestrate individual images. The controlled runtime audit proves image selection, build/load, health and Cypress wiring; a temporary renderer validates the simple Kustomize resource list because `kubectl` is unavailable in this execution environment. Durable ownership is promoted to ADR-0031, Rule 012, runtime context, and runtime documentation.
 
 ## Further Notes
 
