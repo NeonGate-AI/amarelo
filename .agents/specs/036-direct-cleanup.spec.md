@@ -2,7 +2,7 @@
 id: SPEC-036
 title: Make cleanup execute without an apply flag
 type: fix
-status: ready
+status: in-progress
 mode: prospective
 created: 2026-09-04
 updated: 2026-09-04
