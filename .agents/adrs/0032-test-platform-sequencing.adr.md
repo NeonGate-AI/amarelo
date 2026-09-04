@@ -2,7 +2,8 @@
 
 ## Status
 
-Accepted on 2026-09-04; initial implementation is intentionally deferred.
+Superseded on 2026-09-04 by ADR-0035, after the owner approved the first
+Fastify/Vitest slice and the integration-test boundary.
 
 ## Context
 
