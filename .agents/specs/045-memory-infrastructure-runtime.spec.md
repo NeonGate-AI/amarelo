@@ -2,7 +2,7 @@
 id: SPEC-045
 title: Establish the Memory infrastructure runtime topology
 type: feature
-status: in-progress
+status: implemented
 mode: prospective
 created: 2026-09-04
 updated: 2026-09-04
@@ -37,7 +37,8 @@ evidence:
   - workspaces/packages/runtime/kubernetes/object-storage.yaml
   - workspaces/packages/runtime/src/cli.ts
   - .audit/runtime.audit.sh
-  - closure pending Docker-backed doctor and database gate
+  - GitHub Actions CI run 580 passed on reconciled commit 1d46fb6045e5aaa574c61c13054e050cc0595fb6
+  - standards and spec-fidelity reviews passed on the reconciled tree
 ---
 
 # SPEC-045: Establish the Memory infrastructure runtime topology
@@ -133,7 +134,7 @@ operator check and is not misrepresented by controlled command evidence.
   PostgreSQL as canonical Memory storage; historical evidence remains intact.
 - [x] The Harness and active Memory specs agree on Neo4j, outbox, BullMQ,
   idempotent workers, synchronous guardrails and Testcontainers boundaries.
-- [ ] Required validation and both review axes pass on the final head.
+- [x] Required validation and both review axes pass on the final head.
 
 ## Failure Behavior
 
@@ -156,12 +157,15 @@ The Kubernetes manifests, runtime lifecycle audit and generated environment
 contract provide stable evidence. `kubectl kustomize` and the controlled
 lifecycle audit pass with the expected 6 Deployments, 4 StatefulSets, 10
 Services and 4 PVCs. Target architecture and current implementation gaps were
-promoted to Memory/runtime context and rules. Closure remains pending because
-this execution environment has neither a Docker CLI nor daemon, so the complete
-repository environment gate cannot pass here.
+promoted to Memory/runtime context and rules. GitHub Actions CI run 580 passed
+the complete repository gate, including Docker doctor and the container-backed
+PostgreSQL reference-adapter eval. Standards and spec-fidelity reviews found no
+blocking findings.
 
 ## Further Notes
 
 This foundation enables, but does not replace, the operational core and
 background-curation specs. Their real adapter suites will use Vitest plus
-Testcontainers with separate Redis containers.
+Testcontainers with separate Redis containers. Its durable ID was reallocated
+from the stale branch's concurrent `SPEC-043` allocation to `SPEC-045` while
+reconciling with `staging`; the approved behavior and scope did not change.

@@ -2,7 +2,7 @@
 id: SPEC-042
 title: Establish the layered test platform foundation
 type: feature
-status: in-progress
+status: implemented
 mode: prospective
 created: 2026-09-04
 updated: 2026-09-04
@@ -35,7 +35,8 @@ evidence:
   - workspaces/microservices/chatterbox/package.json
   - .audit/runtime.audit.sh
   - Docker-independent repository validation passed on 2026-09-04
-  - closure pending Docker-backed doctor and database gate
+  - GitHub Actions CI run 580 passed on reconciled commit 1d46fb6045e5aaa574c61c13054e050cc0595fb6
+  - standards and spec-fidelity reviews passed on the reconciled tree
 ---
 
 # SPEC-042: Establish the layered test platform foundation
@@ -124,7 +125,7 @@ runtime and architecture audits, and the complete repository validation.
   physical Redis test instances, sparse Cypress coverage and scoped synthetic
   seeds.
 - [x] Runtime E2E still starts and waits for containers before Cypress.
-- [ ] Required validation and both review axes pass on the final head.
+- [x] Required validation and both review axes pass on the final head.
 
 ## Failure Behavior
 
@@ -145,9 +146,10 @@ blocks an infrastructure suite; it must not be converted into mocked evidence.
 The Vitest test/configuration, package command and runtime audit are stable
 evidence. The source convention and layered responsibilities were promoted to
 rules and workspace context. Chatterbox tests, evals, typecheck, repository
-lint, audits, full typecheck, evals and build pass. Closure remains pending
-because this execution environment has neither a Docker CLI nor daemon, so
-`elo doctor --ci` and the existing PostgreSQL container eval cannot pass here.
+lint, audits, full typecheck, evals and build pass. GitHub Actions CI run 580
+also passed `elo doctor --ci`, the Docker-backed PostgreSQL reference-adapter
+eval and Git hook smoke tests on the reconciled tree. Standards and spec-fidelity
+reviews found no blocking findings.
 
 ## Further Notes
 

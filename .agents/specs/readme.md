@@ -55,10 +55,10 @@ The specification catalog is flat, priority-ordered and mechanically checked.
 | 039 | SPEC-039 | implemented | [Chatterbox Microservice workspace](039-chatterbox-microservice-workspace.spec.md) |
 | 040 | SPEC-040 | implemented | [Project-owned runtime application containers](040-project-owned-container-images.spec.md) |
 | 041 | SPEC-041 | implemented | [Direct cleanup of node_modules](041-cleanup-removes-node-modules.spec.md) |
-| 042 | SPEC-042 | in-progress | [Layered test platform foundation](042-layered-test-platform-foundation.spec.md) |
+| 042 | SPEC-042 | implemented | [Layered test platform foundation](042-layered-test-platform-foundation.spec.md) |
 | 043 | SPEC-043 | ready | [Memory integrity and poisoning assurance](043-memory-integrity-and-poisoning-assurance.spec.md) |
 | 044 | SPEC-044 | in-progress | [Staging-first repository delivery flow](044-staging-delivery-flow.spec.md) |
-| 045 | SPEC-045 | in-progress | [Memory infrastructure runtime topology](045-memory-infrastructure-runtime.spec.md) |
+| 045 | SPEC-045 | implemented | [Memory infrastructure runtime topology](045-memory-infrastructure-runtime.spec.md) |
 
 The next unallocated durable delivery ID is `SPEC-046`.
 
