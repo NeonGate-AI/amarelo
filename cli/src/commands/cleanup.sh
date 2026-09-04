@@ -2,13 +2,11 @@
 set -eu
 . "$ELO_CLI_DIR/core/common.sh"
 
-apply=false
 include_dependencies=false
 for arg in "$@"; do
   case "$arg" in
-    --apply) apply=true ;;
     --dependencies) include_dependencies=true ;;
-    --help|-h) echo 'Usage: ./elo cleanup [--apply] [--dependencies]'; exit 0 ;;
+    --help|-h) echo 'Usage: elo cleanup [--dependencies]'; exit 0 ;;
     *) echo "Unknown cleanup option: $arg" >&2; exit 2 ;;
   esac
 done
@@ -27,7 +25,8 @@ remove_target() {
     printf 'protected tracked path %s\n' "$rel"
     return 0
   fi
-  if [ "$apply" = true ]; then rm -rf -- "$target"; printf 'removed %s\n' "$rel"; else printf 'would remove %s\n' "$rel"; fi
+  rm -rf -- "$target"
+  printf 'removed %s\n' "$rel"
 }
 
 for name in .next .turbo dist coverage build out .cache storybook-static .mastra; do
@@ -38,5 +37,3 @@ find "$ELO_PROJECT_ROOT" \( -name .git -o -name .audit -o -name node_modules \) 
 if [ "$include_dependencies" = true ]; then
   find "$ELO_PROJECT_ROOT" \( -name .git -o -name .audit \) -prune -o -type d -name node_modules -print | while IFS= read -r target; do remove_target "$target"; done
 fi
-
-if [ "$apply" = false ]; then printf 'Dry run only. Re-run with --apply to delete these untracked outputs.\n'; fi
