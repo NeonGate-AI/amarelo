@@ -36,6 +36,12 @@ Reproducible output showing what was verified. Temporary output lives in `.audit
 **Promotion**  
 Moving a proven durable conclusion to the correct context, rule, ADR, spec or mechanical check without duplicating ownership.
 
+**Integration**  
+Merging an implemented and reviewed delivery branch into `staging`, the repository's default branch and the base for subsequent work.
+
+**Production promotion**  
+Merging `staging` into `main` through a dedicated pull request after the integrated head passes the required release gates.
+
 ## Catalog layout
 
 `.agents/specs/` is flat and contains:
@@ -89,7 +95,7 @@ Completion: the dependency graph has an unblocked frontier and no orphaned crite
 
 ### 5. Execute
 
-Start a spec-named branch from the required base. The first implementation commit changes status to `in-progress`. Use [`implement`](../skills/implement/SKILL.md) and [`tdd`](../skills/tdd/SKILL.md) at the agreed seams. Work only from the unblocked frontier.
+Start a spec-named branch from `staging` unless the active spec defines an explicit emergency or migration exception. The first implementation commit changes status to `in-progress`. Use [`implement`](../skills/implement/SKILL.md) and [`tdd`](../skills/tdd/SKILL.md) at the agreed seams. Work only from the unblocked frontier.
 
 Do not weaken acceptance criteria to match an implementation result. A material contract change returns to owner approval before work continues.
 
@@ -124,11 +130,19 @@ Both reviews and CI apply to the exact same final head. Any head change invalida
 
 Completion: CI is fully green and both axes have zero unresolved blocking findings.
 
-### 10. Merge
+### 10. Integrate into staging
 
-Confirm the branch is current with its base, conflict-free and free of generated or prohibited artifacts. Complete `.github/pull_request_template.md` with the merge base, reviewed head, CI run, reviews, safety/privacy applicability, Memory ROI applicability and promotion record. Merge using the exact expected head SHA.
+Confirm the branch is current with `staging`, conflict-free and free of generated or prohibited artifacts. Complete `.github/pull_request_template.md` with the merge base, reviewed head, CI run, reviews, safety/privacy applicability, Memory ROI applicability and promotion record. Merge using the exact expected head SHA.
 
-Completion: the merge result and spec evidence agree, and dependent work can begin from the resulting `main`.
+Completion: the merge result and spec evidence agree, and dependent work can begin from the resulting `staging`.
+
+### 11. Promote staging to main
+
+Open a dedicated pull request whose base is `main` and whose source is exactly `staging`. Do not promote an ordinary feature, fix, migration, refactor, governance or chore branch directly to `main`.
+
+The promotion pull request must run the complete CI and the `Main accepts only staging` guard on its exact head. Use a merge commit for `staging -> main` so the production branch retains `staging` ancestry; squash or rebase promotion would make later release diffs ambiguous. Repository branch settings must reject direct writes, force pushes and deletion while still permitting gated pull-request merges.
+
+Completion: the exact reviewed `staging` head is reachable from `main`, all required checks pass, and `staging` remains the base for subsequent work.
 
 ## Status model
 
@@ -149,6 +163,8 @@ draft → ready → in-progress → implemented
 
 Branches use `<type>/spec-###-short-slug`. PR titles and bodies reference the same durable ID. Conventional commits include `Spec: SPEC-###` when the relationship is not otherwise obvious.
 
+`staging` is the default branch and ordinary pull-request base. Delivery branches start from `staging` and integrate back into `staging`. `main` is the production-ready branch and accepts only `staging -> main` promotion pull requests. The literal GitHub `Lock branch` option is not used because it would prevent normal promotion merges; branch protection and required checks provide the write boundary.
+
 The PR is the merge record, not a substitute for the spec. A green run or review from an older head never authorizes merge.
 
 ## Retrospective reconstruction
@@ -157,8 +173,8 @@ A retrospective spec uses `mode: retrospective`, `status: implemented`, checked 
 
 ## Emergency changes
 
-Urgent work still begins with a minimal owner-approved `type: fix` spec. It names the failing behavior, public seam, rollback and acceptance check before code changes begin.
+Urgent work still begins with a minimal owner-approved `type: fix` spec. It names the failing behavior, public seam, rollback and acceptance check before code changes begin. A production hotfix that must start from `main` is an explicit exception: after promotion, its result must be reconciled into `staging` before unrelated delivery continues.
 
 ## Workflow evolution
 
-Changing this lifecycle requires its own numbered governance spec and, when the tradeoff is consequential, an ADR. Mechanical checks validate document contracts but do not replace owner approval or semantic review.
+The staging-first branch model is owned by [SPEC-040](040-staging-delivery-flow.spec.md). Changing this lifecycle requires its own numbered governance spec and, when the tradeoff is consequential, an ADR. Mechanical checks validate document contracts but do not replace owner approval or semantic review.
