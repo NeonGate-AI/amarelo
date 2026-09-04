@@ -51,14 +51,16 @@ The specification catalog is flat, priority-ordered and mechanically checked.
 | 035 | SPEC-035 | implemented | [Recover the specification catalog and CI](035-recover-spec-catalog-and-ci.spec.md) |
 | 036 | SPEC-036 | implemented | [Direct cleanup without an apply flag](036-direct-cleanup.spec.md) |
 | 037 | SPEC-037 | implemented | [Kubernetes local runtime migration](037-kubernetes-runtime.spec.md) |
-
 | 038 | SPEC-038 | implemented | [Elo Kubernetes runtime commands](038-elo-kubernetes-runtime.spec.md) |
+| 039 | SPEC-039 | ready | [Memory integrity and poisoning assurance](039-memory-integrity-and-poisoning-assurance.spec.md) |
 
-The next unallocated durable delivery ID is `SPEC-039`.
+The next unallocated durable delivery ID is `SPEC-040`.
 
 The executable Memory Nucleus chain is:
 
-`SPEC-009 baseline → SPEC-016 core → SPEC-012 background → SPEC-011 shadow/parity → SPEC-017 A/B and canary → SPEC-018 scale`.
+`SPEC-009 baseline → SPEC-016 core → SPEC-012 background → SPEC-011 shadow/parity → SPEC-039 integrity/poisoning assurance → SPEC-017 A/B and canary → SPEC-018 scale`.
+
+SPEC-039 is a required assurance gate before user-visible canary exposure. It does not replace the earlier core, background or shadow phases; it converts observed integrity failures into evals and hidden holdouts before canary.
 
 Each implementation PR starts from the `main` produced by its prerequisite. A later phase cannot merge until the preceding gate is proved on the exact reviewed head.
 
