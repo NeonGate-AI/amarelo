@@ -58,11 +58,17 @@ for runtime_file in \
   "$KUBERNETES_ROOT/namespace.yaml" \
   "$KUBERNETES_ROOT/config-map.yaml" \
   "$KUBERNETES_ROOT/postgres.yaml" \
-  "$KUBERNETES_ROOT/redis.yaml" \
+  "$KUBERNETES_ROOT/neo4j.yaml" \
+  "$KUBERNETES_ROOT/redis-queue.yaml" \
+  "$KUBERNETES_ROOT/redis-cache.yaml" \
+  "$KUBERNETES_ROOT/object-storage.yaml" \
   "$KUBERNETES_ROOT/apps.yaml"
 do
   require_file "$runtime_file"
 done
+
+[ ! -e "$KUBERNETES_ROOT/redis.yaml" ] ||
+  runtime_fail workspaces/packages/runtime/kubernetes/redis.yaml "ambiguous shared Redis workload must not remain"
 
 if [ -f "$KUBERNETES_ROOT/kustomization.yaml" ]; then
   if ! command -v kubectl >/dev/null 2>&1; then
@@ -70,26 +76,26 @@ if [ -f "$KUBERNETES_ROOT/kustomization.yaml" ]; then
   elif ! kubectl kustomize "$KUBERNETES_ROOT" >"$TMP_ROOT/rendered.yaml" 2>"$TMP_ROOT/render.err"; then
     runtime_fail workspaces/packages/runtime/kubernetes/kustomization.yaml "kubectl could not render the Kustomize base"
   else
-    for resource_name in amarelo-runtime postgres redis landing console onboarding mobile chatterbox; do
+    for resource_name in amarelo-runtime postgres neo4j redis-queue redis-cache object-storage landing console onboarding mobile chatterbox; do
       grep -F "name: $resource_name" "$TMP_ROOT/rendered.yaml" >/dev/null 2>&1 ||
         runtime_fail workspaces/packages/runtime/kubernetes "rendered resources omit $resource_name"
     done
     [ "$(grep -c '^kind: Deployment$' "$TMP_ROOT/rendered.yaml")" -eq 6 ] ||
       runtime_fail workspaces/packages/runtime/kubernetes "runtime must render six Deployments"
-    [ "$(grep -c '^kind: StatefulSet$' "$TMP_ROOT/rendered.yaml")" -eq 1 ] ||
-      runtime_fail workspaces/packages/runtime/kubernetes "runtime must render one StatefulSet"
-    [ "$(grep -c '^kind: Service$' "$TMP_ROOT/rendered.yaml")" -eq 7 ] ||
-      runtime_fail workspaces/packages/runtime/kubernetes "runtime must render seven Services"
-    [ "$(grep -c '^kind: PersistentVolumeClaim$' "$TMP_ROOT/rendered.yaml")" -eq 1 ] ||
-      runtime_fail workspaces/packages/runtime/kubernetes "runtime must render one retained PostgreSQL claim"
-    if grep -Eq '^kind: Secret$|POSTGRES_PASSWORD:[[:space:]]*[^|[:space:]]|REDIS_PASSWORD:[[:space:]]*[^|[:space:]]' "$TMP_ROOT/rendered.yaml"; then
+    [ "$(grep -c '^kind: StatefulSet$' "$TMP_ROOT/rendered.yaml")" -eq 4 ] ||
+      runtime_fail workspaces/packages/runtime/kubernetes "runtime must render four StatefulSets"
+    [ "$(grep -c '^kind: Service$' "$TMP_ROOT/rendered.yaml")" -eq 10 ] ||
+      runtime_fail workspaces/packages/runtime/kubernetes "runtime must render ten Services"
+    [ "$(grep -c '^kind: PersistentVolumeClaim$' "$TMP_ROOT/rendered.yaml")" -eq 4 ] ||
+      runtime_fail workspaces/packages/runtime/kubernetes "runtime must render four retained state claims"
+    if grep -Eq '^kind: Secret$|POSTGRES_PASSWORD:[[:space:]]*[^|[:space:]]|NEO4J_AUTH:[[:space:]]*[^|[:space:]]|REDIS_(QUEUE|CACHE)_PASSWORD:[[:space:]]*[^|[:space:]]|MINIO_ROOT_PASSWORD:[[:space:]]*[^|[:space:]]' "$TMP_ROOT/rendered.yaml"; then
       runtime_fail workspaces/packages/runtime/kubernetes "tracked manifests must not contain a Secret payload"
     fi
-    [ "$(grep -c 'automountServiceAccountToken: false' "$TMP_ROOT/rendered.yaml")" -eq 7 ] ||
+    [ "$(grep -c 'automountServiceAccountToken: false' "$TMP_ROOT/rendered.yaml")" -eq 10 ] ||
       runtime_fail workspaces/packages/runtime/kubernetes "every workload must disable service-account token mounting"
-    [ "$(grep -c 'readinessProbe:' "$TMP_ROOT/rendered.yaml")" -eq 7 ] ||
+    [ "$(grep -c 'readinessProbe:' "$TMP_ROOT/rendered.yaml")" -eq 10 ] ||
       runtime_fail workspaces/packages/runtime/kubernetes "every workload must declare readiness"
-    [ "$(grep -c 'livenessProbe:' "$TMP_ROOT/rendered.yaml")" -eq 7 ] ||
+    [ "$(grep -c 'livenessProbe:' "$TMP_ROOT/rendered.yaml")" -eq 10 ] ||
       runtime_fail workspaces/packages/runtime/kubernetes "every workload must declare liveness"
   fi
 fi
@@ -291,6 +297,17 @@ else
     runtime_fail workspaces/packages/runtime/src/cli.ts "up did not reconcile the Kustomize base"
   grep -F 'kubectl rollout status' "$command_log" >/dev/null 2>&1 ||
     runtime_fail workspaces/packages/runtime/src/cli.ts "up did not wait for workload readiness"
+  for stateful_workload in postgres neo4j redis-queue object-storage; do
+    grep -F "statefulset/$stateful_workload --timeout=300s" "$command_log" >/dev/null 2>&1 ||
+      runtime_fail workspaces/packages/runtime/src/cli.ts "up did not wait for $stateful_workload readiness"
+  done
+  for environment_key in NEO4J_AUTH REDIS_QUEUE_PASSWORD REDIS_CACHE_PASSWORD MINIO_ROOT_PASSWORD; do
+    grep -F "$environment_key=" "$TMP_ROOT/runtime.env" >/dev/null 2>&1 ||
+      runtime_fail workspaces/packages/runtime/src/cli.ts "generated environment omits $environment_key"
+  done
+  if grep -F 'REDIS_PASSWORD=' "$TMP_ROOT/runtime.env" >/dev/null 2>&1; then
+    runtime_fail workspaces/packages/runtime/src/cli.ts "generated environment retains ambiguous REDIS_PASSWORD"
+  fi
 fi
 
 : >"$command_log"
@@ -302,7 +319,7 @@ else
   grep -F 'kubectl --namespace amarelo-runtime scale statefulset --all --replicas=0' "$command_log" >/dev/null 2>&1 ||
     runtime_fail workspaces/packages/runtime/src/cli.ts "down did not stop every StatefulSet"
   if grep -F 'delete namespace' "$command_log" >/dev/null 2>&1; then
-    runtime_fail workspaces/packages/runtime/src/cli.ts "down must preserve namespace and PostgreSQL state"
+    runtime_fail workspaces/packages/runtime/src/cli.ts "down must preserve namespace and stateful claims"
   fi
 fi
 
@@ -425,4 +442,4 @@ fi
 printf 'Runtime audit PASS\n'
 printf 'Kustomize resource inventory: PASS\n'
 printf 'Kubernetes lifecycle contract: PASS\n'
-printf 'runtime secret and persistence boundaries: PASS\n'
+printf 'runtime secret, queue/cache isolation and persistence boundaries: PASS\n'

@@ -16,7 +16,9 @@ Every application, API, package, or project that is launched as an Amarelo appli
 
 Each containerized project also owns `.env.template`. Templates document only variables relevant to that project and use empty or synthetic values. Browser-visible configuration is explicitly public and uses the framework's public prefix; API keys, credentials, and other secrets never belong in a browser template.
 
-Platform dependencies such as PostgreSQL, Redis, and the ephemeral Cypress runner retain their upstream image ownership and are not treated as Amarelo project containers.
+Platform dependencies such as PostgreSQL, Neo4j, Redis Queue, Redis Cache,
+object storage and the ephemeral Cypress runner retain their upstream image
+ownership and are not treated as Amarelo project containers.
 
 ## Alternatives considered
 

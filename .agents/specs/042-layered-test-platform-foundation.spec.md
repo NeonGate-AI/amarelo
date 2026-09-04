@@ -2,7 +2,7 @@
 id: SPEC-042
 title: Establish the layered test platform foundation
 type: feature
-status: ready
+status: in-progress
 mode: prospective
 created: 2026-09-04
 updated: 2026-09-04

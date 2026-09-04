@@ -10,7 +10,7 @@
     "build": "tsc --noEmit",
     "dev": "tsx watch src/server/chatterbox.server.ts",
     "start": "node --import tsx src/server/chatterbox.server.ts",
-    "test": "node --import tsx src/assurance/evals/chatterbox/chatterbox.eval.ts && node --import tsx src/assurance/evals/realtime-session/realtime-session.eval.ts && node --import tsx src/assurance/evals/pre-memory-baseline/pre-memory-baseline.eval.ts",
+    "test": "vitest run && node --import tsx src/assurance/evals/chatterbox/chatterbox.eval.ts && node --import tsx src/assurance/evals/realtime-session/realtime-session.eval.ts && node --import tsx src/assurance/evals/pre-memory-baseline/pre-memory-baseline.eval.ts",
     "typecheck": "tsc --noEmit",
     "eval": "node --import tsx src/assurance/evals/pre-memory-baseline/pre-memory-baseline.eval.ts",
     "eval:baseline": "node --import tsx src/assurance/evals/pre-memory-baseline/pre-memory-baseline.eval.ts"
@@ -27,6 +27,7 @@
   "devDependencies": {
     "@types/node": "24.13.3",
     "tsx": "4.23.12",
-    "typescript": "5.9.2"
+    "typescript": "5.9.2",
+    "vitest": "5.0.0"
   }
 }

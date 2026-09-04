@@ -5,5 +5,8 @@ resources:
   - namespace.yaml
   - config-map.yaml
   - postgres.yaml
-  - redis.yaml
+  - neo4j.yaml
+  - redis-queue.yaml
+  - redis-cache.yaml
+  - object-storage.yaml
   - apps.yaml

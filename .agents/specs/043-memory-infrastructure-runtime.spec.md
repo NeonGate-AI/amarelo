@@ -2,7 +2,7 @@
 id: SPEC-043
 title: Establish the Memory infrastructure runtime topology
 type: feature
-status: ready
+status: in-progress
 mode: prospective
 created: 2026-09-04
 updated: 2026-09-04
@@ -123,7 +123,8 @@ operator check and is not misrepresented by controlled command evidence.
 - [ ] Ordinary shutdown preserves stateful claims; prune removes the namespace
   and its claims.
 - [ ] No tracked manifest or environment template contains a real credential.
-- [ ] PostgreSQL is no longer documented as canonical Memory storage.
+- [ ] Active runtime context and prospective Memory specs no longer describe
+  PostgreSQL as canonical Memory storage; historical evidence remains intact.
 - [ ] The Harness and active Memory specs agree on Neo4j, outbox, BullMQ,
   idempotent workers, synchronous guardrails and Testcontainers boundaries.
 - [ ] Required validation and both review axes pass on the final head.
