@@ -3,7 +3,10 @@ import assert from 'node:assert/strict'
 import { ConversationSafeErrorResponseSchema } from '@repo/conversation-sdk'
 import { createOpenAiRealtimeCall } from 'conversation-api'
 
-import { RecordingAnaModel, createTestConversationApi } from '../conversation-api'
+import {
+  RecordingAnaModel,
+  createTestConversationApi
+} from '../conversation-api'
 
 const OFFER_SDP = 'v=0\r\no=- 1 2 IN IP4 127.0.0.1\r\n'
 const ANSWER_SDP = 'v=0\r\no=- 3 4 IN IP4 127.0.0.1\r\n'
@@ -31,7 +34,10 @@ async function evaluateOpenAiMultipartContract() {
   assert.equal(answer, ANSWER_SDP)
   assert.equal(capturedUrl, 'https://api.openai.com/v1/realtime/calls')
   assert.equal(capturedMethod, 'POST')
-  assert.equal(capturedHeaders?.get('authorization'), 'Bearer synthetic-openai-key')
+  assert.equal(
+    capturedHeaders?.get('authorization'),
+    'Bearer synthetic-openai-key'
+  )
   assert.equal(capturedHeaders?.has('content-type'), false)
   assert.equal(capturedBody instanceof FormData, true)
 
