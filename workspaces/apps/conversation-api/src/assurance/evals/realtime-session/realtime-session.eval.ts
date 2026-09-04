@@ -1,9 +1,7 @@
 import assert from 'node:assert/strict'
 
-import {
-  ConversationSafeErrorResponseSchema,
-  createOpenAiRealtimeCall
-} from 'conversation-api'
+import { ConversationSafeErrorResponseSchema } from '@repo/conversation-sdk'
+import { createOpenAiRealtimeCall } from 'conversation-api'
 
 import { RecordingAnaModel, createTestConversationApi } from '../conversation-api'
 
