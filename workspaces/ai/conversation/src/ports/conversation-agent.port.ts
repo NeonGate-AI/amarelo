@@ -1,8 +1,8 @@
 import type { MemorySearchContextProjection } from '@repo/memory-sdk'
 import { z } from 'zod'
 
-import type { AgentId, ConversationMessage } from '@contracts'
-import type { ConversationRoutingDecision } from '@routing'
+import type { AgentId, ConversationMessage } from '../contracts'
+import type { ConversationRoutingDecision } from '../routing'
 
 const NullableTokenCountSchema = z.number().int().nonnegative().nullable()
 

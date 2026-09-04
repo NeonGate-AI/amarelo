@@ -1,15 +1,7 @@
 {
   "extends": "../../tsconfig.json",
   "compilerOptions": {
-    "baseUrl": ".",
-    "paths": {
-      "@context": ["../../conversation/src/context/index.ts"],
-      "@contracts": ["../../conversation/src/contracts/index.ts"],
-      "@memory": ["../../conversation/src/memory/index.ts"],
-      "@ports": ["../../conversation/src/ports/index.ts"],
-      "@routing": ["../../conversation/src/routing/index.ts"],
-      "@runtime": ["../../conversation/src/runtime/index.ts"]
-    }
+    "baseUrl": "."
   },
   "include": ["src/**/*.ts"]
 }

@@ -1,18 +1,18 @@
 import type { MemorySearchContextProjection } from '@repo/memory-sdk'
 
-import { selectConversationHistory } from '@context'
+import { selectConversationHistory } from '../context'
 import {
   type AgentId,
   ConversationTurnInputSchema,
   type ConversationMessage
-} from '@contracts'
-import { MemoryContextPort } from '@memory'
+} from '../contracts'
+import { MemoryContextPort } from '../memory'
 import {
   ConversationAgentPort,
   type ConversationAgentResult,
   ConversationAgentResultSchema
-} from '@ports'
-import { routeConversationTurn } from '@routing'
+} from '../ports'
+import { routeConversationTurn } from '../routing'
 
 import {
   ConversationAgentInvocationError,
