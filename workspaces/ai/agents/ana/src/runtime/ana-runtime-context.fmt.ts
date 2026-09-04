@@ -7,6 +7,13 @@ export interface AnaRuntimeContext {
   readonly instructions: string
 }
 
+function serializeUntrustedRecords(records: readonly unknown[]): string {
+  return JSON.stringify(records)
+    .replaceAll('&', '\\u0026')
+    .replaceAll('<', '\\u003c')
+    .replaceAll('>', '\\u003e')
+}
+
 function formatUntrustedMemory(input: ConversationAgentInvocation): string {
   if (input.memory.length === 0) {
     return 'Nenhum contexto longitudinal foi fornecido para este turno.'
@@ -24,7 +31,7 @@ function formatUntrustedMemory(input: ConversationAgentInvocation): string {
 
   return [
     '<contexto-de-memoria-nao-confiavel>',
-    JSON.stringify(records),
+    serializeUntrustedRecords(records),
     '</contexto-de-memoria-nao-confiavel>'
   ].join('\n')
 }
