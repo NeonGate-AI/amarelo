@@ -49,6 +49,9 @@ The specification catalog is flat, priority-ordered and mechanically checked.
 | 033 | SPEC-033 | draft | [Conversation lifecycle hooks and realtime edge-case semantics](033-conversation-lifecycle-hooks.spec.md) |
 
 The next unallocated durable delivery ID is `SPEC-034`.
+| 032 | SPEC-032 | implemented | [Realtime 2 WebRTC voice agent](032-realtime-2-webrtc-voice-agent.spec.md) |
+
+The next unallocated durable delivery ID is `SPEC-033`.
 
 The executable Memory Nucleus chain is:
 

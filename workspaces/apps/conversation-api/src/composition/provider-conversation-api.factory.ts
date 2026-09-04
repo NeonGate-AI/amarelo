@@ -5,7 +5,10 @@ import type { FastifyInstance } from 'fastify'
 
 import { createConversationApi } from '../app'
 import type { ConversationApiEnvironment } from '../configuration'
-import { LangChainAnaChatModelAdapter } from '../model'
+import {
+  createOpenAiRealtimeCall,
+  LangChainAnaChatModelAdapter
+} from '../model'
 
 export function createProviderConversationApi(
   configuration: ConversationApiEnvironment
@@ -26,5 +29,13 @@ export function createProviderConversationApi(
     agents: [new AnaConversationAgent({ model: modelAdapter })]
   })
 
-  return createConversationApi({ logger: true, runtime })
+  return createConversationApi({
+    createRealtimeCall: (sdp) =>
+      createOpenAiRealtimeCall({
+        apiKey: configuration.OPENAI_API_KEY,
+        sdp
+      }),
+    logger: true,
+    runtime
+  })
 }
