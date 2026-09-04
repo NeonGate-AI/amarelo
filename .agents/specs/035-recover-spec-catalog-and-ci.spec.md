@@ -2,7 +2,7 @@
 id: SPEC-035
 title: Recover the specification catalog and CI
 type: fix
-status: ready
+status: in-progress
 mode: prospective
 created: 2026-09-04
 updated: 2026-09-04

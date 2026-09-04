@@ -1,5 +1,5 @@
 ---
-id: SPEC-032
+id: SPEC-033
 title: Enforce application-owned conversational guardrails
 type: feature
 status: draft
@@ -40,7 +40,7 @@ evidence:
   - pending
 ---
 
-# SPEC-032: Enforce application-owned conversational guardrails
+# SPEC-033: Enforce application-owned conversational guardrails
 
 ## Problem Statement
 
@@ -346,7 +346,7 @@ A telemetry failure does not expose data and does not convert a block into an al
 - Reimplementing Memory Nucleus authorization, retention, or persistence rules.
 - Storing every transcript or automatically promoting session context to durable memory.
 - Redesigning the mobile Orb or current voice-state simulation.
-- Implementing lifecycle ordering and cancellation beyond the guardrail touchpoints defined in SPEC-033.
+- Implementing lifecycle ordering and cancellation beyond the guardrail touchpoints defined in SPEC-034.
 - Granting implementation authorization while this spec remains `draft`.
 
 ## Evidence and Promotion
