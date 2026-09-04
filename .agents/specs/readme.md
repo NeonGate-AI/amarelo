@@ -52,7 +52,9 @@ The specification catalog is flat, priority-ordered and mechanically checked.
 | 036 | SPEC-036 | implemented | [Direct cleanup without an apply flag](036-direct-cleanup.spec.md) |
 | 037 | SPEC-037 | implemented | [Kubernetes local runtime migration](037-kubernetes-runtime.spec.md) |
 
-The next unallocated durable delivery ID is `SPEC-038`.
+| 038 | SPEC-038 | ready | [Elo Kubernetes runtime commands](038-elo-kubernetes-runtime.spec.md) |
+
+The next unallocated durable delivery ID is `SPEC-039`.
 
 The executable Memory Nucleus chain is:
 
