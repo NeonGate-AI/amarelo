@@ -111,17 +111,21 @@ async function evaluateInvalidResponse() {
   )
 }
 
+function createAbortablePendingFetch(): typeof fetch {
+  return ((_input, init) =>
+    new Promise<Response>((_resolve, reject) => {
+      init?.signal?.addEventListener(
+        'abort',
+        () => reject(new DOMException('Aborted', 'AbortError')),
+        { once: true }
+      )
+    })) as typeof fetch
+}
+
 async function evaluateAbort() {
   const client = new ConversationClient({
     baseUrl: 'https://conversation.test',
-    fetch: ((_input, init) =>
-      new Promise<Response>((_resolve, reject) => {
-        init?.signal?.addEventListener(
-          'abort',
-          () => reject(new DOMException('Aborted', 'AbortError')),
-          { once: true }
-        )
-      })) as typeof fetch
+    fetch: createAbortablePendingFetch()
   })
   const controller = new AbortController()
   const turn = client.turn(REQUEST, { signal: controller.signal })
@@ -131,6 +135,22 @@ async function evaluateAbort() {
     () => turn,
     (error: unknown) =>
       error instanceof ConversationClientError && error.code === 'aborted'
+  )
+}
+
+async function evaluateTimeout() {
+  const client = new ConversationClient({
+    baseUrl: 'https://conversation.test',
+    fetch: createAbortablePendingFetch(),
+    timeoutMs: 1
+  })
+
+  await assert.rejects(
+    () => client.turn(REQUEST),
+    (error: unknown) =>
+      error instanceof ConversationClientError &&
+      error.code === 'timeout' &&
+      error.requestId === REQUEST.requestId
   )
 }
 
@@ -173,5 +193,6 @@ await evaluateSuccess()
 await evaluateSafeServerFailure()
 await evaluateInvalidResponse()
 await evaluateAbort()
+await evaluateTimeout()
 await evaluateBrowserSafety()
 console.log('Conversation SDK eval PASS')
