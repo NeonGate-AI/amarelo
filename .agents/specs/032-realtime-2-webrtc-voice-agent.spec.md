@@ -2,7 +2,7 @@
 id: SPEC-032
 title: Add a minimal Realtime 2 WebRTC voice agent
 type: feature
-status: ready
+status: in-progress
 mode: prospective
 created: 2026-09-03
 updated: 2026-09-03
