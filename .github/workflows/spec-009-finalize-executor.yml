@@ -1,0 +1,79 @@
+name: Finalize SPEC-009 exact head
+
+on:
+  push:
+    branches:
+      - experiment/spec-009-first-ana-conversation-baseline
+    paths:
+      - .github/workflows/spec-009-finalize-executor.yml
+
+permissions:
+  contents: write
+
+jobs:
+  finalize:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: experiment/spec-009-first-ana-conversation-baseline
+          fetch-depth: 0
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: Complete, promote, validate, and publish
+        shell: bash
+        run: |
+          set -euo pipefail
+          export CI=true
+          pnpm install --frozen-lockfile
+
+          for generator in \
+            .github/spec-009-sdk-ana.py \
+            .github/spec-009-conversation-api.py \
+            .github/spec-009-mobile.py \
+            .github/spec-009-baseline.py
+          do
+            if [ -f "$generator" ]; then
+              python3 "$generator"
+            fi
+          done
+
+          python3 .github/spec-009-finalize.py
+          pnpm install --lockfile-only
+          pnpm install --frozen-lockfile
+          pnpm exec biome check --write workspaces cli turbo.json
+          pnpm --filter conversation-api baseline
+
+          rm -f .github/spec-009-*.py
+          rm -f .github/workflows/spec-009-*.yml
+
+          git diff --check
+          ./cli/elo doctor --ci
+          ./cli/elo check all
+          pnpm exec biome check workspaces cli
+          pnpm exec turbo run typecheck
+          pnpm exec turbo run test
+          pnpm --filter @nucleus/memory run test:database
+          pnpm --filter @nucleus/memory \
+            --filter @repo/memory-sdk \
+            --filter @ai/knowledge \
+            --filter @ai/conversation \
+            --filter @ai/ana \
+            --filter @repo/conversation-sdk \
+            --filter conversation-api run eval
+          pnpm exec turbo run build
+          sh .husky/pre-commit
+          printf 'chore(ci): validate commit hook\n' > .audit/commit-message.txt
+          sh .husky/commit-msg .audit/commit-message.txt
+          rm -f .audit/commit-message.txt
+
+          git config user.name "Jonatas Sales"
+          git config user.email "sykes.echo@proton.me"
+          git add -A
+          git commit -m "feat(conversation): establish the first Ana serving baseline" -m "Spec: SPEC-009"
+          git push origin HEAD:experiment/spec-009-first-ana-conversation-baseline
