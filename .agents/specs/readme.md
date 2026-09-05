@@ -43,7 +43,7 @@ The prefix is a unique catalog rank, not the durable `SPEC-###` identity. Existi
 | 025 | SPEC-012 | implemented | [Background memory curation loop](025-background-memory-curation-loop.spec.md) |
 | 026 | SPEC-011 | implemented | [Shadow Memory serving and parity](026-shadow-memory-serving-parity.spec.md) |
 | 027 | SPEC-017 | implemented | [Memory serving A/B and canary](027-memory-serving-ab-canary.spec.md) |
-| 028 | SPEC-018 | ready | [Memory unit economics and scale gates](028-memory-unit-economics-scale-gates.spec.md) |
+| 028 | SPEC-018 | implemented | [Memory unit economics and scale gates](028-memory-unit-economics-scale-gates.spec.md) |
 | 029 | SPEC-029 | implemented | [Canonical local engineering workflow skills](029-canonical-local-workflow-skills.spec.md) |
 | 030 | SPEC-030 | implemented | [Agent artifact scaffolding](030-agent-artifact-scaffolding.spec.md) |
 | 031 | SPEC-031 | implemented | [Numbered canonical rule catalog](031-numbered-rule-catalog.spec.md) |
@@ -101,3 +101,10 @@ SPEC-043 is a required assurance gate before user-visible canary exposure. It do
 Each implementation PR starts from the `staging` produced by its prerequisite. For this owner-authorized implementation delivery, staging integration proceeds without waiting for new validation. This exception does not assert a passed evidence gate or permit external exposure. Production promotion occurs only through a `staging -> main` pull request after the required gates pass.
 
 Use `template.md` and `workflow.md` for every new numbered spec. Rules, context and ADRs remain separate sources of truth and must be referenced by their canonical numbered semantic filenames.
+
+
+## Integrated delivery — 2026-09-05
+
+The six requested specs now have implementation branches and staging integration. SPEC-016 completed in PR #87; downstream delivery followed 012 → 011 → 043 → 017 → 018. The owner explicitly deferred new validation. An implemented catalog entry records code delivery, while unchecked test/quality/cost criteria remain under SPEC-049. No ready spec remains in this queue. SPEC-025, 033 and 034 retain their deferred draft boundaries.
+
+The background/shadow/canary paths default off and evidence-dependent gates remain hold without measured results. This is an integrated textual implementation; no full voice economics, naturalness, pricing margin or production readiness is asserted.

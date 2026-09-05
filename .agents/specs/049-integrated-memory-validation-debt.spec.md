@@ -105,3 +105,6 @@ Pending by explicit owner instruction. Promote proven operational conclusions in
 
 This draft organizes future work and does not restart validation during the current implementation delivery.
 
+
+
+Delivery inventory: the SPEC-012 100-job load entry/report still needs to be authored as well as run. SPEC-017 admission requires distributed/restart-persistent accounting before multiple processes are permitted. Builds, tests, evals and deployment validation for this implementation delivery were not run; resolve resulting integration failures in this future cycle. These are disclosed remaining work, not measured passes.

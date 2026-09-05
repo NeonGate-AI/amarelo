@@ -32,3 +32,6 @@ status separately from implementation.
 SPEC-016 binds a request-scoped SDK adapter at Chatterbox's composition root using the authenticated context from SPEC-047. It does not introduce a second Memory HTTP service. SPEC-012's dispatcher and long-lived worker are separately started processes owned by this workspace's infrastructure boundary; no nested application/package mini-monorepo is introduced.
 
 Selected infrastructure is not automatically started for ordinary application work. The runtime's explicit Memory profile owns Neo4j, Redis Queue, Redis Cache and object storage; its reference profile owns PostgreSQL. Profile selection changes desired local workloads, not canonical authority or data-retention rights.
+
+
+The [integrated delivery record](integrated-delivery.md) describes the implementation-first SPEC-016/012/011/043/017/018 handoff and its explicitly deferred validation.
