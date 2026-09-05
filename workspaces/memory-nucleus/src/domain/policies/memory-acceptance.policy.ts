@@ -1,4 +1,4 @@
-import type { MemoryJudgment } from '@domain/value-objects/memory-judgment.vo'
+import type { MemoryJudgment } from '@domain/value-objects'
 
 export interface MemoryAcceptanceCandidate {
   readonly kind: 'semantic' | 'episodic'

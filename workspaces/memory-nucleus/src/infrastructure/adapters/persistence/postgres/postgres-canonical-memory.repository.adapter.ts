@@ -4,7 +4,7 @@ import {
   CanonicalMemoryPort,
   type AcceptCandidateInput,
   type AcceptCandidateResult
-} from '@application/ports/canonical-memory.port'
+} from '@application/ports'
 
 interface CandidateRow {
   candidate_id: string

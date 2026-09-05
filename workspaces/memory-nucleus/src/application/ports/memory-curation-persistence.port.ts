@@ -1,17 +1,14 @@
 import { z } from 'zod'
 
-import {
-  MemoryCandidateSchema,
-  type MemoryCandidate
-} from '@domain/entities/memory-candidate.entity'
-import { createCurationIdempotencyKey } from '@application/use-cases/memory-curation.fingerprint'
+import { MemoryCandidateSchema, type MemoryCandidate } from '@domain/entities'
+import { createCurationIdempotencyKey } from '@application/use-cases'
 import {
   MemoryCurationUsageSchema,
   type MemoryCurationUsage,
   MemoryCurationIdentifierSchema,
   PurposeCodeSchema,
   type PurposeCode
-} from '@application/contracts/memory-curation.contract'
+} from '@application/contracts'
 
 export interface SourceClaimRequest {
   actorId: string

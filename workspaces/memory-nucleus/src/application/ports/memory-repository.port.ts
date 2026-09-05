@@ -3,8 +3,8 @@ import type {
   MemoryLifecycle,
   MemoryProvenance,
   MemoryTimeWindow
-} from '@application/contracts/memory-retrieval.contract'
-import type { MemoryTemporalPrecision } from '@domain/entities/memory-candidate.entity'
+} from '@application/contracts'
+import type { MemoryTemporalPrecision } from '@domain/entities'
 
 /**
  * Storage-facing record. Optional provenance permits defensive rejection of a
@@ -95,6 +95,9 @@ export interface AuthorizedRepositorySearch {
 
 export interface RepositorySearchDiagnostics {
   readonly authorizedRowsConsidered: number
+  /** Legacy adapters may omit instrumentation; absence does not mean zero calls. */
+  readonly fullTextCalls?: number
+  readonly fullTextSearchUsed?: boolean
   readonly matchedRows: number
   readonly vectorCalls: number
 }

@@ -14,6 +14,13 @@ import {
   type ConversationTurnResponseData
 } from '@repo/conversation-sdk'
 import { NoopObservability, type Observability } from '@repo/observability'
+import {
+  ExplicitMemoryInputSchema,
+  ExplicitMemoryOptionsSchema,
+  MemorySearchInputSchema,
+  UpdateMemoryConsentInputSchema,
+  type MemoryClient
+} from '@repo/memory-sdk'
 import Fastify, {
   type FastifyInstance,
   type FastifyReply,
@@ -37,6 +44,43 @@ import {
 
 const CONVERSATION_BODY_LIMIT_BYTES = 512 * 1024
 const SessionRequestSchema = z.object({}).strict()
+const MemoryRequestSchema = z.discriminatedUnion('operation', [
+  z
+    .object({
+      conversationId: z.string().uuid(),
+      operation: z.literal('get-consent')
+    })
+    .strict(),
+  z
+    .object({
+      conversationId: z.string().uuid(),
+      operation: z.literal('update-consent'),
+      input: UpdateMemoryConsentInputSchema
+    })
+    .strict(),
+  z
+    .object({
+      conversationId: z.string().uuid(),
+      operation: z.literal('remember'),
+      input: ExplicitMemoryInputSchema,
+      options: ExplicitMemoryOptionsSchema.optional()
+    })
+    .strict(),
+  z
+    .object({
+      conversationId: z.string().uuid(),
+      operation: z.literal('search'),
+      input: MemorySearchInputSchema
+    })
+    .strict(),
+  z
+    .object({
+      conversationId: z.string().uuid(),
+      operation: z.literal('forget'),
+      memoryId: z.string().uuid()
+    })
+    .strict()
+])
 
 export interface ChatterboxFactoryOptions {
   readonly allowedOrigins?: readonly string[]
@@ -45,11 +89,15 @@ export interface ChatterboxFactoryOptions {
   readonly clock?: () => Date
   readonly createConversationId?: () => string
   readonly createRealtimeCall?: (sdp: string) => Promise<string>
+  readonly createMemoryClient?: (
+    context: AuthenticatedConversationContext
+  ) => MemoryClient
   readonly createRuntime?: (
     context: AuthenticatedConversationContext
   ) => Pick<ConversationRuntime, 'execute'>
   readonly maxConcurrentTurns?: number
   readonly maxSessions?: number
+  readonly memoryReadiness?: () => Promise<boolean>
   readonly nowMs?: () => number
   readonly observability?: Pick<Observability, 'event'>
   readonly onObservationFailure?: () => Promise<void> | void
@@ -163,7 +211,8 @@ export function createChatterbox(
   }
 
   app.addHook('onRequest', async (request, reply) => {
-    if (request.method === 'GET' && request.url === '/health') return
+    if (request.method === 'GET' && ['/health', '/ready'].includes(request.url))
+      return
     reply.header('cache-control', 'no-store').header('vary', 'Cookie, Origin')
     // Opaque server correlation joins safe HTTP outcomes to observations;
     // it contains no account identity and never comes from request headers.
@@ -175,7 +224,9 @@ export function createChatterbox(
           ? 'turn'
           : request.routeOptions.url === '/v1/realtime/session'
             ? 'realtime'
-            : 'unknown'
+            : request.routeOptions.url === '/v1/development/memory'
+              ? 'memory'
+              : 'unknown'
     states.set(request, {
       observation: { operation, outcome: 'internal_error' },
       startedAt: Date.now(),
@@ -220,6 +271,26 @@ export function createChatterbox(
     fail(request, reply, 'invalid_request', String(request.id), 404)
   )
   app.get('/health', async () => ({ status: 'ok' as const }))
+  app.get('/ready', async (_request, reply) => {
+    reply.header('cache-control', 'no-store')
+    if (options.memoryReadiness === undefined) {
+      const disabled = options.createMemoryClient === undefined
+      return reply.status(disabled ? 200 : 503).send({
+        status: disabled ? 'ready' : 'not-ready',
+        memory: disabled ? 'disabled' : 'not-ready'
+      })
+    }
+    let ready = false
+    try {
+      ready = (await options.memoryReadiness()) === true
+    } catch {
+      ready = false
+    }
+    return reply.status(ready ? 200 : 503).send({
+      status: ready ? 'ready' : 'not-ready',
+      memory: ready ? 'ready' : 'not-ready'
+    })
+  })
 
   async function authorize(
     request: FastifyRequest,
@@ -358,6 +429,54 @@ export function createChatterbox(
       }
     }
   )
+
+  if (options.createMemoryClient !== undefined) {
+    const createMemoryClient = options.createMemoryClient
+    app.post(
+      '/v1/development/memory',
+      { preHandler: authorize },
+      async (request, reply) => {
+        const parsed = MemoryRequestSchema.safeParse(request.body)
+        if (!parsed.success) return fail(request, reply, 'invalid_request')
+        const state = states.get(request)
+        if (state?.identity === undefined)
+          return fail(request, reply, 'unauthenticated')
+        if (!sessions.owns(parsed.data.conversationId, state.identity))
+          return fail(request, reply, 'forbidden')
+        const release = sessions.acquireWork(state.identity)
+        if (release === null) return fail(request, reply, 'rate_limited')
+        try {
+          const client = createMemoryClient(
+            Object.freeze({
+              ...state.identity,
+              asOf: clock().toISOString(),
+              conversationId: parsed.data.conversationId,
+              purpose: 'conversation.support',
+              requestId: String(request.id)
+            })
+          )
+          const command = parsed.data
+          const data =
+            command.operation === 'get-consent'
+              ? await client.getConsent()
+              : command.operation === 'update-consent'
+                ? await client.updateConsent(command.input)
+                : command.operation === 'remember'
+                  ? await client.rememberExplicitly(
+                      command.input,
+                      command.options
+                    )
+                  : command.operation === 'search'
+                    ? await client.search(command.input)
+                    : await client.forget(command.memoryId)
+          state.observation.outcome = 'success'
+          return reply.send({ data })
+        } finally {
+          release()
+        }
+      }
+    )
+  }
 
   return app
 }

@@ -6,8 +6,8 @@ import {
   SaveCurationRunResultSchema,
   SourceClaimRequestSchema,
   SourceClaimResultSchema
-} from '@application/ports/memory-curation-persistence.port'
-import { createCurationIdempotencyKey } from '@application/use-cases/memory-curation.fingerprint'
+} from '@application/ports'
+import { createCurationIdempotencyKey } from '@application/use-cases'
 import type { MemoryCurationEvalCase } from './memory-curation-eval.contract'
 import {
   HASH_PATTERN,

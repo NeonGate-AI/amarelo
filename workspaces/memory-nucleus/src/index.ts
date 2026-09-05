@@ -1,47 +1,245 @@
-// Domain
-export * from '@domain/entities/memory.entity'
-export * from '@domain/entities/memory-candidate.entity'
-export * from '@domain/entities/memory-evidence.entity'
-export * from '@domain/entities/memory-consent.entity'
-export * from '@domain/value-objects/memory-judgment.vo'
-export * from '@domain/policies/memory-acceptance.policy'
-export * from '@domain/services/memory-economics.compute'
-export * from '@domain/schemas/memory-identifiers.schema'
-
-// Application contracts and ports
-export * from '@application/contracts/memory-curation.contract'
-export * from '@application/contracts/memory-curation-authorization.contract'
-export * from '@application/contracts/memory-retrieval.contract'
-export * from '@application/contracts/memory-retrieval.error'
-export * from '@application/ports/memory-authorization.port'
-export * from '@application/ports/memory-curation-persistence.port'
-export * from '@application/ports/memory-extractor.port'
-export * from '@application/ports/memory-repository.port'
-export * from '@application/ports/memory-retrieval-observer.port'
-export * from '@application/ports/canonical-memory.port'
-export * from '@application/ports/candidate-resolution.port'
-export * from '@application/ports/consent-ledger.port'
-export * from '@application/ports/observability.port'
-export * from '@application/ports/model-pricing.port'
-
-// Application use cases
-export * from '@application/use-cases/curate-memory.use-case'
-export * from '@application/use-cases/memory-curation.handler'
-export * from '@application/use-cases/retrieve-memory.use-case'
-export * from '@application/use-cases/accept-memory-candidate.use-case'
-export * from '@application/use-cases/resolve-memory-candidate.use-case'
-export * from '@application/use-cases/forget-memory.use-case'
-export * from '@application/use-cases/measure-memory-economics.use-case'
-
-// Infrastructure adapters intentionally exported only for composition roots/tests.
-export * from '@infrastructure/adapters/inference/langchain-memory-extractor.adapter'
-export * from '@infrastructure/adapters/persistence/postgres/postgres-memory.repository.adapter'
-export * from '@infrastructure/adapters/persistence/postgres/postgres-memory-curation.adapter'
-export * from '@infrastructure/adapters/persistence/postgres/postgres-canonical-memory.repository.adapter'
-export * from '@infrastructure/adapters/persistence/postgres/postgres-candidate-resolution.repository.adapter'
-export * from '@infrastructure/adapters/persistence/postgres/postgres-consent-ledger.repository.adapter'
-export * from '@infrastructure/adapters/observability/repo-observability.adapter'
-export * from '@infrastructure/adapters/testing/in-memory-memory.repository.adapter'
-export * from '@infrastructure/adapters/testing/in-memory-memory-authorization.adapter'
-export * from '@infrastructure/adapters/testing/in-memory-curation-authorization.adapter'
-export * from '@infrastructure/database'
+// Public composition API; internal directory barrels retain their own module boundaries.
+export {
+  CanonicalMemoryKindSchema,
+  CanonicalMemoryStateSchema,
+  CanonicalMemorySensitivitySchema,
+  CanonicalMemorySchema,
+  MemoryEntity,
+  MemoryKindSchema,
+  MEMORY_CANDIDATE_SCHEMA_VERSION,
+  MemoryConfidenceSchema,
+  MemoryTemporalPrecisionSchema,
+  ExtractedMemoryCandidateSchema,
+  MemoryCandidateProvenanceSchema,
+  MemoryCandidateSchema,
+  MemoryCandidateEntity,
+  MemoryEvidenceSourceSchema,
+  MemoryEvidenceSchema,
+  MemoryCapabilitySchema,
+  MemoryConsentStatusSchema,
+  MemoryConsentLedgerEntrySchema
+} from './domain/entities'
+export type {
+  CanonicalMemoryKind,
+  CanonicalMemoryState,
+  CanonicalMemorySensitivity,
+  CanonicalMemory,
+  MemoryKind,
+  MemoryConfidence,
+  MemoryTemporalPrecision,
+  ExtractedMemoryCandidate,
+  MemoryCandidateProvenance,
+  MemoryCandidate,
+  MemoryEvidence,
+  MemoryConsentLedgerEntry
+} from './domain/entities'
+export { MemoryJudgment } from './domain/value-objects'
+export type { MemoryJudgmentDecision } from './domain/value-objects'
+export { MemoryAcceptancePolicy } from './domain/policies'
+export type { MemoryAcceptanceCandidate } from './domain/policies'
+export { calculateMemoryEconomics } from './domain/services'
+export type {
+  MemoryEconomicsInput,
+  MemoryEconomicsMetrics
+} from './domain/services'
+export {
+  MemoryIdentifierSchema,
+  PurposeCodeSchema
+} from './domain/schemas'
+export type { PurposeCode } from './domain/schemas'
+export {
+  MemoryFormationSignalSchema,
+  MemoryCurationIdentifierSchema,
+  MemoryAuthorizationSchema,
+  ConversationSpeakerSchema,
+  ConversationTurnSchema,
+  MemoryCurationRequestSchema,
+  PreparedConversationTurnSchema,
+  PreparedMemorySourceSchema,
+  MemoryCurationSkipReasonSchema,
+  MemoryCurationGateDecisionSchema,
+  MemoryCurationUsageSchema,
+  MemoryCurationStatusSchema,
+  MemoryCurationResultSchema,
+  MemoryCurationAuthorizationDecisionStatusSchema,
+  MemoryCurationAuthorizationDecisionSchema,
+  MEMORY_AUTHOR_TYPES,
+  DEFAULT_MEMORY_RETRIEVAL_BUDGETS,
+  InvalidAuthorizedMemoryQueryError,
+  MemoryRepositoryScopeError,
+  MemoryRetrievalObservationError,
+  MemoryAuthorizationDecisionError
+} from './application/contracts'
+export type {
+  MemoryFormationSignal,
+  MemoryAuthorization,
+  ConversationSpeaker,
+  ConversationTurn,
+  MemoryCurationRequest,
+  PreparedConversationTurn,
+  PreparedMemorySource,
+  MemoryCurationSkipReason,
+  MemoryCurationGateDecision,
+  MemoryCurationUsage,
+  MemoryCurationStatus,
+  MemoryCurationResult,
+  MemoryCurationAuthorizationDecisionStatus,
+  MemoryCurationAuthorizationDecision,
+  MemoryCurationAuthorizationDecisionResolver,
+  ResolvedMemoryCurationAuthorization,
+  MemoryAuthorType,
+  MemoryLifecycle,
+  MemoryProvenance,
+  MemoryTimeWindow,
+  MemoryRetrievalBudgets,
+  AuthorizedMemoryQuery,
+  MemoryMatchType,
+  RetrievedSemanticMemoryContext,
+  RetrievedExactEpisodicMemoryContext,
+  RetrievedInexactEpisodicMemoryContext,
+  RetrievedEpisodicMemoryContext,
+  RetrievedMemoryContext,
+  RetrievedSemanticMemoryData,
+  RetrievedExactEpisodicMemoryData,
+  RetrievedInexactEpisodicMemoryData,
+  RetrievedEpisodicMemoryData,
+  RetrievedMemoryData,
+  EffectiveMemoryRetrievalBudgets,
+  AuthorizedMemoryRetrievalDiagnostics,
+  AuthorizedMemoryRetrievalResult,
+  MemoryRetrievalObservationFailure,
+  MemoryAuthorizationDecisionFailure
+} from './application/contracts'
+export {
+  MemoryAuthorizationDecisionResolver,
+  SourceClaimRequestSchema,
+  SourceClaimStatusSchema,
+  SourceClaimResultSchema,
+  SaveCurationRunRequestSchema,
+  SaveCurationRunResultSchema,
+  MemoryPersistenceClient,
+  MemoryExtractionSchema,
+  MemoryModelUsageSchema,
+  MemoryExtractionDeadlineMillisecondsSchema,
+  MemoryExtractionDeadlineError,
+  MemoryExtractor,
+  ScopedMemoryRepository,
+  MEMORY_RETRIEVAL_POLICY_VERSION,
+  MemoryRetrievalObserver,
+  CanonicalMemoryPort,
+  CandidateResolutionPort,
+  ConsentLedgerPort,
+  MemoryObservabilityPort,
+  ModelPricingPort
+} from './application/ports'
+export type {
+  MemoryAuthorizationDecisionStatus,
+  MemorySensitivity,
+  MemoryAuthorizationDecision,
+  AuthorizedMemoryRetrievalDependencies,
+  ResolvedMemoryAuthorization,
+  SourceClaimRequest,
+  SourceClaimStatus,
+  SourceClaimResult,
+  SaveCurationRunRequest,
+  SaveCurationRunResult,
+  MemoryExtraction,
+  MemoryExtractionInput,
+  MemoryModelUsage,
+  MemoryExtractionResult,
+  MemoryExtractionExecutionContext,
+  RepositorySemanticMemoryRecord,
+  RepositoryExactEpisodicMemoryRecord,
+  RepositoryInexactEpisodicMemoryRecord,
+  RepositoryEpisodicMemoryRecord,
+  RepositoryMemoryRecord,
+  AuthorizedRepositorySearch,
+  RepositorySearchDiagnostics,
+  RepositorySearchResult,
+  MemoryRetrievalCandidateDecision,
+  MemoryRetrievalCandidateTrace,
+  MemoryRetrievalTrace,
+  MemoryRetrievalObservationContext,
+  AcceptCandidateInput,
+  AcceptCandidateResult,
+  TombstoneMemoryInput,
+  NoncanonicalCandidateDecision,
+  ResolveNoncanonicalCandidateInput,
+  AppendConsentEntryInput,
+  MemoryMetric,
+  ModelInputPrice
+} from './application/ports'
+export {
+  CurateMemoryUseCase,
+  createMemoryCurationGraph,
+  invokeMemoryCurationGraph,
+  createMemoryCurationHandler,
+  retrieveAuthorizedMemory,
+  AcceptMemoryCandidateUseCase,
+  ResolveMemoryCandidateUseCase,
+  ForgetMemoryUseCase,
+  MeasureMemoryEconomicsUseCase
+} from './application/use-cases'
+export type {
+  MemoryCurationDependencies,
+  MemoryCurationGraph,
+  MemoryCurationGraphDependencies,
+  MemoryCurationHandler,
+  AcceptMemoryCandidateCommand,
+  ResolveMemoryCandidateCommand,
+  ForgetMemoryCommand,
+  MeasureMemoryEconomicsInput,
+  MeasuredMemoryEconomics
+} from './application/use-cases'
+export { LangChainMemoryExtractor } from './infrastructure/adapters/inference'
+export type { LangChainMemoryExtractorOptions } from './infrastructure/adapters/inference'
+export {
+  PostgresScopedMemoryRepository,
+  PostgresMemoryCurationAdapter,
+  PostgresCanonicalMemoryRepository,
+  PostgresCandidateResolutionRepository,
+  PostgresConsentLedgerRepository
+} from './infrastructure/adapters/persistence/postgres'
+export {
+  RepoMemoryObservabilityAdapter,
+  RepoMemoryRetrievalObserver
+} from './infrastructure/adapters/observability'
+export {
+  InMemoryScopedMemoryRepository,
+  InMemoryMemoryAuthorizationResolver,
+  InMemoryMemoryCurationAuthorizationResolver
+} from './infrastructure/adapters/testing'
+export type {
+  PostgresQueryResult,
+  PostgresExecutor,
+  PostgresTransactionExecutor
+} from './infrastructure/database'
+export type {
+  OperationalMemoryRuntime,
+  MemoryRequestScope,
+  OperationalMemoryReadiness
+} from './application/contracts'
+export { createNeo4jMemoryRuntime } from './infrastructure/database/neo4j'
+export type { Neo4jMemoryOptions } from './infrastructure/database/neo4j'
+export {
+  MemoryUsageEventSchema,
+  MemoryUsageLedgerEntrySchema,
+  MemoryPricingSnapshotSchema
+} from './application/contracts'
+export type {
+  MemoryUsageEvent,
+  MemoryUsageLedgerEntry,
+  MemoryPricingSnapshot,
+  MemoryUsageLedgerScope
+} from './application/contracts'
+export { createTextMemoryUsageEvent } from './application/services'
+export { MemoryUsageLedger } from './application/ports'
+export type { MemoryUsageObservationSink } from './application/ports'
+export type {
+  TrustedMemorySource,
+  MemoryCandidateStageResult,
+  MemorySubjectTextSource,
+  MemorySourceEvent,
+  EligibleMemorySource,
+  MemoryCandidateDeliveryClient
+} from './application/contracts'

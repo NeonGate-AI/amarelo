@@ -4,12 +4,12 @@ import {
   MemoryIdentifierSchema,
   PurposeCodeSchema,
   type PurposeCode
-} from '@domain/schemas/memory-identifiers.schema'
+} from '@domain/schemas'
 
 export {
   PurposeCodeSchema,
   type PurposeCode
-} from '@domain/schemas/memory-identifiers.schema'
+} from '@domain/schemas'
 
 export const MemoryFormationSignalSchema = z.enum([
   'eligible-source-delta',

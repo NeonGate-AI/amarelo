@@ -1,4 +1,4 @@
-import type { CanonicalMemoryPort } from '@application/ports/canonical-memory.port'
+import type { CanonicalMemoryPort } from '@application/ports'
 
 export interface ForgetMemoryCommand {
   readonly memoryId: string

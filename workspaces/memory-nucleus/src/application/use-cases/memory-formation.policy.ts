@@ -1,18 +1,18 @@
 import { z } from 'zod'
 
-import { createSourceFingerprint } from '@application/use-cases/memory-curation.fingerprint'
+import { createSourceFingerprint } from './memory-curation.fingerprint'
 import {
   estimateMemoryExtractionInputTokens,
   MEMORY_EXTRACTION_INPUT_ESTIMATOR_VERSION
-} from '@application/contracts/memory-extraction.contract'
+} from '@application/contracts'
 import {
   type MemoryCurationGateDecision,
   type MemoryCurationRequest,
   MemoryCurationRequestSchema,
   type PreparedMemorySource,
   PreparedMemorySourceSchema
-} from '@application/contracts/memory-curation.contract'
-import type { MemoryTextNormalizerPort } from '@application/ports/memory-text-normalizer.port'
+} from '@application/contracts'
+import type { MemoryTextNormalizerPort } from '@application/ports'
 
 export interface MemoryCurationPolicy {
   allowExpensiveFallback: false

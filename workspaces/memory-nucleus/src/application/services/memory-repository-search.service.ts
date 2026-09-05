@@ -1,17 +1,17 @@
 import type {
   AuthorizedRepositorySearch,
   ScopedMemoryRepository
-} from '@application/ports/memory-repository.port'
+} from '@application/ports'
 import type {
   AuthorizedMemoryQuery,
   EffectiveMemoryRetrievalBudgets
-} from '@application/contracts/memory-retrieval.contract'
-import { MemoryRepositoryScopeError } from '@application/contracts/memory-retrieval.error'
+} from '@application/contracts'
+import { MemoryRepositoryScopeError } from '@application/contracts'
 import {
   hasBoundedSerializedSize,
   MAX_RECORD_CHARACTERS,
   MAX_SERIALIZED_RECORD_CHARACTERS
-} from '@application/validation/memory-record-shape.validate'
+} from '@application/validation'
 
 const MAX_REPOSITORY_CANDIDATE_MULTIPLIER = 2
 
@@ -80,6 +80,29 @@ export function assertRepositorySearchResult(
   ) {
     throw new MemoryRepositoryScopeError(
       'repository used vector retrieval while vectorFallback was false'
+    )
+  }
+  const diagnostics = result.diagnostics
+  if (
+    'fullTextCalls' in diagnostics &&
+    diagnostics.fullTextCalls !== undefined &&
+    (typeof diagnostics.fullTextCalls !== 'number' ||
+      !Number.isSafeInteger(diagnostics.fullTextCalls) ||
+      diagnostics.fullTextCalls < 0)
+  ) {
+    throw new MemoryRepositoryScopeError(
+      'repository returned invalid full-text usage'
+    )
+  }
+  if (
+    'fullTextSearchUsed' in diagnostics &&
+    diagnostics.fullTextSearchUsed !== undefined &&
+    (!('fullTextCalls' in diagnostics) ||
+      typeof diagnostics.fullTextCalls !== 'number' ||
+      diagnostics.fullTextSearchUsed !== diagnostics.fullTextCalls > 0)
+  ) {
+    throw new MemoryRepositoryScopeError(
+      'repository returned inconsistent full-text usage'
     )
   }
 }

@@ -1,9 +1,9 @@
-import { retrieveAuthorizedMemory } from '@application/use-cases/retrieve-memory.use-case'
-import type { RepositoryMemoryRecord } from '@application/ports/memory-repository.port'
+import { retrieveAuthorizedMemory } from '@application/use-cases'
+import type { RepositoryMemoryRecord } from '@application/ports'
 import type {
   AuthorizedMemoryQuery,
   AuthorizedMemoryRetrievalResult
-} from '@application/contracts/memory-retrieval.contract'
+} from '@application/contracts'
 import {
   createMemoryRetrievalScenario,
   syntheticDirectReportMemoryRecord,

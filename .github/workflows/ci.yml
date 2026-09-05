@@ -93,6 +93,10 @@ jobs:
       - name: Test
         run: pnpm exec turbo run test
 
+      - name: Validate operational Memory against disposable Neo4j
+        timeout-minutes: 10
+        run: pnpm --filter chatterbox run test:integration
+
       - name: Validate current Memory PostgreSQL reference adapter
         run: pnpm --filter @nucleus/memory run test:database
 

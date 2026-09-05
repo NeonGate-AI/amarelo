@@ -79,6 +79,7 @@ The implementation must distinguish:
 - Metrics for poison-at-1, poison-in-projection, answer corruption, utility retained, critical Recall@k, abstention, latency and cost.
 - Comparison of deterministic hard eligibility, trust-weighted ranking and optional model-assisted detection.
 - Hidden eval gate before SPEC-017 canary advancement.
+- Source-attribution assurance for patient text, assistant suggestions, ambiguous acknowledgments and content-free inactivity under SPEC-025.
 
 ## Implementation Decisions
 
@@ -92,6 +93,9 @@ The implementation must distinguish:
 - A conflict between eligible memories that cannot be deterministically resolved must preserve uncertainty; silent winner-takes-all semantic ranking is prohibited.
 - Non-default store configuration is part of the test fixture and every lifecycle operation must demonstrate the same effective tenant/schema/database identity.
 - This spec must not adopt external memory frameworks, sidecars or retrieval platforms.
+- Include an assistant-suggested false fact followed by an ambiguous patient acknowledgment, repeated deterministic Ana replies, a forged person role and a delegate statement mislabeled as patient self-report. Ana's output, silence and unresolved attribution must not become canonical patient facts or eligible projection merely because their text is relevant.
+- Test source eligibility at persistence/formation as well as retrieval. Preserve zero-call rejection where deterministic gates can reject the input; preserve extractor abstention for unsupported eligible patient text. Conversational coherence from a temporary assistant turn is not evidence of Memory truth.
+- Report correct abstention on ambiguous evidence separately from missed recall on self-contained, eligible patient facts. Cost priority does not relax privacy, provenance, lifecycle or integrity gates; mitigations remain separately costed.
 
 ## Testing Decisions
 
@@ -132,6 +136,8 @@ Use synthetic tenants, subjects, evidence, memories and false memories only. No 
 - [ ] Policy-ineligible records have zero ranking/projection eligibility regardless of similarity, salience, recency, decay or trust score.
 - [ ] `poison_at_1`, `poison_projection_rate`, `answer_corruption_rate`, `utility_retained_under_attack`, critical Recall@k and abstention rate are reported.
 - [ ] A conflict between unresolved eligible memories cannot silently become a single asserted fact through similarity alone.
+- [ ] Assistant suggestions/repetitions, inactivity and forged or mismatched speaker attribution cannot be laundered into patient-reported Memory through formation, replay or projection.
+- [ ] Ambiguous patient acknowledgments produce no unsupported fact; metrics distinguish correct abstention from recall failures on eligible self-contained facts.
 - [ ] Explicit non-default store configuration is honored by write, retrieve, supersede, suppress, replay, restore, reindex and rebuild paths.
 - [ ] No lifecycle path silently falls back to a default tenant/schema/database.
 - [ ] Normal deterministic retrieval remains zero-LLM.
@@ -155,6 +161,6 @@ This harness change promotes the durable decision-level assurance requirements i
 
 ## Further Notes
 
-Owner execution hold (2026-09-05): do not start implementation until the SPEC-025 grill-me session reaches explicitly confirmed shared understanding and any affected contracts are reconciled. The technical dependency order below remains valid; this hold overrides immediate execution of a ready contract.
+SPEC-025 reconciliation (2026-09-05): the owner accepted the consolidated discovery and requested this contract revision. The discovery hold is resolved; this phase remains ready and unimplemented. [SPEC-025](007-plans-and-entitlements.spec.md) adds source-contamination and correct-abstention cases to the existing poisoning gate. Lower cost and greater duration never waive these protections. This revision changes contracts only.
 
 Blocked by SPEC-011's paired shadow/parity evidence over the SPEC-016/SPEC-012 path. This assurance phase is a required gate before user-visible canary advancement. It strengthens the existing roadmap rather than replacing authorization, lifecycle, shadow, A/B or economics phases.

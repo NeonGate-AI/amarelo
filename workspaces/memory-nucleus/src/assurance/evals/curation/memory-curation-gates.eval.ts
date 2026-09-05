@@ -3,18 +3,18 @@ import assert from 'node:assert/strict'
 import type {
   MemoryCurationAuthorizationDecision,
   MemoryCurationAuthorizationDecisionResolver
-} from '@application/contracts/memory-curation-authorization.contract'
+} from '@application/contracts'
 import {
   MemoryCurationAuthorizationError,
   type MemoryCurationAuthorizationFailure
 } from '@application/use-cases'
-import type { MemoryCurationRequest } from '@application/contracts/memory-curation.contract'
-import { DEFAULT_MEMORY_CURATION_POLICY } from '@application/use-cases/memory-formation.policy'
+import type { MemoryCurationRequest } from '@application/contracts'
+import { DEFAULT_MEMORY_CURATION_POLICY } from '@application/use-cases'
 import {
   estimateMemoryExtractionInputTokens,
   MEMORY_EXTRACTION_INPUT_ESTIMATOR_VERSION,
   serializeMemoryExtractionApplicationPayload
-} from '@application/contracts/memory-extraction.contract'
+} from '@application/contracts'
 import type { MemoryCurationEvalCase } from './memory-curation-eval.contract'
 import {
   FIXED_NOW,

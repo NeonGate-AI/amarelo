@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict'
 
-import type { AuthorizedMemoryRetrievalResult } from '@application/contracts/memory-retrieval.contract'
+import type { AuthorizedMemoryRetrievalResult } from '@application/contracts'
 import type { MemoryRetrievalEvalCase } from './memory-retrieval.contract.ts'
 import {
   authorizedMemoryQuery,

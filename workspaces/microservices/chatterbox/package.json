@@ -13,21 +13,26 @@
     "test": "vitest run && node --import tsx src/assurance/evals/chatterbox/chatterbox.eval.ts && node --import tsx src/assurance/evals/realtime-session/realtime-session.eval.ts && node --import tsx src/assurance/evals/pre-memory-baseline/pre-memory-baseline.eval.ts",
     "typecheck": "tsc --noEmit",
     "eval": "node --import tsx src/assurance/evals/pre-memory-baseline/pre-memory-baseline.eval.ts",
-    "eval:baseline": "node --import tsx src/assurance/evals/pre-memory-baseline/pre-memory-baseline.eval.ts"
+    "eval:baseline": "node --import tsx src/assurance/evals/pre-memory-baseline/pre-memory-baseline.eval.ts",
+    "test:integration": "vitest run --config vitest.integration.config.ts"
   },
   "dependencies": {
     "@ai/ana": "workspace:*",
     "@ai/conversation": "workspace:*",
     "@langchain/core": "1.2.9",
     "@langchain/openai": "1.5.11",
+    "@nucleus/memory": "workspace:*",
     "@repo/conversation-sdk": "workspace:*",
+    "@repo/memory-sdk": "workspace:*",
     "@repo/observability": "workspace:*",
     "@workos-inc/node": "10.13.0",
     "fastify": "5.12.1",
     "zod": "4.4.3"
   },
   "devDependencies": {
+    "@testcontainers/neo4j": "12.1.0",
     "@types/node": "24.13.3",
+    "neo4j-driver": "6.2.0",
     "tsx": "4.23.12",
     "typescript": "5.9.2",
     "vitest": "4.1.0"
