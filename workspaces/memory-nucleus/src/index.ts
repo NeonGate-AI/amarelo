@@ -250,3 +250,6 @@ export { MemoryBackgroundJobSchema } from './application/background'
 export type { MemoryBackgroundJob, MemoryBackgroundProfile, MemoryBackgroundIngestResult, MemoryBackgroundProcessResult } from './application/background'
 export { startMemoryBackgroundWorker, MEMORY_BACKGROUND_QUEUE } from './infrastructure/queue'
 export type { MemoryBackgroundWorkerOptions, MemoryBackgroundWorkerRuntime } from './infrastructure/queue'
+
+export { MemoryIntegrityReportSchema, serializeMemoryIntegrityReport, evaluateMemoryIntegrityGate } from './application/integrity'
+export type { MemoryIntegrityReport, MemoryIntegrityGate } from './application/integrity'

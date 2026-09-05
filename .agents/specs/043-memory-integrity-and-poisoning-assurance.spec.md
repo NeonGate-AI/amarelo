@@ -2,13 +2,15 @@
 id: SPEC-043
 title: Add Memory integrity and poisoning assurance before canary
 type: experiment
-status: ready
+status: implemented
 mode: prospective
 created: 2026-09-04
 updated: 2026-09-05
 owners:
   - Jonatas Sales
 targets:
+  - workspaces/memory-nucleus/src/assurance/integrity
+  - workspaces/memory-nucleus/src/application/integrity
   - workspaces/memory-nucleus/src/assurance/evals
   - workspaces/packages/memory-sdk
   - Memory serving assurance
@@ -34,7 +36,10 @@ skills:
   - .agents/skills/implement/SKILL.md
   - .agents/skills/code-review/SKILL.md
 evidence:
-  - pending
+  - workspaces/memory-nucleus/src/assurance/integrity/memory-integrity.fixtures.ts
+  - workspaces/memory-nucleus/src/assurance/integrity/memory-integrity.runner.ts
+  - workspaces/memory-nucleus/src/application/integrity/memory-integrity-gate.policy.ts
+  - pending validation under owner-directed deferral
 ---
 
 # SPEC-043: Add Memory integrity and poisoning assurance before canary
@@ -99,6 +104,18 @@ The implementation must distinguish:
 
 ## Testing Decisions
 
+### Owner-directed validation deferral — 2026-09-05
+
+The owner authorized implementation of the ready sequence while deferring validation to conserve the remaining credit budget. This cycle writes runnable assurance and gates without executing evals, tests, reviews or new research. Implementation status must not imply that the shadow, hidden-holdout, cost or exact-head validation gates passed. SPEC-017 exposure remains held until those evidence requirements are actually satisfied.
+
+### Implementation delivery and outstanding evidence — 2026-09-05
+
+The implementation includes a versioned development corpus of 100 synthetic records with two declarative false records; public SDK formation/retrieval/lifecycle exercises; a disposable non-default Neo4j fixture adapter; content-free ranked-candidate capture; a redacted report contract; and a shared development/independent-holdout gate. Native index recreation, scoped reconstruction of derived search text, and stale-head restoration are separate fixtures. They retain canonical suppression and consent state and do not claim safety for a complete database rollback.
+
+Serving now applies existing scope/provenance/lifecycle/temporal guards before the bounded conflict filter and ranking. The filter abstains on overlapping, query-matching semantic candidates with the same normalized semantic key and different statements; it makes no inference about unrelated keys or facts outside the retrieved candidate set.
+
+The runner leaves validation pending, records unavailable answer/cost/ranking measurements as unknown, and requires independently supplied holdout fixtures. The lexical and fixed trust-weighted baselines are synthetic diagnostic comparisons, not measured production alternatives. No model-assisted detector is enabled. The required poisoned retrieval, temporal/source/lifecycle isolation results, cost attribution, quality thresholds, holdout, full CI and both reviews remain unexecuted validation debt. No passing artifact has been produced. Acceptance checkboxes remain unchecked until evidence exists; `implemented` records code delivery under the owner's deferral, not canary readiness.
+
 ### Primary seam
 
 Drive synthetic multi-tenant fixtures through the public Memory SDK / Nucleus serving seam, inject adversarial records and observe the exact ranked candidate set, bounded projection and resulting evaluation artifact.
@@ -161,6 +178,6 @@ This harness change promotes the durable decision-level assurance requirements i
 
 ## Further Notes
 
-SPEC-025 reconciliation (2026-09-05): the owner accepted the consolidated discovery and requested this contract revision. The discovery hold is resolved; this phase remains ready and unimplemented. [SPEC-025](007-plans-and-entitlements.spec.md) adds source-contamination and correct-abstention cases to the existing poisoning gate. Lower cost and greater duration never waive these protections. This revision changes contracts only.
+SPEC-025 reconciliation (2026-09-05): the owner accepted the consolidated discovery and requested the contract revision, resolving the discovery hold. [SPEC-025](007-plans-and-entitlements.spec.md) adds source-contamination and correct-abstention cases to the existing poisoning gate. Lower cost and greater duration never waive these protections. The later owner-authorized implementation is recorded above with validation explicitly deferred.
 
 Blocked by SPEC-011's paired shadow/parity evidence over the SPEC-016/SPEC-012 path. This assurance phase is a required gate before user-visible canary advancement. It strengthens the existing roadmap rather than replacing authorization, lifecycle, shadow, A/B or economics phases.

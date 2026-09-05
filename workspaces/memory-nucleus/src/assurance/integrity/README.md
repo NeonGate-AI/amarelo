@@ -1,0 +1,11 @@
+# Memory integrity assurance
+
+This leaf is invoked explicitly against a disposable **non-default** Neo4j database. It does not run on import. It creates isolated synthetic subjects, uses the public runtime SDK for ordinary operations, and removes those subjects in `finally`. Its fixture driver only injects adversarial state, observes store identity and reconstructs derived state. Native reindexing affects the configured disposable database; do not point it at a shared or production database.
+
+Compose `MemoryIntegrityTraceCollector` as `createNeo4jMemoryRuntime({ ...configuration, retrievalObserver: collector })`. Supply that runtime, a `Neo4jMemoryIntegrityFixtureStore` using the same database, the exact `evaluatedHead`, and `readRankedMemoryIds: collector.readRankedMemoryIds` to `runMemoryIntegrityAssurance`. The caller owns both runtime and fixture-driver shutdown. Clear the collector after the run. Normal runtime configuration continues to use the no-op observer.
+
+The built-in development corpus contains 98 legitimate records and two false, non-imperative records. A holdout corpus must be supplied independently; relabeling the development fixture does not establish independent evidence. Optional `evaluateAnswer` and `measureRunCost` callbacks provide actual downstream answer evaluation and attributable BRL cost evidence. Missing callbacks produce unknown metrics and a held gate, never zero corruption or zero cost.
+
+`serializeMemoryIntegrityReport` emits only the allowlisted redacted report. `createPendingMemoryIntegrityReport` can describe an unexecuted run without touching the runtime. `evaluateMemoryIntegrityGate({ expectedHead, development, holdout })` is the shared SPEC-017/SPEC-018 gate. The runner always leaves CI/review validation pending; actual exact-head evidence must be attached before promotion. No run, metric, hidden-holdout result or CI/review pass was produced during this owner-directed validation deferral.
+
+The lexical and fixed trust-weighted comparisons are corpus diagnostics. They do not bypass production eligibility, claim deployment, or enable a model-assisted detector. Rebuild means reconstruction of scoped derived search text from canonical versions while retaining suppression; stale-head restore also retains the suppression ledger. Neither fixture represents a complete database rollback.

@@ -143,14 +143,12 @@ export function normalizedSemanticMemoryKeySet(
   )
 }
 
-export function rankEligibleMemoryRecord(
+export function isMemoryRecordEligibleForRanking(
   record: RepositoryMemoryRecord,
   query: AuthorizedMemoryQuery,
   fromInclusiveEpoch: number | null,
-  toExclusiveEpoch: number | null,
-  normalizedSemanticKeys: ReadonlySet<string>,
-  queryTokens: ReadonlySet<string>
-): RankedMemoryRecord | null {
+  toExclusiveEpoch: number | null
+): record is RepositoryMemoryRecord & { readonly provenance: MemoryProvenance } {
   if (
     !isBoundedNonEmptyString(record.id) ||
     record.tenantId !== query.tenantId ||
@@ -177,14 +175,27 @@ export function rankEligibleMemoryRecord(
     !hasValidMemoryProvenance(record.provenance) ||
     !hasValidMemoryTemporalSemantics(record)
   )
-    return null
+    return false
 
   const observedAtEpoch = parseStoredTimestamp(record.observedAt)
   if (
     observedAtEpoch === null ||
     !isMemoryEligibleForTimeWindow(record, fromInclusiveEpoch, toExclusiveEpoch)
   )
-    return null
+    return false
+
+  return true
+}
+
+export function rankEligibleMemoryRecord(
+  record: RepositoryMemoryRecord,
+  query: AuthorizedMemoryQuery,
+  fromInclusiveEpoch: number | null,
+  toExclusiveEpoch: number | null,
+  normalizedSemanticKeys: ReadonlySet<string>,
+  queryTokens: ReadonlySet<string>
+): RankedMemoryRecord | null {
+  if (!isMemoryRecordEligibleForRanking(record, query, fromInclusiveEpoch, toExclusiveEpoch)) return null
 
   const exactSemanticKey = hasExactSemanticKeyMatch(
     record,
