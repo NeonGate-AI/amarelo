@@ -70,6 +70,35 @@ const ChatterboxEnvironmentSchema = z
     CHATTERBOX_MEMORY_BACKGROUND_PROFILE: z
       .enum(['free', 'internal'])
       .default('free'),
+    CHATTERBOX_MEMORY_SHADOW_ENABLED: z
+      .enum(['true', 'false'])
+      .default('false')
+      .transform((value) => value === 'true'),
+    CHATTERBOX_MEMORY_SHADOW_TIMEOUT_MS: z.coerce
+      .number()
+      .int()
+      .positive()
+      .max(5_000)
+      .default(250),
+    CHATTERBOX_MEMORY_SHADOW_MAX_CONCURRENT: z.coerce
+      .number()
+      .int()
+      .positive()
+      .max(4)
+      .default(2),
+    CHATTERBOX_MEMORY_RECENT_BUFFER_TOKENS: z.coerce
+      .number()
+      .int()
+      .nonnegative()
+      .max(600)
+      .default(256),
+    CHATTERBOX_MEMORY_COMPARISON_METADATA_JSON: z.preprocess(
+      (value) =>
+        typeof value === 'string' && value.trim().length === 0
+          ? undefined
+          : value,
+      z.string().trim().min(1).max(8_000).optional()
+    ),
     CHATTERBOX_MEMORY_INTERNAL_SUBJECT_IDS: z
       .string()
       .default('')
@@ -133,6 +162,16 @@ const ChatterboxEnvironmentSchema = z
         message:
           'Background ingestion requires the authenticated Memory binding',
         path: ['CHATTERBOX_MEMORY_BACKGROUND_ENABLED']
+      })
+    }
+    if (
+      configuration.CHATTERBOX_MEMORY_SHADOW_ENABLED &&
+      !configuration.CHATTERBOX_MEMORY_ENABLED
+    ) {
+      context.addIssue({
+        code: 'custom',
+        message: 'Shadow requires the authenticated Memory binding',
+        path: ['CHATTERBOX_MEMORY_SHADOW_ENABLED']
       })
     }
     if (!configuration.CHATTERBOX_MEMORY_ENABLED) return

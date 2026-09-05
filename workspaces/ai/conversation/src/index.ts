@@ -4,3 +4,5 @@ export * from './memory'
 export * from './ports'
 export * from './routing'
 export * from './runtime'
+
+export * from './shadow'
