@@ -2,7 +2,7 @@
 id: SPEC-051
 title: Execute Memory orchestration with LangGraph and the existing BullMQ worker
 type: feature
-status: in-progress
+status: implemented
 mode: prospective
 created: 2026-09-05
 updated: 2026-09-05
@@ -30,7 +30,8 @@ skills:
   - .agents/skills/grilling/SKILL.md
   - .agents/skills/grill-me/SKILL.md
 evidence:
-  - pending
+  - workspaces/memory-nucleus/src/infrastructure/orchestration/langgraph-memory-background.adapter.ts
+  - workspaces/memory-nucleus/src/application/background/memory-background-orchestration.port.ts
 ---
 
 # SPEC-051: Execute Memory orchestration with LangGraph and the existing BullMQ worker
@@ -103,3 +104,7 @@ Implementation and pending live verification are recorded separately. Promote th
 
 The owner approved Realtime speech plus LangGraph Memory orchestration by answering “primeira opcao” on 2026-09-05, and explicitly deferred WorkOS. This is the shared-understanding confirmation requested by the grilling skill. The scope derives from the settled MVP portion of SPEC-025 and extends the background contract whose filename rank is 025 but durable ID is SPEC-012. Delivery order: SPEC-050 → SPEC-051 → SPEC-052.
 
+
+Implementation delivered on `feat/spec-051-langgraph-memory-orchestration`. Memory public exports and the worker artifact compiled with pinned @langchain/langgraph 1.4.14. No broker/database/provider scenario or tests were executed. Pending runtime acceptance remains in SPEC-049.
+
+Reference: [LangGraph graph API](https://docs.langchain.com/oss/javascript/langgraph/graph-api).

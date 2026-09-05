@@ -23,6 +23,7 @@ import { createTextMemoryUsageEvent, createUnknownCostMemoryUsageLedgerEntry } f
 import { DEFAULT_MEMORY_CURATION_POLICY, prepareMemoryCuration } from '@application/use-cases'
 import { assertNeo4jMemoryScope, neo4jMemoryFingerprint, neo4jMemoryScopeKey } from '@infrastructure/adapters/persistence/neo4j'
 import { initializeNeo4jMemorySchema, isNeo4jMemoryTransactionSchemaReady } from '@infrastructure/database/neo4j'
+import { LangGraphMemoryBackgroundAdapter } from '@infrastructure/orchestration'
 import { activateBackgroundCandidates } from './neo4j-background-activation.service'
 
 export interface Neo4jMemoryBackgroundOptions {
@@ -480,7 +481,7 @@ export async function createNeo4jMemoryBackgroundRuntime(options:Neo4jMemoryBack
       await driver.executeQuery(`CREATE CONSTRAINT ${name} IF NOT EXISTS FOR (n:${label}) REQUIRE n.${property} IS UNIQUE`,{}, {database:options.database})
   } catch (error) {await driver.close();throw error}
   const store=new Neo4jBackgroundStore(driver,options,now,leaseMs,maxAttempts)
-  const engine=options.extractor===undefined?null:new MemoryBackgroundEngine(store,options.extractor,now)
+  const engine=options.extractor===undefined?null:new MemoryBackgroundEngine(store,options.extractor,now,new LangGraphMemoryBackgroundAdapter())
   return {
     ingest:(scope:MemoryRequestScope,source:TrustedMemorySource,formationSignal:MemoryFormationSignal,profile:MemoryBackgroundProfile)=>store.ingest(scope,source,formationSignal,profile),
     pending:(limit=100)=>store.pending(limit),
