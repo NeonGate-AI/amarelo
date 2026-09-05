@@ -1,4 +1,15 @@
-# ADR 0024: Track the pnpm lockfile for reproducible installs
+---
+id: ADR-0024
+title: Track the pnpm lockfile for reproducible installs
+status: accepted
+date: 2026-09-03
+deciders:
+  - product-owner
+supersedes: []
+superseded-by: null
+---
+
+# ADR-0024: Track the pnpm lockfile for reproducible installs
 
 ## Status
 

@@ -2,7 +2,7 @@
 id: SPEC-047
 title: Vertical slice textual, autenticado e observável
 type: feature
-status: ready
+status: implemented
 mode: prospective
 created: 2026-09-05
 updated: 2026-09-05
@@ -33,7 +33,12 @@ skills:
   - .agents/skills/tdd/SKILL.md
   - .agents/skills/code-review/SKILL.md
 evidence:
-  - pending
+  - workspaces/microservices/chatterbox/src/assurance/tests/authenticated-conversation
+  - workspaces/microservices/chatterbox/src/assurance/evals/pre-memory-baseline
+  - workspaces/packages/conversation-sdk/src/assurance/evals/conversation-sdk
+  - workspaces/apps/mobile/src/assurance/evals/mobile-conversation
+  - workspaces/ai/conversation/src/assurance/evals/conversation-runtime
+  - workspaces/apps/mobile/readme.md
 ---
 
 # SPEC-047: Vertical slice textual, autenticado e observável
@@ -90,16 +95,16 @@ Focused red-to-green tests/evals, affected typechecks, lint, builds and Elo audi
 
 ## Acceptance Criteria
 
-- [ ] Production composition authenticates existing WorkOS sessions and fails closed for missing configuration, missing/invalid/expired authentication and resolver failure.
-- [ ] Server-issued conversations are principal-bound, bounded and expiring; another principal cannot reuse one.
-- [ ] Server derives purpose and asOf; injected tenant/subject/purpose/time fields are rejected at the HTTP boundary.
-- [ ] Missing/invalid origin, oversize input, exhausted limits and concurrent work reject safely before provider invocation; health remains dependency-free.
-- [ ] SDK and development PWA acquire a server session, send same-origin credentials, handle safe auth/session failures and preserve cancellation without persistence.
-- [ ] Success and failure emit allowlisted content-free observations with server correlation and honest nullable usage; sink failure is bounded and never leaks raw content.
-- [ ] Memory availability and contract failures are distinguishable without enabling durable Memory or exposing failed projections.
-- [ ] Existing Realtime provider access has no unauthenticated bypass.
-- [ ] Scoped tests, local validation and independent review evidence are recorded with unexecuted live gates explicit.
-- [ ] Trusted-context ownership, local setup, runtime limitations and the next SPEC-016 bridge are promoted to durable context.
+- [x] Production composition authenticates existing WorkOS sessions and fails closed for missing configuration, missing/invalid/expired authentication and resolver failure.
+- [x] Server-issued conversations are principal-bound, bounded and expiring; another principal cannot reuse one.
+- [x] Server derives purpose and asOf; injected tenant/subject/purpose/time fields are rejected at the HTTP boundary.
+- [x] Missing/invalid origin, oversize input, exhausted limits and concurrent work reject safely before provider invocation; health remains dependency-free.
+- [x] SDK and development PWA acquire a server session, send same-origin credentials, handle safe auth/session failures and preserve cancellation without persistence.
+- [x] Success and failure emit allowlisted content-free observations with server correlation and honest nullable usage; sink failure is bounded and never leaks raw content.
+- [x] Memory availability and contract failures are distinguishable without enabling durable Memory or exposing failed projections.
+- [x] Existing Realtime provider access has no unauthenticated bypass.
+- [x] Scoped tests, local validation and independent review evidence are recorded with unexecuted live gates explicit.
+- [x] Trusted-context ownership, local setup, runtime limitations and the next SPEC-016 bridge are promoted to durable context.
 
 ## Failure Behavior
 
@@ -112,6 +117,14 @@ Neo4j driver/schema/outbox, persistent MemoryClient, BullMQ worker, durable chat
 ## Evidence and Promotion
 
 Promote trusted request context and observation ownership to Chatterbox/Conversation context, configuration examples to server/browser templates, and regression invariants to tests and audits. Record exact local commands and honest unavailable gates before closing.
+
+### Local execution evidence — 2026-09-05
+
+- `corepack pnpm --filter chatterbox test`: authenticated/owned Fastify tests plus existing text, Realtime and sanitized pre-Memory baseline evals. Adversarial fixtures cover origin, forged authority, principal/session ownership, expiry, capacity, concurrency, resolver failure and redacted observations. The real locked WorkOS SDK rejects an invalid seal without a live identity call.
+- `corepack pnpm --filter @repo/conversation-sdk test`, `corepack pnpm --filter mobile test` and `corepack pnpm --filter @ai/conversation test`: PASS. SDK regressions include cancellation and timeout after response headers; Mobile tests prove ephemeral session/history reset and cancellation before paid work; Memory diagnostics distinguish dependency, contract and unexpected failures.
+- The complete local test and typecheck graphs, sequential workspace builds, Biome and dependency-free Elo checks passed. Mobile emits a non-blocking bundle-size warning; no performance budget claim is made.
+- Independent review identified and repaired cancellation classification, dev-command environment filtering, authenticated setup instructions and production telemetry backpressure. Final fixed-head review results are recorded in the delivery handoff.
+- Trusted context, WorkOS renewal limitations, process-local limits, setup and telemetry ownership are promoted to the linked contexts and Mobile README. No real WorkOS login, paid provider, full-browser journey, cluster deployment or remote CI was performed. SPEC-016 remains the unimplemented concrete Memory bridge.
 
 ## Further Notes
 

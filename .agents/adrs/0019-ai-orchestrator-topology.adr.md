@@ -1,8 +1,19 @@
-# ADR 0019: Group Conversation under the AI orchestrator parent
+---
+id: ADR-0019
+title: Group Conversation under the AI orchestrator parent
+status: superseded
+date: 2026-09-03
+deciders:
+  - product-owner
+supersedes: []
+superseded-by: ADR-0023
+---
+
+# ADR-0019: Group Conversation under the AI orchestrator parent
 
 ## Status
 
-Superseded on 2026-09-03 by [ADR-0023](0023-direct-ai-conversation-topology.md).
+Superseded on 2026-09-03 by [ADR-0023](0023-direct-ai-conversation-topology.adr.md).
 
 ## Context
 

@@ -125,7 +125,16 @@ async function createArtifact(): Promise<PreMemoryBaselineArtifact> {
   })
 
   try {
-    const result = await client.turn(PRE_MEMORY_BASELINE_REQUEST)
+    await client.session()
+    const {
+      asOf: _historicalTime,
+      purpose: _historicalPurpose,
+      ...transport
+    } = PRE_MEMORY_BASELINE_REQUEST
+    const result = await client.turn({
+      ...transport,
+      history: [...transport.history]
+    })
     assert.equal(model.requests.length, 1)
     assert.equal(result.metrics.memoryStatus, 'skipped')
     assert.equal(result.metrics.firstTokenLatency.status, 'unavailable')

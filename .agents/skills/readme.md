@@ -25,31 +25,18 @@ They are the only retained workflow skills from the Matt Pocock import lineage. 
 
 ## Project and domain skills
 
-These independently sourced or project-native skills remain available:
+The current product surfaces justify three maintained domain procedures:
 
-- accessibility
-- agent-memory-systems
-- best-practices
-- context-engineering
-- core-web-vitals
-- deep-agents-core
-- deep-agents-memory
-- deep-agents-orchestration
-- documentation-and-adrs
-- frontend-ui-engineering
-- langchain-architecture
-- langchain-fundamentals
-- langchain-middleware
-- langchain-rag
-- langchain-typescript-quickstart
-- langgraph-docs
-- langgraph-human-in-the-loop
-- langgraph-persistence
-- managed-deep-agents
-- performance
-- pwa-development
-- seo
-- spec-driven-development
-- web-quality-audit
+- [accessibility](accessibility/SKILL.md): keyboard, screen-reader, contrast, reflow and authentication review.
+- [frontend-ui-engineering](frontend-ui-engineering/SKILL.md): existing design-system UI, transient state and asynchronous interaction.
+- [pwa-development](pwa-development/SKILL.md): installation, static-shell privacy and safe service-worker updates.
+
+Load them from the owning workspace/workflow context. They use the current test platform rather than the obsolete static-only verification policy.
 
 Supporting `references/`, `scripts/`, `agents/` and companion Markdown remain colocated with an owning retained skill when applicable.
+
+## SPEC-046 curation
+
+The owner removed these 21 presently unused or redundant packages: `agent-memory-systems`, `best-practices`, `context-engineering`, `core-web-vitals`, `deep-agents-core`, `deep-agents-memory`, `deep-agents-orchestration`, `documentation-and-adrs`, `langchain-architecture`, `langchain-fundamentals`, `langchain-middleware`, `langchain-rag`, `langchain-typescript-quickstart`, `langgraph-docs`, `langgraph-human-in-the-loop`, `langgraph-persistence`, `managed-deep-agents`, `performance`, `seo`, `spec-driven-development` and `web-quality-audit`.
+
+Canonical `to-spec` replaces the redundant spec router; `domain-modeling` and `writing-for-agents` own architectural/documentation procedures. Memory rules and accepted ADRs own the Neo4j boundary. LangChain remains an implementation dependency where declared, but that does not justify LangGraph, vector-store or Deep Agents instruction packages. Removed files remain recoverable from Git history; reintroduction needs a concrete consumer and a maintained contract.

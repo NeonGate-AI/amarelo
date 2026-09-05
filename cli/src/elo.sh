@@ -110,6 +110,10 @@ case "$elo_command" in
     [ "$#" -eq 0 ] || elo_usage_error "Audit checks do not accept additional arguments."
     case "$elo_subcommand" in
       architecture) elo_run_check architecture ;;
+      canonical)
+        elo_run_check canonical
+        elo_run_check canonical-regressions
+        ;;
       imports) elo_run_check import-boundaries ;;
       memory) elo_run_check memory-invariants ;;
       platform) elo_run_check elo-platform ;;
@@ -118,11 +122,11 @@ case "$elo_command" in
       skills) elo_run_check workflow-skills ;;
       specs) elo_run_check specs ;;
       all)
-        for elo_check in elo-platform architecture rules specs workflow-skills runtime import-boundaries memory-invariants; do
+        for elo_check in elo-platform architecture rules specs canonical canonical-regressions workflow-skills runtime import-boundaries memory-invariants; do
           elo_run_check "$elo_check"
         done
         ;;
-      *) elo_usage_error "Usage: elo check <all|architecture|imports|memory|platform|rules|runtime|skills|specs>" ;;
+      *) elo_usage_error "Usage: elo check <all|architecture|canonical|imports|memory|platform|rules|runtime|skills|specs>" ;;
     esac
     ;;
   --*)

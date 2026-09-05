@@ -17,6 +17,7 @@
     "postclone": "./cli/elo setup --postclone",
     "elo": "./cli/elo",
     "dev": "turbo dev --filter=landing --filter=console --filter=onboarding --filter=mobile",
+    "dev:text": "turbo dev --filter=onboarding --filter=mobile --filter=chatterbox",
     "start": "turbo start --filter=landing --filter=console --filter=onboarding --filter=mobile",
     "build": "turbo run build",
     "typecheck": "turbo run typecheck",

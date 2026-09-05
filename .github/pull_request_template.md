@@ -6,7 +6,7 @@ for conditional sections that do not apply.
 
 ## Delivery contract
 
-- Spec: [SPEC-###](../blob/BRANCH/.agents/specs/NNN-short-slug.md)
+- Spec: [SPEC-###](../blob/BRANCH/.agents/specs/NNN-short-slug.spec.md)
 - Status: `in-progress | implemented`
 - Type: `feature | fix | migration | refactor | governance | chore | experiment`
 - Primary public seam:

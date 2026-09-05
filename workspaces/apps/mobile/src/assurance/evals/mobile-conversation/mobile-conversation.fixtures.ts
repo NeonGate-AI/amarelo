@@ -1,5 +1,6 @@
 import {
   ConversationClientError,
+  type ConversationSessionResponseData,
   type ConversationTurnRequest,
   type ConversationTurnResponseData
 } from '@repo/conversation-sdk'
@@ -46,17 +47,27 @@ export function createMobileTurnRequest(
 ): ConversationTurnRequest {
   return {
     agentId: 'ana',
-    asOf: '2026-09-03T12:00:00.000Z',
     conversationId: 'mobile-conversation-1',
     history: [],
     message: 'Oi!',
-    purpose: 'conversation.support',
     requestId
   }
 }
 
 export class DeferredConversationClient {
   readonly turns: PendingTurn[] = []
+  readonly sessions: { readonly signal?: AbortSignal }[] = []
+  sessionFailure: unknown = null
+  async session(
+    options: { readonly signal?: AbortSignal } = {}
+  ): Promise<ConversationSessionResponseData> {
+    this.sessions.push(options)
+    if (this.sessionFailure !== null) throw this.sessionFailure
+    return {
+      conversationId: 'server-issued-mobile-conversation',
+      expiresAt: '2099-09-05T12:05:00.000Z'
+    }
+  }
 
   turn(
     input: ConversationTurnRequest,

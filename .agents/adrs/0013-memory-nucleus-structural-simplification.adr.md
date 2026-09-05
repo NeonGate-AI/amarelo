@@ -1,6 +1,17 @@
-# ADR-0013 — Simplify Memory Nucleus into apps and packages
+---
+id: ADR-0013
+title: Simplify Memory Nucleus into apps and packages
+status: superseded
+date: null
+deciders:
+  - product-owner
+supersedes: []
+superseded-by: ADR-0015
+---
 
-Status: accepted
+# ADR-0013: Simplify Memory Nucleus into apps and packages
+
+Status: superseded by ADR-0015. The nested application/package layout below is historical, not a current implementation target.
 
 ## Decision
 

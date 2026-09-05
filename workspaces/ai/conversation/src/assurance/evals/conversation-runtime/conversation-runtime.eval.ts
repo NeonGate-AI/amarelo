@@ -6,6 +6,7 @@ import {
   ConversationTurnInputSchema
 } from '@contracts'
 import { routeConversationTurn } from '@routing'
+import { MemoryContextError } from '@memory'
 import {
   ConversationAgentInvocationError,
   ConversationAgentNotConfiguredError,
@@ -109,9 +110,42 @@ async function evaluateUnavailableMemory() {
   const result = await runtime.execute(createConversationTurnInput())
 
   assert.equal(result.memory.status, 'unavailable')
+  assert.equal(result.memory.failure, 'unexpected_failure')
   assert.equal(result.memory.itemCount, 0)
   assert.deepEqual(agent.invocations.at(0)?.memory, [])
   assert.equal(agent.invocations.length, 1)
+}
+
+async function evaluateMemoryContractFailure() {
+  const agent = new RecordingConversationAgent('ana')
+  const runtime = new ConversationRuntime({
+    agents: [agent],
+    memory: new FixedMemoryContextPort({
+      projection: [SYNTHETIC_MEMORY_PROJECTION],
+      requestId: 'synthetic-contract-failure',
+      tokenBudgetUsed: 999_999
+    })
+  })
+  const result = await runtime.execute(createConversationTurnInput())
+  assert.equal(result.memory.status, 'unavailable')
+  assert.equal(result.memory.failure, 'contract_violation')
+  assert.deepEqual(agent.invocations[0]?.memory, [])
+}
+
+async function evaluateExpectedMemoryOutage() {
+  const agent = new RecordingConversationAgent('ana')
+  const runtime = new ConversationRuntime({
+    agents: [agent],
+    memory: {
+      retrieve: async () => {
+        throw new MemoryContextError('dependency_unavailable')
+      }
+    }
+  })
+  const result = await runtime.execute(createConversationTurnInput())
+  assert.equal(result.memory.failure, 'dependency_unavailable')
+  assert.deepEqual(agent.invocations[0]?.memory, [])
+  assert.equal(JSON.stringify(result.memory).includes('synthetic'), false)
 }
 
 async function evaluateAgentRegistryFailures() {
@@ -171,6 +205,8 @@ async function run() {
   await evaluateContextualTurn()
   await evaluateDeliberativeTurn()
   await evaluateUnavailableMemory()
+  await evaluateMemoryContractFailure()
+  await evaluateExpectedMemoryOutage()
   await evaluateAgentRegistryFailures()
   await evaluateAgentFailure()
   await evaluateStrictInputBoundary()

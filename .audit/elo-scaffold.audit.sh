@@ -163,14 +163,21 @@ fi
 
 if [ -f "$default_adr" ]; then
   for required in \
-    '# ADR 0026:' \
-    '## Status' \
+    'id: ADR-0026' \
+    'status: proposed' \
     '## Context' \
     '## Decision' \
+    '## Alternatives considered' \
+    '## Compliance and verification' \
+    '## Links' \
     '## Consequences'
   do
     require_line "$default_adr" "$required" .agents/prompts/adr.prompt.md
   done
+  grep -Eq '^# ADR-0026: .+' "$default_adr" ||
+    scaffold_fail .agents/prompts/adr.prompt.md "ADR H1 must match its durable identity and include a title"
+  grep -Eq '^date: [0-9]{4}-[0-9]{2}-[0-9]{2}$' "$default_adr" ||
+    scaffold_fail .agents/prompts/adr.prompt.md "ADR date must be rendered"
   require_no_tokens "$default_adr" .agents/prompts/adr.prompt.md
 fi
 

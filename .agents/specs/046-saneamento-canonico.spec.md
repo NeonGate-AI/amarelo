@@ -2,7 +2,7 @@
 id: SPEC-046
 title: Saneamento canônico
 type: governance
-status: ready
+status: implemented
 mode: prospective
 created: 2026-09-05
 updated: 2026-09-05
@@ -31,7 +31,14 @@ skills:
   - .agents/skills/writing-for-agents/SKILL.md
   - .agents/skills/code-review/SKILL.md
 evidence:
-  - pending
+  - .audit/canonical.audit.sh
+  - .audit/canonical-regressions.audit.sh
+  - .audit/workflow-skills.audit.sh
+  - .audit/runtime.audit.sh
+  - .agents/specs/readme.md
+  - .agents/adrs/readme.md
+  - .agents/skills/readme.md
+  - workspaces/packages/runtime/readme.md
 ---
 
 # SPEC-046: Saneamento canônico
@@ -84,14 +91,14 @@ All dependency-free Elo audits, runtime command tests, affected TypeScript typec
 
 ## Acceptance Criteria
 
-- [ ] Spec priorities and durable IDs are unique, indexed and accompanied by the remaining dependency-ordered roadmap.
-- [ ] ADR identities are unique and indexed; active references resolve to canonical files and the authoring template is consistent.
-- [ ] Removed skills and their replacements are documented; every retained normative skill reference resolves and obsolete test prohibitions are removed.
-- [ ] Active specs target current workspace boundaries, Neo4j core and a Memory-owned worker; history is not mislabeled as new implementation.
-- [ ] Audits reject representative duplicate identity, missing-reference and stale-target regressions.
-- [ ] Default application runtime excludes unused Memory/reference workloads; explicit profiles preserve the accepted isolated topology without deleting existing state.
-- [ ] CI, PR template and scoped harness routing agree with the corrected boundaries.
-- [ ] Local validation and independent review results are recorded honestly with unavailable gates distinguished from passing gates.
+- [x] Spec priorities and durable IDs are unique, indexed and accompanied by the remaining dependency-ordered roadmap.
+- [x] ADR identities are unique and indexed; active references resolve to canonical files and the authoring template is consistent.
+- [x] Removed skills and their replacements are documented; every retained normative skill reference resolves and obsolete test prohibitions are removed.
+- [x] Active specs target current workspace boundaries, Neo4j core and a Memory-owned worker; history is not mislabeled as new implementation.
+- [x] Audits reject representative duplicate identity, missing-reference and stale-target regressions.
+- [x] Default application runtime excludes unused Memory/reference workloads; explicit profiles preserve the accepted isolated topology without deleting existing state.
+- [x] CI, PR template and scoped harness routing agree with the corrected boundaries.
+- [x] Local validation and independent review results are recorded honestly with unavailable gates distinguished from passing gates.
 
 ## Failure Behavior
 
@@ -104,6 +111,14 @@ Neo4j adapters, BullMQ workers, production deployment, GitHub configuration, rem
 ## Evidence and Promotion
 
 Promote maintained routing to context and skill inventory, canonical identity invariants to audits, profile semantics to runtime documentation, and the remaining roadmap to the catalog. Local commits and reproducible tests provide delivery evidence.
+
+### Local execution evidence — 2026-09-05
+
+- `./cli/elo check platform`, `architecture`, `rules`, `specs`, `canonical`, `skills`, `imports` and `memory`: PASS. Canonical validation covers 35 ADRs, 47 specs and 17 positive/negative regression fixtures; skills inventory is seven workflow plus three domain procedures.
+- `bash .audit/runtime.audit.sh --commands-only`: PASS for profile membership, safe commands, isolated queue/cache credentials and state-preserving switches. Kustomize rendering is explicitly skipped, not simulated as a pass.
+- `corepack pnpm -r run typecheck`, `corepack pnpm -r run test`, `corepack pnpm -r --workspace-concurrency=1 run build` and `corepack pnpm exec biome check .`: PASS locally. Node 24 and the repository-pinned pnpm 10.32.1 were used; installation disabled lifecycle scripts.
+- Independent review found SDK cancellation, Turbo environment forwarding and setup drift in the companion slice; those findings were corrected and covered by regression checks. Final fixed-head Standards and Spec-fidelity results belong to the delivery handoff.
+- No kubectl/Docker cluster, Cypress browser journey, live WorkOS/provider call or remote CI was executed. The owner-authorized local exception is not production promotion or completion of SPEC-044's external settings gate.
 
 ## Further Notes
 

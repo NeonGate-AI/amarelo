@@ -5,7 +5,7 @@ type: experiment
 status: ready
 mode: prospective
 created: 2026-09-03
-updated: 2026-09-04
+updated: 2026-09-05
 owners:
   - Jonatas Sales
 targets:
@@ -24,9 +24,9 @@ adrs:
   - .agents/adrs/0008-cost-first-background-memory-curation.adr.md
   - .agents/adrs/0012-memory-nucleus-layout.adr.md
   - .agents/adrs/0016-shared-memory-sdk-observability-evaluation.adr.md
-  - .agents/adrs/0030-memory-eligibility-before-ranking.adr.md
+  - .agents/adrs/0036-memory-eligibility-before-ranking.adr.md
 skills:
-  - .agents/skills/spec-driven-development/SKILL.md
+  - .agents/skills/to-spec/SKILL.md
   - .agents/skills/to-tickets/SKILL.md
   - .agents/skills/implement/SKILL.md
   - .agents/skills/code-review/SKILL.md
@@ -75,8 +75,9 @@ Join context reduction, calls, escalation, recall, relevance, temporal correctne
 - Avoided serving cost is derived from comparable control/treatment usage, not hypothetical token removal alone.
 - Memory processing cost includes eligible formation, retrieval, retries, eval allocation, integrity mitigation and attributable infrastructure under versioned rules.
 - Memory ROI above 3x is the healthy minimum; above 5x is the target.
+- Numeric thresholds belong to the versioned experiment/report configuration. Context reduction above the 50–70% target remains eligible when all quality/safety gates pass; thresholds cannot change silently after seeing results.
 - Net Memory Cost is ideally negative.
-- Scale requires 50–70% context reduction, critical Recall@k above 90%, strong-model escalation below 5%, zero leakage/consent violations, zero policy-ineligible poison projection, no lifecycle resurrection and no quality regression.
+- Scale requires at least 50% context reduction (50–70% target), critical Recall@k above 90%, strong-model escalation below 5%, zero leakage/consent violations, zero policy-ineligible poison projection, no lifecycle resurrection and no quality regression.
 - Dashboard integrity metrics include `poison_at_1`, `poison_projection_rate`, `answer_corruption_rate`, `utility_retained_under_attack` and abstention rate from SPEC-043 fixtures.
 - Deterministic eligibility and any model-assisted detector are costed separately; model-assisted mitigation cannot hide its token, latency or retry overhead inside aggregate Memory cost.
 - AI COGS target is 10% and ceiling is 20% only against an explicitly authorized revenue scenario.
@@ -112,7 +113,7 @@ Formula/gate tests, reconciliation fixtures, SPEC-043 metric ingestion, mitigati
 - [ ] Dashboard reports context reduction, calls/turn, strong-model escalation, Recall@k, irrelevant rate, temporal errors, poisoning/integrity metrics, leakage, consent, latency, backlog and failures.
 - [ ] `poison_at_1`, `poison_projection_rate`, `answer_corruption_rate`, `utility_retained_under_attack` and abstention rate are traceable to versioned SPEC-043 fixtures.
 - [ ] Any model-assisted integrity mitigation reports separate token, latency and attributable cost deltas.
-- [ ] Scale requires 50–70% context reduction, Recall@k above 90%, strong-model escalation below 5%, no quality regression, zero leakage/consent violations, zero policy-ineligible poison projection and no lifecycle resurrection.
+- [ ] Scale requires at least 50% context reduction (50–70% target), Recall@k above 90%, strong-model escalation below 5%, no quality regression, zero leakage/consent violations, zero policy-ineligible poison projection and no lifecycle resurrection.
 - [ ] Memory ROI must exceed 3x to pass; above 5x is reported as target achievement.
 - [ ] AI COGS 10% target and 20% ceiling appear only for authorized revenue scenarios.
 - [ ] Reports include pricing/rate version, sample size, uncertainty and exclusions.

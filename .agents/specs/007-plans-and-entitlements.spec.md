@@ -25,7 +25,7 @@ adrs:
   - .agents/adrs/0016-shared-memory-sdk-observability-evaluation.adr.md
   - .agents/adrs/0017-cognitive-routing-and-memory-boundary.adr.md
 skills:
-  - .agents/skills/spec-driven-development/SKILL.md
+  - .agents/skills/to-spec/SKILL.md
   - .agents/skills/domain-modeling/SKILL.md
   - .agents/skills/code-review/SKILL.md
 evidence:

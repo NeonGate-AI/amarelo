@@ -5,12 +5,12 @@ type: feature
 status: draft
 mode: prospective
 created: 2026-09-03
-updated: 2026-09-03
+updated: 2026-09-05
 owners:
   - Jonatas Sales
 targets:
   - workspaces/ai/conversation
-  - workspaces/apps/conversation-api
+  - workspaces/microservices/chatterbox
   - workspaces/apps/mobile
 context:
   - .agents/context/architecture/overview.md
@@ -86,7 +86,7 @@ This spec uses **application** to mean the Amarelo host and composition layer. I
 
 Reusable semantic contracts and evaluators belong under the existing `workspaces/ai/conversation/src/assurance` concern. They are exported through the Conversation package only when needed by a host composition root.
 
-The host application or `conversation-api` owns:
+The host application or `chatterbox` owns:
 
 - authenticated actor and membership context;
 - session validity and conversation ownership;
@@ -295,7 +295,7 @@ Exercise the guarded behavior through the highest existing public seam, `Convers
 
 ### Secondary seams
 
-Use direct table-driven tests of discriminated guardrail inputs only to localize policy failures. Use `conversation-api` integration tests for trusted host context, tool allowlists, session ownership, and receipt matching. Use assurance eval fixtures for semantic fast-path versus escalation behavior.
+Use direct table-driven tests of discriminated guardrail inputs only to localize policy failures. Use `chatterbox` integration tests for trusted host context, tool allowlists, session ownership, and receipt matching. Use assurance eval fixtures for semantic fast-path versus escalation behavior.
 
 ### Fixtures and privacy
 
@@ -351,10 +351,12 @@ A telemetry failure does not expose data and does not convert a block into an al
 
 ## Evidence and Promotion
 
-Planned evidence includes table-driven guardrail tests, semantic escalation evals, `conversation-api` integration tests, import-boundary checks, exact-head CI, and independent review.
+Planned evidence includes table-driven guardrail tests, semantic escalation evals, `chatterbox` integration tests, import-boundary checks, exact-head CI, and independent review.
 
 When implemented, promote the final public contract and ownership summary to `.agents/context/workspaces/ai/conversation.md`, update any affected application harness, replace `pending` evidence with stable paths and PR references, and mark this spec `implemented` only after behavior is verifiable on `main`.
 
 ## Further Notes
+
+SPEC-047 establishes the authenticated bounded text host seam first; reuse that session/correlation boundary. This draft retains broader semantic guardrails and is required before external canary participants or the authoritative realtime bridge. It does not duplicate SPEC-047 transport authentication as a second policy authority.
 
 This spec is intentionally provider-neutral so the same policy applies to text, streaming text, and a future approved realtime voice transport. A separate ready spec must authorize microphone, audio, WebRTC, provider credentials, and user-visible voice behavior.

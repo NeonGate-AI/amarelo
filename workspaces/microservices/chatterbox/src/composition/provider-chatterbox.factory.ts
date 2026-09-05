@@ -3,8 +3,10 @@ import { ConversationRuntime } from '@ai/conversation'
 import { ChatOpenAI } from '@langchain/openai'
 import type { FastifyInstance } from 'fastify'
 
-import { createChatterbox } from '../app'
+import { createChatterbox, type ChatterboxFactoryOptions } from '../app'
+import { createWorkOsSessionAuthenticator } from '../authentication'
 import {
+  hasChatterboxAuthenticationConfiguration,
   hasChatterboxProviderConfiguration,
   type ChatterboxEnvironment
 } from '../configuration'
@@ -12,12 +14,31 @@ import {
   createOpenAiRealtimeCall,
   LangChainAnaChatModelAdapter
 } from '../model'
+import { ChatterboxObservabilityAdapter } from '../observability'
 
 export function createProviderChatterbox(
   configuration: ChatterboxEnvironment
 ): FastifyInstance {
+  const options: ChatterboxFactoryOptions = {
+    allowedOrigins: configuration.CHATTERBOX_ALLOWED_ORIGINS,
+    authenticate: hasChatterboxAuthenticationConfiguration(configuration)
+      ? createWorkOsSessionAuthenticator({
+          apiKey: configuration.WORKOS_API_KEY,
+          clientId: configuration.WORKOS_CLIENT_ID,
+          cookieName: configuration.WORKOS_COOKIE_NAME,
+          cookiePassword: configuration.WORKOS_COOKIE_PASSWORD,
+          timeoutMs: configuration.CHATTERBOX_AUTH_TIMEOUT_MS
+        })
+      : undefined,
+    authenticationTimeoutMs: configuration.CHATTERBOX_AUTH_TIMEOUT_MS,
+    maxConcurrentTurns: configuration.CHATTERBOX_MAX_CONCURRENT_TURNS,
+    maxSessions: configuration.CHATTERBOX_MAX_SESSIONS,
+    observability: new ChatterboxObservabilityAdapter(),
+    rateLimitPerMinute: configuration.CHATTERBOX_RATE_LIMIT_PER_MINUTE,
+    sessionTtlMs: configuration.CHATTERBOX_SESSION_TTL_MS
+  }
   if (!hasChatterboxProviderConfiguration(configuration)) {
-    return createChatterbox({ logger: true })
+    return createChatterbox(options)
   }
 
   const model = new ChatOpenAI({
@@ -37,12 +58,13 @@ export function createProviderChatterbox(
   })
 
   return createChatterbox({
+    ...options,
     createRealtimeCall: (sdp) =>
       createOpenAiRealtimeCall({
         apiKey: configuration.OPENAI_API_KEY,
-        sdp
+        sdp,
+        timeoutMs: configuration.CHATTERBOX_MODEL_TIMEOUT_MS
       }),
-    logger: true,
     runtime
   })
 }

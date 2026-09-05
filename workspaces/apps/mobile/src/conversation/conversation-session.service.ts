@@ -1,11 +1,17 @@
 import {
   ConversationClientError,
+  MAX_CONVERSATION_HISTORY_MESSAGES,
+  type ConversationSdkMessage,
+  type ConversationSessionResponseData,
   type ConversationTurnRequest
 } from '@repo/conversation-sdk'
 
 import type { ConversationSessionEvent } from './conversation-session.event'
 
 interface ConversationTurnClient {
+  session(options?: {
+    readonly signal?: AbortSignal
+  }): Promise<ConversationSessionResponseData>
   turn(
     input: ConversationTurnRequest,
     options?: { readonly signal?: AbortSignal }
@@ -31,13 +37,17 @@ export class ConversationSessionService {
   readonly #onEvent: (event: ConversationSessionEvent) => void
   #active: ActiveConversationRequest | null = null
   #generation = 0
+  #session: ConversationSessionResponseData | null = null
+  #history: ConversationSdkMessage[] = []
 
   constructor(options: ConversationSessionServiceOptions) {
     this.#client = options.client
     this.#onEvent = options.onEvent
   }
 
-  async submit(input: ConversationTurnRequest): Promise<void> {
+  async submit(
+    input: Omit<ConversationTurnRequest, 'conversationId' | 'history'>
+  ): Promise<void> {
     this.cancel()
 
     const active = Object.freeze({
@@ -49,12 +59,37 @@ export class ConversationSessionService {
     this.#onEvent({ requestId: active.requestId, type: 'pending' })
 
     try {
-      const result = await this.#client.turn(input, {
-        signal: active.controller.signal
-      })
+      if (
+        this.#session === null ||
+        Date.parse(this.#session.expiresAt) <= Date.now()
+      ) {
+        const session = await this.#client.session({
+          signal: active.controller.signal
+        })
+        if (!this.#isCurrent(active)) return
+        this.#session = session
+        this.#history = []
+      }
+      const result = await this.#client.turn(
+        {
+          agentId: input.agentId,
+          conversationId: this.#session.conversationId,
+          history: this.#history,
+          message: input.message,
+          requestId: input.requestId
+        },
+        {
+          signal: active.controller.signal
+        }
+      )
       if (!this.#isCurrent(active)) return
 
       this.#active = null
+      this.#history = [
+        ...this.#history,
+        { content: input.message, role: 'user' as const },
+        { content: result.response, role: 'assistant' as const }
+      ].slice(-MAX_CONVERSATION_HISTORY_MESSAGES)
       this.#onEvent({
         requestId: active.requestId,
         result,
@@ -73,6 +108,14 @@ export class ConversationSessionService {
       }
 
       if (error instanceof ConversationClientError) {
+        if (
+          ['unauthenticated', 'forbidden', 'session_unavailable'].includes(
+            error.code
+          )
+        ) {
+          this.#session = null
+          this.#history = []
+        }
         this.#onEvent({
           failure: {
             code: error.code,
@@ -111,6 +154,8 @@ export class ConversationSessionService {
 
   dispose(): void {
     this.cancel({ notify: false })
+    this.#session = null
+    this.#history = []
   }
 
   #isCurrent(active: ActiveConversationRequest): boolean {

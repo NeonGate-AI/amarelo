@@ -23,10 +23,9 @@ rules:
 adrs:
   - .agents/adrs/0018-spec-driven-delivery.adr.md
 skills:
-  - .agents/skills/spec-driven-development/SKILL.md
   - .agents/skills/to-spec/SKILL.md
   - .agents/skills/to-tickets/SKILL.md
-  - .agents/skills/implement-spec/SKILL.md
+  - .agents/skills/implement/SKILL.md
   - .agents/skills/code-review/SKILL.md
 evidence:
   - .github/pull_request_template.md

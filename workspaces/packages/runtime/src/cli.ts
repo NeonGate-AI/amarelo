@@ -7,7 +7,7 @@ import { fileURLToPath, pathToFileURL } from 'node:url'
 const runtimeDirectory = resolve(dirname(fileURLToPath(import.meta.url)), '..')
 const projectRoot = resolve(runtimeDirectory, '../../..')
 const kubernetesDirectory = resolve(runtimeDirectory, 'kubernetes')
-const namespaceFile = resolve(kubernetesDirectory, 'namespace.yaml')
+const namespaceFile = resolve(kubernetesDirectory, 'application/namespace.yaml')
 const cypressDirectory = resolve(runtimeDirectory, 'cypress')
 const cypressConfigFile = resolve(cypressDirectory, 'cypress.config.cjs')
 const cypressSpecFile = resolve(cypressDirectory, 'e2e/runtime.cy.js')
@@ -50,12 +50,29 @@ const applicationContainers = [
     workload: 'chatterbox'
   }
 ] as const
-const deploymentWorkloads = ['redis-cache', ...applicationWorkloads] as const
-const statefulWorkloads = [
-  'postgres',
-  'neo4j',
-  'redis-queue',
-  'object-storage'
+const runtimeProfiles = {
+  application: {
+    directory: kubernetesDirectory,
+    infrastructure: []
+  },
+  memory: {
+    directory: resolve(kubernetesDirectory, 'profiles/memory'),
+    infrastructure: [
+      'statefulset/neo4j',
+      'statefulset/redis-queue',
+      'deployment/redis-cache',
+      'statefulset/object-storage'
+    ]
+  },
+  reference: {
+    directory: resolve(kubernetesDirectory, 'profiles/reference'),
+    infrastructure: ['statefulset/postgres']
+  }
+} as const
+type RuntimeProfile = keyof typeof runtimeProfiles
+const optionalWorkloads = [
+  ...runtimeProfiles.memory.infrastructure,
+  ...runtimeProfiles.reference.infrastructure
 ] as const
 
 const runtimeActions = [
@@ -76,19 +93,29 @@ export async function runRuntimeCli(
     rawArguments[0] === '--' ? rawArguments.slice(1) : rawArguments
   const [actionArgument, ...remainingArguments] = normalizedArguments
   const action = actionArgument ?? 'up'
+  const hasProfileArgument = remainingArguments.length > 0
+  const acceptsProfile = ['up', 'e2e', 'config'].includes(action)
+  const profileArgument = hasProfileArgument
+    ? remainingArguments[1]
+    : (process.env.AMARELO_RUNTIME_PROFILE ?? 'application')
 
-  if (!isRuntimeAction(action) || remainingArguments.length > 0) {
+  if (
+    !isRuntimeAction(action) ||
+    (hasProfileArgument &&
+      (!acceptsProfile ||
+        remainingArguments.length !== 2 ||
+        remainingArguments[0] !== '--profile')) ||
+    !isRuntimeProfile(profileArgument)
+  ) {
     printUsage(
-      actionArgument
-        ? `Ação ou argumentos inválidos: ${normalizedArguments.join(' ')}`
-        : 'Ação inválida.'
+      'Ação, perfil ou argumentos inválidos. Perfis: application, memory, reference.'
     )
     return 2
   }
 
   switch (action) {
     case 'up':
-      await runtimeUp()
+      await runtimeUp(profileArgument)
       return 0
     case 'down':
       await runtimeDown()
@@ -97,7 +124,7 @@ export async function runRuntimeCli(
       await runtimePrune()
       return 0
     case 'e2e':
-      await runtimeE2e()
+      await runtimeE2e(profileArgument)
       return 0
     case 'logs':
       await runtimeLogs()
@@ -106,7 +133,7 @@ export async function runRuntimeCli(
       await runtimePs()
       return 0
     case 'config':
-      await runtimeConfig()
+      await runtimeConfig(profileArgument)
       return 0
   }
 }
@@ -115,7 +142,11 @@ function isRuntimeAction(value: string): value is RuntimeAction {
   return runtimeActions.some((action) => action === value)
 }
 
-async function runtimeUp(): Promise<void> {
+function isRuntimeProfile(value: string | undefined): value is RuntimeProfile {
+  return value !== undefined && Object.hasOwn(runtimeProfiles, value)
+}
+
+async function runtimeUp(profile: RuntimeProfile): Promise<void> {
   assertKubectlIsAvailable()
   const imagePrefix = configuredImagePrefix()
   const images = applicationContainers.map((container) => ({
@@ -145,7 +176,12 @@ async function runtimeUp(): Promise<void> {
   await ensureLocalEnvironment()
   await runCommand('kubectl', ['apply', '--filename', namespaceFile])
   await applyRuntimeEnvironment()
-  await runCommand('kubectl', ['apply', '--kustomize', kubernetesDirectory])
+  await runCommand('kubectl', [
+    'apply',
+    '--kustomize',
+    runtimeProfiles[profile].directory
+  ])
+  await suspendExcludedInfrastructure(profile)
 
   for (const container of images) {
     await runCommand('kubectl', [
@@ -158,47 +194,60 @@ async function runtimeUp(): Promise<void> {
     ])
   }
 
-  await runCommand('kubectl', [
-    '--namespace',
-    runtimeNamespace,
-    'scale',
-    'deployment',
-    '--all',
-    '--replicas=1'
-  ])
-  await runCommand('kubectl', [
-    '--namespace',
-    runtimeNamespace,
-    'scale',
-    'statefulset',
-    '--all',
-    '--replicas=1'
-  ])
-
-  for (const workload of deploymentWorkloads) {
+  const selectedWorkloads = [
+    ...applicationWorkloads.map((workload) => `deployment/${workload}`),
+    ...runtimeProfiles[profile].infrastructure
+  ]
+  for (const workload of selectedWorkloads) {
     await runCommand('kubectl', [
-      'rollout',
-      'status',
       '--namespace',
       runtimeNamespace,
-      `deployment/${workload}`,
-      '--timeout=300s'
+      'scale',
+      workload,
+      '--replicas=1'
     ])
   }
-  for (const workload of statefulWorkloads) {
+  for (const workload of selectedWorkloads) {
     await runCommand('kubectl', [
       'rollout',
       'status',
       '--namespace',
       runtimeNamespace,
-      `statefulset/${workload}`,
+      workload,
       '--timeout=300s'
     ])
   }
 
   console.info(
-    '[runtime] Kubernetes reconciliado: PostgreSQL, Neo4j, Redis Queue, Redis Cache, object storage e aplicações estão prontos.'
+    `[runtime] Perfil ${profile} pronto; infraestrutura fora do perfil permanece parada e seu estado é preservado.`
   )
+}
+
+async function suspendExcludedInfrastructure(
+  profile: RuntimeProfile
+): Promise<void> {
+  const selected = new Set<string>(runtimeProfiles[profile].infrastructure)
+  for (const workload of optionalWorkloads) {
+    if (selected.has(workload)) continue
+    const existing = readOptionalCommand('kubectl', [
+      '--namespace',
+      runtimeNamespace,
+      'get',
+      workload,
+      '--ignore-not-found',
+      '--output=name'
+    ])
+    if (!existing) continue
+    await runCommand('kubectl', [
+      '--namespace',
+      runtimeNamespace,
+      'scale',
+      workload,
+      '--replicas=0'
+    ])
+    const name = workload.split('/')[1]
+    await waitForNoRuntimePods(`app.kubernetes.io/name=${name}`)
+  }
 }
 
 function configuredImagePrefix(): string | undefined {
@@ -288,13 +337,13 @@ async function runtimePs(): Promise<void> {
   ])
 }
 
-async function runtimeConfig(): Promise<void> {
+async function runtimeConfig(profile: RuntimeProfile): Promise<void> {
   assertKubectlIsAvailable()
-  await runCommand('kubectl', ['kustomize', kubernetesDirectory])
+  await runCommand('kubectl', ['kustomize', runtimeProfiles[profile].directory])
 }
 
-async function runtimeE2e(): Promise<void> {
-  await runtimeUp()
+async function runtimeE2e(profile: RuntimeProfile): Promise<void> {
+  await runtimeUp(profile)
   await deleteCypressResources()
   await applyCypressSuite()
   await runCommand('kubectl', ['apply', '--filename', cypressJobFile])
@@ -387,7 +436,9 @@ async function waitForCypressJob(): Promise<void> {
   )
 }
 
-async function waitForNoRuntimePods(): Promise<void> {
+async function waitForNoRuntimePods(
+  selector = 'app.kubernetes.io/part-of=amarelo'
+): Promise<void> {
   for (let attempt = 0; attempt < 150; attempt += 1) {
     const pods = readOptionalCommand('kubectl', [
       '--namespace',
@@ -395,7 +446,7 @@ async function waitForNoRuntimePods(): Promise<void> {
       'get',
       'pods',
       '--selector',
-      'app.kubernetes.io/part-of=amarelo',
+      selector,
       '--field-selector=status.phase!=Succeeded,status.phase!=Failed',
       '--output=name'
     ])
@@ -595,6 +646,13 @@ async function ensureLocalEnvironment(): Promise<void> {
 
   const contents = [
     '# Generated by the Amarelo Kubernetes runtime. Local development only.',
+    'WORKOS_API_KEY=',
+    'WORKOS_CLIENT_ID=',
+    `WORKOS_COOKIE_PASSWORD=${randomBytes(32).toString('base64url')}`,
+    'WORKOS_COOKIE_NAME=wos-session',
+    'CHATTERBOX_ALLOWED_ORIGINS=',
+    'OPENAI_API_KEY=',
+    'AI_CONVERSATION_MODEL=',
     'POSTGRES_DB=amarelo',
     'POSTGRES_USER=amarelo',
     `POSTGRES_PASSWORD=${randomBytes(32).toString('base64url')}`,
@@ -690,6 +748,9 @@ function printUsage(message: string): void {
   console.error(`[runtime] ${message}`)
   console.error(
     'Uso: pnpm --filter @repo/runtime start -- <up|down|prune|e2e|logs|ps|config>'
+  )
+  console.error(
+    'up, e2e e config aceitam --profile <application|memory|reference>; padrão: application.'
   )
 }
 

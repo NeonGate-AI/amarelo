@@ -32,7 +32,7 @@ skills:
   - .agents/skills/to-spec/SKILL.md
   - .agents/skills/to-tickets/SKILL.md
   - .agents/skills/domain-modeling/SKILL.md
-  - .agents/skills/documentation-and-adrs/SKILL.md
+  - .agents/skills/writing-for-agents/SKILL.md
   - .agents/skills/implement/SKILL.md
   - .agents/skills/tdd/SKILL.md
   - .agents/skills/code-review/SKILL.md

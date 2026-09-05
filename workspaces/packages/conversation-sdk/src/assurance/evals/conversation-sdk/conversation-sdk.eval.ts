@@ -6,17 +6,16 @@ import { fileURLToPath } from 'node:url'
 import {
   ConversationClient,
   ConversationClientError,
+  ConversationTurnRequestSchema,
   type ConversationTurnRequest,
   type ConversationTurnResponseData
 } from '@repo/conversation-sdk'
 
 const REQUEST: ConversationTurnRequest = {
   agentId: 'ana',
-  asOf: '2026-09-03T12:00:00.000Z',
   conversationId: 'conversation-sdk-1',
   history: [],
   message: 'Oi, Ana.',
-  purpose: 'conversation.support',
   requestId: 'request-sdk-1'
 }
 
@@ -64,11 +63,95 @@ async function evaluateSuccess() {
     fetch: (async (input, init) => {
       assert.equal(input, 'https://conversation.test/api/v1/conversation/turn')
       assert.equal(init?.method, 'POST')
+      assert.equal(init?.credentials, 'same-origin')
       return jsonResponse({ data: RESPONSE })
     }) as typeof fetch
   })
 
   assert.deepEqual(await client.turn(REQUEST), RESPONSE)
+}
+
+async function evaluateSession() {
+  const expected = {
+    conversationId: 'server-issued-conversation',
+    expiresAt: '2099-09-05T12:05:00.000Z'
+  }
+  const client = new ConversationClient({
+    baseUrl: '/api',
+    fetch: (async (input, init) => {
+      assert.equal(input, '/api/v1/conversation/session')
+      assert.equal(init?.credentials, 'same-origin')
+      assert.equal(init?.body, '{}')
+      return jsonResponse({ data: expected })
+    }) as typeof fetch
+  })
+  assert.deepEqual(await client.session(), expected)
+}
+
+async function evaluateAuthenticatedBoundaryFailures() {
+  for (const injected of [
+    { tenantId: 'foreign-tenant' },
+    { subjectId: 'foreign-subject' },
+    { purpose: 'memory.share' },
+    { asOf: '2099-01-01T00:00:00.000Z' }
+  ]) {
+    assert.equal(
+      ConversationTurnRequestSchema.safeParse({ ...REQUEST, ...injected })
+        .success,
+      false
+    )
+  }
+  const denied = new ConversationClient({
+    baseUrl: '/api',
+    fetch: (async () =>
+      jsonResponse(
+        {
+          error: {
+            code: 'unauthenticated',
+            message: 'Entre novamente para conversar.',
+            requestId: null
+          }
+        },
+        401
+      )) as typeof fetch
+  })
+  await assert.rejects(
+    () => denied.session(),
+    (error: unknown) =>
+      error instanceof ConversationClientError &&
+      error.code === 'unauthenticated'
+  )
+
+  const mismatch = new ConversationClient({
+    baseUrl: '/api',
+    fetch: (async () =>
+      jsonResponse({
+        data: { ...RESPONSE, conversationId: 'another-conversation' }
+      })) as typeof fetch
+  })
+  await assert.rejects(
+    () => mismatch.turn(REQUEST),
+    (error: unknown) =>
+      error instanceof ConversationClientError &&
+      error.code === 'invalid_response'
+  )
+
+  let fetched = false
+  const aborted = new ConversationClient({
+    baseUrl: '/api',
+    fetch: (async () => {
+      fetched = true
+      return jsonResponse({ data: RESPONSE })
+    }) as typeof fetch
+  })
+  const controller = new AbortController()
+  controller.abort()
+  await assert.rejects(
+    () => aborted.session({ signal: controller.signal }),
+    (error: unknown) =>
+      error instanceof ConversationClientError && error.code === 'aborted'
+  )
+  assert.equal(fetched, false)
 }
 
 async function evaluateSafeServerFailure() {
@@ -154,6 +237,36 @@ async function evaluateTimeout() {
   )
 }
 
+async function evaluateCancellationDuringBodyRead() {
+  for (const mode of ['aborted', 'timeout'] as const) {
+    const caller = new AbortController()
+    const client = new ConversationClient({
+      baseUrl: '/api',
+      timeoutMs: mode === 'timeout' ? 5 : 30_000,
+      fetch: (async (_input, init) => {
+        const response = jsonResponse({})
+        response.json = () =>
+          new Promise((_resolve, reject) => {
+            init?.signal?.addEventListener(
+              'abort',
+              () => {
+                reject(new DOMException('Aborted', 'AbortError'))
+              },
+              { once: true }
+            )
+            if (mode === 'aborted') caller.abort()
+          })
+        return response
+      }) as typeof fetch
+    })
+    await assert.rejects(
+      () => client.session({ signal: caller.signal }),
+      (error: unknown) =>
+        error instanceof ConversationClientError && error.code === mode
+    )
+  }
+}
+
 async function listSourceFiles(directory: string): Promise<string[]> {
   const entries = await readdir(directory, { withFileTypes: true })
   const files: string[] = []
@@ -190,9 +303,12 @@ async function evaluateBrowserSafety() {
 }
 
 await evaluateSuccess()
+await evaluateSession()
+await evaluateAuthenticatedBoundaryFailures()
 await evaluateSafeServerFailure()
 await evaluateInvalidResponse()
 await evaluateAbort()
 await evaluateTimeout()
+await evaluateCancellationDuringBodyRead()
 await evaluateBrowserSafety()
 console.log('Conversation SDK eval PASS')

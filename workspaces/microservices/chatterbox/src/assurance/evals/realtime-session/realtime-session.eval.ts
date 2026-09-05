@@ -3,7 +3,11 @@ import assert from 'node:assert/strict'
 import { ConversationSafeErrorResponseSchema } from '@repo/conversation-sdk'
 import { createOpenAiRealtimeCall } from 'chatterbox'
 
-import { RecordingAnaModel, createTestChatterbox } from '../chatterbox'
+import {
+  RecordingAnaModel,
+  createTestChatterbox,
+  SYNTHETIC_CONVERSATION_HEADERS
+} from '../chatterbox'
 
 const OFFER_SDP = 'v=0\r\no=- 1 2 IN IP4 127.0.0.1\r\n'
 const ANSWER_SDP = 'v=0\r\no=- 3 4 IN IP4 127.0.0.1\r\n'
@@ -67,7 +71,10 @@ async function evaluateRealtimeSessionEndpoint() {
   })
 
   const response = await app.inject({
-    headers: { 'content-type': 'application/sdp' },
+    headers: {
+      'content-type': 'application/sdp',
+      ...SYNTHETIC_CONVERSATION_HEADERS
+    },
     method: 'POST',
     payload: OFFER_SDP,
     url: '/v1/realtime/session'
@@ -91,7 +98,10 @@ async function evaluateInvalidOfferBeforeProvider() {
   })
 
   const response = await app.inject({
-    headers: { 'content-type': 'application/sdp' },
+    headers: {
+      'content-type': 'application/sdp',
+      ...SYNTHETIC_CONVERSATION_HEADERS
+    },
     method: 'POST',
     payload: '   ',
     url: '/v1/realtime/session'
@@ -114,7 +124,10 @@ async function evaluateSafeProviderFailure() {
   })
 
   const response = await app.inject({
-    headers: { 'content-type': 'application/sdp' },
+    headers: {
+      'content-type': 'application/sdp',
+      ...SYNTHETIC_CONVERSATION_HEADERS
+    },
     method: 'POST',
     payload: OFFER_SDP,
     url: '/v1/realtime/session'

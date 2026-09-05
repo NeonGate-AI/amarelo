@@ -5,13 +5,13 @@ type: feature
 status: ready
 mode: prospective
 created: 2026-09-03
-updated: 2026-09-03
+updated: 2026-09-05
 owners:
   - Jonatas Sales
 targets:
   - workspaces/memory-nucleus
   - workspaces/packages/memory-sdk
-  - workspaces/apps/conversation-api
+  - workspaces/microservices/chatterbox
   - operational Neo4j composition
 context:
   - .agents/context/architecture/boundaries/ai-memory-nucleus.md
@@ -31,7 +31,7 @@ adrs:
   - .agents/adrs/0015-memory-nucleus-mvp-clean-architecture.adr.md
   - .agents/adrs/0016-shared-memory-sdk-observability-evaluation.adr.md
 skills:
-  - .agents/skills/spec-driven-development/SKILL.md
+  - .agents/skills/to-spec/SKILL.md
   - .agents/skills/to-tickets/SKILL.md
   - .agents/skills/implement/SKILL.md
   - .agents/skills/code-review/SKILL.md
@@ -47,7 +47,7 @@ The repository already contains a strong Memory domain, a PostgreSQL reference a
 
 ## Solution
 
-Compose the existing clean-architecture ports behind the server-side memory-sdk boundary with Neo4j as the canonical Memory graph. Prove an authorized explicit-memory round trip and enforce current authorization immediately before every durable mutation. Commit evidence, Memory lifecycle state and a pending outbox event in one graph transaction. Implement immediate tombstone/suppression, a deletion/suppression ledger and no-resurrection behavior; do not label that mechanism physical erasure unless a separately evidenced purge contract is implemented.
+Compose the existing clean-architecture ports through a request-bound Memory SDK adapter at Chatterbox's server composition root, with Neo4j as the canonical Memory graph. The adapter consumes the trusted actor/session/conversation context established by SPEC-047; browser-supplied identifiers or purpose are not authorization. Prove an authorized explicit-memory round trip and enforce current authorization immediately before every durable mutation. Commit evidence, Memory lifecycle state and a pending outbox event in one graph transaction. Implement immediate tombstone/suppression, a deletion/suppression ledger and no-resurrection behavior; do not label that mechanism physical erasure unless a separately evidenced purge contract is implemented.
 
 Establish the versioned operational usage-event, pricing metadata and redacted ledger seams consumed by later background, shadow, A/B and economics phases.
 
@@ -61,7 +61,7 @@ Establish the versioned operational usage-event, pricing metadata and redacted l
 
 ## Scope
 
-- Concrete Neo4j executor/transaction composition and server-side memory-sdk transport.
+- Concrete Neo4j executor/transaction composition and request-bound Memory SDK adapter in the existing Chatterbox process.
 - Atomic evidence, Memory lifecycle and pending-outbox graph writes.
 - Authorized explicit-memory write/read/suppress/read integration path.
 - Current authorization/consent validation immediately before candidate-to-durable mutation.
@@ -76,6 +76,8 @@ Establish the versioned operational usage-event, pricing metadata and redacted l
 
 - Neo4j is the canonical Memory source; full-text/vector indexes and longitudinal projections are derived.
 - AI consumers use `@repo/memory-sdk`; browser code cannot connect to Memory internals.
+- Chatterbox's composition root may bind the public `@nucleus/memory` API to a scoped SDK adapter; AI consumers still import only `@repo/memory-sdk`. This phase does not create a separate Memory HTTP microservice.
+- Reuse SPEC-047 authentication and correlation rather than creating a second session authority. Resolve subject, actor, tenant and purpose server-side and revalidate the specific Memory consent/authorization decision at the protected boundary.
 - Authorization is checked before repository access, before exposure and again immediately before durable writes.
 - Promotion carries or resolves current tenant, subject, actor, purpose, decision and consent state; extraction-time approval alone is insufficient.
 - MVP delete means immediate tombstone/suppression, removal from normal retrieval and no resurrection through known replay/reindex/restore paths.
@@ -132,4 +134,4 @@ Evidence will include Neo4j/SDK round-trip tests, atomic outbox tests, promotion
 
 ## Further Notes
 
-Blocked by SPEC-009. This phase reuses the current core rather than creating a second Memory implementation, and it blocks SPEC-012 and SPEC-011.
+Blocked by SPEC-047 and the retained SPEC-009 baseline. This phase reuses the current core rather than creating a second Memory implementation, and it blocks SPEC-012 and SPEC-011. SPEC-047 supplies authenticated text transport and observations, not durable Memory consent or the Neo4j adapter; those are proved here.

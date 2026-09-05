@@ -5,7 +5,7 @@ type: experiment
 status: ready
 mode: prospective
 created: 2026-09-04
-updated: 2026-09-04
+updated: 2026-09-05
 owners:
   - Jonatas Sales
 targets:
@@ -25,11 +25,11 @@ adrs:
   - .agents/adrs/0003-authorization-before-retrieval.adr.md
   - .agents/adrs/0007-memory-taxonomy-and-longitudinal-projections.adr.md
   - .agents/adrs/0008-cost-first-background-memory-curation.adr.md
-  - .agents/adrs/0009-postgresql-jsonb-fts-memory-store.adr.md
+  - .agents/adrs/0033-neo4j-canonical-memory-graph.adr.md
   - .agents/adrs/0016-shared-memory-sdk-observability-evaluation.adr.md
-  - .agents/adrs/0030-memory-eligibility-before-ranking.adr.md
+  - .agents/adrs/0036-memory-eligibility-before-ranking.adr.md
 skills:
-  - .agents/skills/spec-driven-development/SKILL.md
+  - .agents/skills/to-spec/SKILL.md
   - .agents/skills/tdd/SKILL.md
   - .agents/skills/implement/SKILL.md
   - .agents/skills/code-review/SKILL.md
@@ -41,7 +41,7 @@ evidence:
 
 ## Problem Statement
 
-The current Memory roadmap proves authorization-before-retrieval, suppression/no-resurrection, cross-scope isolation, bounded projection, shadow parity, A/B comparability and unit economics. It does not yet prove that semantically strong but false, stale, conflicted or provenance-ineligible records cannot outrank legitimate Memory, especially when the adversarial content contains no prompt-injection instructions.
+The current Memory roadmap is designed to prove authorization-before-retrieval, suppression/no-resurrection, cross-scope isolation, bounded projection, shadow parity, A/B comparability and unit economics. Those future delivery gates are not completed evidence. The roadmap also needs to prove that semantically strong but false, stale, conflicted or provenance-ineligible records cannot outrank legitimate Memory, especially when the adversarial content contains no prompt-injection instructions.
 
 That gap matters because a retrieval system can satisfy authorization and still return the wrong memory. Similarity, recency, salience, trust weighting or model judgment can amplify a poisoned record unless policy eligibility is established before ranking. The repository also needs proof that read/write/replay/rebuild paths all resolve the same effective non-default store identity.
 
@@ -83,7 +83,7 @@ The implementation must distinguish:
 ## Implementation Decisions
 
 - ADR-0003 remains authoritative for authorization-before-retrieval.
-- ADR-0030 governs integrity/provenance eligibility before ranking.
+- ADR-0036 governs integrity/provenance eligibility before ranking.
 - Ineligible records are excluded, not merely down-ranked.
 - Ranking signals may order only eligible records.
 - Prompt-injection detection is not treated as a substitute for false-memory integrity testing.
@@ -92,7 +92,6 @@ The implementation must distinguish:
 - A conflict between eligible memories that cannot be deterministically resolved must preserve uncertainty; silent winner-takes-all semantic ranking is prohibited.
 - Non-default store configuration is part of the test fixture and every lifecycle operation must demonstrate the same effective tenant/schema/database identity.
 - This spec must not adopt external memory frameworks, sidecars or retrieval platforms.
-- `akitaonrails/ai-memory` remains excluded from adoption, architecture, implementation-reference and dependency consideration.
 
 ## Testing Decisions
 
@@ -140,7 +139,7 @@ Use synthetic tenants, subjects, evidence, memories and false memories only. No 
 - [ ] No strategy passes by improving Recall while increasing unauthorized leakage, consent violation or lifecycle resurrection above zero.
 - [ ] Hidden adversarial evals pass before SPEC-017 canary exposure can advance.
 - [ ] Full CI and both reviews pass on the exact final head.
-- [ ] Measured thresholds and implementation-specific invariants are promoted only after validation; decision-level assurance requirements remain governed by ADR-0030 and the Memory Nucleus rule.
+- [ ] Measured thresholds and implementation-specific invariants are promoted only after validation; decision-level assurance requirements remain governed by ADR-0036 and the Memory Nucleus rule.
 
 ## Failure Behavior
 
@@ -152,8 +151,8 @@ User-visible rollout, production pricing, vector activation, graph-database adop
 
 ## Evidence and Promotion
 
-This harness change promotes the durable decision-level assurance requirements in ADR-0030, the Memory Nucleus rule and workspace context. Implementation evidence will include versioned adversarial fixtures, deterministic eval artifacts, configured-store isolation results, cost/latency comparisons, hidden holdout results, exact-head CI and both reviews. Measured thresholds, mitigation mechanics and implementation-specific invariants are promoted to the harness only after those validations succeed.
+This harness change promotes the durable decision-level assurance requirements in ADR-0036, the Memory Nucleus rule and workspace context. Implementation evidence will include versioned adversarial fixtures, deterministic eval artifacts, configured-store isolation results, cost/latency comparisons, hidden holdout results, exact-head CI and both reviews. Measured thresholds, mitigation mechanics and implementation-specific invariants are promoted to the harness only after those validations succeed.
 
 ## Further Notes
 
-This assurance phase is inserted as a required gate before user-visible canary advancement. It strengthens the existing roadmap rather than replacing authorization, lifecycle, shadow, A/B or economics phases.
+Blocked by SPEC-011's paired shadow/parity evidence over the SPEC-016/SPEC-012 path. This assurance phase is a required gate before user-visible canary advancement. It strengthens the existing roadmap rather than replacing authorization, lifecycle, shadow, A/B or economics phases.

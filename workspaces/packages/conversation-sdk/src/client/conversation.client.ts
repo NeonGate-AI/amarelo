@@ -1,8 +1,10 @@
 import {
   ConversationSafeErrorResponseSchema,
+  ConversationSessionResponseSchema,
   ConversationTurnRequestSchema,
   ConversationTurnResponseSchema,
   type ConversationTurnRequest,
+  type ConversationSessionResponseData,
   type ConversationTurnResponseData
 } from '../contracts'
 import { ConversationClientError } from '../errors'
@@ -20,11 +22,9 @@ export interface ConversationTurnOptions {
   readonly signal?: AbortSignal
 }
 
-function joinEndpoint(baseUrl: string): string {
+function joinEndpoint(baseUrl: string, path = TURN_PATH): string {
   const normalized = baseUrl.trim().replace(/\/+$/, '')
-  return normalized.length === 0
-    ? `/${TURN_PATH}`
-    : `${normalized}/${TURN_PATH}`
+  return normalized.length === 0 ? `/${path}` : `${normalized}/${path}`
 }
 
 async function parseJson(response: Response): Promise<unknown> {
@@ -37,6 +37,7 @@ async function parseJson(response: Response): Promise<unknown> {
 
 export class ConversationClient {
   readonly #endpoint: string
+  readonly #sessionEndpoint: string
   readonly #fetch: typeof fetch
   readonly #timeoutMs: number
 
@@ -49,6 +50,10 @@ export class ConversationClient {
     }
 
     this.#endpoint = joinEndpoint(options.baseUrl)
+    this.#sessionEndpoint = joinEndpoint(
+      options.baseUrl,
+      'v1/conversation/session'
+    )
     this.#fetch = options.fetch ?? globalThis.fetch
     this.#timeoutMs = timeoutMs
   }
@@ -58,6 +63,56 @@ export class ConversationClient {
     options: ConversationTurnOptions = {}
   ): Promise<ConversationTurnResponseData> {
     const input = ConversationTurnRequestSchema.parse(rawInput)
+    const payload = await this.#request(
+      this.#endpoint,
+      input,
+      input.requestId,
+      options
+    )
+    const result = ConversationTurnResponseSchema.safeParse(payload)
+    if (
+      !result.success ||
+      result.data.data.conversationId !== input.conversationId ||
+      result.data.data.requestId !== input.requestId
+    ) {
+      throw new ConversationClientError({
+        code: 'invalid_response',
+        message: 'A resposta da conversa não pôde ser validada.',
+        requestId: input.requestId
+      })
+    }
+    return result.data.data
+  }
+
+  async session(
+    options: ConversationTurnOptions = {}
+  ): Promise<ConversationSessionResponseData> {
+    const payload = await this.#request(
+      this.#sessionEndpoint,
+      {},
+      null,
+      options
+    )
+    const result = ConversationSessionResponseSchema.safeParse(payload)
+    if (
+      !result.success ||
+      Date.parse(result.data.data.expiresAt) <= Date.now()
+    ) {
+      throw new ConversationClientError({
+        code: 'invalid_response',
+        message: 'A sessão da conversa não pôde ser validada.',
+        requestId: null
+      })
+    }
+    return result.data.data
+  }
+
+  async #request(
+    endpoint: string,
+    body: unknown,
+    requestId: string | null,
+    options: ConversationTurnOptions
+  ): Promise<unknown> {
     const controller = new AbortController()
     let timedOut = false
 
@@ -76,15 +131,22 @@ export class ConversationClient {
     }, this.#timeoutMs)
 
     try {
-      const response = await this.#fetch(this.#endpoint, {
-        body: JSON.stringify(input),
+      if (controller.signal.aborted)
+        throw new DOMException('Aborted', 'AbortError')
+      const response = await this.#fetch(endpoint, {
+        body: JSON.stringify(body),
+        cache: 'no-store',
+        credentials: 'same-origin',
+        redirect: 'error',
         headers: {
           'content-type': 'application/json'
         },
         method: 'POST',
         signal: controller.signal
       })
+      controller.signal.throwIfAborted()
       const payload = await parseJson(response)
+      controller.signal.throwIfAborted()
 
       if (!response.ok) {
         const safeError = ConversationSafeErrorResponseSchema.safeParse(payload)
@@ -92,27 +154,18 @@ export class ConversationClient {
           throw new ConversationClientError({
             code: safeError.data.error.code,
             message: safeError.data.error.message,
-            requestId: safeError.data.error.requestId ?? input.requestId
+            requestId: safeError.data.error.requestId ?? requestId
           })
         }
 
         throw new ConversationClientError({
           code: 'invalid_response',
           message: 'A resposta de erro da conversa não pôde ser validada.',
-          requestId: input.requestId
+          requestId
         })
       }
 
-      const result = ConversationTurnResponseSchema.safeParse(payload)
-      if (!result.success) {
-        throw new ConversationClientError({
-          code: 'invalid_response',
-          message: 'A resposta da conversa não pôde ser validada.',
-          requestId: input.requestId
-        })
-      }
-
-      return result.data.data
+      return payload
     } catch (error) {
       if (error instanceof ConversationClientError) {
         throw error
@@ -125,7 +178,7 @@ export class ConversationClient {
           message: timedOut
             ? 'A conversa excedeu o tempo de resposta.'
             : 'A solicitação da conversa foi cancelada.',
-          requestId: input.requestId
+          requestId
         })
       }
 
@@ -133,7 +186,7 @@ export class ConversationClient {
         cause: error,
         code: 'network_error',
         message: 'Não foi possível alcançar o serviço de conversa.',
-        requestId: input.requestId
+        requestId
       })
     } finally {
       clearTimeout(timeout)

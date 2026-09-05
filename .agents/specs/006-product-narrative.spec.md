@@ -23,7 +23,7 @@ adrs:
   - .agents/adrs/0002-elos-as-contextual-agents.adr.md
   - .agents/adrs/0003-authorization-before-retrieval.adr.md
 skills:
-  - .agents/skills/spec-driven-development/SKILL.md
+  - .agents/skills/to-spec/SKILL.md
   - .agents/skills/frontend-ui-engineering/SKILL.md
   - .agents/skills/code-review/SKILL.md
 evidence:

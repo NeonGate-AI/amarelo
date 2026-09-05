@@ -5,12 +5,12 @@ type: experiment
 status: ready
 mode: prospective
 created: 2026-09-03
-updated: 2026-09-03
+updated: 2026-09-05
 owners:
   - Jonatas Sales
 targets:
   - workspaces/ai/conversation
-  - workspaces/apps/conversation-api
+  - workspaces/microservices/chatterbox
   - workspaces/packages/memory-sdk
   - Memory serving assurance
 context:
@@ -31,7 +31,7 @@ adrs:
   - .agents/adrs/0017-cognitive-routing-and-memory-boundary.adr.md
   - .agents/adrs/0023-direct-ai-conversation-topology.adr.md
 skills:
-  - .agents/skills/spec-driven-development/SKILL.md
+  - .agents/skills/to-spec/SKILL.md
   - .agents/skills/to-tickets/SKILL.md
   - .agents/skills/implement/SKILL.md
   - .agents/skills/code-review/SKILL.md
@@ -128,4 +128,4 @@ Evidence will include no-effect, authorization, budget and adversarial tests; pa
 
 ## Further Notes
 
-Blocked by SPEC-009, SPEC-016 and SPEC-012. It blocks SPEC-017.
+Blocked by SPEC-009, SPEC-047, SPEC-016 and SPEC-012. Its no-effect/parity evidence unlocks SPEC-043; both gates remain prerequisites of SPEC-017.
