@@ -1,11 +1,18 @@
 import { createNeo4jMemoryBackgroundRuntime } from '@nucleus/memory'
 
 import type { ChatterboxFactoryOptions } from '../app'
+import { createLocalOwnerIdentity } from '../authentication'
 import type { ChatterboxEnvironment } from '../configuration'
 import { createObservationStreamWriter } from '../observability'
 import { createMemoryRequestScope } from './request-memory-scope.factory'
+import { mapMemoryIdentity } from './memory-identity.map'
 
-type IngestionStatus = 'committed' | 'buffered' | 'duplicate' | 'skipped' | 'unconfirmed'
+type IngestionStatus =
+  | 'committed'
+  | 'buffered'
+  | 'duplicate'
+  | 'skipped'
+  | 'unconfirmed'
 
 /** Ingests current patient text atomically; extraction runs only in the separate worker. */
 export function createMemoryBackgroundBinding(
@@ -25,6 +32,17 @@ export function createMemoryBackgroundBinding(
   const internalSubjects = new Set(
     configuration.CHATTERBOX_MEMORY_INTERNAL_SUBJECT_IDS
   )
+  if (
+    configuration.CHATTERBOX_AUTH_MODE === 'local' &&
+    configuration.CHATTERBOX_MEMORY_BACKGROUND_PROFILE === 'internal'
+  ) {
+    const owner = createLocalOwnerIdentity(
+      configuration.CHATTERBOX_LOCAL_OWNER_ID
+    )
+    internalSubjects.add(
+      mapMemoryIdentity('person', owner.tenantId, owner.subjectId)
+    )
+  }
   const writeLine = createObservationStreamWriter(process.stdout)
 
   function observe(status: IngestionStatus, traceId?: string): void {

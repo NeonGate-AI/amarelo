@@ -61,8 +61,8 @@ For example, a person might say that evening walks helped during one week and la
 
 ### How continuity becomes context
 
-1. **Capture evidence within scope.** The internal text integration captures the authenticated person's current message. A transcript is evidence; an assistant's response does not become evidence about the person.
-2. **Curate in the background.** Neo4j commits protected changes and an outbox event together. A dispatcher publishes reference-only jobs to BullMQ on a dedicated Redis Queue service. Delivery is at least once, so processing is idempotent and protected effects recheck current authority.
+1. **Capture evidence within scope.** The internal text integration captures the person's current message under a server-owned identity and consent boundary. A transcript is evidence; an assistant's response does not become evidence about the person.
+2. **Curate in the background.** Neo4j commits protected changes and an outbox event together. A dispatcher publishes reference-only jobs to BullMQ on a dedicated Redis Queue service; LangGraph orchestrates the worker's curation flow. Delivery is at least once, so processing is idempotent and protected effects recheck current authority.
 3. **Let models propose; let policy decide.** Signal, duplicate and budget checks can skip or defer extraction. When extraction runs, the model produces candidates. Deterministic acceptance rules control which candidates become canonical memory.
 4. **Retrieve eligible records.** Permission, provenance, lifecycle and integrity checks come before ranking. Conflicting eligible records preserve uncertainty; similarity alone cannot turn an ineligible record into context.
 5. **Project a bounded context.** Relevant records are selected within a hard token budget. Conversation owns final context assembly, so a longer personal history does not require sending the entire history to the model.
@@ -81,7 +81,7 @@ Serving and curation attempts feed a usage ledger. Missing usage or cost stays u
 | Boundary | Responsibility |
 | --- | --- |
 | [Mobile PWA](./workspaces/apps/mobile/readme.md) | The person's conversation surface, captions and voice presence, using [Orbz](https://github.com/NeonGate-AI/orbz). |
-| [Chatterbox](./workspaces/microservices/chatterbox/readme.md) | Fastify transport, WorkOS authentication and server-side provider composition. |
+| [Chatterbox](./workspaces/microservices/chatterbox/readme.md) | Fastify transport, server-side identity and provider composition; WorkOS and an explicit local development mode. |
 | [Conversation](./.agents/context/workspaces/ai/conversation.md) | Framework-neutral interaction, cognitive routing and final context assembly for Ana. |
 | [Memory SDK](./workspaces/packages/memory-sdk/readme.md) | The approved public boundary through which AI consumes personal memory. |
 | [Memory Nucleus](./.agents/context/workspaces/memory-nucleus/overview.md) | Memory formation, lifecycle, retrieval, projection and economics; Neo4j is its canonical graph. |
@@ -95,11 +95,13 @@ See the [architecture overview](./.agents/context/architecture/overview.md), [me
 
 ## Current status
 
+This snapshot covers source integrated through [SPEC-051](./.agents/specs/051-langgraph-memory-orchestration.spec.md). Implementation and validation are tracked separately.
+
 | Area | What is in this repository |
 | --- | --- |
 | **Product surfaces** | Public landing page, onboarding, an installable PWA and a memory console. The default voice interface and console use synthetic data. |
-| **Conversation** | Authenticated development text with Ana, plus an opt-in Realtime WebRTC experiment. These are bounded development paths. |
-| **Memory** | Neo4j integration, background curation, shadow comparisons, an internal canary and economics reporting are integrated in source. Memory flags default to off. |
+| **Conversation** | Development text with Ana, local single-owner and WorkOS identity modes, plus an opt-in Realtime WebRTC experiment. These are bounded development paths. |
+| **Memory** | Neo4j integration, LangGraph/BullMQ curation, shadow comparisons, an internal canary and economics reporting are integrated in source. The local MVP explicitly enables ingestion/curation; shadow and canary remain off by default. |
 | **Next proof point** | Validate the integrated text-and-memory path, then complete the voice lifecycle and the guardrails needed before external exposure. |
 
 The latest Memory delivery prioritized source integration and explicitly deferred validation. It is not evidence of a working deployment, measured ROI or production readiness. [SPEC-049](./.agents/specs/049-integrated-memory-validation-debt.spec.md) tracks that validation debt; the [spec catalog](./.agents/specs/readme.md) records the delivery sequence.
@@ -118,7 +120,9 @@ pnpm dev
 
 `pnpm dev` starts the four interface applications: landing, console, onboarding and mobile. Open the PWA at `http://localhost:3003` to explore its default synthetic voice interface.
 
-For an authenticated conversation with Ana, follow the [local conversation setup](./workspaces/apps/mobile/readme.md#run-the-authenticated-text-slice), configure the owning `.env.template` files and run `pnpm dev:text`. WorkOS and model credentials stay server-side. This development setup is separate from enabling Memory and its background worker.
+The [local MVP guide](./workspaces/packages/runtime/mvp.md) covers the owner-only environment, `.env.template` configuration and launcher commands with OpenAI, Neo4j and separate Redis services. This path defers WorkOS and keeps credentials server-side. Its complete Realtime-to-Memory bridge is tracked in [SPEC-052](./.agents/specs/052-realtime-pwa-memory-bridge.spec.md); setup instructions are not proof of integrated operation.
+
+The [development text guide](./workspaces/apps/mobile/readme.md#run-the-authenticated-text-slice) also documents the earlier WorkOS flow and `pnpm dev:text`; select the matching server authentication mode explicitly.
 
 For the local infrastructure profiles, use the [runtime guide](./workspaces/packages/runtime/readme.md). The [Elo CLI guide](./cli/readme.md) covers environment setup, diagnostics and repository checks.
 

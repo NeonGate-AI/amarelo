@@ -1,5 +1,7 @@
 # Runtime local
 
+Para a primeira conversa local com memória e sem WorkOS, use o [guia do MVP](mvp.md): `pnpm mvp:init`, configuração dos serviços, `pnpm mvp:infra` e `pnpm dev:mvp`.
+
 `@repo/runtime` representa o ambiente local do Amarelo em Kubernetes. A base Kustomize vive em `kubernetes/` e pertence ao namespace `amarelo-runtime`. Por padrão somente as cinco aplicações são iniciadas; infraestrutura sem consumidor ativo exige um perfil explícito. Docker continua responsável apenas por construir a imagem OCI local; não existe um segundo orquestrador ativo.
 
 ## Perfis

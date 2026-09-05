@@ -242,3 +242,8 @@ The six ready contracts now include these source, testing, cost and evidence-cov
 This documentation-only cycle branches from the exact source in the delivered `amarelo-spec-025.zip`, commit `64c22c3cacf746b9e8fb9e74870b726b1181beeb`. The owner will handle the earlier branch's PR/merge; no remote merge is asserted. Continue the authorized ZIP/local-branch workflow, with scoped harness checks and independent review. This cycle makes no runtime changes or claim of full CI/live-provider validation. The dependency order in the catalog remains authoritative when implementation resumes.
 
 This file replaces `107-plans-and-entitlements.md`. The next step is owner resolution of the OPEN values, not speculative implementation. The canonical Memory Nucleus economics still use `netMemoryCost = memoryProcessingCost - avoidedServingCost`, Memory ROI above 3x as healthy and above 5x as target; those metrics do not approve plan prices or benefits.
+
+
+### MVP scope extracted — 2026-09-05
+
+The owner approved SPEC-050/051/052 for the first working PWA voice + longitudinal Memory loop, selecting Realtime speech and LangGraph Memory orchestration. WorkOS and commercial entitlements remain deferred. Those implementation slices no longer depend on unresolved prices, paid quotas or billing semantics in this draft. The 60-minute weekly investor workload remains an evaluation scenario.

@@ -64,10 +64,12 @@ The prefix is a unique catalog rank, not the durable `SPEC-###` identity. Existi
 | 046 | SPEC-046 | implemented | [Saneamento canônico](046-saneamento-canonico.spec.md) |
 | 047 | SPEC-047 | implemented | [Vertical slice textual, autenticado e observável](047-vertical-slice-textual-autenticado-observavel.spec.md) |
 | 048 | SPEC-048 | implemented | [Install grill-me and align discovery gates](048-grill-me-discovery-alignment.spec.md) |
-
 | 049 | SPEC-049 | draft | [Integrated Memory validation debt](049-integrated-memory-validation-debt.spec.md) |
+| 050 | SPEC-050 | implemented | [Local MVP environment](050-local-mvp-environment.spec.md) |
+| 051 | SPEC-051 | implemented | [LangGraph Memory orchestration](051-langgraph-memory-orchestration.spec.md) |
+| 052 | SPEC-052 | in-progress | [Realtime PWA Memory bridge](052-realtime-pwa-memory-bridge.spec.md) |
 
-The next unallocated durable delivery ID is `SPEC-050`.
+The next unallocated durable delivery ID is `SPEC-053`.
 
 SPEC-046 and SPEC-047 were implemented in the owner-authorized local ZIP branch. Their source/test acceptance does not assert live login, deployed infrastructure, browser E2E or remote CI.
 
@@ -86,7 +88,7 @@ On 2026-09-05 the owner confirmed SPEC-046/047 completed in staging and directed
 | 5 | SPEC-017 | Internal canary followed by controlled A/B | SPEC-043; SPEC-033 before external participants |
 | 6 | SPEC-018 | Measured economics report and scale/hold decision | SPEC-017 |
 
-The retained drafts are SPEC-033 (owner-deferred application guardrails, still required before external exposure), SPEC-034 (lifecycle/realtime semantics, after guardrails and before the voice bridge) and SPEC-025 (owner understanding accepted and downstream contracts reconciled; remaining commercial decisions deferred; no entitlement implementation yet). Those open commercial choices do not block internal Memory validation. SPEC-044 is closed by explicit owner acceptance; its external enforcement was not independently reinspected here.
+The retained drafts are SPEC-033 (owner-deferred application guardrails, still required before external exposure), SPEC-034 (broader lifecycle/realtime semantics before external voice exposure; the owner-approved local bridge is SPEC-052) and SPEC-025 (owner understanding accepted and downstream contracts reconciled; remaining commercial decisions deferred; no entitlement implementation yet). Those open commercial choices do not block internal Memory validation. SPEC-044 is closed by explicit owner acceptance; its external enforcement was not independently reinspected here.
 
 The six-spec sequence validates Memory over the authenticated textual path. SPEC-018 reports observed text/Memory economics and explicitly labeled voice estimates or unknowns until separate voice-bridge measurements exist. Passing this sequence alone cannot prove the complete cost or naturalness of an hour of voice use.
 
@@ -108,3 +110,8 @@ Use `template.md` and `workflow.md` for every new numbered spec. Rules, context 
 The six requested specs now have implementation branches and staging integration. SPEC-016 completed in PR #87; downstream delivery followed 012 → 011 → 043 → 017 → 018. The owner explicitly deferred new validation. An implemented catalog entry records code delivery, while unchecked test/quality/cost criteria remain under SPEC-049. No ready spec remains in this queue. SPEC-025, 033 and 034 retain their deferred draft boundaries.
 
 The background/shadow/canary paths default off and evidence-dependent gates remain hold without measured results. This is an integrated textual implementation; no full voice economics, naturalness, pricing margin or production readiness is asserted.
+
+
+## First usable voice MVP — 2026-09-05
+
+The owner selected OpenAI Realtime for spoken answers with LangGraph governing Memory, and explicitly deferred WorkOS. Execute SPEC-050 → SPEC-051 → SPEC-052. These approved local slices separate the settled MVP goal from SPEC-025's still-deferred commercial rules. The background foundation remains SPEC-012 (`025-background-memory-curation-loop.spec.md`). Broad validation remains deferred in SPEC-049.
