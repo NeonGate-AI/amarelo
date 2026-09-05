@@ -2,7 +2,7 @@
 id: SPEC-011
 title: Evaluate bounded Memory Nucleus serving in shadow mode
 type: experiment
-status: ready
+status: implemented
 mode: prospective
 created: 2026-09-03
 updated: 2026-09-05
@@ -139,3 +139,8 @@ Evidence will include no-effect, authorization, budget and adversarial tests; pa
 SPEC-025 reconciliation (2026-09-05): the owner accepted the consolidated discovery and requested this contract revision. The discovery hold is resolved; this phase remains ready and unimplemented. [SPEC-025](007-plans-and-entitlements.spec.md) separates personal-memory evidence, temporary dialogue and timing telemetry. This revision keeps no-effect shadow behavior and allows properly paired model research without attributing a model-price change to Memory. It changes contracts only.
 
 Blocked by SPEC-009, SPEC-047, SPEC-016 and SPEC-012. Its no-effect/parity evidence unlocks SPEC-043; both gates remain prerequisites of SPEC-017.
+
+
+## Delivery decision — 2026-09-05
+
+Implemented and integrated under the owner's delivery-first instruction. No new validation was executed for this phase; unchecked acceptance evidence is explicitly deferred to SPEC-049. Implementation status does not certify a passed parity, integrity, canary or economics gate. Internal flags default off; missing evidence keeps control/hold.
