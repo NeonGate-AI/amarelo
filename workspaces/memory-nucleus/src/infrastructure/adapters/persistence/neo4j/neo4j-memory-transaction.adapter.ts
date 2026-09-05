@@ -34,6 +34,7 @@ import {
 } from '@application/ports'
 import { parseNeo4jMemoryRecord } from './neo4j-memory-record.map'
 import { Neo4jScopedMemoryRepository } from './neo4j-memory-search.adapter'
+import { prepareNeo4jMemorySource } from './neo4j-memory-source.guard'
 import {
   assertNeo4jMemoryScope,
   neo4jMemoryFingerprint,
@@ -51,7 +52,8 @@ const ConsentHeadSchema = z.object({
 const CandidateSchema = z.object({
   candidateId: z.string().uuid(),
   commandId: z.string(),
-  requestedAt: z.string(),
+  requestedAt: z.string().datetime({ offset: true }),
+  observedAt: z.string().datetime({ offset: true }),
   evidenceId: z.string().uuid(),
   contentHash: z.string(),
   inputJson: z.string(),
@@ -201,14 +203,22 @@ export class Neo4jOperationalMemoryTransaction
     options: ExplicitMemoryOptions,
     source?: EligibleMemorySource
   ): Promise<StagedExplicitMemory> {
-    if (source !== undefined)
-      throw new Error('Trusted Memory evidence staging is not implemented')
     this.requireOperation('persist')
     await this.assertAuthority()
     const parsed = ExplicitMemoryInputSchema.parse(input)
     const parsedOptions = ExplicitMemoryOptionsSchema.parse(options)
     if (parsed.purpose !== this.scope.purpose)
       throw new Error('Explicit Memory purpose mismatch')
+    const preparedSource =
+      source === undefined
+        ? undefined
+        : prepareNeo4jMemorySource(
+            source,
+            this.scope,
+            this.scopeKey,
+            parsed.statement,
+            this.now()
+          )
     const commandId = neo4jMemoryFingerprint([
       this.scopeKey,
       parsedOptions.idempotencyKey ?? randomUUID()
@@ -221,7 +231,11 @@ export class Neo4jOperationalMemoryTransaction
     ])
     await this.assertUnsuppressed(canonicalIdentityKey)
     const inputJson = JSON.stringify(parsed)
-    const inputHash = neo4jMemoryFingerprint([parsed])
+    const inputHash = neo4jMemoryFingerprint(
+      preparedSource === undefined
+        ? [parsed]
+        : [parsed, preparedSource.contentHash]
+    )
     const prior = await this.transaction.run(
       `MATCH (c:MemoryCommand {commandId: $commandId, scopeKey: $scopeKey})
        RETURN c.inputHash AS inputHash, c.candidateId AS candidateId, c.requestedAt AS requestedAt`,
@@ -231,6 +245,10 @@ export class Neo4jOperationalMemoryTransaction
       const row = prior.records[0]
       if (row?.get('inputHash') !== inputHash)
         throw new Error('Memory command identity collision')
+      if (preparedSource !== undefined)
+        await this.loadExplicitCandidate(
+          z.string().uuid().parse(row.get('candidateId'))
+        )
       return {
         candidateId: z.string().uuid().parse(row.get('candidateId')),
         requestedAt: z
@@ -243,19 +261,51 @@ export class Neo4jOperationalMemoryTransaction
     const candidateId = randomUUID()
     const evidenceId = randomUUID()
     const requestedAt = this.now().toISOString()
-    const contentHash = neo4jMemoryFingerprint([parsed.statement])
+    const observedAt = preparedSource?.observedAt ?? requestedAt
+    const contentHash =
+      preparedSource?.contentHash ?? neo4jMemoryFingerprint([parsed.statement])
     await this.assertAuthority()
+    if (preparedSource !== undefined) {
+      const sources = await this.transaction.run(
+        `UNWIND $turns AS turn
+         MERGE (s:MemorySourceTurn {identityKey: turn.identityKey})
+         ON CREATE SET s.scopeKey = $scopeKey, s.tenantId = $tenantId,
+           s.subjectId = $subjectId, s.actorId = $actorId, s.purpose = $purpose,
+           s.conversationId = $conversationId, s.sourceKind = $sourceKind,
+           s.sourceTurnId = turn.sourceTurnId, s.sourceTurnVersion = turn.sourceTurnVersion,
+           s.observedAt = turn.observedAt, s.sourceFingerprint = turn.sourceFingerprint
+         WITH s, turn
+         WHERE s.scopeKey = $scopeKey AND s.tenantId = $tenantId
+           AND s.subjectId = $subjectId AND s.actorId = $actorId AND s.purpose = $purpose
+           AND s.conversationId = $conversationId AND s.sourceKind = $sourceKind
+           AND s.sourceTurnId = turn.sourceTurnId AND s.sourceTurnVersion = turn.sourceTurnVersion
+           AND s.observedAt = turn.observedAt AND s.sourceFingerprint = turn.sourceFingerprint
+         RETURN s.identityKey AS identityKey`,
+        {
+          ...this.parameters(),
+          conversationId: this.scope.conversationId,
+          sourceKind: this.scope.sourceKind,
+          turns: preparedSource.turns
+        }
+      )
+      if (sources.records.length !== preparedSource.turns.length)
+        throw new Error('Memory source turn version has conflicting evidence')
+    }
     await this.transaction.run(
       `CREATE (e:MemoryEvidence {evidenceId: $evidenceId, scopeKey: $scopeKey,
          tenantId: $tenantId, subjectId: $subjectId, actorId: $actorId, purpose: $purpose,
          text: $statement, contentHash: $contentHash, sourceKind: $sourceKind,
          sourceType: 'explicit-user', conversationId: $conversationId,
-         sourceTurnId: $sourceTurnId, sourceTurnVersion: 1, observedAt: $requestedAt, eligible: true})
+         sourceTurnId: $sourceTurnId, sourceTurnVersion: $sourceTurnVersion,
+         sourceTurnIds: $sourceTurnIds, sourceTurnVersions: $sourceTurnVersions,
+         sourceObservedAts: $sourceObservedAts, sourceIdentityKeys: $sourceIdentityKeys,
+         sourceFingerprints: $sourceFingerprints, observedAt: $observedAt, eligible: true})
        CREATE (c:MemoryCandidate {candidateId: $candidateId, scopeKey: $scopeKey,
          tenantId: $tenantId, subjectId: $subjectId, actorId: $actorId, purpose: $purpose,
          commandId: $commandId, canonicalIdentityKey: $canonicalIdentityKey,
          canonicalKey: $canonicalKey, inputJson: $inputJson, evidenceId: $evidenceId,
-         contentHash: $contentHash, requestedAt: $requestedAt, status: 'candidate',
+         contentHash: $contentHash, requestedAt: $requestedAt, observedAt: $observedAt,
+         status: 'candidate',
          consentVersion: $consentVersion})
        CREATE (c)-[:SUPPORTED_BY]->(e)
        CREATE (:MemoryCommand {commandId: $commandId, scopeKey: $scopeKey,
@@ -273,20 +323,161 @@ export class Neo4jOperationalMemoryTransaction
         inputHash,
         contentHash,
         requestedAt,
+        observedAt,
         statement: parsed.statement,
         sourceKind: this.scope.sourceKind,
         conversationId: this.scope.conversationId,
-        sourceTurnId: this.scope.requestId,
+        sourceTurnId:
+          preparedSource === undefined
+            ? this.scope.requestId
+            : preparedSource.turns.length === 1
+              ? preparedSource.turns[0]?.sourceTurnId
+              : null,
+        sourceTurnVersion:
+          preparedSource === undefined
+            ? 1
+            : preparedSource.turns.length === 1
+              ? preparedSource.turns[0]?.sourceTurnVersion
+              : null,
+        sourceTurnIds:
+          preparedSource?.turns.map((turn) => turn.sourceTurnId) ?? [],
+        sourceTurnVersions:
+          preparedSource?.turns.map((turn) => turn.sourceTurnVersion) ?? [],
+        sourceObservedAts:
+          preparedSource?.turns.map((turn) => turn.observedAt) ?? [],
+        sourceIdentityKeys:
+          preparedSource?.turns.map((turn) => turn.identityKey) ?? [],
+        sourceFingerprints:
+          preparedSource?.turns.map((turn) => turn.sourceFingerprint) ?? [],
         consentVersion: this.consentVersion
       }
     )
+    if (preparedSource !== undefined) {
+      const linked = await this.transaction.run(
+        `MATCH (e:MemoryEvidence {evidenceId: $evidenceId, scopeKey: $scopeKey})
+         UNWIND $turns AS turn
+         MATCH (s:MemorySourceTurn {identityKey: turn.identityKey, scopeKey: $scopeKey})
+         WHERE s.sourceFingerprint = turn.sourceFingerprint
+         CREATE (e)-[:HAS_SOURCE_TURN]->(s)
+         RETURN s.identityKey AS identityKey`,
+        { ...this.parameters(), evidenceId, turns: preparedSource.turns }
+      )
+      if (linked.records.length !== preparedSource.turns.length)
+        throw new Error('Memory evidence source binding failed')
+      await this.appendEvent(
+        commandId,
+        'memory.candidate-staged.v1',
+        null,
+        1,
+        requestedAt,
+        { candidateId, evidenceId }
+      )
+    }
+    await this.assertAuthority()
     return { candidateId, commandId, requestedAt }
   }
 
   async loadExplicitCandidate(
-    _candidateId: string
+    candidateId: string
   ): Promise<StoredExplicitMemoryCandidate> {
-    throw new Error('Stored Memory candidate delivery is not implemented')
+    this.requireOperation('persist')
+    const candidate = await this.readCandidate(candidateId)
+    const input = ExplicitMemoryInputSchema.parse(
+      JSON.parse(candidate.inputJson)
+    )
+    if (input.purpose !== this.scope.purpose)
+      throw new Error('Stored Memory candidate purpose mismatch')
+    return {
+      input,
+      staged: {
+        candidateId: candidate.candidateId,
+        commandId: candidate.commandId,
+        requestedAt: candidate.requestedAt
+      }
+    }
+  }
+
+  private async readCandidate(candidateId: string) {
+    await this.assertAuthority()
+    const result = await this.transaction.run(
+      `MATCH (c:MemoryCandidate {candidateId: $candidateId, scopeKey: $scopeKey})
+         -[:SUPPORTED_BY]->(e:MemoryEvidence {scopeKey: $scopeKey})
+       WHERE c.tenantId = $tenantId AND c.subjectId = $subjectId AND c.actorId = $actorId
+         AND c.purpose = $purpose AND c.consentVersion = $consentVersion
+         AND e.evidenceId = c.evidenceId AND e.contentHash = c.contentHash
+         AND e.tenantId = $tenantId AND e.subjectId = $subjectId AND e.actorId = $actorId
+         AND e.purpose = $purpose AND e.eligible = true AND e.sourceType = 'explicit-user'
+         AND e.sourceKind IN ['development-text', 'synthetic-transcript']
+         AND e.observedAt = coalesce(c.observedAt, c.requestedAt)
+         AND datetime(e.observedAt) <= datetime(c.requestedAt)
+         AND datetime(c.requestedAt) <= datetime($now)
+       RETURN c.candidateId AS candidateId, c.commandId AS commandId,
+         c.requestedAt AS requestedAt, e.observedAt AS observedAt,
+         c.evidenceId AS evidenceId, c.contentHash AS contentHash, c.inputJson AS inputJson,
+         c.canonicalIdentityKey AS canonicalIdentityKey, c.canonicalKey AS canonicalKey,
+         c.status AS status, e.text AS evidenceText, e.sourceKind AS sourceKind,
+         coalesce(e.sourceIdentityKeys, []) AS sourceIdentityKeys,
+         coalesce(e.sourceFingerprints, []) AS sourceFingerprints`,
+      {
+        ...this.parameters(),
+        candidateId: z.string().uuid().parse(candidateId),
+        consentVersion: this.consentVersion,
+        now: this.now().toISOString()
+      }
+    )
+    if (result.records.length !== 1)
+      throw new Error('Stored Memory candidate authority is unavailable')
+    const row = result.records[0]
+    const candidate = CandidateSchema.parse(row?.toObject())
+    await this.assertUnsuppressed(candidate.canonicalIdentityKey)
+    const input = ExplicitMemoryInputSchema.parse(
+      JSON.parse(candidate.inputJson)
+    )
+    if (
+      input.purpose !== this.scope.purpose ||
+      input.statement !== row?.get('evidenceText')
+    )
+      throw new Error('Stored Memory candidate evidence does not match')
+    const sourceKeys = z
+      .array(z.string())
+      .max(100)
+      .parse(row?.get('sourceIdentityKeys'))
+    const fingerprints = z
+      .array(z.string())
+      .max(100)
+      .parse(row?.get('sourceFingerprints'))
+    if (sourceKeys.length !== fingerprints.length)
+      throw new Error('Stored Memory source binding is incomplete')
+    if (sourceKeys.length > 0) {
+      const sources = await this.transaction.run(
+        `MATCH (e:MemoryEvidence {evidenceId: $evidenceId, scopeKey: $scopeKey})
+           -[:HAS_SOURCE_TURN]->(s:MemorySourceTurn)
+         WHERE s.identityKey IN $sourceKeys AND s.scopeKey = $scopeKey
+           AND s.tenantId = $tenantId AND s.subjectId = $subjectId AND s.actorId = $actorId
+           AND s.purpose = $purpose AND s.sourceKind = $sourceKind
+           AND s.conversationId = e.conversationId
+         RETURN s.identityKey AS identityKey, s.sourceFingerprint AS sourceFingerprint`,
+        {
+          ...this.parameters(),
+          evidenceId: candidate.evidenceId,
+          sourceKeys,
+          sourceKind: row?.get('sourceKind')
+        }
+      )
+      if (
+        sources.records.length !== sourceKeys.length ||
+        new Set(sourceKeys).size !== sourceKeys.length ||
+        sources.records.some((source) => {
+          const index = sourceKeys.indexOf(source.get('identityKey'))
+          return (
+            index < 0 || source.get('sourceFingerprint') !== fingerprints[index]
+          )
+        })
+      )
+        throw new Error('Stored Memory source version has conflicting evidence')
+    }
+    await this.assertAuthority()
+    return candidate
   }
 
   private async assertUnsuppressed(
@@ -304,21 +495,7 @@ export class Neo4jOperationalMemoryTransaction
     input: AcceptCandidateInput
   ): Promise<AcceptCandidateResult> {
     this.requireOperation('persist')
-    await this.assertAuthority()
-    const result = await this.transaction.run(
-      `MATCH (c:MemoryCandidate {candidateId: $candidateId, scopeKey: $scopeKey})
-       WHERE c.tenantId = $tenantId AND c.subjectId = $subjectId AND c.actorId = $actorId
-         AND c.purpose = $purpose AND c.consentVersion = $consentVersion
-       RETURN c.candidateId AS candidateId, c.commandId AS commandId, c.requestedAt AS requestedAt,
-         c.evidenceId AS evidenceId, c.contentHash AS contentHash, c.inputJson AS inputJson,
-         c.canonicalIdentityKey AS canonicalIdentityKey, c.canonicalKey AS canonicalKey, c.status AS status`,
-      {
-        ...this.parameters(),
-        candidateId: input.candidateId,
-        consentVersion: this.consentVersion
-      }
-    )
-    const candidate = CandidateSchema.parse(result.records[0]?.toObject())
+    const candidate = await this.readCandidate(input.candidateId)
     const body = ExplicitMemoryInputSchema.parse(
       JSON.parse(candidate.inputJson)
     )
@@ -379,13 +556,13 @@ export class Neo4jOperationalMemoryTransaction
       state: 'active',
       version,
       validUntil: null,
-      observedAt: candidate.requestedAt,
+      observedAt: candidate.observedAt,
       createdAt: candidate.requestedAt,
       updatedAt: at,
       provenance: {
         actorType: 'user',
         authorId: this.scope.actorId,
-        observedAt: candidate.requestedAt,
+        observedAt: candidate.observedAt,
         sourceArtifactIds: [candidate.evidenceId],
         sourceType: 'explicit_user',
         transformation: null
@@ -436,7 +613,7 @@ export class Neo4jOperationalMemoryTransaction
           `${body.statement} ${body.semanticKey ?? ''}`
         ),
         recordJson: JSON.stringify(record),
-        observedAt: candidate.requestedAt,
+        observedAt: candidate.observedAt,
         occurredAt: body.occurredAt,
         validFrom: body.validFrom,
         temporalPrecision: body.temporalPrecision,
@@ -648,18 +825,20 @@ export class Neo4jOperationalMemoryTransaction
     eventType: string,
     memoryId: string | null,
     version: number,
-    at: string
+    at: string,
+    source?: { readonly candidateId: string; readonly evidenceId: string }
   ): Promise<void> {
     const eventId = neo4jMemoryFingerprint([commandId, eventType])
     await this.transaction.run(
       `CREATE (l:MemoryLifecycleEvent {eventId: $eventId, scopeKey: $scopeKey,
          tenantId: $tenantId, subjectId: $subjectId, purpose: $purpose,
-         memoryId: $memoryId, eventType: $eventType, version: $version, occurredAt: $at})
+         memoryId: $memoryId, eventType: $eventType, version: $version, occurredAt: $at,
+         candidateId: $candidateId, evidenceId: $evidenceId})
        CREATE (o:OutboxEvent {eventId: $eventId, scopeKey: $scopeKey,
          tenantId: $tenantId, subjectId: $subjectId, purpose: $purpose,
          memoryId: $memoryId, eventType: $eventType, aggregateVersion: $version,
          schemaVersion: 'memory-outbox-v1', status: 'pending', createdAt: $at,
-         requestId: $requestId, attempts: 0})
+         requestId: $requestId, attempts: 0, candidateId: $candidateId, evidenceId: $evidenceId})
        CREATE (l)-[:EMITS]->(o)`,
       {
         ...this.parameters(),
@@ -668,6 +847,8 @@ export class Neo4jOperationalMemoryTransaction
         memoryId,
         version,
         at,
+        candidateId: source?.candidateId ?? null,
+        evidenceId: source?.evidenceId ?? null,
         requestId: this.scope.requestId
       }
     )

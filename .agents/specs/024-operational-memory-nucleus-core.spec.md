@@ -158,6 +158,10 @@ BullMQ dispatch/workers, shadow serving, A/B flags, vector quality activation, b
 
 ## Evidence and Promotion
 
+Owner execution override (2026-09-05): the owner merged PR #86 at `e93df2aee664e071d9c734ff21505a0eded068ab` and explicitly prioritized implementation/integration over repeated validation to conserve credits and advance to SPEC-012. The follow-up branch `fix/spec-016-operational-completion` finishes candidate delivery, schema readiness and automatic usage recording. Full final-head CI and independent reviews remain pending; this override does not turn pending evidence into a pass or authorize promotion to `main`.
+
+[CI 33959276586](https://github.com/NeonGate-AI/amarelo/actions/runs/33959276586), head `343028da019776f5f3c59ee022758bd18c657ba6`, proves ten real Neo4j checks: the public SDK round trip, authenticated HTTP composition, durable ledger restart, and seven authority/isolation/rollback/suppression cases. The same run records behavioral red for the three follow-up implementations. Local typechecking/bundling supports their integration; their final graph validation is tracked separately.
+
 Initial behavioral red: [CI 33956277041](https://github.com/NeonGate-AI/amarelo/actions/runs/33956277041), head `0baca4e14d91bf0c0f46ef5962b21e3b618d986c`, starts the real Neo4j container and driver, then fails at the missing public SDK operation. Audits, lint, typechecks and existing tests pass before that failure. [PR #86](https://github.com/NeonGate-AI/amarelo/pull/86) owns delivery; no completion or merge is claimed by this red checkpoint.
 
 Evidence will include Neo4j/SDK round-trip tests, atomic outbox tests, promotion-time authorization tests, isolation/no-resurrection fixtures, redaction assertions, zero-LLM retrieval, exact-head CI and both reviews. Proven semantics are promoted to the Memory context and rules.

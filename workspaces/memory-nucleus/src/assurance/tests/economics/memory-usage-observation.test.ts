@@ -130,4 +130,41 @@ describe('operational usage observation', () => {
     )
     expect(received).toEqual(['usage-1', 'usage-3'])
   })
+
+  it('shares one delivery capacity across separately bound request sinks', async () => {
+    vi.useFakeTimers()
+    const event = MemoryUsageEventSchema.parse(memoryUsageFixture())
+    let release: (() => void) | undefined
+    const held = new Promise<void>((resolve) => {
+      release = resolve
+    })
+    const observer = new MemoryUsageObservationService({
+      maxPending: 1,
+      timeoutMilliseconds: 20,
+      onObservation: () => held
+    })
+    const first = observer.observe(event)
+    await vi.advanceTimersByTimeAsync(25)
+    await expect(first).resolves.toBe('unavailable')
+    const received: string[] = []
+    const requestSink = (input: typeof event) => {
+      received.push(input.eventId)
+    }
+    await expect(
+      observer.observeWithSink(
+        { ...event, eventId: 'request-two-event' },
+        requestSink
+      )
+    ).resolves.toBe('unavailable')
+    expect(received).toEqual([])
+    release?.()
+    await vi.advanceTimersByTimeAsync(0)
+    await expect(
+      observer.observeWithSink(
+        { ...event, eventId: 'request-three-event' },
+        requestSink
+      )
+    ).resolves.toBe('recorded')
+    expect(received).toEqual(['request-three-event'])
+  })
 })

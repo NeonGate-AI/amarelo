@@ -181,3 +181,7 @@ export const MemoryUsageEventSchema = z
   })
   .readonly()
 export type MemoryUsageEvent = z.infer<typeof MemoryUsageEventSchema>
+export type MemoryUsageProfile = Pick<
+  MemoryUsageEvent,
+  'workloadVersion' | 'profileVersion' | 'costClass'
+>

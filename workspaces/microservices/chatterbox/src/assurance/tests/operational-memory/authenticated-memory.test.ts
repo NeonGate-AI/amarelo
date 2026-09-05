@@ -141,6 +141,20 @@ test('the development Memory seam binds authenticated WorkOS identity to canonic
     )
     for (const denied of [
       {
+        headers: { origin, cookie: 'session=alice' },
+        payload: {
+          conversationId,
+          operation: 'search',
+          input: {
+            purpose: 'marketing',
+            query: 'caminhar',
+            asOf: '2026-09-05T00:00:00.000Z',
+            tokenBudget: 600
+          }
+        },
+        status: 400
+      },
+      {
         headers: { origin },
         payload: { conversationId, operation: 'get-consent' },
         status: 401

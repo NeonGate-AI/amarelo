@@ -1,4 +1,4 @@
-import type { Driver } from 'neo4j-driver'
+import type { Driver, ManagedTransaction } from 'neo4j-driver'
 import { z } from 'zod'
 import type { MemoryRequestScope } from '@application/contracts'
 import {
@@ -16,7 +16,10 @@ export class Neo4jOperationalMemoryUnitOfWork extends OperationalMemoryUnitOfWor
   constructor(
     private readonly driver: Driver,
     private readonly database: string,
-    private readonly now: () => Date
+    private readonly now: () => Date,
+    private readonly assertSchemaReady: (
+      transaction: ManagedTransaction
+    ) => Promise<void>
   ) {
     super()
   }
@@ -34,6 +37,7 @@ export class Neo4jOperationalMemoryUnitOfWork extends OperationalMemoryUnitOfWor
       return await session.executeWrite(
         async (transaction) => {
           assertNeo4jMemoryScope(boundScope, this.now())
+          await this.assertSchemaReady(transaction)
           const head = await transaction.run(
             `MERGE (h:MemoryConsentHead {scopeKey: $scopeKey})
            ON CREATE SET h.tenantId = $tenantId, h.subjectId = $subjectId,
@@ -64,6 +68,7 @@ export class Neo4jOperationalMemoryUnitOfWork extends OperationalMemoryUnitOfWor
           )
           await unit.assertAuthority()
           const result = await work(unit)
+          await this.assertSchemaReady(transaction)
           await unit.assertAuthority()
           return result
         },

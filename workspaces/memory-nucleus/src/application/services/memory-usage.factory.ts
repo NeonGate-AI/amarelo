@@ -1,7 +1,9 @@
 import {
   MemoryUsageEventSchema,
+  MemoryUsageLedgerEntrySchema,
   type MemoryRequestScope,
   type MemoryUsageEvent,
+  type MemoryUsageLedgerEntry,
   type MemoryProviderUsage
 } from '@application/contracts'
 
@@ -17,6 +19,27 @@ export interface CreateTextMemoryUsageEventInput {
   readonly providerUsage?: MemoryProviderUsage | null
   readonly estimatedUsage?: MemoryUsageEvent['estimatedUsage']
   readonly calls?: MemoryUsageEvent['calls']
+}
+
+/** Known zero provider calls do not establish the cost of storage or infrastructure. */
+export function createUnknownCostMemoryUsageLedgerEntry(
+  usageEvent: MemoryUsageEvent,
+  ledgerEntryId: string
+): MemoryUsageLedgerEntry {
+  return MemoryUsageLedgerEntrySchema.parse({
+    schemaVersion: 'memory-usage-ledger-v1',
+    ledgerEntryId,
+    usageEvent,
+    pricingSnapshot: null,
+    brlConversionSnapshot: null,
+    cost: {
+      sourceAmount: null,
+      sourceCurrency: null,
+      brlAmount: null,
+      evidence: 'unknown',
+      calculationVersion: null
+    }
+  })
 }
 
 export function createTextMemoryUsageEvent(

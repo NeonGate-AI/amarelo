@@ -2,6 +2,7 @@ export type OperationalMemoryErrorCode =
   | 'expired-request'
   | 'invalid-request'
   | 'invalid-result'
+  | 'invalid-source'
   | 'scope-mismatch'
   | 'unsupported-operation'
 

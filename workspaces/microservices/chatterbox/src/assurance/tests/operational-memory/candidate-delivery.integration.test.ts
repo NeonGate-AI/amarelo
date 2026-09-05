@@ -96,7 +96,7 @@ function source(scope: MemoryRequestScope): TrustedMemorySource {
 
 async function artifacts(scope: MemoryRequestScope) {
   const result = await driver.executeQuery(
-    'MATCH (n {tenantId: $tenantId, subjectId: $subjectId}) WHERE n:MemoryEvidence OR n:MemoryCandidate OR n:Memory OR n:MemoryVersion OR (n:OutboxEvent AND n.eventType <> "memory.consent-updated.v1") RETURN labels(n) AS labels, properties(n) AS properties',
+    'MATCH (n {tenantId: $tenantId, subjectId: $subjectId}) WHERE n:MemoryEvidence OR n:MemoryCandidate OR n:Memory OR n:MemoryVersion OR (n:OutboxEvent AND n.eventType <> "memory.consent-updated.v1") RETURN labels(n) AS labels, properties(n) AS properties ORDER BY elementId(n)',
     { tenantId: scope.tenantId, subjectId: scope.subjectId },
     { database: 'neo4j' }
   )
@@ -127,6 +127,28 @@ test('trusted mixed input persists only patient evidence before delayed explicit
     sourceTurnVersion: 2
   })
   expect(before.some((row) => row.labels.includes('OutboxEvent'))).toBe(true)
+  await expect(
+    candidates.stageExplicit(
+      input,
+      { idempotencyKey: 'candidate-source-1' },
+      {
+        events: source(scope).events.filter(
+          (event) => event.kind === 'subject-text'
+        )
+      }
+    )
+  ).resolves.toEqual(staged)
+  const changedStatement = 'Prefiro caminhar à noite.'
+  await expect(
+    candidates.stageExplicit(
+      { ...input, statement: changedStatement },
+      { idempotencyKey: 'candidate-source-changed' },
+      {
+        events: [{ ...source(scope).events[1], text: changedStatement }]
+      } as TrustedMemorySource
+    )
+  ).rejects.toThrow()
+  expect(await artifacts(scope)).toEqual(before)
   const written = await candidates.promoteExplicit(staged.candidateId)
   const found = await runtime.forRequest(scope).search({
     query: 'caminhar',

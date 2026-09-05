@@ -45,7 +45,12 @@ export function createMemoryRuntimeBinding(
         uri,
         username,
         password,
-        database
+        database,
+        usageProfile: {
+          workloadVersion: 'development-text-validation-v1',
+          profileVersion: 'memory-internal-validation-v1',
+          costClass: 'experiment'
+        }
       })
     },
     async close() {

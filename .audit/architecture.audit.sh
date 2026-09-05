@@ -511,6 +511,18 @@ while IFS= read -r path; do
   is_source_file "$path" || continue
 
   case "$path_relative" in
+    workspaces/memory-nucleus/src/domain/*|workspaces/memory-nucleus/src/application/*)
+      if grep -Eq "['\"](neo4j-driver|bullmq|ioredis|fastify)(/|['\"])" "$path"; then
+        architecture_fail \
+          clean-driver-boundary \
+          "$path_relative" \
+          "Memory policy layer imports a database, queue or HTTP driver" \
+          "bind the driver through an Application port in Infrastructure"
+      fi
+      ;;
+  esac
+
+  case "$path_relative" in
     workspaces/memory-nucleus/src/domain/*)
       if grep -Eq "from[[:space:]]+['\"]node:crypto['\"]" "$path"; then
         architecture_fail \

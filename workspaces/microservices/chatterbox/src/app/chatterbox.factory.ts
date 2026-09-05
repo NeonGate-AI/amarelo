@@ -55,14 +55,20 @@ const MemoryRequestSchema = z.discriminatedUnion('operation', [
     .object({
       conversationId: z.string().uuid(),
       operation: z.literal('update-consent'),
-      input: UpdateMemoryConsentInputSchema
+      input: UpdateMemoryConsentInputSchema.refine((input) =>
+        input.changes.every(
+          (change) => change.purpose === 'conversation.support'
+        )
+      )
     })
     .strict(),
   z
     .object({
       conversationId: z.string().uuid(),
       operation: z.literal('remember'),
-      input: ExplicitMemoryInputSchema,
+      input: ExplicitMemoryInputSchema.refine(
+        (input) => input.purpose === 'conversation.support'
+      ),
       options: ExplicitMemoryOptionsSchema.optional()
     })
     .strict(),
@@ -70,7 +76,9 @@ const MemoryRequestSchema = z.discriminatedUnion('operation', [
     .object({
       conversationId: z.string().uuid(),
       operation: z.literal('search'),
-      input: MemorySearchInputSchema
+      input: MemorySearchInputSchema.refine(
+        (input) => input.purpose === 'conversation.support'
+      )
     })
     .strict(),
   z
