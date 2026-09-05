@@ -13,7 +13,13 @@ const OptionalServerPath = z.preprocess(
 
 const ChatterboxEnvironmentSchema = z
   .object({
+    NODE_ENV: z.enum(['development', 'test', 'production']).optional(),
     AI_CONVERSATION_MODEL: OptionalNonEmptyString,
+    CHATTERBOX_AUTH_MODE: z.enum(['workos', 'local']).default('workos'),
+    CHATTERBOX_LOCAL_OWNER_ID: z
+      .string()
+      .regex(/^[A-Za-z0-9_-]{1,80}$/)
+      .default('owner'),
     CHATTERBOX_ALLOWED_ORIGINS: z
       .string()
       .default('')
@@ -156,7 +162,13 @@ const ChatterboxEnvironmentSchema = z
       .positive()
       .max(3_600_000)
       .default(900_000),
-    OPENAI_API_KEY: OptionalNonEmptyString,
+    OPENAI_API_KEY: z.preprocess(
+      (value) =>
+        typeof value === 'string' && value.trim().length === 0
+          ? undefined
+          : value,
+      z.string().trim().min(1).max(1_024).optional()
+    ),
     WORKOS_API_KEY: OptionalNonEmptyString,
     WORKOS_CLIENT_ID: OptionalNonEmptyString,
     WORKOS_COOKIE_NAME: z
@@ -166,6 +178,39 @@ const ChatterboxEnvironmentSchema = z
     WORKOS_COOKIE_PASSWORD: OptionalNonEmptyString
   })
   .superRefine((configuration, context) => {
+    if (configuration.CHATTERBOX_AUTH_MODE === 'local') {
+      if (!['development', 'test'].includes(configuration.NODE_ENV ?? ''))
+        context.addIssue({
+          code: 'custom',
+          message: 'Local authentication requires NODE_ENV=development or test',
+          path: ['NODE_ENV']
+        })
+      if (
+        !['127.0.0.1', '::1', 'localhost'].includes(
+          configuration.CHATTERBOX_HOST
+        )
+      )
+        context.addIssue({
+          code: 'custom',
+          message: 'Local authentication requires a loopback listen host',
+          path: ['CHATTERBOX_HOST']
+        })
+      if (
+        configuration.CHATTERBOX_ALLOWED_ORIGINS.length === 0 ||
+        configuration.CHATTERBOX_ALLOWED_ORIGINS.some(
+          (origin) =>
+            !['127.0.0.1', '[::1]', 'localhost'].includes(
+              new URL(origin).hostname
+            )
+        )
+      )
+        context.addIssue({
+          code: 'custom',
+          message:
+            'Local authentication requires exact loopback browser origins',
+          path: ['CHATTERBOX_ALLOWED_ORIGINS']
+        })
+    }
     if (
       configuration.CHATTERBOX_MEMORY_BACKGROUND_ENABLED &&
       !configuration.CHATTERBOX_MEMORY_ENABLED

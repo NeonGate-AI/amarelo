@@ -6,6 +6,7 @@
   "scripts": {
     "build": "tsc --noEmit",
     "start": "node --import tsx src/cli.ts",
+    "mvp": "sh src/mvp/mvp.sh",
     "typecheck": "tsc --noEmit"
   },
   "devDependencies": {

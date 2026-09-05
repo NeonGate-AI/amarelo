@@ -1,4 +1,5 @@
 import { pathToFileURL } from 'node:url'
+import { ZodError } from 'zod'
 
 import { createProviderChatterbox } from '../composition'
 import { validateChatterboxEnvironment } from '../configuration'
@@ -30,8 +31,17 @@ if (
   entryPath !== undefined &&
   import.meta.url === pathToFileURL(entryPath).href
 ) {
-  startChatterbox().catch(() => {
-    console.error('Chatterbox failed to start.')
+  startChatterbox().catch((error: unknown) => {
+    if (error instanceof ZodError) {
+      const fields = [
+        ...new Set(error.issues.map((issue) => issue.path.join('.')))
+      ]
+      console.error(`Invalid Chatterbox configuration: ${fields.join(', ')}.`)
+    } else {
+      console.error(
+        'Chatterbox failed to start. Check configured services and connections.'
+      )
+    }
     process.exitCode = 1
   })
 }
