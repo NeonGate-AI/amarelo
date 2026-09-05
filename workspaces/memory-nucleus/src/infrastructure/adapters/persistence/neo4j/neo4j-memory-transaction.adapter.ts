@@ -17,7 +17,10 @@ import {
   type MemorySearchInput,
   type UpdateMemoryConsentInput
 } from '@repo/memory-sdk'
-import type { MemoryRequestScope } from '@application/contracts'
+import type {
+  EligibleMemorySource,
+  MemoryRequestScope
+} from '@application/contracts'
 import {
   CanonicalMemoryPort,
   type AcceptCandidateInput,
@@ -26,7 +29,8 @@ import {
   type OperationalMemoryOperation,
   type OperationalMemorySearch,
   type OperationalMemoryTransaction,
-  type StagedExplicitMemory
+  type StagedExplicitMemory,
+  type StoredExplicitMemoryCandidate
 } from '@application/ports'
 import { parseNeo4jMemoryRecord } from './neo4j-memory-record.map'
 import { Neo4jScopedMemoryRepository } from './neo4j-memory-search.adapter'
@@ -194,8 +198,11 @@ export class Neo4jOperationalMemoryTransaction
 
   async stageExplicit(
     input: ExplicitMemoryInput,
-    options: ExplicitMemoryOptions
+    options: ExplicitMemoryOptions,
+    source?: EligibleMemorySource
   ): Promise<StagedExplicitMemory> {
+    if (source !== undefined)
+      throw new Error('Trusted Memory evidence staging is not implemented')
     this.requireOperation('persist')
     await this.assertAuthority()
     const parsed = ExplicitMemoryInputSchema.parse(input)
@@ -274,6 +281,12 @@ export class Neo4jOperationalMemoryTransaction
       }
     )
     return { candidateId, commandId, requestedAt }
+  }
+
+  async loadExplicitCandidate(
+    _candidateId: string
+  ): Promise<StoredExplicitMemoryCandidate> {
+    throw new Error('Stored Memory candidate delivery is not implemented')
   }
 
   private async assertUnsuppressed(

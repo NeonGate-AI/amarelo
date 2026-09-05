@@ -1,6 +1,16 @@
-import type { OperationalMemoryRuntime } from '@application/contracts'
-import { OperationalMemoryClient } from '@application/clients'
-import { Neo4jOperationalMemoryUnitOfWork } from '@infrastructure/adapters/persistence/neo4j'
+import type {
+  OperationalMemoryRuntime,
+  MemoryUsageEvent
+} from '@application/contracts'
+import type { MemoryUsageObservationSink } from '@application/ports'
+import {
+  OperationalMemoryCandidateDeliveryClient,
+  OperationalMemoryClient
+} from '@application/clients'
+import {
+  Neo4jOperationalMemoryUnitOfWork,
+  Neo4jMemoryUsageLedger
+} from '@infrastructure/adapters/persistence/neo4j'
 import neo4j from 'neo4j-driver'
 import {
   initializeNeo4jMemorySchema,
@@ -14,6 +24,12 @@ export interface Neo4jMemoryOptions {
   readonly password: string
   readonly database: string
   readonly now?: () => Date
+  readonly onObservation?: MemoryUsageObservationSink
+  readonly usageProfile?: {
+    readonly workloadVersion: string
+    readonly profileVersion: string
+    readonly costClass: MemoryUsageEvent['costClass']
+  }
 }
 
 /** Server composition root for the request-bound SDK and canonical graph. */
@@ -45,6 +61,10 @@ export async function createNeo4jMemoryRuntime(
     throw error
   }
   const now = options.now ?? (() => new Date())
+  const assertSchemaReady = async (): Promise<void> => {
+    if (!(await isNeo4jMemorySchemaReady(driver, options.database)))
+      throw new Error('Neo4j Memory schema is not ready')
+  }
   const unitOfWork = new Neo4jOperationalMemoryUnitOfWork(
     driver,
     options.database,
@@ -53,9 +73,16 @@ export async function createNeo4jMemoryRuntime(
   return {
     close: () => driver.close(),
     forRequest: (scope) => new OperationalMemoryClient(scope, unitOfWork, now),
-    usageLedgerForRequest: () => {
-      throw new Error('Durable Memory usage ledger is not implemented')
-    },
+    candidatesForRequest: (scope) =>
+      new OperationalMemoryCandidateDeliveryClient(scope, unitOfWork, now),
+    usageLedgerForRequest: (scope) =>
+      new Neo4jMemoryUsageLedger(
+        driver,
+        options.database,
+        scope,
+        now,
+        assertSchemaReady
+      ),
     readiness: async () => {
       try {
         const ready = await isNeo4jMemorySchemaReady(driver, options.database)

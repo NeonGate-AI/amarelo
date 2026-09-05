@@ -1,5 +1,6 @@
 import type { MemoryClient } from '@repo/memory-sdk'
 import type { MemoryUsageLedger } from '@application/ports'
+import type { MemoryCandidateDeliveryClient } from './memory-candidate-delivery.contract'
 
 /** Server-authenticated context; never construct this from browser identity headers. */
 export interface MemoryRequestScope {
@@ -22,6 +23,8 @@ export interface OperationalMemoryReadiness {
 
 export interface OperationalMemoryRuntime {
   forRequest(scope: MemoryRequestScope): MemoryClient
+  /** Server-only evidence staging and later promotion under fresh authority. */
+  candidatesForRequest(scope: MemoryRequestScope): MemoryCandidateDeliveryClient
   /** Server-only usage accounting; the authenticated request bounds ledger access. */
   usageLedgerForRequest(scope: MemoryRequestScope): MemoryUsageLedger
   readiness(): Promise<OperationalMemoryReadiness>

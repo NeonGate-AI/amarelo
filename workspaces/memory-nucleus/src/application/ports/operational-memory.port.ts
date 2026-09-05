@@ -9,6 +9,7 @@ import type {
 } from '@repo/memory-sdk'
 import type {
   AuthorizedMemoryQuery,
+  EligibleMemorySource,
   MemoryRequestScope
 } from '@application/contracts'
 import type { CanonicalMemoryPort } from './canonical-memory.port'
@@ -27,6 +28,12 @@ export interface StagedExplicitMemory {
   readonly requestedAt: string
 }
 
+/** Candidate content is reloaded from the governed store rather than supplied at promotion. */
+export interface StoredExplicitMemoryCandidate {
+  readonly staged: StagedExplicitMemory
+  readonly input: ExplicitMemoryInput
+}
+
 export interface OperationalMemorySearch {
   readonly query: AuthorizedMemoryQuery
   readonly dependencies: AuthorizedMemoryRetrievalDependencies
@@ -40,8 +47,12 @@ export interface OperationalMemoryTransaction {
   updateConsent(input: UpdateMemoryConsentInput): Promise<MemoryConsentState>
   stageExplicit(
     input: ExplicitMemoryInput,
-    options: ExplicitMemoryOptions
+    options: ExplicitMemoryOptions,
+    source?: EligibleMemorySource
   ): Promise<StagedExplicitMemory>
+  loadExplicitCandidate(
+    candidateId: string
+  ): Promise<StoredExplicitMemoryCandidate>
   authorizeSearch(input: MemorySearchInput): Promise<OperationalMemorySearch>
   readRecord(memoryId: string): Promise<MemoryRecord | null>
   readDeletionReceipt(memoryId: string): Promise<MemoryDeletionReceipt | null>

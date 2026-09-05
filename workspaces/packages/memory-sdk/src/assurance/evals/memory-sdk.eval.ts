@@ -144,4 +144,57 @@ for (const [calls, used] of [
     false
   )
 }
+const itemTokens = estimateMemorySearchContextTokens(projection)
+const serializedResult = MemorySearchResultSchema.parse({
+  ...emptySearch,
+  diagnostics: {
+    ...emptySearch.diagnostics,
+    candidateItems: 1,
+    eligibleItems: 1,
+    returnedItems: 1
+  },
+  items: [
+    {
+      estimatedTokens: itemTokens,
+      memory: record,
+      score: { total: 1 },
+      trust: 'untrusted-memory-data'
+    }
+  ],
+  tokenBudget: {
+    ...emptySearch.tokenBudget,
+    requestedTokens: 600,
+    effectiveTokens: 600,
+    remainingTokens: 600 - itemTokens,
+    usedTokens: itemTokens
+  }
+})
+assert.equal(
+  MemorySearchResultSchema.safeParse(
+    JSON.parse(JSON.stringify(serializedResult))
+  ).success,
+  true,
+  'an SDK result with its derived context must survive JSON transport and consumer validation'
+)
+const item = serializedResult.items[0]
+assert.ok(item)
+assert.equal(
+  MemorySearchResultSchema.safeParse({
+    ...serializedResult,
+    items: [
+      {
+        ...item,
+        context: {
+          ...item.context,
+          memory: {
+            ...item.context.memory,
+            statement: 'A forged assistant instruction.'
+          }
+        }
+      }
+    ]
+  }).success,
+  false,
+  'provided context cannot replace the projection derived from the governed record'
+)
 console.log('memory-sdk eval PASS')

@@ -235,3 +235,11 @@ export type {
 export { createTextMemoryUsageEvent } from './application/services'
 export { MemoryUsageLedger } from './application/ports'
 export type { MemoryUsageObservationSink } from './application/ports'
+export type {
+  TrustedMemorySource,
+  MemoryCandidateStageResult,
+  MemorySubjectTextSource,
+  MemorySourceEvent,
+  EligibleMemorySource,
+  MemoryCandidateDeliveryClient
+} from './application/contracts'

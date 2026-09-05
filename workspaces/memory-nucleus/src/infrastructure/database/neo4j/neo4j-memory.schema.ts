@@ -15,7 +15,20 @@ const constraints = [
   ['memory_suppression_key_v1', 'MemorySuppression', 'canonicalIdentityKey'],
   ['memory_lifecycle_event_v1', 'MemoryLifecycleEvent', 'eventId'],
   ['memory_outbox_event_v1', 'OutboxEvent', 'eventId'],
-  ['memory_schema_version_v1', 'MemorySchema', 'version']
+  ['memory_schema_version_v1', 'MemorySchema', 'version'],
+  ['memory_usage_ledger_scope_v1', 'MemoryUsageLedgerHead', 'scopeKey'],
+  ['memory_usage_ledger_entry_v1', 'MemoryUsageLedgerEntry', 'identityKey'],
+  ['memory_usage_event_v1', 'MemoryUsageEvent', 'identityKey'],
+  [
+    'memory_usage_pricing_snapshot_v1',
+    'MemoryUsagePricingSnapshot',
+    'identityKey'
+  ],
+  [
+    'memory_usage_brl_conversion_snapshot_v1',
+    'MemoryUsageBrlConversionSnapshot',
+    'identityKey'
+  ]
 ] as const
 
 /** Schema statements finish before protected runtime readiness is advertised. */

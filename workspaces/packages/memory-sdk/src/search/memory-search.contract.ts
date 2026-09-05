@@ -99,14 +99,56 @@ export const MemorySearchScoreSchema = z
   .strict()
 export type MemorySearchScore = z.infer<typeof MemorySearchScoreSchema>
 
+function matchesDerivedContext(actual: unknown, expected: unknown): boolean {
+  if (actual === expected) return true
+  if (
+    actual === null ||
+    expected === null ||
+    typeof actual !== 'object' ||
+    typeof expected !== 'object' ||
+    Array.isArray(actual)
+  )
+    return false
+  try {
+    const entries = Object.entries(expected)
+    return (
+      Object.keys(actual).length === entries.length &&
+      entries.every(
+        ([key, value]) =>
+          Object.hasOwn(actual, key) &&
+          matchesDerivedContext(Reflect.get(actual, key), value)
+      )
+    )
+  } catch {
+    return false
+  }
+}
+
 export const MemorySearchItemSchema = z
   .object({
+    context: z.unknown().optional(),
     estimatedTokens: z.number().int().positive().max(MAX_MEMORY_SEARCH_TOKENS),
     memory: MemoryRecordSchema,
     score: MemorySearchScoreSchema,
     trust: z.literal('untrusted-memory-data')
   })
   .strict()
+  .superRefine((item, context) => {
+    if (
+      item.context !== undefined &&
+      !matchesDerivedContext(
+        item.context,
+        createMemorySearchContextProjection(item)
+      )
+    ) {
+      context.addIssue({
+        code: 'custom',
+        message:
+          'provided context must match the projection derived from the governed memory',
+        path: ['context']
+      })
+    }
+  })
   .transform((item) =>
     Object.freeze({
       ...item,

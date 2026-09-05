@@ -89,7 +89,9 @@ Establish the versioned operational usage-event, pricing metadata and redacted l
 - Promotion carries or resolves current tenant, subject, actor, purpose, decision and consent state; extraction-time approval alone is insufficient.
 - MVP delete means immediate tombstone/suppression, removal from normal retrieval and no resurrection through known replay/reindex/restore paths.
 - Physical erasure of immutable versions/evidence is not claimed unless a separately reviewed purge implementation proves it.
+- The supported restore fixture restores stale canonical heads/versions while retaining the authoritative suppression ledger. Whole-database rollback that also rolls back that ledger is unsupported: keep Chatterbox stopped until the latest suppression journal is established and reconciled. Database connectivity/schema readiness cannot certify backup freshness.
 - Normal retrieval performs zero LLM and web calls; vector use is independently measurable and gated by retrieval evidence.
+- `MemoryClient.correct()` remains explicitly unsupported in this slice; the implemented user path is consent, explicit write, search and suppression. A later correction delivery must preserve immutable provenance and suppression guarantees.
 - Telemetry records identifiers/hashes, counts, timings and policy outcomes, never raw evidence or memory text.
 - `netMemoryCost` keeps the canonical cost-minus-avoided-cost sign.
 

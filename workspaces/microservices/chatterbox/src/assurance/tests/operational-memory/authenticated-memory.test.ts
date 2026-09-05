@@ -41,6 +41,9 @@ test('the development Memory seam binds authenticated WorkOS identity to canonic
   }
   const runtime: OperationalMemoryRuntime = {
     close: async () => {},
+    candidatesForRequest: () => {
+      throw new Error('unused candidate delivery')
+    },
     usageLedgerForRequest: () => {
       throw new Error('unused server ledger')
     },
