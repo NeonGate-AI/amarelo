@@ -155,3 +155,8 @@ Blocked by SPEC-009 and SPEC-016. It blocks SPEC-011 shadow/parity.
 ## Delivery decision — 2026-09-05
 
 Implemented under the owner's explicit delivery-first instruction. Completion here records implementation and integration, not passed acceptance evidence. Runtime, queue, provider attempts and deterministic activation now have executable boundaries; existing unchecked verification items remain pending. No paid provider calls, load fixture, broker restart or full validation was run for this delivery. SPEC-049 tracks deferred validation. Unknown costs keep economic/shadow maturity on hold.
+
+
+### First usable voice continuation — 2026-09-05
+
+SPEC-050 prepares the local provider/runtime environment, SPEC-051 supplies actual LangGraph orchestration for this worker, and SPEC-052 connects finalized Realtime patient speech and later recall. The existing imperative engine must not be described as already using LangGraph. This continuation is owner-approved and leaves WorkOS/commercial rules deferred.

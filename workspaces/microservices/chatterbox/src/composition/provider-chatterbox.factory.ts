@@ -4,7 +4,10 @@ import { ChatOpenAI } from '@langchain/openai'
 import type { FastifyInstance } from 'fastify'
 
 import { createChatterbox, type ChatterboxFactoryOptions } from '../app'
-import { createWorkOsSessionAuthenticator } from '../authentication'
+import {
+  createLocalSessionAuthenticator,
+  createWorkOsSessionAuthenticator
+} from '../authentication'
 import {
   hasChatterboxAuthenticationConfiguration,
   hasChatterboxProviderConfiguration,
@@ -40,15 +43,23 @@ export function createProviderChatterbox(
   }
   const options: ChatterboxFactoryOptions = {
     allowedOrigins: configuration.CHATTERBOX_ALLOWED_ORIGINS,
-    authenticate: hasChatterboxAuthenticationConfiguration(configuration)
-      ? createWorkOsSessionAuthenticator({
-          apiKey: configuration.WORKOS_API_KEY,
-          clientId: configuration.WORKOS_CLIENT_ID,
-          cookieName: configuration.WORKOS_COOKIE_NAME,
-          cookiePassword: configuration.WORKOS_COOKIE_PASSWORD,
-          timeoutMs: configuration.CHATTERBOX_AUTH_TIMEOUT_MS
-        })
-      : undefined,
+    authenticate:
+      configuration.CHATTERBOX_AUTH_MODE === 'local'
+        ? createLocalSessionAuthenticator({
+            host: configuration.CHATTERBOX_HOST,
+            nodeEnvironment: configuration.NODE_ENV,
+            ownerId: configuration.CHATTERBOX_LOCAL_OWNER_ID,
+            sessionTtlMs: configuration.CHATTERBOX_SESSION_TTL_MS
+          })
+        : hasChatterboxAuthenticationConfiguration(configuration)
+          ? createWorkOsSessionAuthenticator({
+              apiKey: configuration.WORKOS_API_KEY,
+              clientId: configuration.WORKOS_CLIENT_ID,
+              cookieName: configuration.WORKOS_COOKIE_NAME,
+              cookiePassword: configuration.WORKOS_COOKIE_PASSWORD,
+              timeoutMs: configuration.CHATTERBOX_AUTH_TIMEOUT_MS
+            })
+          : undefined,
     authenticationTimeoutMs: configuration.CHATTERBOX_AUTH_TIMEOUT_MS,
     maxConcurrentTurns: configuration.CHATTERBOX_MAX_CONCURRENT_TURNS,
     maxSessions: configuration.CHATTERBOX_MAX_SESSIONS,
