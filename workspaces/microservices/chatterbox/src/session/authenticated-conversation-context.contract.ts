@@ -7,4 +7,5 @@ export interface AuthenticatedConversationContext
   readonly conversationId: string
   readonly purpose: 'conversation.support'
   readonly requestId: string
+  readonly sourceKind?: 'development-text' | 'realtime-transcript'
 }

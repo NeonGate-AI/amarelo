@@ -223,6 +223,7 @@ export { createNeo4jMemoryRuntime } from './infrastructure/database/neo4j'
 export type { Neo4jMemoryOptions } from './infrastructure/database/neo4j'
 export {
   MemoryUsageEventSchema,
+  MemoryProviderUsageSchema,
   MemoryUsageLedgerEntrySchema,
   MemoryPricingSnapshotSchema
 } from './application/contracts'

@@ -21,3 +21,7 @@ WorkOS remains the default authentication mode. The owner-approved local mode re
 ## LangGraph worker — SPEC-051
 
 The existing BullMQ worker now invokes a compiled LangGraph through an application orchestration port. Deterministic claim/admission, curation, completion and release branches reuse the existing use case, consent, Neo4j fences and accounting. Graph state contains only bounded outcomes; protected invocation state stays in closures. Neo4j remains durable authority, with no second checkpoint store or added routing model. Public and worker artifacts compiled; live worker scenarios remain pending.
+
+## Realtime voice continuation — SPEC-052
+
+The owner-approved local profile now connects direct PWA/OpenAI WebRTC with trusted server-sideband ingestion, explicit consent and governed recall. Final patient speech uses `realtime-transcript`; pause and assistant output remain excluded. [Local voice context](local-voice-mvp.md) records the call lifecycle, Orbs evolution contract, usage unknowns and pending execution evidence.

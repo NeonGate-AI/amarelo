@@ -16,6 +16,6 @@ export function createMemoryRequestScope(
     actorId: mapMemoryIdentity('person', context.tenantId, context.actorId),
     subjectId: mapMemoryIdentity('person', context.tenantId, context.subjectId),
     tenantId: mapMemoryIdentity('tenant', context.tenantId),
-    sourceKind: 'development-text'
+    sourceKind: context.sourceKind ?? 'development-text'
   })
 }

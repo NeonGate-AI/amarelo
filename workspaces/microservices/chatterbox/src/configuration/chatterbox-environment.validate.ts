@@ -162,6 +162,10 @@ const ChatterboxEnvironmentSchema = z
       .positive()
       .max(3_600_000)
       .default(900_000),
+    OPENAI_REALTIME_MODEL: z.string().trim().min(1).max(200).default('gpt-realtime-2.1-mini'),
+    OPENAI_REALTIME_VOICE: z.string().trim().min(1).max(80).default('marin'),
+    OPENAI_TRANSCRIPTION_MODEL: z.string().trim().min(1).max(200).default('gpt-4o-mini-transcribe'),
+    CHATTERBOX_REALTIME_MEMORY_ENABLED: z.enum(['true', 'false']).default('false').transform((value) => value === 'true'),
     OPENAI_API_KEY: z.preprocess(
       (value) =>
         typeof value === 'string' && value.trim().length === 0
@@ -178,6 +182,10 @@ const ChatterboxEnvironmentSchema = z
     WORKOS_COOKIE_PASSWORD: OptionalNonEmptyString
   })
   .superRefine((configuration, context) => {
+    if (configuration.CHATTERBOX_REALTIME_MEMORY_ENABLED &&
+      (configuration.CHATTERBOX_AUTH_MODE !== 'local' || !configuration.CHATTERBOX_MEMORY_ENABLED || !configuration.CHATTERBOX_MEMORY_BACKGROUND_ENABLED || configuration.CHATTERBOX_MEMORY_BACKGROUND_PROFILE !== 'internal')) {
+      context.addIssue({ code: 'custom', path: ['CHATTERBOX_REALTIME_MEMORY_ENABLED'], message: 'Realtime Memory requires the local owner profile, Memory and internal background ingestion' })
+    }
     if (configuration.CHATTERBOX_AUTH_MODE === 'local') {
       if (!['development', 'test'].includes(configuration.NODE_ENV ?? ''))
         context.addIssue({

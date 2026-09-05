@@ -56,7 +56,11 @@ export function createTextMemoryUsageEvent(
     attemptId: input.attemptId,
     occurredAt: input.occurredAt,
     operation: input.operation,
-    sourceKind: input.scope.sourceKind,
+    // Transcript provenance is real voice, while this operation measures text work only.
+    // Speech duration is not inferred from transcript length or extraction tokens.
+    sourceKind: input.scope.sourceKind === 'realtime-transcript'
+      ? 'observed-voice'
+      : input.scope.sourceKind,
     workloadVersion: input.workloadVersion,
     profileVersion: input.profileVersion,
     costClass: input.costClass,

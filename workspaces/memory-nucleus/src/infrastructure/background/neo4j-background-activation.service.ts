@@ -114,7 +114,7 @@ export async function activateBackgroundCandidates(
      WHERE e.tenantId = $tenantId AND e.subjectId = $subjectId
        AND e.actorId = $actorId AND e.eligible = true
        AND e.conversationId = $conversationId
-       AND e.sourceKind IN ['development-text', 'synthetic-transcript']
+       AND e.sourceKind IN ['development-text', 'synthetic-transcript', 'realtime-transcript']
      RETURN e.contentHash AS contentHash, e.observedAt AS observedAt,
        e.sourceTurnIds AS sourceTurnIds`,
     parameters
