@@ -1,4 +1,4 @@
-import type { AuthorizedMemoryRetrievalDependencies } from '@application/ports/memory-authorization.port'
+import type { AuthorizedMemoryRetrievalDependencies } from '@application/ports'
 
 const DEFAULT_OBSERVER_TIMEOUT_MILLISECONDS = 100
 const MAX_OBSERVER_TIMEOUT_MILLISECONDS = 1_000

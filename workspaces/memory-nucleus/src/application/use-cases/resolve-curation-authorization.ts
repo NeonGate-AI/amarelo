@@ -3,8 +3,8 @@ import {
   type MemoryCurationAuthorizationDecisionResolver,
   MemoryCurationAuthorizationDecisionSchema,
   type ResolvedMemoryCurationAuthorization
-} from '@application/contracts/memory-curation-authorization.contract'
-import type { MemoryCurationRequest } from '@application/contracts/memory-curation.contract'
+} from '@application/contracts'
+import type { MemoryCurationRequest } from '@application/contracts'
 
 export type MemoryCurationAuthorizationFailure =
   | 'expired-decision'

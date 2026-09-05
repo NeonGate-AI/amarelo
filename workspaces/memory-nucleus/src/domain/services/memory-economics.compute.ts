@@ -17,6 +17,7 @@ export interface MemoryEconomicsMetrics {
   readonly contextEfficiency: number | null
   readonly contextTokensAvoided: number
   readonly memoryRoi: number | null
+  readonly netMemoryCost: number
   readonly netMemorySaving: number
   readonly servingCostAvoided: number
 }
@@ -76,6 +77,7 @@ export const calculateMemoryEconomics = (
   const servingCostAvoided =
     (contextTokensAvoided / 1_000_000) * input.inputCostPerMillionTokens
   const netMemorySaving = servingCostAvoided - input.memoryProcessingCost
+  const netMemoryCost = input.memoryProcessingCost - servingCostAvoided
   const contextEfficiency =
     input.totalContextTokens === 0
       ? null
@@ -87,6 +89,7 @@ export const calculateMemoryEconomics = (
 
   assertFiniteResult(servingCostAvoided, 'servingCostAvoided')
   assertFiniteResult(netMemorySaving, 'netMemorySaving')
+  assertFiniteResult(netMemoryCost, 'netMemoryCost')
 
   if (contextEfficiency !== null) {
     assertFiniteResult(contextEfficiency, 'contextEfficiency')
@@ -100,6 +103,7 @@ export const calculateMemoryEconomics = (
     contextEfficiency,
     contextTokensAvoided,
     memoryRoi,
+    netMemoryCost,
     netMemorySaving,
     servingCostAvoided
   })

@@ -39,7 +39,7 @@ The prefix is a unique catalog rank, not the durable `SPEC-###` identity. Existi
 | 021 | SPEC-014 | implemented | [Spec-driven pull request evidence](021-spec-driven-pull-request-evidence.spec.md) |
 | 022 | SPEC-015 | implemented | [Canonical Memory Nucleus validation roadmap](022-memory-nucleus-validation-roadmap.spec.md) |
 | 023 | SPEC-009 | implemented | [First Ana/PWA conversation and serving baseline](023-first-ana-pwa-conversation-baseline.spec.md) |
-| 024 | SPEC-016 | ready | [Operational Memory Nucleus core](024-operational-memory-nucleus-core.spec.md) |
+| 024 | SPEC-016 | in-progress | [Operational Memory Nucleus core](024-operational-memory-nucleus-core.spec.md) |
 | 025 | SPEC-012 | ready | [Background memory curation loop](025-background-memory-curation-loop.spec.md) |
 | 026 | SPEC-011 | ready | [Shadow Memory serving and parity](026-shadow-memory-serving-parity.spec.md) |
 | 027 | SPEC-017 | ready | [Memory serving A/B and canary](027-memory-serving-ab-canary.spec.md) |
@@ -73,7 +73,7 @@ On 2026-09-05 the owner confirmed SPEC-046/047 completed in staging and directed
 
 ## Remaining execution order
 
-**Owner execution hold (2026-09-05):** the owner has ended SPEC-025 questioning; the validation workload, Free investor proposal and Memory/telemetry distinction are consolidated in that draft for shared-understanding review. Obtain confirmation of that consolidated understanding and reconcile the affected contracts before starting any of the six specs below. Their current technical dependency order is retained; `ready` does not override this owner hold.
+**Discovery reconciled (2026-09-05):** the owner accepted SPEC-025's consolidated understanding and requested revisions of the six contracts below using the delivered ZIP. Their source, validation and economic-report boundaries are now reconciled and the discovery hold is resolved. All six remain `ready`, with unchecked implementation criteria and their original dependency gates. This documentation cycle does not execute them or claim the owner's pending PR/merge has completed.
 
 | Order | Durable ID | Delivery boundary | Prerequisite or gate |
 |---:|---|---|---|
@@ -84,7 +84,9 @@ On 2026-09-05 the owner confirmed SPEC-046/047 completed in staging and directed
 | 5 | SPEC-017 | Internal canary followed by controlled A/B | SPEC-043; SPEC-033 before external participants |
 | 6 | SPEC-018 | Measured economics report and scale/hold decision | SPEC-017 |
 
-The retained drafts are SPEC-033 (owner-deferred application guardrails, still required before external exposure), SPEC-034 (lifecycle/realtime semantics, after guardrails and before the voice bridge) and SPEC-025 (owner answers consolidated; remaining commercial decisions deferred; no entitlement implementation yet). They remain useful but are not implementation authorization. SPEC-044 is closed by explicit owner acceptance; its external enforcement was not independently reinspected here.
+The retained drafts are SPEC-033 (owner-deferred application guardrails, still required before external exposure), SPEC-034 (lifecycle/realtime semantics, after guardrails and before the voice bridge) and SPEC-025 (owner understanding accepted and downstream contracts reconciled; remaining commercial decisions deferred; no entitlement implementation yet). Those open commercial choices do not block internal Memory validation. SPEC-044 is closed by explicit owner acceptance; its external enforcement was not independently reinspected here.
+
+The six-spec sequence validates Memory over the authenticated textual path. SPEC-018 reports observed text/Memory economics and explicitly labeled voice estimates or unknowns until separate voice-bridge measurements exist. Passing this sequence alone cannot prove the complete cost or naturalness of an hour of voice use.
 
 No pending contract requests a PostgreSQL Memory implementation. SPEC-016 and SPEC-012 already target Neo4j/BullMQ. Implemented PostgreSQL reference-adapter evidence stays historical; ADR-0009 is superseded. No meaningful pending spec was retired or merged merely to make the list shorter.
 

@@ -1,17 +1,17 @@
 import type {
   AuthorizedRepositorySearch,
   ScopedMemoryRepository
-} from '@application/ports/memory-repository.port'
+} from '@application/ports'
 import type {
   AuthorizedMemoryQuery,
   EffectiveMemoryRetrievalBudgets
-} from '@application/contracts/memory-retrieval.contract'
-import { MemoryRepositoryScopeError } from '@application/contracts/memory-retrieval.error'
+} from '@application/contracts'
+import { MemoryRepositoryScopeError } from '@application/contracts'
 import {
   hasBoundedSerializedSize,
   MAX_RECORD_CHARACTERS,
   MAX_SERIALIZED_RECORD_CHARACTERS
-} from '@application/validation/memory-record-shape.validate'
+} from '@application/validation'
 
 const MAX_REPOSITORY_CANDIDATE_MULTIPLIER = 2
 

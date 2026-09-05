@@ -1,9 +1,9 @@
-import type { RepositoryMemoryRecord } from '@application/ports/memory-repository.port'
+import type { RepositoryMemoryRecord } from '@application/ports'
 import type {
   AuthorizedMemoryQuery,
   MemoryMatchType,
   MemoryProvenance
-} from '@application/contracts/memory-retrieval.contract'
+} from '@application/contracts'
 import {
   cloneMemoryProvenance,
   hasBoundedSerializedSize,
@@ -13,13 +13,13 @@ import {
   isStringArray,
   MAX_CATEGORIES,
   MAX_RECORD_CHARACTERS
-} from '@application/validation/memory-record-shape.validate'
+} from '@application/validation'
 import {
   hasValidMemoryTemporalSemantics,
   isMemoryEligibleForTimeWindow,
   parseStoredTimestamp,
   resolveMemoryTemporalSortEpoch
-} from '@application/validation/memory-temporal-state.validate'
+} from '@application/validation'
 
 const LEXICAL_STOP_WORDS = new Set([
   'a',

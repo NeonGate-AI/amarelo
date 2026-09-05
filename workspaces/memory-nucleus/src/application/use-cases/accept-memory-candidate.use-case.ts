@@ -2,9 +2,9 @@ import type {
   AcceptCandidateInput,
   AcceptCandidateResult,
   CanonicalMemoryPort
-} from '@application/ports/canonical-memory.port'
-import { MemoryAcceptancePolicy } from '@domain/policies/memory-acceptance.policy'
-import { MemoryJudgment } from '@domain/value-objects/memory-judgment.vo'
+} from '@application/ports'
+import { MemoryAcceptancePolicy } from '@domain/policies'
+import { MemoryJudgment } from '@domain/value-objects'
 
 export interface AcceptMemoryCandidateCommand extends AcceptCandidateInput {
   readonly kind: 'semantic' | 'episodic'

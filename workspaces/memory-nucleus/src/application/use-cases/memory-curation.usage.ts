@@ -1,5 +1,5 @@
-import type { MemoryCurationUsage } from '@application/contracts/memory-curation.contract'
-import type { MemoryModelUsage } from '@application/ports/memory-extractor.port'
+import type { MemoryCurationUsage } from '@application/contracts'
+import type { MemoryModelUsage } from '@application/ports'
 
 export interface CreateMemoryCurationUsageInput {
   candidateCount: number

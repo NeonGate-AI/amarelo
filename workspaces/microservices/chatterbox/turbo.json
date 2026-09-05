@@ -3,6 +3,12 @@
   "tasks": {
     "build": {
       "outputs": []
+    },
+    "typecheck": {
+      "dependsOn": ["^typecheck", "@nucleus/memory#build"]
+    },
+    "dev": {
+      "dependsOn": ["@nucleus/memory#build"]
     }
   }
 }

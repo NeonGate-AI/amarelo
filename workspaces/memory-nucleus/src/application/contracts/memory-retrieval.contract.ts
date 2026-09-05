@@ -1,9 +1,6 @@
-import type {
-  MemoryKind,
-  MemoryTemporalPrecision
-} from '@domain/entities/memory-candidate.entity'
+import type { MemoryKind, MemoryTemporalPrecision } from '@domain/entities'
 
-export type { MemoryKind } from '@domain/entities/memory-candidate.entity'
+export type { MemoryKind } from '@domain/entities'
 
 export const MEMORY_AUTHOR_TYPES = Object.freeze([
   'authorized-delegate',

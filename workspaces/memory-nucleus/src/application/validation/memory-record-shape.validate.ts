@@ -1,9 +1,6 @@
-import type {
-  MemoryAuthorType,
-  MemoryProvenance
-} from '@application/contracts/memory-retrieval.contract'
-import { MEMORY_AUTHOR_TYPES } from '@application/contracts/memory-retrieval.contract'
-import { parseStoredTimestamp } from '@application/validation/memory-temporal-state.validate'
+import type { MemoryAuthorType, MemoryProvenance } from '@application/contracts'
+import { MEMORY_AUTHOR_TYPES } from '@application/contracts'
+import { parseStoredTimestamp } from './memory-temporal-state.validate'
 
 export const MAX_IDENTIFIER_CHARACTERS = 200
 export const MAX_CATEGORIES = 32

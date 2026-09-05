@@ -103,7 +103,7 @@ The owner selects the person's spoken text as the input source for this MVP's pe
 | Provider usage and cost | Attribute both audio directions and all actual provider work, including generated voice for deterministic text, retries, cancellation residue and Memory work. Excluding content from Memory never makes its processing cost zero. |
 | Commercial allowance | The definition of the minute deducted from a future plan remains OPEN. The owner's patient-only collection decision concerns Memory input; it does not silently approve patient-only billing. Record speech durations and inactivity separately so the meter can later be chosen from evidence. |
 
-**Engineering clarification for consolidated review:** when a short patient reply such as "yes" has no self-contained meaning in the eligible patient evidence, preserve the existing extractor's abstention behavior: produce no unsupported candidate. Temporary dialogue context helps Conversation respond coherently; it does not authorize adding Ana's turns to Memory extraction. Any future disambiguation mechanism requires its own explicit contract.
+**Accepted engineering clarification:** when a short patient reply such as "yes" has no self-contained meaning in the eligible patient evidence, preserve the existing extractor's abstention behavior: produce no unsupported candidate. Temporary dialogue context helps Conversation respond coherently; it does not authorize adding Ana's turns to Memory extraction. Any future disambiguation mechanism requires its own explicit contract.
 
 The initial patient-transcript seam does not expand to ingest support-network conversations. Existing contracts for separately authorized contributions remain intact: a contributor is not the subject, and contribution authority never implies read access.
 
@@ -224,11 +224,11 @@ Evidence remains pending because the contract contains explicit open decisions a
 
 ### Owner-requested discovery — 2026-09-05
 
-The owner requested a grill-me session before executing SPEC-016, SPEC-012, SPEC-011, SPEC-043, SPEC-017 or SPEC-018, then explicitly ended further questions after selecting the one-hour workload and clarifying patient-only Memory input. Questioning is closed at the owner's request. The owner answers are consolidated above; commercial choices left open are deferred, not silently answered. This draft records the engineering clarification for shared-understanding review before downstream implementation. It does not claim billing implementation or completed cost experiments. SPEC-033 remains owner-deferred without removing its external-exposure safety gate.
+The owner requested a grill-me session before executing SPEC-016, SPEC-012, SPEC-011, SPEC-043, SPEC-017 or SPEC-018, then explicitly ended further questions after selecting the one-hour workload and clarifying patient-only Memory input. Questioning is closed at the owner's request. The owner subsequently accepted the consolidated understanding and requested reconciliation of the six contracts using the delivered ZIP while personally handling its PR/merge. Commercial choices left open are deferred, not silently answered; they do not block the internal technical Memory slices. This draft does not claim billing implementation or completed cost experiments. SPEC-033 remains owner-deferred without removing its external-exposure safety gate.
 
 ### Downstream reconciliation boundary
 
-| Spec | Required reconciliation before its implementation |
+| Spec | Reconciled contract for later implementation |
 |---|---|
 | [SPEC-016](024-operational-memory-nucleus-core.spec.md) | Preserve source/subject provenance and the distinction between transcript, candidate and accepted Memory; the initial adapter admits patient-spoken text only. |
 | [SPEC-012](025-background-memory-curation-loop.spec.md) | Reconcile source eligibility and ambiguous short replies; silence and Ana's output are not independent formation sources. Preserve plan capability gates and background costs. |
@@ -237,6 +237,8 @@ The owner requested a grill-me session before executing SPEC-016, SPEC-012, SPEC
 | [SPEC-017](027-memory-serving-ab-canary.spec.md) | Use comparable workloads and labeled capability profiles. Evaluate cost and response quality; external exposure still requires SPEC-033. |
 | [SPEC-018](028-memory-unit-economics-scale-gates.spec.md) | Lead with measured monthly cost at 60 min/week, with separate LLM/voice/Memory/infrastructure totals and disclosed usage mix; retain net Memory economics as supporting evidence. |
 
-These are reconciliation requirements, not a claim that the six ready contracts have already been amended or executed. SPEC-034's lifecycle boundary remains a prerequisite for the subsequent production voice bridge. The current scope stops at the consolidated review of the owner's decisions and engineering clarification. This draft-only synthesis continues the owner-authorized ZIP/local-branch workflow, with scoped harness checks and no Amarelo remote access, runtime changes or claim of full CI/live-provider validation.
+The six ready contracts now include these source, testing, cost and evidence-coverage revisions; none has been implemented by this reconciliation. The discovery hold is resolved. SPEC-034's lifecycle boundary remains a prerequisite for the subsequent voice bridge, and measured voice costs/experience are still needed before claiming total voice affordability. No new architecture ADR is needed: Neo4j/BullMQ/Redis separation, private-memory authority and existing safety/integrity gates are unchanged.
+
+This documentation-only cycle branches from the exact source in the delivered `amarelo-spec-025.zip`, commit `64c22c3cacf746b9e8fb9e74870b726b1181beeb`. The owner will handle the earlier branch's PR/merge; no remote merge is asserted. Continue the authorized ZIP/local-branch workflow, with scoped harness checks and independent review. This cycle makes no runtime changes or claim of full CI/live-provider validation. The dependency order in the catalog remains authoritative when implementation resumes.
 
 This file replaces `107-plans-and-entitlements.md`. The next step is owner resolution of the OPEN values, not speculative implementation. The canonical Memory Nucleus economics still use `netMemoryCost = memoryProcessingCost - avoidedServingCost`, Memory ROI above 3x as healthy and above 5x as target; those metrics do not approve plan prices or benefits.

@@ -1,14 +1,11 @@
 import type { Observability } from '@repo/observability'
 
-import {
-  MemoryObservabilityPort,
-  type MemoryMetric
-} from '@application/ports/observability.port'
+import { MemoryObservabilityPort, type MemoryMetric } from '@application/ports'
 import {
   MemoryRetrievalObserver,
   type MemoryRetrievalObservationContext,
   type MemoryRetrievalTrace
-} from '@application/ports/memory-retrieval-observer.port'
+} from '@application/ports'
 
 export class RepoMemoryObservabilityAdapter extends MemoryObservabilityPort {
   constructor(private readonly observability: Observability) {
