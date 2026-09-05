@@ -20,7 +20,9 @@
     "eval:economics": "node --import tsx src/assurance/evals/economics/memory-economics.eval.ts",
     "test:unit": "vitest run --project unit",
     "background:start": "pnpm build:background && node dist/worker/memory-background.cli.mjs",
-    "build:background": "tsdown src/infrastructure/worker/memory-background.cli.ts --format esm --platform node --target es2022 --out-dir dist/worker --clean"
+    "build:background": "tsdown src/infrastructure/worker/memory-background.cli.ts --format esm --platform node --target es2022 --out-dir dist/worker --clean",
+    "build:report": "tsdown src/infrastructure/reporting/memory-economics-report.cli.ts --format esm --platform node --target es2022 --out-dir dist/reporting --clean",
+    "report:economics": "node dist/reporting/memory-economics-report.cli.mjs"
   },
   "dependencies": {
     "@langchain/core": "1.2.9",

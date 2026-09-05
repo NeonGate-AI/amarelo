@@ -255,3 +255,7 @@ export { MemoryIntegrityReportSchema, serializeMemoryIntegrityReport, evaluateMe
 export type { MemoryIntegrityReport, MemoryIntegrityGate } from './application/integrity'
 
 export { createUnknownCostMemoryUsageLedgerEntry } from './application/services'
+
+export { MemoryEconomicsReportInputSchema, createMemoryEconomicsReport } from './application/reporting'
+export type { MemoryEconomicsReportInput, MemoryEconomicsReport } from './application/reporting'
+export { renderMemoryEconomicsReportHtml, writeMemoryEconomicsReportFiles } from './infrastructure/reporting'

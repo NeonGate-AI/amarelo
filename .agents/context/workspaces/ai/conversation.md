@@ -22,3 +22,10 @@ The SPEC-009 baseline does not configure Memory retrieval. Its canonical Reflex 
 A future serving phase may configure the existing Memory port only through the approved SDK and authorization boundary. SPEC-016 binds that adapter at Chatterbox's request-aware composition root; SPEC-047 still supplies no concrete MemoryClient. Client history is bounded untrusted context, not authorized canonical evidence.
 
 Memory retrieval failure remains fail-closed for exposure while allowing the current turn without Memory. Diagnostics distinguish `not_configured`, explicitly classified `dependency_unavailable`, `contract_violation` and `unexpected_failure`; a skipped retrieval has no failure. Failed projections never reach the agent. Chatterbox transports these content-free diagnostics through its observation allowlist, not through raw exception serialization. Missing provider usage remains null and unavailable first-token latency stays explicit; domain economics and quality are not owned by the telemetry transport.
+
+
+## Internal Memory implementation — 2026-09-05
+
+Conversation exports MemoryShadowExecutor/MemoryShadowAgent and MemoryExperimentController/MemoryExperimentAgent. Chatterbox binds authenticated request scope, server allowlist and live evidence/policy adapters. Control keeps the bounded existing history; treatment replaces it with governed Memory and a minimal recent buffer containing both roles. Shadow never changes the visible invocation. Serving has one provider invocation per attempted turn and records actual available usage.
+
+These implementations are merged to staging with new validation explicitly deferred by the owner. Flags default off, missing evidence holds control, and canary admission is process-local. SPEC-049 tracks validation and distributed/restart-persistent admission debt. No external rollout or full voice-cost claim follows from code integration.

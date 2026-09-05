@@ -2,7 +2,7 @@
 id: SPEC-018
 title: Establish Memory unit economics dashboard and scale gates
 type: experiment
-status: ready
+status: implemented
 mode: prospective
 created: 2026-09-03
 updated: 2026-09-05
@@ -31,7 +31,9 @@ skills:
   - .agents/skills/implement/SKILL.md
   - .agents/skills/code-review/SKILL.md
 evidence:
-  - pending
+  - workspaces/memory-nucleus/src/application/reporting/
+  - workspaces/memory-nucleus/src/infrastructure/reporting/
+  - validation-deferred-by-owner-2026-09-05
 ---
 
 # SPEC-018: Establish Memory unit economics dashboard and scale gates
@@ -157,4 +159,14 @@ Evidence will include deterministic economics/reconciliation fixtures, SPEC-043 
 
 SPEC-025 reconciliation (2026-09-05): the owner accepted the consolidated discovery and requested this contract revision. The discovery hold is resolved; this phase remains ready and unimplemented. [SPEC-025](007-plans-and-entitlements.spec.md) governs the monthly investor metric, initial duration and open commercial choices. Technical Memory scale gates are retained, with evidence coverage preventing a textual result from being marketed as proven voice economics. This revision changes contracts only.
 
-Blocked by SPEC-017. SPEC-017 itself is blocked by SPEC-043 before canary exposure. This phase decides whether to scale; it does not assume scale is the successful outcome.
+Blocked by SPEC-017 evidence. SPEC-017 itself is blocked by SPEC-043 before canary exposure. This phase decides whether to scale; it does not assume scale is the successful outcome.
+
+## Implementation handoff · 2026-09-05
+
+The owner explicitly prioritized implementation and integration and deferred validation execution. The new `application/reporting` leaf implements a strict redacted input contract and deterministic canonical-ledger aggregation. The `infrastructure/reporting` leaf provides a JSON-to-JSON/HTML CLI and standalone dashboard renderer without frontend dependencies or provider calls. Runtime and public package integration remain owned by the delivery composition.
+
+The implementation separates operational and experiment allocations, reconciles background intent/completion observations by attempt, rejects overlapping valuations and inconsistent immutable rates, retains unknown money/durations, and derives Memory savings only from comparable provider-measured serving evidence. Monthly reporting declares the 60-to-260 conversion, duration basis, distribution and observed/normalized/simulated status. Free has zero scenario revenue and an undefined revenue ratio. Missing voice evidence cannot become measured total voice affordability.
+
+Versioned SPEC-011/SPEC-017/SPEC-043/SPEC-012 gate references and configured quality/privacy/integrity/queue thresholds produce scale, hold or rollback. The report consumes supplied gate evidence and does not execute, fabricate or certify upstream results. Numeric ROI and COGS outputs are scenario diagnostics, not approved plans, quotas or exposure changes.
+
+No tests, evaluations, report snapshots, CI runs or reviews were executed for this implementation slice. No measured cost/rate/result artifact was invented. Required validation and evidence-based acceptance remain deferred, so this delivery note does not mark those criteria complete or authorize scale.
