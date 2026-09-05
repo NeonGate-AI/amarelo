@@ -60,7 +60,9 @@ The specification catalog is flat, priority-ordered and mechanically checked.
 | 044 | SPEC-044 | in-progress | [Staging-first repository delivery flow](044-staging-delivery-flow.spec.md) |
 | 045 | SPEC-045 | implemented | [Memory infrastructure runtime topology](045-memory-infrastructure-runtime.spec.md) |
 
-The next unallocated durable delivery ID is `SPEC-046`.
+| 046 | SPEC-046 | ready | [Saneamento canônico](046-saneamento-canonico.spec.md) |
+
+The next unallocated durable delivery ID is `SPEC-047`.
 
 The executable Memory Nucleus chain is:
 
