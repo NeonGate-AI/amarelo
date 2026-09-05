@@ -39,7 +39,7 @@ evidence:
   - workspaces/memory-nucleus/src/assurance/integrity/memory-integrity.fixtures.ts
   - workspaces/memory-nucleus/src/assurance/integrity/memory-integrity.runner.ts
   - workspaces/memory-nucleus/src/application/integrity/memory-integrity-gate.policy.ts
-  - pending validation under owner-directed deferral
+  - pending
 ---
 
 # SPEC-043: Add Memory integrity and poisoning assurance before canary

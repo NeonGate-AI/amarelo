@@ -5,6 +5,11 @@ const OptionalNonEmptyString = z.preprocess(
     typeof value === 'string' && value.trim().length === 0 ? undefined : value,
   z.string().trim().min(1).max(200).optional()
 )
+const OptionalServerPath = z.preprocess(
+  (value) =>
+    typeof value === 'string' && value.trim().length === 0 ? undefined : value,
+  z.string().trim().min(1).max(1_024).optional()
+)
 
 const ChatterboxEnvironmentSchema = z
   .object({
@@ -74,6 +79,14 @@ const ChatterboxEnvironmentSchema = z
       .enum(['true', 'false'])
       .default('false')
       .transform((value) => value === 'true'),
+    CHATTERBOX_MEMORY_EXPERIMENT_ENABLED: z
+      .enum(['true', 'false'])
+      .default('false')
+      .transform((value) => value === 'true'),
+    CHATTERBOX_MEMORY_EXPERIMENT_POLICY_FILE: OptionalServerPath,
+    CHATTERBOX_MEMORY_EXPERIMENT_EVIDENCE_FILE: OptionalServerPath,
+    CHATTERBOX_MEMORY_EXPERIMENT_METRICS_FILE: OptionalServerPath,
+    CHATTERBOX_MEMORY_EVIDENCE_DIRECTORY: OptionalServerPath,
     CHATTERBOX_MEMORY_SHADOW_TIMEOUT_MS: z.coerce
       .number()
       .int()
@@ -172,6 +185,16 @@ const ChatterboxEnvironmentSchema = z
         code: 'custom',
         message: 'Shadow requires the authenticated Memory binding',
         path: ['CHATTERBOX_MEMORY_SHADOW_ENABLED']
+      })
+    }
+    if (
+      configuration.CHATTERBOX_MEMORY_EXPERIMENT_ENABLED &&
+      !configuration.CHATTERBOX_MEMORY_ENABLED
+    ) {
+      context.addIssue({
+        code: 'custom',
+        message: 'Experiments require the authenticated Memory binding',
+        path: ['CHATTERBOX_MEMORY_EXPERIMENT_ENABLED']
       })
     }
     if (!configuration.CHATTERBOX_MEMORY_ENABLED) return

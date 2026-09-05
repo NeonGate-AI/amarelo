@@ -42,7 +42,7 @@ The prefix is a unique catalog rank, not the durable `SPEC-###` identity. Existi
 | 024 | SPEC-016 | implemented | [Operational Memory Nucleus core](024-operational-memory-nucleus-core.spec.md) |
 | 025 | SPEC-012 | implemented | [Background memory curation loop](025-background-memory-curation-loop.spec.md) |
 | 026 | SPEC-011 | implemented | [Shadow Memory serving and parity](026-shadow-memory-serving-parity.spec.md) |
-| 027 | SPEC-017 | ready | [Memory serving A/B and canary](027-memory-serving-ab-canary.spec.md) |
+| 027 | SPEC-017 | implemented | [Memory serving A/B and canary](027-memory-serving-ab-canary.spec.md) |
 | 028 | SPEC-018 | ready | [Memory unit economics and scale gates](028-memory-unit-economics-scale-gates.spec.md) |
 | 029 | SPEC-029 | implemented | [Canonical local engineering workflow skills](029-canonical-local-workflow-skills.spec.md) |
 | 030 | SPEC-030 | implemented | [Agent artifact scaffolding](030-agent-artifact-scaffolding.spec.md) |

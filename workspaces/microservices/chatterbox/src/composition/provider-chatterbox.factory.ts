@@ -18,6 +18,8 @@ import { ChatterboxObservabilityAdapter } from '../observability'
 import { createMemoryRuntimeBinding } from './memory-runtime-binding.factory'
 import { createMemoryBackgroundBinding } from './memory-background-binding.factory'
 import { createMemoryShadowBinding } from './memory-shadow-binding.factory'
+import { createMemoryExperimentBinding } from './memory-experiment-binding.factory'
+import { createMemoryServingModelBinding } from './memory-serving-model.factory'
 
 export function createProviderChatterbox(
   configuration: ChatterboxEnvironment
@@ -72,11 +74,28 @@ export function createProviderChatterbox(
   })
   const agent = new AnaConversationAgent({ model: modelAdapter })
   const runtime = new ConversationRuntime({ agents: [agent] })
-  const createRuntime = createMemoryShadowBinding(configuration, {
-    agent,
-    baseline: runtime,
-    createMemoryClient: memory.options.createMemoryClient
+  const servingModel = createMemoryServingModelBinding(configuration, {
+    model,
+    usageLedgerForRequest: memory.usageLedgerForRequest
   })
+  const createRuntime = configuration.CHATTERBOX_MEMORY_EXPERIMENT_ENABLED
+    ? createMemoryExperimentBinding(configuration, {
+        baseline: runtime,
+        createMemoryClient: memory.options.createMemoryClient,
+        createAgent: (context) =>
+          new AnaConversationAgent({
+            model: new LangChainAnaChatModelAdapter({
+              model: servingModel(context),
+              modelId: configuration.AI_CONVERSATION_MODEL,
+              providerId: 'openai'
+            })
+          })
+      })
+    : createMemoryShadowBinding(configuration, {
+        agent,
+        baseline: runtime,
+        createMemoryClient: memory.options.createMemoryClient
+      })
 
   return compose({
     ...options,
