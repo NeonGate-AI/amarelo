@@ -49,7 +49,7 @@ Merging `staging` into `main` through a dedicated pull request after the integra
 - `readme.md`, `template.md` and `workflow.md` as unnumbered support files;
 - numbered specs named `001-lowercase-slug.spec.md` through `099-lowercase-slug.spec.md`.
 
-The filename prefix is a unique mutable priority rank. Reserved ranks must be named in `readme.md`. A priority or semantic-suffix change updates every repository reference atomically. Retrospective mode is metadata, not a subdirectory.
+The filename prefix is a unique mutable catalog-priority rank, not another spec ID. The dependency-ordered execution queue in `readme.md` determines which retained contract can run next; implemented history or an owner-blocked draft does not block an otherwise executable later rank. Reserved ranks must be named in `readme.md`. A priority or semantic-suffix change updates every repository reference atomically. Retrospective mode is metadata, not a subdirectory.
 
 ## Sources of truth
 

@@ -21,7 +21,7 @@ adrs:
   - .agents/adrs/0020-conversation-agent-port.adr.md
   - .agents/adrs/0023-direct-ai-conversation-topology.adr.md
 skills:
-  - .agents/skills/spec-driven-development/SKILL.md
+  - .agents/skills/to-spec/SKILL.md
   - .agents/skills/code-review/SKILL.md
 evidence:
   - workspaces/ai/conversation/src/routing

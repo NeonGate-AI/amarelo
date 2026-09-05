@@ -1,0 +1,8 @@
+# All runtime profiles retain the same explicit ownership boundary.
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: amarelo-runtime
+  labels:
+    app.kubernetes.io/name: amarelo-runtime
+    app.kubernetes.io/part-of: amarelo

@@ -5,11 +5,11 @@ type: experiment
 status: ready
 mode: prospective
 created: 2026-09-03
-updated: 2026-09-04
+updated: 2026-09-05
 owners:
   - Jonatas Sales
 targets:
-  - workspaces/apps/conversation-api
+  - workspaces/microservices/chatterbox
   - workspaces/ai/conversation
   - workspaces/packages/memory-sdk
   - experiment observability
@@ -28,9 +28,9 @@ adrs:
   - .agents/adrs/0016-shared-memory-sdk-observability-evaluation.adr.md
   - .agents/adrs/0017-cognitive-routing-and-memory-boundary.adr.md
   - .agents/adrs/0023-direct-ai-conversation-topology.adr.md
-  - .agents/adrs/0030-memory-eligibility-before-ranking.adr.md
+  - .agents/adrs/0036-memory-eligibility-before-ranking.adr.md
 skills:
-  - .agents/skills/spec-driven-development/SKILL.md
+  - .agents/skills/to-spec/SKILL.md
   - .agents/skills/to-tickets/SKILL.md
   - .agents/skills/implement/SKILL.md
   - .agents/skills/code-review/SKILL.md
@@ -99,8 +99,9 @@ The authorized projection **replaces** the longitudinal history that control wou
 - Quality, critical Recall@k, temporal correctness, poisoning/integrity, leakage/consent, latency, calls and cost remain paired and comparable.
 - Canary precedes A/B; assignment is server-owned, sticky and purpose-aware.
 - SPEC-043 hidden adversarial evals must pass before canary exposure is enabled.
+- Internal synthetic canary does not authorize external participants. SPEC-033 application guardrails must be implemented and evidenced before externally accessible user-facing exposure.
 - Kill switch defaults to control. Any unauthorized leakage, consent violation, integrity regression or lifecycle resurrection triggers immediate rollback.
-- Advancement requires 50–70% comparable context reduction, Recall@k above 90%, zero unauthorized leakage/consent violations, zero policy-ineligible poisoning in projection, no lifecycle resurrection, no quality regression and Memory ROI above 3x; above 5x remains the target.
+- Advancement requires at least 50% comparable context reduction (50–70% target), Recall@k above 90%, zero unauthorized leakage/consent violations, zero policy-ineligible poisoning in projection, no lifecycle resurrection, no quality regression and Memory ROI above 3x; above 5x remains the target.
 
 ## Testing Decisions
 
@@ -132,7 +133,7 @@ Context-plan tests, assignment/kill-switch/rollback tests, authorization adversa
 - [ ] Assignment is server-owned, stable and cannot be selected by the browser.
 - [ ] Kill switch returns all requests to control without deploy.
 - [ ] Any unauthorized leakage, consent violation, policy-ineligible poisoning or lifecycle resurrection triggers rollback.
-- [ ] Advancement requires 50–70% context reduction, Recall@k above 90%, no quality regression, temporal correctness, integrity gates and Memory ROI above 3x.
+- [ ] Advancement requires at least 50% context reduction (50–70% target), Recall@k above 90%, no quality regression, temporal correctness, integrity gates and Memory ROI above 3x.
 - [ ] Latency, errors, calls and cost remain within predeclared gates.
 - [ ] Reports include sample size, uncertainty and an explicit advance/hold/rollback decision.
 - [ ] No broad production rollout or pricing claim is made.
@@ -152,4 +153,4 @@ Evidence will include exact context-plan diffs, additive-treatment rejection, as
 
 ## Further Notes
 
-Blocked by SPEC-011 shadow go/no-go and SPEC-043 Memory integrity/poisoning assurance. It blocks SPEC-018 scale gates.
+Blocked by SPEC-011 shadow go/no-go and SPEC-043 Memory integrity/poisoning assurance. External exposure additionally requires SPEC-033. It blocks SPEC-018 scale gates. Numeric advancement gates are versioned experiment inputs; improving context reduction beyond the 50–70% target is not a failure when quality and safety gates still pass.

@@ -123,7 +123,7 @@ package_script_value() {
       sub(/^[[:space:]]*"/, "", key)
       sub(/".*$/, "", key)
       if (key == wanted) {
-        sub(/^[^:]*:[[:space:]]*"/, "", line)
+        sub(/^[[:space:]]*"[^"]+":[[:space:]]*"/, "", line)
         sub(/",[[:space:]]*$/, "", line)
         print line
         exit
@@ -175,15 +175,22 @@ postinstall
 postclone
 elo
 dev
+dev:text
 start
 build
 typecheck
 test
 '
+is_canonical_root_script() {
+  printf '%s' "$allowed_scripts" | grep -Fx "$1" >/dev/null 2>&1
+}
+if ! is_canonical_root_script dev:text || is_canonical_root_script dev:arbitrary; then
+  platform_fail .audit/elo-platform.audit.sh "root task allowlist must admit only the bounded dev:text addition"
+fi
 package_script_names >"$TMP_ROOT/scripts"
 while IFS= read -r script_name; do
   [ -n "$script_name" ] || continue
-  if ! printf '%s' "$allowed_scripts" | grep -Fx "$script_name" >/dev/null 2>&1; then
+  if ! is_canonical_root_script "$script_name"; then
     platform_fail package.json "root script $script_name is not a canonical Elo/Turbo entrypoint"
   fi
 done <"$TMP_ROOT/scripts"
@@ -196,6 +203,8 @@ done <"$TMP_ROOT/scripts"
   platform_fail package.json "postclone must expose the explicit direct-command recovery path"
 [ "$(package_script_value elo)" = './cli/elo' ] ||
   platform_fail package.json "pnpm elo must execute the local cli/elo binary"
+[ "$(package_script_value dev:text)" = 'turbo dev --filter=onboarding --filter=mobile --filter=chatterbox' ] ||
+  platform_fail package.json "dev:text must run exactly the onboarding, mobile and Chatterbox Turbo development slice"
 
 for script_name in dev start build typecheck test; do
   script_value=$(package_script_value "$script_name")

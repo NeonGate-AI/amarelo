@@ -23,7 +23,7 @@ adrs:
   - .agents/adrs/0005-orbz-web-component.adr.md
   - .agents/adrs/0006-mobile-react-vite-pwa.adr.md
 skills:
-  - .agents/skills/spec-driven-development/SKILL.md
+  - .agents/skills/to-spec/SKILL.md
   - .agents/skills/pwa-development/SKILL.md
   - .agents/skills/accessibility/SKILL.md
   - .agents/skills/code-review/SKILL.md

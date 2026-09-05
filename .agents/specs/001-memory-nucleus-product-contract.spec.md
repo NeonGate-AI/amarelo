@@ -26,8 +26,8 @@ adrs:
   - .agents/adrs/0015-memory-nucleus-mvp-clean-architecture.adr.md
   - .agents/adrs/0016-shared-memory-sdk-observability-evaluation.adr.md
 skills:
-  - .agents/skills/spec-driven-development/SKILL.md
-  - .agents/skills/agent-memory-systems/SKILL.md
+  - .agents/skills/to-spec/SKILL.md
+  - .agents/skills/domain-modeling/SKILL.md
   - .agents/skills/code-review/SKILL.md
 evidence:
   - workspaces/memory-nucleus/src domain, application, infrastructure and assurance seams

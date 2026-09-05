@@ -1,5 +1,5 @@
 ---
-version: 8
+version: 9
 extends: 002-code-style.rule.md
 name: Source Organization
 description: Source roots, module boundaries, file naming, barrels, and architectural source ownership.
@@ -126,13 +126,7 @@ A package-level `src/index.ts` remains a deliberate public API. Framework route 
 
 ## 7. Imports
 
-First-party absolute source aliases always begin with `@`; never define or use a project source alias beginning with `#`.
-
-Imports terminate at the owning directory barrel. Do not import a final semantic source file directly. For example, import `@application/ports`, not `@application/ports/memory-repository.port`, and import `@component/auth-shell`, not `@component/auth-shell/auth-shell`.
-
-Relative imports follow the same boundary: outside an `index.ts` barrel, import a directory API rather than another module file. An `index.ts` may directly reexport its own leaf modules because that is the barrel's purpose.
-
-Do not import another workspace's internals; consume its declared package API. Avoid deep relative imports such as `../../../`.
+`.agents/rules/004-import-boundaries.rule.md` owns alias, directory-barrel, same-leaf sibling and server/client import rules. Apply that rule directly; source organization does not define a second, stricter interpretation of sibling imports.
 
 ## 8. Validation ownership
 

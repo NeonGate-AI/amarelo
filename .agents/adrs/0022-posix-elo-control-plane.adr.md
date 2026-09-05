@@ -1,4 +1,15 @@
-# ADR 0022: Use a POSIX shell control plane and user-scoped Elo launcher
+---
+id: ADR-0022
+title: Use a POSIX shell control plane and user-scoped Elo launcher
+status: accepted
+date: 2026-09-03
+deciders:
+  - product-owner
+supersedes: []
+superseded-by: null
+---
+
+# ADR-0022: Use a POSIX shell control plane and user-scoped Elo launcher
 
 ## Status
 

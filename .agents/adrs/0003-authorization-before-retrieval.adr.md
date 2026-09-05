@@ -37,7 +37,7 @@ Every sensitive read path must demonstrate an authorization decision before a da
 
 ## Links
 
-- Memory contract: `.agents/MEMORY.md`
+- Memory contract: `.agents/rules/006-memory-nucleus.rule.md`
 - Safety rule: `.agents/rules/008-product-safety-and-privacy.rule.md`
-- Runtime memory design: `elos/memory-nucleus/docs/MEMORY.md`
-- Memory Nucleus boundary: `.agents/decisions/0012-memory-nucleus-layout.md`
+- Runtime memory design: `.agents/context/workspaces/memory-nucleus/overview.md`
+- Memory Nucleus boundary: `.agents/adrs/0012-memory-nucleus-layout.adr.md`

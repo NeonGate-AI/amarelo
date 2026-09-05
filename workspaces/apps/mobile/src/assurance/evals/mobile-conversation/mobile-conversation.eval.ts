@@ -33,12 +33,11 @@ async function evaluateConfigurationGate() {
     }),
     { baseUrl: '/api', enabled: true }
   )
-  assert.deepEqual(
+  assert.throws(() =>
     validateDevelopmentConversationConfiguration({
       VITE_AMARELO_TEXT_DRIVER: 'true',
       VITE_CHATTERBOX_URL: 'https://chatterbox.example/'
-    }),
-    { baseUrl: 'https://chatterbox.example', enabled: true }
+    })
   )
   assert.throws(() =>
     validateDevelopmentConversationConfiguration({
@@ -57,6 +56,12 @@ async function evaluateSuccessfulTurn() {
   })
 
   const execution = session.submit(createMobileTurnRequest())
+  await Promise.resolve()
+  assert.equal(client.sessions.length, 1)
+  assert.equal(
+    client.turns[0]?.input.conversationId,
+    'server-issued-mobile-conversation'
+  )
   assert.deepEqual(
     events.map((event) => event.type),
     ['pending']
@@ -85,6 +90,7 @@ async function evaluateSafeFailure() {
   })
 
   const execution = session.submit(createMobileTurnRequest())
+  await Promise.resolve()
   client.reject(0, new Error(secret))
   await execution
 
@@ -103,6 +109,7 @@ async function evaluateTimeoutFailure() {
   const request = createMobileTurnRequest('mobile-timeout-request')
 
   const execution = session.submit(request)
+  await Promise.resolve()
   client.reject(
     0,
     new ConversationClientError({
@@ -130,6 +137,7 @@ async function evaluateCancellation() {
   })
 
   const execution = session.submit(createMobileTurnRequest())
+  await Promise.resolve()
   session.cancel()
   await execution
 
@@ -149,6 +157,7 @@ async function evaluateOverlappingTurns() {
   })
 
   const first = session.submit(createMobileTurnRequest('mobile-request-1'))
+  await Promise.resolve()
   const second = session.submit(createMobileTurnRequest('mobile-request-2'))
   client.resolve(0, {
     ...SYNTHETIC_TURN_RESPONSE,
@@ -194,6 +203,73 @@ async function evaluateEphemeralSourceBoundary() {
   assert.equal(vite.includes('runtimeCaching: []'), true)
 }
 
+async function evaluateAuthenticationAndSessionReuse() {
+  const client = new DeferredConversationClient()
+  const events: ConversationSessionEvent[] = []
+  const session = new ConversationSessionService({
+    client,
+    onEvent: (event) => events.push(event)
+  })
+  client.sessionFailure = new ConversationClientError({
+    code: 'unauthenticated',
+    message: 'Entre novamente.',
+    requestId: null
+  })
+  await session.submit(createMobileTurnRequest())
+  assert.equal(client.turns.length, 0)
+  const denied = events.at(-1)
+  assert.equal(
+    denied?.type === 'failed' ? denied.failure.code : null,
+    'unauthenticated'
+  )
+
+  client.sessionFailure = null
+  const first = session.submit(createMobileTurnRequest())
+  await Promise.resolve()
+  client.resolve(0, SYNTHETIC_TURN_RESPONSE)
+  await first
+  const second = session.submit(createMobileTurnRequest('next-turn'))
+  assert.equal(client.sessions.length, 2)
+  assert.deepEqual(client.turns[1]?.input.history, [
+    { content: 'Oi!', role: 'user' },
+    { content: SYNTHETIC_TURN_RESPONSE.response, role: 'assistant' }
+  ])
+  client.reject(
+    1,
+    new ConversationClientError({
+      code: 'forbidden',
+      message: 'Abra uma nova conversa.',
+      requestId: 'next-turn'
+    })
+  )
+  await second
+  const retry = session.submit(createMobileTurnRequest('after-expiry'))
+  await Promise.resolve()
+  assert.equal(client.sessions.length, 3)
+  assert.deepEqual(client.turns[2]?.input.history, [])
+  session.cancel()
+  await retry
+  session.dispose()
+}
+
+async function evaluateCancellationBeforeSession() {
+  const client = new DeferredConversationClient()
+  const events: ConversationSessionEvent[] = []
+  const session = new ConversationSessionService({
+    client,
+    onEvent: (event) => events.push(event)
+  })
+  const pending = session.submit(createMobileTurnRequest())
+  session.cancel()
+  await pending
+  assert.equal(client.turns.length, 0)
+  assert.equal(client.sessions[0]?.signal?.aborted, true)
+  assert.deepEqual(
+    events.map((event) => event.type),
+    ['pending', 'aborted']
+  )
+}
+
 await evaluateConfigurationGate()
 await evaluateSuccessfulTurn()
 await evaluateSafeFailure()
@@ -201,4 +277,6 @@ await evaluateTimeoutFailure()
 await evaluateCancellation()
 await evaluateOverlappingTurns()
 await evaluateEphemeralSourceBoundary()
+await evaluateAuthenticationAndSessionReuse()
+await evaluateCancellationBeforeSession()
 console.log('Mobile conversation lifecycle eval PASS')

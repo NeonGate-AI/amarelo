@@ -1,4 +1,7 @@
 export * from './app'
+export * from './authentication'
 export * from './composition'
 export * from './configuration'
 export * from './model'
+export * from './observability'
+export * from './session'

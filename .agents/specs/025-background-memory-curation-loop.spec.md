@@ -5,12 +5,11 @@ type: experiment
 status: ready
 mode: prospective
 created: 2026-09-03
-updated: 2026-09-03
+updated: 2026-09-05
 owners:
   - Jonatas Sales
 targets:
-  - workspaces/apps/conversation-api
-  - workspaces/apps/memory-worker
+  - workspaces/microservices/chatterbox
   - workspaces/memory-nucleus
   - background queue infrastructure
 context:
@@ -32,7 +31,7 @@ adrs:
   - .agents/adrs/0015-memory-nucleus-mvp-clean-architecture.adr.md
   - .agents/adrs/0016-shared-memory-sdk-observability-evaluation.adr.md
 skills:
-  - .agents/skills/spec-driven-development/SKILL.md
+  - .agents/skills/to-spec/SKILL.md
   - .agents/skills/to-tickets/SKILL.md
   - .agents/skills/implement/SKILL.md
   - .agents/skills/code-review/SKILL.md
@@ -65,7 +64,7 @@ Advance to shadow only when a versioned load fixture proves controlled backlog, 
 ## Scope
 
 - Transactional evidence/outbox boundary and versioned completion event.
-- One durable queue and one long-lived Node worker.
+- One durable queue and one long-lived Node worker, started separately from Chatterbox but owned by `workspaces/memory-nucleus`.
 - Reference-only payloads and persistent local broker configuration.
 - Lease/fencing, bounded retry with backoff/jitter and terminal quarantine/dead-letter behavior.
 - Current authorization/consent checks before load, inference and durable activation.
@@ -77,6 +76,7 @@ Advance to shadow only when a versioned load fixture proves controlled backlog, 
 ## Implementation Decisions
 
 - Neo4j commits evidence and outbox atomically; no unsafe graph/queue dual write.
+- Dispatcher and worker implementation live in the existing Memory Nucleus workspace's infrastructure boundary and run as a separately started process. Do not create an undeclared application or nested workspace for the worker. Keep driver/BullMQ imports outside domain/application and update the owning runtime/container contract when this process becomes deployable.
 - Delivery is at least once; source claims, fingerprints, fencing and activation idempotency produce exactly-once effects.
 - BullMQ uses the physically separate Redis Queue service. Redis Cache is prohibited for job delivery and neither Redis role is a source of truth.
 - The dispatcher uses stable `jobId = eventId` and marks the outbox event published only after enqueue succeeds; this is eventual delivery, not a distributed transaction.

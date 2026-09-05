@@ -1,4 +1,15 @@
-# ADR 0030: Place Chatterbox in the Microservices workspace
+---
+id: ADR-0030
+title: Place Chatterbox in the Microservices workspace
+status: accepted
+date: 2026-09-04
+deciders:
+  - product-owner
+supersedes: []
+superseded-by: null
+---
+
+# ADR-0030: Place Chatterbox in the Microservices workspace
 
 ## Status
 

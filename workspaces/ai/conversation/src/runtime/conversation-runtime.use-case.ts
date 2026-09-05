@@ -6,7 +6,11 @@ import {
   ConversationTurnInputSchema,
   type ConversationMessage
 } from '../contracts'
-import { MemoryContextPort } from '../memory'
+import {
+  MemoryContextError,
+  MemoryContextPort,
+  type MemoryContextFailure
+} from '../memory'
 import {
   ConversationAgentPort,
   type ConversationAgentResult,
@@ -41,11 +45,11 @@ function validateMemoryContext(
     tokenBudgetUsed < 0 ||
     tokenBudgetUsed > tokenBudgetRequested
   ) {
-    throw new RangeError('Memory context exceeded the requested token budget')
+    throw new MemoryContextError('contract_violation')
   }
 
   if (projection.some((item) => item.trust !== 'untrusted-memory-data')) {
-    throw new TypeError('Memory context lost its untrusted-data marker')
+    throw new MemoryContextError('contract_violation')
   }
 }
 
@@ -84,6 +88,8 @@ export class ConversationRuntime {
     let memoryStatus: ConversationMemoryStatus =
       routing.budget.memoryTokens === 0 ? 'skipped' : 'unavailable'
     let memoryUsedTokens = 0
+    let memoryFailure: MemoryContextFailure | null =
+      memoryStatus === 'unavailable' ? 'not_configured' : null
 
     if (routing.budget.memoryTokens > 0 && this.#memory !== undefined) {
       try {
@@ -101,12 +107,17 @@ export class ConversationRuntime {
         memory = Object.freeze([...memoryContext.projection])
         memoryRequestId = memoryContext.requestId
         memoryStatus = 'retrieved'
+        memoryFailure = null
         memoryUsedTokens = memoryContext.tokenBudgetUsed
-      } catch {
+      } catch (error) {
         memory = EMPTY_MEMORY
         memoryRequestId = null
         memoryStatus = 'unavailable'
         memoryUsedTokens = 0
+        memoryFailure =
+          error instanceof MemoryContextError
+            ? error.code
+            : 'unexpected_failure'
       }
     }
 
@@ -146,6 +157,7 @@ export class ConversationRuntime {
       }),
       conversationId: input.conversationId,
       memory: Object.freeze({
+        failure: memoryFailure,
         itemCount: memory.length,
         requestId: memoryRequestId,
         requestedTokens: routing.budget.memoryTokens,

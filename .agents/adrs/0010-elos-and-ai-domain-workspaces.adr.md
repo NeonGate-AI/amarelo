@@ -104,10 +104,10 @@ Ana, Nico, and Isa are called agents in technical language. They live under the 
 
 ## Links
 
-- Repository architecture: `.agents/ARCHITECTURE.md`
+- Repository architecture: `.agents/context/architecture/overview.md`
 - Source organization: `.agents/rules/010-source-organization.rule.md`
 - AI runtime rules: `.agents/rules/003-context-engineering.rule.md`
-- Superseded decision: `.agents/decisions/0004-product-agent-workspace.md`
-- AI-wide instructions: `elos/ai/AGENTS.md`
-- AI architecture: `elos/ai/ARCHITECTURE.md`
-- Superseding decision: `.agents/decisions/0011-memory-platform-and-sdk.md`
+- Superseded decision: `.agents/adrs/0004-product-agent-workspace.adr.md`
+- AI-wide instructions: `AGENTS.md`
+- AI architecture: `.agents/context/workspaces/ai/overview.md`
+- Superseding decision: `.agents/adrs/0011-memory-platform-and-sdk.adr.md`

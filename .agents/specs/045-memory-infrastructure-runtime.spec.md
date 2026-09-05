@@ -5,7 +5,7 @@ type: feature
 status: implemented
 mode: prospective
 created: 2026-09-04
-updated: 2026-09-04
+updated: 2026-09-05
 owners:
   - Jonatas Sales
 targets:
@@ -31,10 +31,10 @@ skills:
   - .agents/skills/implement/SKILL.md
   - .agents/skills/code-review/SKILL.md
 evidence:
-  - workspaces/packages/runtime/kubernetes/neo4j.yaml
-  - workspaces/packages/runtime/kubernetes/redis-queue.yaml
-  - workspaces/packages/runtime/kubernetes/redis-cache.yaml
-  - workspaces/packages/runtime/kubernetes/object-storage.yaml
+  - workspaces/packages/runtime/kubernetes/memory/neo4j.yaml
+  - workspaces/packages/runtime/kubernetes/memory/redis-queue.yaml
+  - workspaces/packages/runtime/kubernetes/memory/redis-cache.yaml
+  - workspaces/packages/runtime/kubernetes/memory/object-storage.yaml
   - workspaces/packages/runtime/src/cli.ts
   - .audit/runtime.audit.sh
   - GitHub Actions CI run 580 passed on reconciled commit 1d46fb6045e5aaa574c61c13054e050cc0595fb6
@@ -153,6 +153,14 @@ must never destroy canonical Memory.
 - Removing the existing PostgreSQL reference adapter or workload.
 
 ## Evidence and Promotion
+
+The validation inventory below records this spec's original implementation.
+SPEC-046 subsequently moved its Memory manifests under
+`workspaces/packages/runtime/kubernetes/memory/` and made those dependencies an
+explicit optional profile. Evidence paths above follow their current locations;
+the original CI/review record and accepted historical behavior remain intact.
+Current default/profile membership is owned by SPEC-046 and
+`workspaces/packages/runtime/readme.md`, not by the historical counts below.
 
 The Kubernetes manifests, runtime lifecycle audit and generated environment
 contract provide stable evidence. `kubectl kustomize` and the controlled

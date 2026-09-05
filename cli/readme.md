@@ -42,6 +42,7 @@ elo setup
 elo doctor
 elo cleanup
 elo runtime up
+elo runtime up --profile memory
 elo runtime down
 elo runtime prune
 elo runtime e2e
@@ -60,7 +61,7 @@ elo check all
 
 `elo cleanup` immediately removes eligible untracked generated outputs and `node_modules` directories. The command has no options and protects tracked paths, `.git`, and `.audit`; `--dependencies`, the former `--apply` gate, and every other option are rejected before mutation.
 
-`elo runtime` exposes exactly four Kubernetes lifecycle actions. `up` reconciles the namespace and waits for PostgreSQL, Redis, the four interface apps and Chatterbox; `down` removes transient Cypress resources, scales all base workloads to zero and waits for their pods to terminate while preserving PostgreSQL; `prune` waits for deletion of the complete `amarelo-runtime` namespace and then removes the generated runtime `.env`; `e2e` runs `up` before an in-cluster headless Cypress Job and leaves the base runtime up. Invalid or extra runtime arguments return status 2 before delegation.
+`elo runtime` exposes exactly four Kubernetes lifecycle actions. `up` starts only the four interface apps and Chatterbox by default. `up` and `e2e` accept `--profile application|memory|reference`, overriding the shell variable `AMARELO_RUNTIME_PROFILE`: Memory adds Neo4j, separate Redis Queue/Cache and MinIO; reference adds only PostgreSQL. Changing a profile stops excluded infrastructure while retaining its resources and persistent state. `down` stops all namespace workloads and waits for termination; `prune` deletes the complete `amarelo-runtime` namespace before removing the generated `.env`. Both reject profile flags. `e2e` starts and waits for the selected profile before running in-cluster headless Cypress. Invalid syntax returns status 2 before delegation. Details and safe credentials belong to `workspaces/packages/runtime/readme.md`.
 
 The artifact commands render the four canonical empty templates in `.agents/prompts/`. ADRs, rules, and specs receive their next repository number; rule numbers are stable catalog identities rather than precedence; specs also receive the next durable `SPEC-###` ID. Skills preserve `.agents/skills/<name>/SKILL.md`. Generation never overwrites an existing target or updates approval/catalog state automatically.
 

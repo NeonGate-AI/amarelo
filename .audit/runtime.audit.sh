@@ -1,6 +1,13 @@
 #!/bin/sh
 set -u
 
+render_resources=true
+case "$#:$*" in
+  0:) ;;
+  1:--commands-only) render_resources=false ;;
+  *) printf 'Usage: runtime.audit.sh [--commands-only]\n' >&2; exit 2 ;;
+esac
+
 AUDIT_DIR=$(
   CDPATH=
   cd -P "$(dirname "$0")"
@@ -14,28 +21,15 @@ PROJECT_ROOT=${GITHUB_WORKSPACE:-$(
 RUNTIME_ROOT="$PROJECT_ROOT/workspaces/packages/runtime"
 KUBERNETES_ROOT="$RUNTIME_ROOT/kubernetes"
 RUNTIME_CLI="$RUNTIME_ROOT/src/cli.ts"
-RUNTIME_ENV="$RUNTIME_ROOT/.env"
 ELO_RUNTIME_COMMAND="$PROJECT_ROOT/cli/src/commands/runtime.sh"
 CYPRESS_JOB="$KUBERNETES_ROOT/cypress-job.yaml"
 CYPRESS_CONFIG="$RUNTIME_ROOT/cypress/cypress.config.cjs"
 CYPRESS_SPEC="$RUNTIME_ROOT/cypress/e2e/runtime.cy.js"
-TMP_ROOT="${TMPDIR:-/tmp}/amarelo-runtime-audit.$$"
-had_runtime_env=false
-mkdir "$TMP_ROOT" || {
+TMP_ROOT=$(mktemp -d "${TMPDIR:-/tmp}/amarelo-runtime-audit.XXXXXX") || {
   printf 'Runtime audit FAIL: cannot create temporary directory\n' >&2
   exit 1
 }
-if [ -f "$RUNTIME_ENV" ]; then
-  had_runtime_env=true
-  cp "$RUNTIME_ENV" "$TMP_ROOT/runtime.env.before"
-fi
-
 runtime_audit_cleanup() {
-  if [ "$had_runtime_env" = true ]; then
-    cp "$TMP_ROOT/runtime.env.before" "$RUNTIME_ENV"
-  else
-    rm -f "$RUNTIME_ENV"
-  fi
   rm -rf "$TMP_ROOT"
 }
 trap runtime_audit_cleanup 0 1 2 15
@@ -55,49 +49,96 @@ require_file() {
 
 for runtime_file in \
   "$KUBERNETES_ROOT/kustomization.yaml" \
-  "$KUBERNETES_ROOT/namespace.yaml" \
-  "$KUBERNETES_ROOT/config-map.yaml" \
-  "$KUBERNETES_ROOT/postgres.yaml" \
-  "$KUBERNETES_ROOT/neo4j.yaml" \
-  "$KUBERNETES_ROOT/redis-queue.yaml" \
-  "$KUBERNETES_ROOT/redis-cache.yaml" \
-  "$KUBERNETES_ROOT/object-storage.yaml" \
-  "$KUBERNETES_ROOT/apps.yaml"
+  "$KUBERNETES_ROOT/application/kustomization.yaml" \
+  "$KUBERNETES_ROOT/application/namespace.yaml" \
+  "$KUBERNETES_ROOT/application/config-map.yaml" \
+  "$KUBERNETES_ROOT/reference/kustomization.yaml" \
+  "$KUBERNETES_ROOT/reference/postgres.yaml" \
+  "$KUBERNETES_ROOT/memory/kustomization.yaml" \
+  "$KUBERNETES_ROOT/memory/neo4j.yaml" \
+  "$KUBERNETES_ROOT/memory/redis-queue.yaml" \
+  "$KUBERNETES_ROOT/memory/redis-cache.yaml" \
+  "$KUBERNETES_ROOT/memory/object-storage.yaml" \
+  "$KUBERNETES_ROOT/profiles/memory/kustomization.yaml" \
+  "$KUBERNETES_ROOT/profiles/reference/kustomization.yaml" \
+  "$KUBERNETES_ROOT/application/apps.yaml"
 do
   require_file "$runtime_file"
 done
 
-[ ! -e "$KUBERNETES_ROOT/redis.yaml" ] ||
-  runtime_fail workspaces/packages/runtime/kubernetes/redis.yaml "ambiguous shared Redis workload must not remain"
+for retired_manifest in apps config-map namespace postgres neo4j redis-queue redis-cache object-storage redis; do
+  [ ! -e "$KUBERNETES_ROOT/$retired_manifest.yaml" ] ||
+    runtime_fail "workspaces/packages/runtime/kubernetes/$retired_manifest.yaml" "retired root manifest must not duplicate the selected profile bases"
+done
 
-if [ -f "$KUBERNETES_ROOT/kustomization.yaml" ]; then
-  if ! command -v kubectl >/dev/null 2>&1; then
-    runtime_fail kubectl "kubectl is required to render the canonical Kustomize runtime"
-  elif ! kubectl kustomize "$KUBERNETES_ROOT" >"$TMP_ROOT/rendered.yaml" 2>"$TMP_ROOT/render.err"; then
-    runtime_fail workspaces/packages/runtime/kubernetes/kustomization.yaml "kubectl could not render the Kustomize base"
-  else
-    for resource_name in amarelo-runtime postgres neo4j redis-queue redis-cache object-storage landing console onboarding mobile chatterbox; do
+grep -F -- '--appendonly yes --appendfsync everysec' "$KUBERNETES_ROOT/memory/redis-queue.yaml" >/dev/null 2>&1 ||
+  runtime_fail workspaces/packages/runtime/kubernetes/memory/redis-queue.yaml "queue must retain its AOF persistence policy"
+grep -F 'claimName: redis-queue-data' "$KUBERNETES_ROOT/memory/redis-queue.yaml" >/dev/null 2>&1 ||
+  runtime_fail workspaces/packages/runtime/kubernetes/memory/redis-queue.yaml "queue must mount its own persistent claim"
+grep -F -- '--appendonly no' "$KUBERNETES_ROOT/memory/redis-cache.yaml" >/dev/null 2>&1 ||
+  runtime_fail workspaces/packages/runtime/kubernetes/memory/redis-cache.yaml "cache must retain its disposable policy"
+if grep -Eq 'REDIS_CACHE_PASSWORD|redis-cache-data' "$KUBERNETES_ROOT/memory/redis-queue.yaml" ||
+  grep -Eq 'REDIS_QUEUE_PASSWORD|persistentVolumeClaim:' "$KUBERNETES_ROOT/memory/redis-cache.yaml"; then
+  runtime_fail workspaces/packages/runtime/kubernetes/memory "queue/cache credentials and persistence must remain isolated"
+fi
+
+if [ "$render_resources" = true ]; then
+  for profile in application memory reference; do
+    profile_path="$KUBERNETES_ROOT"
+    stateful_count=0
+    deployment_count=5
+    optional_names=''
+    excluded_names='postgres neo4j redis-queue redis-cache object-storage'
+    case "$profile" in
+      memory)
+        profile_path="$KUBERNETES_ROOT/profiles/memory"
+        stateful_count=3
+        deployment_count=6
+        optional_names='neo4j redis-queue redis-cache object-storage'
+        excluded_names='postgres'
+        ;;
+      reference)
+        profile_path="$KUBERNETES_ROOT/profiles/reference"
+        stateful_count=1
+        optional_names='postgres'
+        excluded_names='neo4j redis-queue redis-cache object-storage'
+        ;;
+    esac
+    if ! command -v kubectl >/dev/null 2>&1; then
+      runtime_fail kubectl "kubectl is required to render $profile; use --commands-only solely for disclosed synthetic validation"
+      break
+    elif ! kubectl kustomize "$profile_path" >"$TMP_ROOT/rendered.yaml" 2>"$TMP_ROOT/render.err"; then
+      runtime_fail "$profile_path/kustomization.yaml" "kubectl could not render the $profile profile"
+      continue
+    fi
+    workload_count=$((stateful_count + deployment_count))
+    for resource_name in amarelo-runtime landing console onboarding mobile chatterbox $optional_names; do
       grep -F "name: $resource_name" "$TMP_ROOT/rendered.yaml" >/dev/null 2>&1 ||
-        runtime_fail workspaces/packages/runtime/kubernetes "rendered resources omit $resource_name"
+        runtime_fail workspaces/packages/runtime/kubernetes "$profile resources omit $resource_name"
     done
-    [ "$(grep -c '^kind: Deployment$' "$TMP_ROOT/rendered.yaml")" -eq 6 ] ||
-      runtime_fail workspaces/packages/runtime/kubernetes "runtime must render six Deployments"
-    [ "$(grep -c '^kind: StatefulSet$' "$TMP_ROOT/rendered.yaml")" -eq 4 ] ||
-      runtime_fail workspaces/packages/runtime/kubernetes "runtime must render four StatefulSets"
-    [ "$(grep -c '^kind: Service$' "$TMP_ROOT/rendered.yaml")" -eq 10 ] ||
-      runtime_fail workspaces/packages/runtime/kubernetes "runtime must render ten Services"
-    [ "$(grep -c '^kind: PersistentVolumeClaim$' "$TMP_ROOT/rendered.yaml")" -eq 4 ] ||
-      runtime_fail workspaces/packages/runtime/kubernetes "runtime must render four retained state claims"
+    for resource_name in $excluded_names; do
+      if grep -Eq "^  name: $resource_name(-data)?$" "$TMP_ROOT/rendered.yaml"; then
+        runtime_fail workspaces/packages/runtime/kubernetes "$profile must exclude resources for $resource_name"
+      fi
+    done
+    [ "$(grep -c '^kind: Deployment$' "$TMP_ROOT/rendered.yaml")" -eq "$deployment_count" ] ||
+      runtime_fail workspaces/packages/runtime/kubernetes "$profile must render $deployment_count Deployments"
+    [ "$(grep -c '^kind: StatefulSet$' "$TMP_ROOT/rendered.yaml")" -eq "$stateful_count" ] ||
+      runtime_fail workspaces/packages/runtime/kubernetes "$profile must render $stateful_count StatefulSets"
+    [ "$(grep -c '^kind: Service$' "$TMP_ROOT/rendered.yaml")" -eq "$workload_count" ] ||
+      runtime_fail workspaces/packages/runtime/kubernetes "$profile must render $workload_count Services"
+    [ "$(grep -c '^kind: PersistentVolumeClaim$' "$TMP_ROOT/rendered.yaml")" -eq "$stateful_count" ] ||
+      runtime_fail workspaces/packages/runtime/kubernetes "$profile must render $stateful_count retained state claims"
     if grep -Eq '^kind: Secret$|POSTGRES_PASSWORD:[[:space:]]*[^|[:space:]]|NEO4J_AUTH:[[:space:]]*[^|[:space:]]|REDIS_(QUEUE|CACHE)_PASSWORD:[[:space:]]*[^|[:space:]]|MINIO_ROOT_PASSWORD:[[:space:]]*[^|[:space:]]' "$TMP_ROOT/rendered.yaml"; then
       runtime_fail workspaces/packages/runtime/kubernetes "tracked manifests must not contain a Secret payload"
     fi
-    [ "$(grep -c 'automountServiceAccountToken: false' "$TMP_ROOT/rendered.yaml")" -eq 10 ] ||
+    [ "$(grep -c 'automountServiceAccountToken: false' "$TMP_ROOT/rendered.yaml")" -eq "$workload_count" ] ||
       runtime_fail workspaces/packages/runtime/kubernetes "every workload must disable service-account token mounting"
-    [ "$(grep -c 'readinessProbe:' "$TMP_ROOT/rendered.yaml")" -eq 10 ] ||
+    [ "$(grep -c 'readinessProbe:' "$TMP_ROOT/rendered.yaml")" -eq "$workload_count" ] ||
       runtime_fail workspaces/packages/runtime/kubernetes "every workload must declare readiness"
-    [ "$(grep -c 'livenessProbe:' "$TMP_ROOT/rendered.yaml")" -eq 10 ] ||
+    [ "$(grep -c 'livenessProbe:' "$TMP_ROOT/rendered.yaml")" -eq "$workload_count" ] ||
       runtime_fail workspaces/packages/runtime/kubernetes "every workload must declare liveness"
-  fi
+  done
 fi
 
 if [ ! -f "$RUNTIME_CLI" ]; then
@@ -126,16 +167,16 @@ do
   require_file "$PROJECT_ROOT/$project_path/.env.template"
   grep -F "$project_path/Dockerfile" "$RUNTIME_CLI" >/dev/null 2>&1 ||
     runtime_fail workspaces/packages/runtime/src/cli.ts "runtime does not select $workload project Dockerfile"
-  grep -F "amarelo-$workload:local" "$KUBERNETES_ROOT/apps.yaml" >/dev/null 2>&1 ||
-    runtime_fail workspaces/packages/runtime/kubernetes/apps.yaml "runtime manifest does not declare the $workload image"
+  grep -F "amarelo-$workload:local" "$KUBERNETES_ROOT/application/apps.yaml" >/dev/null 2>&1 ||
+    runtime_fail workspaces/packages/runtime/kubernetes/application/apps.yaml "runtime manifest does not declare the $workload image"
 done
 
 if grep -Eq '^[[:space:]]*(OPENAI_API_KEY|[^=]*(TOKEN|SECRET)[^=]*)=' "$PROJECT_ROOT/workspaces/apps/mobile/.env.template"; then
   runtime_fail workspaces/apps/mobile/.env.template "browser template must not declare credentials"
 fi
 
-grep -F 'path: /health' "$KUBERNETES_ROOT/apps.yaml" >/dev/null 2>&1 ||
-  runtime_fail workspaces/packages/runtime/kubernetes/apps.yaml "Chatterbox must expose health probes"
+grep -F 'path: /health' "$KUBERNETES_ROOT/application/apps.yaml" >/dev/null 2>&1 ||
+  runtime_fail workspaces/packages/runtime/kubernetes/application/apps.yaml "Chatterbox must expose health probes"
 
 if grep -F 'Docker Compose' "$RUNTIME_ROOT/readme.md" >/dev/null 2>&1; then
   runtime_fail workspaces/packages/runtime/readme.md "current runtime documentation still requires Docker Compose"
@@ -227,6 +268,11 @@ case "$*" in
       printf 'namespace/amarelo-runtime\n'
     fi
     ;;
+  *" get statefulset/"*|*" get deployment/redis-cache"*)
+    if [ "${AMARELO_RUNTIME_EXISTING_OPTIONAL:-}" = true ]; then
+      printf '%s\n' "$4"
+    fi
+    ;;
   *"get pods"*)
     if [ "${AMARELO_RUNTIME_PODS_REMAINING:-}" = true ]; then
       printf 'pod/runtime-still-terminating\n'
@@ -255,6 +301,8 @@ runtime_command() {
   PATH="$fake_bin:$PATH" \
   AMARELO_RUNTIME_AUDIT_LOG="$command_log" \
   AMARELO_RUNTIME_ENV_FILE="$TMP_ROOT/runtime.env" \
+  AMARELO_RUNTIME_PROFILE="${AMARELO_RUNTIME_PROFILE:-application}" \
+  AMARELO_RUNTIME_EXISTING_OPTIONAL="${AMARELO_RUNTIME_EXISTING_OPTIONAL:-}" \
   AMARELO_RUNTIME_CYPRESS_STATUS="${AMARELO_RUNTIME_CYPRESS_STATUS:-}" \
   AMARELO_RUNTIME_FAIL_MATCH="${AMARELO_RUNTIME_FAIL_MATCH:-}" \
   AMARELO_RUNTIME_NAMESPACE_ABSENT="${AMARELO_RUNTIME_NAMESPACE_ABSENT:-}" \
@@ -267,6 +315,8 @@ elo_runtime_command() {
   AMARELO_RUNTIME_AUDIT_LOG="$command_log" \
   AMARELO_RUNTIME_CYPRESS_STATUS="${AMARELO_RUNTIME_CYPRESS_STATUS:-}" \
   AMARELO_RUNTIME_ENV_FILE="$TMP_ROOT/runtime.env" \
+  AMARELO_RUNTIME_PROFILE="${AMARELO_RUNTIME_PROFILE:-application}" \
+  AMARELO_RUNTIME_EXISTING_OPTIONAL="${AMARELO_RUNTIME_EXISTING_OPTIONAL:-}" \
   AMARELO_RUNTIME_FAIL_MATCH="${AMARELO_RUNTIME_FAIL_MATCH:-}" \
   AMARELO_RUNTIME_NAMESPACE_ABSENT="${AMARELO_RUNTIME_NAMESPACE_ABSENT:-}" \
   AMARELO_RUNTIME_PODS_REMAINING="${AMARELO_RUNTIME_PODS_REMAINING:-}" \
@@ -297,17 +347,63 @@ else
     runtime_fail workspaces/packages/runtime/src/cli.ts "up did not reconcile the Kustomize base"
   grep -F 'kubectl rollout status' "$command_log" >/dev/null 2>&1 ||
     runtime_fail workspaces/packages/runtime/src/cli.ts "up did not wait for workload readiness"
-  for stateful_workload in postgres neo4j redis-queue object-storage; do
-    grep -F "statefulset/$stateful_workload --timeout=300s" "$command_log" >/dev/null 2>&1 ||
-      runtime_fail workspaces/packages/runtime/src/cli.ts "up did not wait for $stateful_workload readiness"
-  done
-  for environment_key in NEO4J_AUTH REDIS_QUEUE_PASSWORD REDIS_CACHE_PASSWORD MINIO_ROOT_PASSWORD; do
+  if grep -Eq 'rollout status.*(statefulset/|deployment/redis-cache)|scale (statefulset|deployment) --all --replicas=1' "$command_log"; then
+    runtime_fail workspaces/packages/runtime/src/cli.ts "default up must not start or wait for optional infrastructure"
+  fi
+  for environment_key in NEO4J_AUTH REDIS_QUEUE_PASSWORD REDIS_CACHE_PASSWORD MINIO_ROOT_PASSWORD WORKOS_API_KEY WORKOS_CLIENT_ID WORKOS_COOKIE_PASSWORD WORKOS_COOKIE_NAME CHATTERBOX_ALLOWED_ORIGINS OPENAI_API_KEY AI_CONVERSATION_MODEL; do
     grep -F "$environment_key=" "$TMP_ROOT/runtime.env" >/dev/null 2>&1 ||
       runtime_fail workspaces/packages/runtime/src/cli.ts "generated environment omits $environment_key"
   done
   if grep -F 'REDIS_PASSWORD=' "$TMP_ROOT/runtime.env" >/dev/null 2>&1; then
     runtime_fail workspaces/packages/runtime/src/cli.ts "generated environment retains ambiguous REDIS_PASSWORD"
   fi
+fi
+
+: >"$command_log"
+if ! elo_runtime_command up --profile memory >"$TMP_ROOT/memory-up.out" 2>&1; then
+  runtime_fail cli/src/commands/runtime.sh "explicit Memory profile failed"
+else
+  grep -F "kubectl apply --kustomize $KUBERNETES_ROOT/profiles/memory" "$command_log" >/dev/null 2>&1 ||
+    runtime_fail workspaces/packages/runtime/src/cli.ts "Memory profile did not select its Kustomize overlay"
+  for memory_workload in statefulset/neo4j statefulset/redis-queue deployment/redis-cache statefulset/object-storage; do
+    grep -F "kubectl rollout status --namespace amarelo-runtime $memory_workload --timeout=300s" "$command_log" >/dev/null 2>&1 ||
+      runtime_fail workspaces/packages/runtime/src/cli.ts "Memory profile omitted $memory_workload readiness"
+  done
+  if grep -F 'rollout status --namespace amarelo-runtime statefulset/postgres' "$command_log" >/dev/null 2>&1; then
+    runtime_fail workspaces/packages/runtime/src/cli.ts "Memory profile must not start PostgreSQL"
+  fi
+fi
+
+: >"$command_log"
+if ! AMARELO_RUNTIME_PROFILE=reference runtime_command up >"$TMP_ROOT/reference-up.out" 2>&1; then
+  runtime_fail workspaces/packages/runtime/src/cli.ts "environment-selected reference profile failed"
+else
+  grep -F "kubectl apply --kustomize $KUBERNETES_ROOT/profiles/reference" "$command_log" >/dev/null 2>&1 ||
+    runtime_fail workspaces/packages/runtime/src/cli.ts "reference profile did not select its Kustomize overlay"
+  grep -F 'kubectl rollout status --namespace amarelo-runtime statefulset/postgres --timeout=300s' "$command_log" >/dev/null 2>&1 ||
+    runtime_fail workspaces/packages/runtime/src/cli.ts "reference profile did not wait for PostgreSQL"
+  if grep -Eq 'rollout status.*(neo4j|redis-queue|redis-cache|object-storage)' "$command_log"; then
+    runtime_fail workspaces/packages/runtime/src/cli.ts "reference profile must not start Memory infrastructure"
+  fi
+fi
+
+cp "$TMP_ROOT/runtime.env" "$TMP_ROOT/profile.env.before"
+: >"$command_log"
+if ! AMARELO_RUNTIME_EXISTING_OPTIONAL=true runtime_command up --profile application >"$TMP_ROOT/profile-switch.out" 2>&1; then
+  runtime_fail workspaces/packages/runtime/src/cli.ts "returning to the application profile failed"
+else
+  for optional_workload in statefulset/postgres statefulset/neo4j statefulset/redis-queue deployment/redis-cache statefulset/object-storage; do
+    grep -F "kubectl --namespace amarelo-runtime scale $optional_workload --replicas=0" "$command_log" >/dev/null 2>&1 ||
+      runtime_fail workspaces/packages/runtime/src/cli.ts "profile switch did not suspend existing $optional_workload"
+    optional_name=${optional_workload#*/}
+    grep -F "kubectl --namespace amarelo-runtime get pods --selector app.kubernetes.io/name=$optional_name " "$command_log" >/dev/null 2>&1 ||
+      runtime_fail workspaces/packages/runtime/src/cli.ts "profile switch did not observe $optional_workload termination"
+  done
+  if grep -F 'delete ' "$command_log" >/dev/null 2>&1; then
+    runtime_fail workspaces/packages/runtime/src/cli.ts "profile selection must not delete resources"
+  fi
+  cmp -s "$TMP_ROOT/runtime.env" "$TMP_ROOT/profile.env.before" ||
+    runtime_fail workspaces/packages/runtime/src/cli.ts "profile selection must preserve existing credentials"
 fi
 
 : >"$command_log"
@@ -340,6 +436,24 @@ if ! runtime_command config >"$TMP_ROOT/config.out" 2>&1; then
 elif ! grep -F 'kubectl kustomize' "$command_log" >/dev/null 2>&1; then
   runtime_fail workspaces/packages/runtime/src/cli.ts "config did not render through kubectl kustomize"
 fi
+
+: >"$command_log"
+if ! AMARELO_RUNTIME_PROFILE=memory runtime_command config --profile reference >"$TMP_ROOT/profile-precedence.out" 2>&1; then
+  runtime_fail workspaces/packages/runtime/src/cli.ts "profile flag did not override environment selection"
+else
+  grep -F "kubectl kustomize $KUBERNETES_ROOT/profiles/reference" "$command_log" >/dev/null 2>&1 ||
+    runtime_fail workspaces/packages/runtime/src/cli.ts "config rendered the wrong explicit profile"
+  if grep -Eq '(apply|scale|delete|docker build)' "$command_log"; then
+    runtime_fail workspaces/packages/runtime/src/cli.ts "config must not mutate the runtime"
+  fi
+fi
+
+: >"$command_log"
+AMARELO_RUNTIME_PROFILE=invalid elo_runtime_command up >"$TMP_ROOT/profile-env-invalid.out" 2>&1
+[ "$?" -eq 2 ] ||
+  runtime_fail cli/src/commands/runtime.sh "unknown environment profile must exit with status 2"
+[ ! -s "$command_log" ] ||
+  runtime_fail cli/src/commands/runtime.sh "unknown environment profile mutated the runtime"
 
 runtime_command unsupported >"$TMP_ROOT/unsupported.out" 2>&1
 unsupported_status=$?
@@ -397,9 +511,11 @@ prune_failure_status=$?
 rm -f "$TMP_ROOT/runtime.env"
 
 : >"$command_log"
-if ! elo_runtime_command e2e >"$TMP_ROOT/elo-e2e.out" 2>&1; then
+if ! elo_runtime_command e2e --profile memory >"$TMP_ROOT/elo-e2e.out" 2>&1; then
   runtime_fail cli/src/commands/runtime.sh "elo runtime e2e failed"
 else
+  grep -F "kubectl apply --kustomize $KUBERNETES_ROOT/profiles/memory" "$command_log" >/dev/null 2>&1 ||
+    runtime_fail workspaces/packages/runtime/src/cli.ts "e2e did not propagate the selected Memory profile to up"
   up_line=$(grep -n -F 'kubectl apply --kustomize' "$command_log" | sed -n '1s/:.*//p')
   cypress_line=$(grep -n -F 'kubectl apply --filename' "$command_log" | grep -F 'cypress-job.yaml' | sed -n '1s/:.*//p')
   if [ -z "$up_line" ] || [ -z "$cypress_line" ] || [ "$up_line" -ge "$cypress_line" ]; then
@@ -419,7 +535,7 @@ e2e_failure_status=$?
 [ "$(grep -c -F 'kubectl --namespace amarelo-runtime delete job/amarelo-cypress configmap/amarelo-cypress-suite' "$command_log")" -eq 1 ] ||
   runtime_fail workspaces/packages/runtime/src/cli.ts "failed Cypress resources must remain after the initial stale-resource cleanup"
 
-for invalid_runtime_arguments in '' 'unknown' 'up extra'; do
+for invalid_runtime_arguments in '' 'unknown' 'up extra' 'up --profile unknown' 'up --profile' 'down --profile memory' 'prune --profile reference' 'up --profile memory extra'; do
   : >"$command_log"
   if [ -z "$invalid_runtime_arguments" ]; then
     "$PROJECT_ROOT/cli/elo" runtime >"$TMP_ROOT/invalid-runtime.out" 2>&1
@@ -440,6 +556,10 @@ if [ "$failures" -gt 0 ]; then
 fi
 
 printf 'Runtime audit PASS\n'
-printf 'Kustomize resource inventory: PASS\n'
+if [ "$render_resources" = true ]; then
+  printf 'Kustomize resource inventory (application, memory, reference): PASS\n'
+else
+  printf 'Kustomize rendering: SKIPPED (--commands-only); not live-cluster evidence\n'
+fi
 printf 'Kubernetes lifecycle contract: PASS\n'
 printf 'runtime secret, queue/cache isolation and persistence boundaries: PASS\n'

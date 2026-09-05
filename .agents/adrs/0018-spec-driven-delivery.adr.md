@@ -1,4 +1,15 @@
-# ADR 0018: Use numbered delivery specs as the unit of engineering change
+---
+id: ADR-0018
+title: Use numbered delivery specs as the unit of engineering change
+status: accepted
+date: 2026-09-02
+deciders:
+  - product-owner
+supersedes: []
+superseded-by: null
+---
+
+# ADR-0018: Use numbered delivery specs as the unit of engineering change
 
 ## Status
 

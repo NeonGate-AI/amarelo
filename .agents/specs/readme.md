@@ -10,7 +10,9 @@ The specification catalog is flat, priority-ordered and mechanically checked.
 - ADRs use `.adr.md`, rules use `.rule.md`, numbered specs use `.spec.md`, and executable audit checkers use `.audit.sh`.
 - Implemented and retrospective specs remain readable in this flat catalog; there is no history subdirectory.
 
-## Delivery priority
+## Catalog priority
+
+The prefix is a unique catalog rank, not the durable `SPEC-###` identity. Existing ranks are retained to preserve reference stability. Follow the dependency-ordered queue below for execution; implemented history and deferred contracts do not block a later executable rank merely by appearing first.
 
 | Priority | Durable ID | Status | Contract |
 |---:|---|---|---|
@@ -59,12 +61,31 @@ The specification catalog is flat, priority-ordered and mechanically checked.
 | 043 | SPEC-043 | ready | [Memory integrity and poisoning assurance](043-memory-integrity-and-poisoning-assurance.spec.md) |
 | 044 | SPEC-044 | in-progress | [Staging-first repository delivery flow](044-staging-delivery-flow.spec.md) |
 | 045 | SPEC-045 | implemented | [Memory infrastructure runtime topology](045-memory-infrastructure-runtime.spec.md) |
+| 046 | SPEC-046 | implemented | [Saneamento canônico](046-saneamento-canonico.spec.md) |
+| 047 | SPEC-047 | implemented | [Vertical slice textual, autenticado e observável](047-vertical-slice-textual-autenticado-observavel.spec.md) |
 
-The next unallocated durable delivery ID is `SPEC-046`.
+The next unallocated durable delivery ID is `SPEC-048`.
+
+SPEC-046 and SPEC-047 were implemented in the owner-authorized local ZIP branch. Their source/test acceptance does not assert live login, deployed infrastructure, browser E2E or remote CI.
+
+## Remaining execution order
+
+| Order | Durable ID | Delivery boundary | Prerequisite or gate |
+|---:|---|---|---|
+| 1 | SPEC-016 | Request-bound Memory SDK composition and Neo4j write/read/suppress round trip | SPEC-047 implemented locally; retain SPEC-009 baseline |
+| 2 | SPEC-012 | Memory-owned outbox dispatcher and one BullMQ worker process | SPEC-016 |
+| 3 | SPEC-011 | Shadow retrieval with no effect on delivered responses | SPEC-012 |
+| 4 | SPEC-043 | Integrity, poisoning and no-resurrection assurance | SPEC-011 parity evidence |
+| 5 | SPEC-017 | Internal canary followed by controlled A/B | SPEC-043; SPEC-033 before external participants |
+| 6 | SPEC-018 | Measured economics report and scale/hold decision | SPEC-017 |
+
+The retained drafts are SPEC-033 (application guardrails, before external exposure), SPEC-034 (lifecycle/realtime semantics, after guardrails and before the voice bridge) and SPEC-025 (commercial entitlements, blocked by explicit owner-open quotas/reset/plan decisions). They remain useful but are not implementation authorization. SPEC-044 remains in-progress because its repository-settings gate cannot be completed in a local ZIP-only delivery.
+
+No pending contract requests a PostgreSQL Memory implementation. SPEC-016 and SPEC-012 already target Neo4j/BullMQ. Implemented PostgreSQL reference-adapter evidence stays historical; ADR-0009 is superseded. No meaningful pending spec was retired or merged merely to make the list shorter.
 
 The executable Memory Nucleus chain is:
 
-`SPEC-009 baseline → SPEC-016 core → SPEC-012 background → SPEC-011 shadow/parity → SPEC-043 integrity/poisoning assurance → SPEC-017 A/B and canary → SPEC-018 scale`.
+`SPEC-009 baseline → SPEC-046 reconciliation → SPEC-047 authenticated text → SPEC-016 core → SPEC-012 background → SPEC-011 shadow/parity → SPEC-043 integrity/poisoning assurance → SPEC-017 A/B and canary → SPEC-018 scale`.
 
 SPEC-043 is a required assurance gate before user-visible canary exposure. It does not replace the earlier core, background or shadow phases; it converts observed integrity failures into evals and hidden holdouts before canary.
 

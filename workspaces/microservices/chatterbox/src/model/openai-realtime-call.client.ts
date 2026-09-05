@@ -14,6 +14,7 @@ export interface OpenAiRealtimeCallInput {
   readonly apiKey: string
   readonly fetchImplementation?: typeof fetch
   readonly sdp: string
+  readonly timeoutMs?: number
 }
 
 export async function createOpenAiRealtimeCall(
@@ -30,7 +31,8 @@ export async function createOpenAiRealtimeCall(
       headers: {
         Authorization: `Bearer ${input.apiKey}`
       },
-      method: 'POST'
+      method: 'POST',
+      signal: AbortSignal.timeout(input.timeoutMs ?? 30_000)
     }
   )
 

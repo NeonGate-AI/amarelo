@@ -1,18 +1,18 @@
-> Superseded in physical layout by ADR-0013; semantic ownership remains valid.
-
 ---
 id: ADR-0012
 title: Name the memory ownership boundary Memory Nucleus and colocate its SDK
-status: accepted
+status: superseded
 date: 2026-08-30
 deciders:
   - product-owner
 supersedes:
   - ADR-0011
-superseded-by: null
+superseded-by: ADR-0015
 ---
 
 # ADR-0012: Name the memory ownership boundary Memory Nucleus and colocate its SDK
+
+Historical physical layout: ADR-0013 first replaced this tree; ADR-0015 establishes the current single workspace. The Memory Nucleus name and SDK ownership remain valid. Use the current workspace context for live paths.
 
 ## Context
 
@@ -74,6 +74,6 @@ Deep relative imports that traverse two or more parent directories are prohibite
 
 ## Links
 
-- Memory Nucleus architecture: `elos/memory-nucleus/README.md`
-- Memory research register: `elos/memory-nucleus/docs/RESEARCH.md`
-- Superseded decision: `.agents/decisions/0011-memory-platform-and-sdk.md`
+- Memory Nucleus architecture: `.agents/context/workspaces/memory-nucleus/overview.md`
+- The original research register belonged to the retired physical layout and is available only through Git history.
+- Superseded decision: `.agents/adrs/0011-memory-platform-and-sdk.adr.md`

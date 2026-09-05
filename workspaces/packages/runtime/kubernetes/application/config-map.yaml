@@ -1,0 +1,45 @@
+# Public/default runtime configuration; secret values come from the local Secret.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: amarelo-runtime-config
+  labels:
+    app.kubernetes.io/name: runtime-config
+    app.kubernetes.io/part-of: amarelo
+data:
+  AI_VOICE_MODEL: gpt-4o-mini-tts
+  AI_VOICE_NAME: coral
+  CHOKIDAR_USEPOLLING: "true"
+  CHATTERBOX_ALLOWED_ORIGINS: ""
+  CHATTERBOX_AUTH_TIMEOUT_MS: "5000"
+  CHATTERBOX_HOST: 0.0.0.0
+  CHATTERBOX_MAX_CONCURRENT_TURNS: "4"
+  CHATTERBOX_MAX_SESSIONS: "1000"
+  CHATTERBOX_MODEL_TIMEOUT_MS: "30000"
+  CHATTERBOX_PORT: "3004"
+  CHATTERBOX_RATE_LIMIT_PER_MINUTE: "20"
+  CHATTERBOX_SESSION_TTL_MS: "900000"
+  CHATTERBOX_URL: http://chatterbox:3004
+  MEMORY_NEO4J_URI: bolt://neo4j:7687
+  MEMORY_QUEUE_NAME: memory-processing
+  NEXT_PUBLIC_CONSOLE_URL: http://localhost:3001
+  NEXT_PUBLIC_ONBOARDING_URL: http://localhost:3002
+  NEXT_PUBLIC_WORKOS_REDIRECT_URI: http://localhost:3002/api/auth/callback
+  NEXT_TELEMETRY_DISABLED: "1"
+  OPENAI_API_KEY: ""
+  OBJECT_STORAGE_BUCKET: amarelo-memory
+  OBJECT_STORAGE_ENDPOINT: http://object-storage:9000
+  OBJECT_STORAGE_REGION: us-east-1
+  REDIS_CACHE_HOST: redis-cache
+  REDIS_CACHE_PORT: "6379"
+  REDIS_QUEUE_HOST: redis-queue
+  REDIS_QUEUE_PORT: "6379"
+  WATCHPACK_POLLING: "true"
+  VITE_CHATTERBOX_URL: /api
+  WORKOS_API_KEY: ""
+  WORKOS_CLIENT_ID: ""
+  WORKOS_COOKIE_DOMAIN: ""
+  WORKOS_COOKIE_MAX_AGE: "2592000"
+  WORKOS_COOKIE_NAME: wos-session
+  WORKOS_COOKIE_PASSWORD: ""
+  WORKOS_COOKIE_SAMESITE: lax

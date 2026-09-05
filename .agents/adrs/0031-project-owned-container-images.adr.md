@@ -1,4 +1,15 @@
-# ADR 0031: Make container images and environment templates project-owned
+---
+id: ADR-0031
+title: Make container images and environment templates project-owned
+status: accepted
+date: 2026-09-04
+deciders:
+  - product-owner
+supersedes: []
+superseded-by: null
+---
+
+# ADR-0031: Make container images and environment templates project-owned
 
 ## Status
 

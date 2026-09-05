@@ -47,7 +47,7 @@ The shared wrapper must contain no React Orbz import, voice-engine assignment, `
 
 ## Links
 
-- Implementation: `elos/packages/react/src/ui/agent-orb/agent-orb.tsx`
-- Presets: `elos/packages/react/src/ui/agent-orb/presets.ts`
-- Landing Hero: `elos/apps/landing/app/section/hero/agent-showcase.tsx`
-- Mobile evolution: `.agents/decisions/0006-mobile-react-vite-pwa.md`
+- Implementation: `workspaces/packages/react/src/ui/agent-orb/agent-orb.tsx`
+- Presets: `workspaces/packages/react/src/ui/agent-orb/presets.ts`
+- Landing Hero: `workspaces/apps/landing/src/app/section/hero/agent-showcase.tsx`
+- Mobile evolution: `.agents/adrs/0006-mobile-react-vite-pwa.adr.md`

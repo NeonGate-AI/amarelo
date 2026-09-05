@@ -1,4 +1,5 @@
 import type { AgentId } from '../contracts'
+import type { MemoryContextFailure } from '../memory'
 import type { ConversationModelUsage } from '../ports'
 import type { ConversationRoutingDecision } from '../routing'
 
@@ -14,6 +15,7 @@ export interface ConversationContextDiagnostics {
 }
 
 export interface ConversationMemoryDiagnostics {
+  readonly failure: MemoryContextFailure | null
   readonly itemCount: number
   readonly requestId: string | null
   readonly requestedTokens: number
