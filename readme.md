@@ -57,15 +57,15 @@ For example, a person might say that evening walks helped during one week and la
   </a>
 </p>
 
-*Architecture overview, including the intended voice loop and selected cache layer. The current internal integration is text-based; the full voice bridge, serving-cache integration and end-to-end validation remain separate work.*
+*Conceptual architecture. The local voice bridge is implemented through SPEC-052: audio flows directly between the PWA and OpenAI over WebRTC, with Chatterbox handling session setup and Memory in parallel. Redis cache-aside serving remains planned; current retrieval queries Neo4j directly. Live validation and complete cost measurement remain pending.*
 
 ### How continuity becomes context
 
-1. **Capture evidence within scope.** The internal text integration captures the person's current message under a server-owned identity and consent boundary. A transcript is evidence; an assistant's response does not become evidence about the person.
+1. **Capture evidence within scope.** The text integration captures the person's current message; the local voice bridge accepts finalized provider input transcriptions through the server sideband. Both use a server-owned identity and explicit consent. A transcript is evidence; an assistant's response does not become evidence about the person.
 2. **Curate in the background.** Neo4j commits protected changes and an outbox event together. A dispatcher publishes reference-only jobs to BullMQ on a dedicated Redis Queue service; LangGraph orchestrates the worker's curation flow. Delivery is at least once, so processing is idempotent and protected effects recheck current authority.
 3. **Let models propose; let policy decide.** Signal, duplicate and budget checks can skip or defer extraction. When extraction runs, the model produces candidates. Deterministic acceptance rules control which candidates become canonical memory.
 4. **Retrieve eligible records.** Permission, provenance, lifecycle and integrity checks come before ranking. Conflicting eligible records preserve uncertainty; similarity alone cannot turn an ineligible record into context.
-5. **Project a bounded context.** Relevant records are selected within a hard token budget. Conversation owns final context assembly, so a longer personal history does not require sending the entire history to the model.
+5. **Project a bounded context.** Relevant records are selected within a hard token budget. The textual Conversation runtime assembles context; Realtime requests bounded Memory through its server-owned `memory_search` tool when needed. Memory retrieval is not a mandatory HTTP round trip for every audio turn.
 
 ### Spend reasoning where it helps
 
@@ -95,14 +95,14 @@ See the [architecture overview](./.agents/context/architecture/overview.md), [me
 
 ## Current status
 
-This snapshot covers source integrated through [SPEC-051](./.agents/specs/051-langgraph-memory-orchestration.spec.md). Implementation and validation are tracked separately.
+This snapshot covers source integrated into staging through [SPEC-052](https://github.com/NeonGate-AI/amarelo/blob/staging/.agents/specs/052-realtime-pwa-memory-bridge.spec.md). Implementation and validation are tracked separately.
 
 | Area | What is in this repository |
 | --- | --- |
 | **Product surfaces** | Public landing page, onboarding, an installable PWA and a memory console. The default voice interface and console use synthetic data. |
-| **Conversation** | Development text with Ana, local single-owner and WorkOS identity modes, plus an opt-in Realtime WebRTC experiment. These are bounded development paths. |
+| **Conversation** | Development text with Ana, local single-owner and WorkOS identity modes, plus an opt-in direct Realtime WebRTC voice path with server-side Memory ingestion and recall. These are bounded development paths. |
 | **Memory** | Neo4j integration, LangGraph/BullMQ curation, shadow comparisons, an internal canary and economics reporting are integrated in source. The local MVP explicitly enables ingestion/curation; shadow and canary remain off by default. |
-| **Next proof point** | Validate the integrated text-and-memory path, then complete the voice lifecycle and the guardrails needed before external exposure. |
+| **Next proof point** | Exercise the configured voice-to-Memory journey, measure total voice cost and quality, and complete guardrails before external exposure. |
 
 The latest Memory delivery prioritized source integration and explicitly deferred validation. It is not evidence of a working deployment, measured ROI or production readiness. [SPEC-049](./.agents/specs/049-integrated-memory-validation-debt.spec.md) tracks that validation debt; the [spec catalog](./.agents/specs/readme.md) records the delivery sequence.
 
@@ -120,11 +120,13 @@ pnpm dev
 
 `pnpm dev` starts the four interface applications: landing, console, onboarding and mobile. Open the PWA at `http://localhost:3003` to explore its default synthetic voice interface.
 
-The [local MVP guide](./workspaces/packages/runtime/mvp.md) covers the owner-only environment, `.env.template` configuration and launcher commands with OpenAI, Neo4j and separate Redis services. This path defers WorkOS and keeps credentials server-side. Its complete Realtime-to-Memory bridge is tracked in [SPEC-052](./.agents/specs/052-realtime-pwa-memory-bridge.spec.md); setup instructions are not proof of integrated operation.
+The [local MVP guide](./workspaces/packages/runtime/mvp.md) covers the owner-only environment, `.env.template` configuration and launcher commands with OpenAI, Neo4j and separate Redis services. This path defers WorkOS and keeps credentials server-side. Its Realtime-to-Memory bridge is implemented in [SPEC-052](https://github.com/NeonGate-AI/amarelo/blob/staging/.agents/specs/052-realtime-pwa-memory-bridge.spec.md); compilation passed, while setup instructions are not proof of live operation.
 
 The [development text guide](./workspaces/apps/mobile/readme.md#run-the-authenticated-text-slice) also documents the earlier WorkOS flow and `pnpm dev:text`; select the matching server authentication mode explicitly.
 
 For the local infrastructure profiles, use the [runtime guide](./workspaces/packages/runtime/readme.md). The [Elo CLI guide](./cli/readme.md) covers environment setup, diagnostics and repository checks.
+
+Orbz currently supplies the visual component while the PWA owns its direct voice connection. Selectable model properties, reusable Realtime connection adapters and canonical JSON configuration are being prepared as separate Orbz review PRs. Their eventual adoption by Amarelo remains a follow-up integration; no permanent provider key belongs in browser-delivered configuration.
 
 ## Contributing
 
