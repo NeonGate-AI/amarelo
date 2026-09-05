@@ -67,3 +67,10 @@ export {
   MemoryConsentStateSchema,
   UpdateMemoryConsentInputSchema
 } from './consent/memory-consent.contract.js'
+
+export {
+  ExplicitMemoryOptionsSchema,
+  MemoryRecordSchema,
+  createExplicitMemoryResultSchema
+} from './memory'
+export { estimateMemorySearchItemTokens } from './search'

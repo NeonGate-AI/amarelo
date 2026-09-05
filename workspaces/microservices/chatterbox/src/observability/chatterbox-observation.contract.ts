@@ -18,7 +18,7 @@ export const ChatterboxObservationSchema = z
         memoryStatus: z
           .enum(['retrieved', 'skipped', 'unavailable'])
           .optional(),
-        operation: z.enum(['session', 'turn', 'realtime', 'unknown']),
+        operation: z.enum(['session', 'turn', 'realtime', 'memory', 'unknown']),
         outcome: z.enum([
           'success',
           'unauthenticated',

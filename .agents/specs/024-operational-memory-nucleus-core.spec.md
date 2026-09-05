@@ -78,6 +78,7 @@ Establish the versioned operational usage-event, pricing metadata and redacted l
 - Neo4j is the canonical Memory source; full-text/vector indexes and longitudinal projections are derived.
 - AI consumers use `@repo/memory-sdk`; browser code cannot connect to Memory internals.
 - Chatterbox's composition root may bind the public `@nucleus/memory` API to a scoped SDK adapter; AI consumers still import only `@repo/memory-sdk`. This phase does not create a separate Memory HTTP microservice.
+- The trusted Chatterbox composition maps external WorkOS tenant/person identifiers to deterministic tenant-scoped UUIDv8 identities using `amarelo-memory-identity-v1` and SHA-256. Actor and subject use the same person namespace; changing that mapping requires a data migration. Hash-derived identifiers are not an authorization grant or an anonymity claim.
 - Reuse SPEC-047 authentication and correlation rather than creating a second session authority. Resolve subject, actor, tenant and purpose server-side and revalidate the specific Memory consent/authorization decision at the protected boundary.
 - The initial source adapter persists only eligible text attributable to the authenticated subject's own submitted speech evidence. A generic `person` role alone does not prove patient attribution. Record actor, subject, source kind, stable source-turn identity/version and provenance from the trusted request boundary; client-supplied history is not authoritative evidence.
 - Filter the evidence artifact before its atomic evidence/outbox write, not only before extraction. Ana's utterances, pause labels and inactivity never enter the initial personal-memory evidence artifact. Reject mismatched or unresolved attribution before protected persistence. Preserve broader contribution/provenance contracts without enabling support-network ingestion in this slice.
@@ -154,6 +155,8 @@ Invalid configuration or graph readiness prevents protected service readiness. A
 BullMQ dispatch/workers, shadow serving, A/B flags, vector quality activation, browser-direct Memory access, production SSO, billing, multi-region replication and a claim of complete physical erasure.
 
 ## Evidence and Promotion
+
+Initial behavioral red: [CI 33956277041](https://github.com/NeonGate-AI/amarelo/actions/runs/33956277041), head `0baca4e14d91bf0c0f46ef5962b21e3b618d986c`, starts the real Neo4j container and driver, then fails at the missing public SDK operation. Audits, lint, typechecks and existing tests pass before that failure. [PR #86](https://github.com/NeonGate-AI/amarelo/pull/86) owns delivery; no completion or merge is claimed by this red checkpoint.
 
 Evidence will include Neo4j/SDK round-trip tests, atomic outbox tests, promotion-time authorization tests, isolation/no-resurrection fixtures, redaction assertions, zero-LLM retrieval, exact-head CI and both reviews. Proven semantics are promoted to the Memory context and rules.
 

@@ -25,6 +25,7 @@ export function memoryUsageFixture() {
       measurementVersion: null
     },
     providerUsage: null,
+    calls: { llm: null, web: null, fullText: null, vector: null },
     estimatedUsage: null
   }
 }
@@ -46,5 +47,76 @@ export function memoryProviderUsageFixture() {
     cachedInputTokens: 40,
     cachedInputTextTokens: 30,
     cachedInputAudioTokens: 10
+  }
+}
+
+export function memoryUsageLedgerFixture() {
+  return {
+    schemaVersion: 'memory-usage-ledger-v1',
+    ledgerEntryId: 'ledger-1',
+    usageEvent: memoryUsageFixture(),
+    pricingSnapshot: null,
+    brlConversionSnapshot: null,
+    cost: {
+      sourceAmount: null,
+      sourceCurrency: null,
+      brlAmount: null,
+      evidence: 'unknown',
+      calculationVersion: null
+    }
+  }
+}
+
+export function memoryPricingFixture() {
+  return {
+    schemaVersion: 'memory-pricing-v1',
+    pricingVersion: 'synthetic-pricing-v1',
+    providerId: 'synthetic-provider',
+    modelId: 'synthetic-model',
+    modelVersion: 'model-v1',
+    currency: 'USD',
+    effectiveAt: '2026-09-01T00:00:00.000Z',
+    provenance: 'synthetic',
+    sourceReference: 'synthetic-rates-v1',
+    unit: 'currency-per-million-tokens',
+    rates: {
+      inputText: 2,
+      cachedInputText: 1,
+      inputAudio: 4,
+      cachedInputAudio: 2,
+      outputText: 6,
+      outputAudio: 8
+    }
+  }
+}
+
+export function memoryBrlConversionFixture() {
+  return {
+    schemaVersion: 'memory-brl-conversion-v1',
+    rateVersion: 'synthetic-fx-v1',
+    sourceCurrency: 'USD',
+    targetCurrency: 'BRL',
+    brlPerSourceCurrencyUnit: 5,
+    effectiveAt: '2026-09-01T00:00:00.000Z',
+    provenance: 'synthetic',
+    sourceReference: 'synthetic-fx-fixture'
+  }
+}
+
+export function pricedMemoryUsageLedgerFixture() {
+  return {
+    ...memoryUsageLedgerFixture(),
+    usageEvent: {
+      ...memoryUsageFixture(),
+      providerUsage: memoryProviderUsageFixture()
+    },
+    pricingSnapshot: memoryPricingFixture(),
+    cost: {
+      sourceAmount: 0.00032,
+      sourceCurrency: 'USD',
+      brlAmount: null,
+      evidence: 'calculated',
+      calculationVersion: 'synthetic-calculation-v1'
+    }
   }
 }

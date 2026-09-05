@@ -25,6 +25,25 @@ describe('operational Memory economics', () => {
     expect(result.netMemorySaving).toBeCloseTo(0.6)
   })
 
+  it('keeps an uneconomic run positive and zero-processing ROI unknown', () => {
+    const input = {
+      inputCostPerMillionTokens: 2,
+      memoryProcessingCost: 0.2,
+      servingBaselineInputTokens: 0,
+      servingWithMemoryInputTokens: 100_000,
+      totalContextTokens: 1,
+      usefulContextTokens: 1
+    }
+    expect(calculateMemoryEconomics(input).netMemoryCost).toBeCloseTo(0.4)
+    const zero = calculateMemoryEconomics({
+      ...input,
+      memoryProcessingCost: 0,
+      servingWithMemoryInputTokens: 0
+    })
+    expect(zero.netMemoryCost).toBe(0)
+    expect(zero.memoryRoi).toBeNull()
+  })
+
   it('accepts content-free usage and rejects extra transcript fields', () => {
     expect(MemoryUsageEventSchema.parse(memoryUsageFixture())).toEqual(
       memoryUsageFixture()

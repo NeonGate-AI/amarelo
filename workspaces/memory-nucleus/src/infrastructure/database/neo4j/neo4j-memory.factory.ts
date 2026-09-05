@@ -1,5 +1,12 @@
 import type { OperationalMemoryRuntime } from '@application/contracts'
+import { OperationalMemoryClient } from '@application/clients'
+import { Neo4jOperationalMemoryUnitOfWork } from '@infrastructure/adapters/persistence/neo4j'
 import neo4j from 'neo4j-driver'
+import {
+  initializeNeo4jMemorySchema,
+  isNeo4jMemorySchemaReady,
+  NEO4J_MEMORY_SCHEMA_VERSION
+} from './neo4j-memory.schema'
 
 export interface Neo4jMemoryOptions {
   readonly uri: string
@@ -9,30 +16,58 @@ export interface Neo4jMemoryOptions {
   readonly now?: () => Date
 }
 
-/** Connection seam for the first public SDK behavioral red test. */
+/** Server composition root for the request-bound SDK and canonical graph. */
 export async function createNeo4jMemoryRuntime(
   options: Neo4jMemoryOptions
 ): Promise<OperationalMemoryRuntime> {
+  if (
+    !options.uri ||
+    !options.username ||
+    !options.password ||
+    !options.database ||
+    options.database.trim() !== options.database
+  )
+    throw new Error('Neo4j Memory configuration is incomplete')
   const driver = neo4j.driver(
     options.uri,
     neo4j.auth.basic(options.username, options.password),
-    { connectionTimeout: 5_000, maxTransactionRetryTime: 0 }
+    {
+      connectionTimeout: 5_000,
+      maxTransactionRetryTime: 0,
+      disableLosslessIntegers: true
+    }
   )
   try {
     await driver.verifyConnectivity({ database: options.database })
+    await initializeNeo4jMemorySchema(driver, options.database)
   } catch (error) {
     await driver.close()
     throw error
   }
+  const now = options.now ?? (() => new Date())
+  const unitOfWork = new Neo4jOperationalMemoryUnitOfWork(
+    driver,
+    options.database,
+    now
+  )
   return {
     close: () => driver.close(),
-    forRequest: () => {
-      throw new Error('Operational Memory SDK behavior is not implemented')
-    },
-    readiness: async () => ({
-      database: 'available',
-      schemaVersion: null,
-      status: 'not-ready'
-    })
+    forRequest: (scope) => new OperationalMemoryClient(scope, unitOfWork, now),
+    readiness: async () => {
+      try {
+        const ready = await isNeo4jMemorySchemaReady(driver, options.database)
+        return {
+          database: 'available',
+          schemaVersion: ready ? NEO4J_MEMORY_SCHEMA_VERSION : null,
+          status: ready ? 'ready' : 'not-ready'
+        }
+      } catch {
+        return {
+          database: 'unavailable',
+          schemaVersion: null,
+          status: 'not-ready'
+        }
+      }
+    }
   }
 }

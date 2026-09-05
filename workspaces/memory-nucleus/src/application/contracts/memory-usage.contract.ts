@@ -133,6 +133,14 @@ export const MemoryUsageEventSchema = z
       ])
       .nullable(),
     durations: MemoryUsageDurationsSchema,
+    calls: z
+      .strictObject({
+        llm: NullableCounterSchema,
+        web: NullableCounterSchema,
+        fullText: NullableCounterSchema,
+        vector: NullableCounterSchema
+      })
+      .readonly(),
     providerUsage: MemoryProviderUsageSchema.nullable(),
     estimatedUsage: MemoryEstimatedUsageSchema.nullable()
   })

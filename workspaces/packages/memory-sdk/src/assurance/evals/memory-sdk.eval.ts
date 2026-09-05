@@ -2,6 +2,7 @@ import assert from 'node:assert/strict'
 
 import {
   MAX_MEMORY_SEARCH_TOKENS,
+  MemoryDeletionReceiptSchema,
   MemorySearchInputSchema,
   createMemorySearchContextProjection,
   estimateMemorySearchContextTokens,
@@ -52,4 +53,24 @@ const projection = createMemorySearchContextProjection({
 assert.equal(estimateMemorySearchContextTokens(projection) > 0, true)
 assert.equal(projection.trust, 'untrusted-memory-data')
 assert.equal(projection.memory.kind, 'semantic')
+// A stop-serving acknowledgement must not invent a physical-purge deadline.
+const suppressionReceipt = {
+  memoryId: record.id,
+  receiptId: 'suppression-fixture-001',
+  requestedAt: observedAt,
+  tombstonedAt: observedAt,
+  purgeBy: null,
+  purgeStatus: 'suppression-only'
+}
+assert.equal(
+  MemoryDeletionReceiptSchema.safeParse(suppressionReceipt).success,
+  true
+)
+assert.equal(
+  MemoryDeletionReceiptSchema.safeParse({
+    ...suppressionReceipt,
+    purgeBy: '2026-10-01T00:00:00.000Z'
+  }).success,
+  false
+)
 console.log('memory-sdk eval PASS')
