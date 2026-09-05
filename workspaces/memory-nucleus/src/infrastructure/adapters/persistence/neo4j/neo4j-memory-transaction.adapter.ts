@@ -23,6 +23,7 @@ import type {
 } from '@application/contracts'
 import {
   CanonicalMemoryPort,
+  type MemoryRetrievalObserver,
   type AcceptCandidateInput,
   type AcceptCandidateResult,
   type TombstoneMemoryInput,
@@ -75,7 +76,8 @@ export class Neo4jOperationalMemoryTransaction
     private readonly scope: MemoryRequestScope,
     private readonly operation: OperationalMemoryOperation,
     private consentVersion: number,
-    private readonly now: () => Date
+    private readonly now: () => Date,
+    private readonly retrievalObserver?: MemoryRetrievalObserver
   ) {
     super()
     this.scopeKey = neo4jMemoryScopeKey(scope)
@@ -702,7 +704,7 @@ export class Neo4jOperationalMemoryTransaction
       consentVersion: this.consentVersion,
       dependencies: {
         now: this.now,
-        observer: { record: () => undefined },
+        observer: this.retrievalObserver ?? { record: () => undefined },
         repository: new Neo4jScopedMemoryRepository(
           this.transaction,
           this.scope,

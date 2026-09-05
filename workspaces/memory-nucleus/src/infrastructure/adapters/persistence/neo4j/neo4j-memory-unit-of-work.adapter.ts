@@ -3,6 +3,7 @@ import { z } from 'zod'
 import type { MemoryRequestScope } from '@application/contracts'
 import {
   OperationalMemoryUnitOfWork,
+  type MemoryRetrievalObserver,
   type OperationalMemoryOperation,
   type OperationalMemoryTransaction
 } from '@application/ports'
@@ -19,7 +20,8 @@ export class Neo4jOperationalMemoryUnitOfWork extends OperationalMemoryUnitOfWor
     private readonly now: () => Date,
     private readonly assertSchemaReady: (
       transaction: ManagedTransaction
-    ) => Promise<void>
+    ) => Promise<void>,
+    private readonly retrievalObserver?: MemoryRetrievalObserver
   ) {
     super()
   }
@@ -64,7 +66,8 @@ export class Neo4jOperationalMemoryUnitOfWork extends OperationalMemoryUnitOfWor
             boundScope,
             operation,
             version,
-            this.now
+            this.now,
+            this.retrievalObserver
           )
           await unit.assertAuthority()
           const result = await work(unit)

@@ -5,7 +5,7 @@ import {
   type OperationalMemoryRuntime,
   type MemoryUsageProfile
 } from '@application/contracts'
-import type { MemoryUsageObservationSink } from '@application/ports'
+import type { MemoryRetrievalObserver, MemoryUsageObservationSink } from '@application/ports'
 import {
   OperationalMemoryCandidateDeliveryClient,
   OperationalMemoryClient,
@@ -33,6 +33,8 @@ export interface Neo4jMemoryOptions {
   readonly now?: () => Date
   readonly onObservation?: MemoryUsageObservationSink
   readonly usageProfile?: MemoryUsageProfile
+  /** Content-free, bounded retrieval trace sink; omitted in the normal runtime. */
+  readonly retrievalObserver?: MemoryRetrievalObserver
 }
 
 /** Server composition root for the request-bound SDK and canonical graph. */
@@ -66,6 +68,8 @@ export async function createNeo4jMemoryRuntime(
   const onObservation = options.onObservation
   if (onObservation !== undefined && typeof onObservation !== 'function')
     throw new Error('Memory usage observation configuration is invalid')
+  if (options.retrievalObserver !== undefined && typeof options.retrievalObserver?.record !== 'function')
+    throw new Error('Memory retrieval observation configuration is invalid')
   // One limiter belongs to the runtime, including every request-bound client.
   const usageObserver = new MemoryUsageObservationService({
     onObservation: onObservation ?? (() => undefined)
@@ -99,7 +103,8 @@ export async function createNeo4jMemoryRuntime(
     driver,
     options.database,
     now,
-    assertSchemaReady
+    assertSchemaReady,
+    options.retrievalObserver
   )
   return {
     close: () => driver.close(),

@@ -11,8 +11,12 @@ import type {
   RetrievedMemoryData
 } from '@application/contracts'
 import { MemoryRepositoryScopeError } from '@application/contracts'
+import { excludeUnresolvedMemoryConflicts } from '@application/integrity'
 import {
   compareRankedMemoryRecords,
+  hasExactSemanticKeyMatch,
+  isMemoryRecordEligibleForRanking,
+  lexicalMemoryOverlapScore,
   lexicalMemoryTokens,
   normalizedSemanticMemoryKeySet,
   rankEligibleMemoryRecord,
@@ -135,7 +139,13 @@ export async function retrieveAuthorizedMemory(
     throw new RangeError('monotonic clock returned an invalid start value')
   }
 
-  const rankedWithPossibleDuplicates = repositoryRecords
+  // Scope, provenance, lifecycle and time eligibility precede any conflict decision.
+  // Nonmatching candidates cannot suppress a query-relevant eligible fact.
+  const eligibleMatches = repositoryRecords.filter((record) =>
+    isMemoryRecordEligibleForRanking(record, authorizedQuery, fromInclusiveEpoch, toExclusiveEpoch) &&
+    (hasExactSemanticKeyMatch(record, normalizedSemanticKeys) || lexicalMemoryOverlapScore(queryTokens, record) > 0)
+  )
+  const rankedWithPossibleDuplicates = excludeUnresolvedMemoryConflicts(eligibleMatches)
     .map((record) =>
       rankEligibleMemoryRecord(
         record,

@@ -58,7 +58,7 @@ The prefix is a unique catalog rank, not the durable `SPEC-###` identity. Existi
 | 040 | SPEC-040 | implemented | [Project-owned runtime application containers](040-project-owned-container-images.spec.md) |
 | 041 | SPEC-041 | implemented | [Direct cleanup of node_modules](041-cleanup-removes-node-modules.spec.md) |
 | 042 | SPEC-042 | implemented | [Layered test platform foundation](042-layered-test-platform-foundation.spec.md) |
-| 043 | SPEC-043 | ready | [Memory integrity and poisoning assurance](043-memory-integrity-and-poisoning-assurance.spec.md) |
+| 043 | SPEC-043 | implemented | [Memory integrity and poisoning assurance](043-memory-integrity-and-poisoning-assurance.spec.md) |
 | 044 | SPEC-044 | implemented | [Staging-first repository delivery flow](044-staging-delivery-flow.spec.md) |
 | 045 | SPEC-045 | implemented | [Memory infrastructure runtime topology](045-memory-infrastructure-runtime.spec.md) |
 | 046 | SPEC-046 | implemented | [Saneamento canônico](046-saneamento-canonico.spec.md) |
