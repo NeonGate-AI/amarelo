@@ -15,3 +15,5 @@ prefer `app.inject()`. Testcontainers belongs to concrete external-adapter
 integration suites and uses distinct containers for Redis Queue and Redis
 Cache. Cypress remains the only browser/interface runner and is limited to the
 runtime availability smoke plus explicitly approved critical journeys.
+
+SPEC-050 adds `mvp:init`, `mvp:infra` and `dev:mvp` for the owner-only voice slice. This launcher uses its own `amarelo-mvp` Redis namespace, hosted Neo4j configuration and loopback host processes; the original runtime profiles retain `amarelo-runtime`. See `workspaces/packages/runtime/mvp.md`.

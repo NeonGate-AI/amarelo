@@ -67,7 +67,7 @@ The prefix is a unique catalog rank, not the durable `SPEC-###` identity. Existi
 | 049 | SPEC-049 | draft | [Integrated Memory validation debt](049-integrated-memory-validation-debt.spec.md) |
 | 050 | SPEC-050 | implemented | [Local MVP environment](050-local-mvp-environment.spec.md) |
 | 051 | SPEC-051 | implemented | [LangGraph Memory orchestration](051-langgraph-memory-orchestration.spec.md) |
-| 052 | SPEC-052 | in-progress | [Realtime PWA Memory bridge](052-realtime-pwa-memory-bridge.spec.md) |
+| 052 | SPEC-052 | implemented | [Realtime PWA Memory bridge](052-realtime-pwa-memory-bridge.spec.md) |
 
 The next unallocated durable delivery ID is `SPEC-053`.
 
@@ -115,3 +115,5 @@ The background/shadow/canary paths default off and evidence-dependent gates rema
 ## First usable voice MVP — 2026-09-05
 
 The owner selected OpenAI Realtime for spoken answers with LangGraph governing Memory, and explicitly deferred WorkOS. Execute SPEC-050 → SPEC-051 → SPEC-052. These approved local slices separate the settled MVP goal from SPEC-025's still-deferred commercial rules. The background foundation remains SPEC-012 (`025-background-memory-curation-loop.spec.md`). Broad validation remains deferred in SPEC-049.
+
+Local voice delivery: SPEC-050/051/052 implemented in separate staging PRs. OpenAI audio is direct WebRTC; LangGraph/BullMQ/Neo4j work in parallel through the server sideband. WorkOS is deferred for this explicit local owner profile. Compile integration is recorded separately from pending live evidence in SPEC-049. See [the current local voice context](../context/workspaces/memory-nucleus/local-voice-mvp.md).

@@ -14,10 +14,11 @@ import {
   type ChatterboxEnvironment
 } from '../configuration'
 import {
-  createOpenAiRealtimeCall,
   LangChainAnaChatModelAdapter
 } from '../model'
 import { ChatterboxObservabilityAdapter } from '../observability'
+import { OpenAiRealtimeSessionService } from '../realtime'
+import { createMemoryRequestScope } from './request-memory-scope.factory'
 import { createMemoryRuntimeBinding } from './memory-runtime-binding.factory'
 import { createMemoryBackgroundBinding } from './memory-background-binding.factory'
 import { createMemoryShadowBinding } from './memory-shadow-binding.factory'
@@ -29,6 +30,20 @@ export function createProviderChatterbox(
 ): FastifyInstance {
   const memory = createMemoryRuntimeBinding(configuration)
   const background = createMemoryBackgroundBinding(configuration)
+  const realtime = configuration.OPENAI_API_KEY === undefined ? undefined : new OpenAiRealtimeSessionService({
+    apiKey: configuration.OPENAI_API_KEY, model: configuration.OPENAI_REALTIME_MODEL,
+    voice: configuration.OPENAI_REALTIME_VOICE, transcriptionModel: configuration.OPENAI_TRANSCRIPTION_MODEL,
+    timeoutMs: configuration.CHATTERBOX_MODEL_TIMEOUT_MS, maxSessions: Math.min(configuration.CHATTERBOX_MAX_CONCURRENT_TURNS, 4),
+    ...(configuration.CHATTERBOX_REALTIME_MEMORY_ENABLED ? { memory: {
+      createMemoryClient: (context) => {
+        if (memory.options.createMemoryClient === undefined) throw new Error('Memory unavailable')
+        return memory.options.createMemoryClient(context)
+      },
+      createScope: createMemoryRequestScope,
+      usageLedgerForRequest: memory.usageLedgerForRequest,
+      ingest: async (input) => background.options.ingestPatientTurn?.(input) ?? 'unconfirmed'
+    } } : {})
+  })
   function compose(options: ChatterboxFactoryOptions): FastifyInstance {
     const app = createChatterbox({
       ...options,
@@ -37,12 +52,16 @@ export function createProviderChatterbox(
     })
     app.addHook('onReady', memory.start)
     app.addHook('onReady', background.start)
+    app.addHook('onClose', async () => { await realtime?.close() })
     app.addHook('onClose', background.close)
     app.addHook('onClose', memory.close)
     return app
   }
   const options: ChatterboxFactoryOptions = {
     allowedOrigins: configuration.CHATTERBOX_ALLOWED_ORIGINS,
+    createRealtimeSession: realtime === undefined ? undefined : (context, sdp) => realtime.start(context, sdp),
+    stopRealtimeSession: realtime === undefined ? undefined : (context) => realtime.stop(context),
+    realtimeSessionStatus: realtime === undefined ? undefined : (context) => realtime.status(context),
     authenticate:
       configuration.CHATTERBOX_AUTH_MODE === 'local'
         ? createLocalSessionAuthenticator({
@@ -110,12 +129,6 @@ export function createProviderChatterbox(
 
   return compose({
     ...options,
-    createRealtimeCall: (sdp) =>
-      createOpenAiRealtimeCall({
-        apiKey: configuration.OPENAI_API_KEY,
-        sdp,
-        timeoutMs: configuration.CHATTERBOX_MODEL_TIMEOUT_MS
-      }),
     createRuntime
   })
 }

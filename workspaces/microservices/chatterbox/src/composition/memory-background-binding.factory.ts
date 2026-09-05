@@ -70,7 +70,7 @@ export function createMemoryBackgroundBinding(
     if (
       configuration.CHATTERBOX_MEMORY_BACKGROUND_PROFILE !== 'internal' ||
       !internalSubjects.has(scope.subjectId) ||
-      !eligiblePatientStatement(message)
+      (scope.sourceKind !== 'realtime-transcript' && !eligiblePatientStatement(message))
     ) {
       observe('skipped', context.requestId)
       return 'skipped'

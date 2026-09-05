@@ -409,7 +409,7 @@ export class Neo4jOperationalMemoryTransaction
          AND e.evidenceId = c.evidenceId AND e.contentHash = c.contentHash
          AND e.tenantId = $tenantId AND e.subjectId = $subjectId AND e.actorId = $actorId
          AND e.purpose = $purpose AND e.eligible = true AND e.sourceType = 'explicit-user'
-         AND e.sourceKind IN ['development-text', 'synthetic-transcript']
+         AND e.sourceKind IN ['development-text', 'synthetic-transcript', 'realtime-transcript']
          AND e.observedAt = coalesce(c.observedAt, c.requestedAt)
          AND datetime(e.observedAt) <= datetime(c.requestedAt)
          AND datetime(c.requestedAt) <= datetime($now)
