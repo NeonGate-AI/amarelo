@@ -2,7 +2,7 @@
 id: SPEC-017
 title: Activate Memory serving through controlled A B and canary gates
 type: experiment
-status: ready
+status: implemented
 mode: prospective
 created: 2026-09-03
 updated: 2026-09-05
@@ -162,3 +162,10 @@ Evidence will include exact context-plan diffs, additive-treatment rejection, as
 SPEC-025 reconciliation (2026-09-05): the owner accepted the consolidated discovery and requested this contract revision. The discovery hold is resolved; this phase remains ready and unimplemented. [SPEC-025](007-plans-and-entitlements.spec.md) makes monthly affordability the lead investor metric while preserving the fixed-model comparison needed for an architecture-specific claim. This contract still covers textual/internal Memory validation, not implementation or validation of the voice bridge. This revision changes contracts only.
 
 Blocked by SPEC-011 shadow go/no-go and SPEC-043 Memory integrity/poisoning assurance. External exposure additionally requires SPEC-033. It blocks SPEC-018 scale gates. Numeric advancement gates are versioned experiment inputs; improving context reduction beyond the 50–70% target is not a failure when quality and safety gates still pass.
+
+
+## Delivery decision — 2026-09-05
+
+Implemented and integrated under the owner's delivery-first instruction. No new validation was executed for this phase; unchecked acceptance evidence is explicitly deferred to SPEC-049. Implementation status does not certify a passed parity, integrity, canary or economics gate. Internal flags default off; missing evidence keeps control/hold.
+
+Canary exposure accounting is process-local in this delivery. Use a single process for any future internal canary until distributed and restart-persistent admission is implemented and verified. External exposure remains blocked on SPEC-033.

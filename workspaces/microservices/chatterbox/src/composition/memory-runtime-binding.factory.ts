@@ -5,7 +5,9 @@ import {
 
 import type { ChatterboxFactoryOptions } from '../app'
 import type { ChatterboxEnvironment } from '../configuration'
+import type { AuthenticatedConversationContext } from '../session'
 import { createRequestMemoryClient } from './request-memory.factory'
+import { createMemoryRequestScope } from './request-memory-scope.factory'
 
 /** Process lifecycle owns the database; every client still binds a fresh trusted request. */
 export function createMemoryRuntimeBinding(
@@ -17,10 +19,15 @@ export function createMemoryRuntimeBinding(
   >
   readonly start: () => Promise<void>
   readonly close: () => Promise<void>
+  readonly usageLedgerForRequest: (
+    context: AuthenticatedConversationContext
+  ) => ReturnType<OperationalMemoryRuntime['usageLedgerForRequest']> | null
 } {
   let runtime: OperationalMemoryRuntime | undefined
   const enabled = configuration.CHATTERBOX_MEMORY_ENABLED
   return {
+    usageLedgerForRequest: (context) =>
+      runtime?.usageLedgerForRequest(createMemoryRequestScope(context)) ?? null,
     options: enabled
       ? {
           createMemoryClient: (context) => {

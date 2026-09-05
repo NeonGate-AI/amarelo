@@ -253,3 +253,5 @@ export type { MemoryBackgroundWorkerOptions, MemoryBackgroundWorkerRuntime } fro
 
 export { MemoryIntegrityReportSchema, serializeMemoryIntegrityReport, evaluateMemoryIntegrityGate } from './application/integrity'
 export type { MemoryIntegrityReport, MemoryIntegrityGate } from './application/integrity'
+
+export { createUnknownCostMemoryUsageLedgerEntry } from './application/services'
