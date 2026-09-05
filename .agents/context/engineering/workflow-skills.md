@@ -24,6 +24,10 @@ Their normative entry points are `.agents/skills/<name>/SKILL.md` at the checked
 
 Commit `a50757b5c1bba3455a6098a26d06c01028cf9b46` imported a larger Matt Pocock catalog. SPEC-029 retained the seven procedures above and removed the rest of that import lineage. SPEC-046 subsequently curated all lineages by current use: the seven procedures plus `accessibility`, `frontend-ui-engineering` and `pwa-development` form the maintained ten-skill set. The exact removals and replacements are recorded in `.agents/skills/readme.md`; prior provenance does not require an unused skill to remain installed.
 
+## Discovery before delivery
+
+When the owner requests a grill-me session, load `.agents/skills/grill-me/SKILL.md` and its local `.agents/skills/grilling/SKILL.md` engine. SPEC-048 adds this minimal pair to the existing ten skills. Discovery uses decision-frontier rounds; unresolved decisions stay open, and downstream implementation waits for explicit shared-understanding confirmation and contract reconciliation.
+
 ## Reference contract
 
 Active specs, rules, context, templates and `AGENTS.md` point to local skill paths when the procedure is vendored. Remote skill URLs may document attribution or immutable historical evidence, but they do not tell an agent which current procedure to execute.

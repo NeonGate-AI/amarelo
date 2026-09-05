@@ -155,4 +155,6 @@ This harness change promotes the durable decision-level assurance requirements i
 
 ## Further Notes
 
+Owner execution hold (2026-09-05): do not start implementation until the SPEC-025 grill-me session reaches explicitly confirmed shared understanding and any affected contracts are reconciled. The technical dependency order below remains valid; this hold overrides immediate execution of a ready contract.
+
 Blocked by SPEC-011's paired shadow/parity evidence over the SPEC-016/SPEC-012 path. This assurance phase is a required gate before user-visible canary advancement. It strengthens the existing roadmap rather than replacing authorization, lifecycle, shadow, A/B or economics phases.

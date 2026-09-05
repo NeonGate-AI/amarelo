@@ -75,6 +75,8 @@ Load `AGENTS.md`, every applicable `alwaysApply` rule, scoped context, current p
 
 Completion: every affected public boundary and durable constraint is identified.
 
+For an owner-requested grill-me interview, use [grill-me](../skills/grill-me/SKILL.md) and its required [grilling](../skills/grilling/SKILL.md) engine before synthesis. Follow decision-frontier rounds and obtain explicit shared-understanding confirmation before implementing the resulting decisions.
+
 ### 2. Synthesize
 
 Use [`to-spec`](../skills/to-spec/SKILL.md) and `template.md` to create or revise the next durable spec. Prefer the highest observable test seam and record unresolved questions only when they materially block execution.

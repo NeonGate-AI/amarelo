@@ -23,6 +23,13 @@ The end-to-end lifecycle is owned by `.agents/specs/workflow.md`. These seven lo
 
 They are the only retained workflow skills from the Matt Pocock import lineage. They are adapted to Amarelo and do not depend on its deleted router, setup, triage or session-management skills.
 
+## Owner-requested discovery
+
+- [grill-me](grill-me/SKILL.md): explicit entry point for an owner-requested plan/decision interview.
+- [grilling](grilling/SKILL.md): required interview engine; ask the current decision frontier in rounds and wait for explicit shared-understanding confirmation before execution.
+
+SPEC-048 restores this minimal pair for SPEC-025 discovery. The other ten maintained skills are unchanged. The upstream source paths and content identifiers are in `skills-lock.json`; the grill-me entry point has one portability adjustment to resolve the repository-local engine without assuming a particular Skill tool.
+
 ## Project and domain skills
 
 The current product surfaces justify three maintained domain procedures:

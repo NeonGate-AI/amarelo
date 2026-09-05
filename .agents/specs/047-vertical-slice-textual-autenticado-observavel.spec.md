@@ -126,6 +126,10 @@ Promote trusted request context and observation ownership to Chatterbox/Conversa
 - Independent review identified and repaired cancellation classification, dev-command environment filtering, authenticated setup instructions and production telemetry backpressure. Final fixed-head review results are recorded in the delivery handoff.
 - Trusted context, WorkOS renewal limitations, process-local limits, setup and telemetry ownership are promoted to the linked contexts and Mobile README. No real WorkOS login, paid provider, full-browser journey, cluster deployment or remote CI was performed. SPEC-016 remains the unimplemented concrete Memory bridge.
 
+### Owner-reported staging completion — 2026-09-05
+
+The owner reports that SPEC-047 is completed in `staging`. This records accepted integration state under [SPEC-048](048-grill-me-discovery-alignment.spec.md) while preserving the local execution evidence and its limits above. No remote repository inspection, merge SHA, CI run or deployment verification was supplied or performed for this update; staging completion is owner-reported, not independently verified here.
+
 ## Further Notes
 
 Depends on SPEC-046. SPEC-016 follows this slice and owns the concrete request-bound Neo4j Memory bridge. SPEC-033 remains required before external user exposure and SPEC-034 before expanded voice/lifecycle behavior.

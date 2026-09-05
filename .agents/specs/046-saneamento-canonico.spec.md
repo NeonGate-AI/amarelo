@@ -118,7 +118,11 @@ Promote maintained routing to context and skill inventory, canonical identity in
 - `bash .audit/runtime.audit.sh --commands-only`: PASS for profile membership, safe commands, isolated queue/cache credentials and state-preserving switches. Kustomize rendering is explicitly skipped, not simulated as a pass.
 - `corepack pnpm -r run typecheck`, `corepack pnpm -r run test`, `corepack pnpm -r --workspace-concurrency=1 run build` and `corepack pnpm exec biome check .`: PASS locally. Node 24 and the repository-pinned pnpm 10.32.1 were used; installation disabled lifecycle scripts.
 - Independent review found SDK cancellation, Turbo environment forwarding and setup drift in the companion slice; those findings were corrected and covered by regression checks. Final fixed-head Standards and Spec-fidelity results belong to the delivery handoff.
-- No kubectl/Docker cluster, Cypress browser journey, live WorkOS/provider call or remote CI was executed. The owner-authorized local exception is not production promotion or completion of SPEC-044's external settings gate.
+- No kubectl/Docker cluster, Cypress browser journey, live WorkOS/provider call or remote CI was executed. At the original ZIP handoff, the owner-authorized local exception did not claim production promotion or completion of SPEC-044's external settings gate.
+
+### Owner-reported staging completion — 2026-09-05
+
+The owner reports that SPEC-046 is completed in `staging`. This records accepted integration state under [SPEC-048](048-grill-me-discovery-alignment.spec.md) while preserving the local execution evidence and its limits above. No remote repository inspection, merge SHA, CI run or deployment verification was supplied or performed for this update; staging completion is owner-reported, not independently verified here.
 
 ## Further Notes
 

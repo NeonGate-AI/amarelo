@@ -138,4 +138,6 @@ Evidence will include outbox, payload-privacy, restart, duplicate, revoke, retry
 
 ## Further Notes
 
+Owner execution hold (2026-09-05): do not start implementation until the SPEC-025 grill-me session reaches explicitly confirmed shared understanding and any affected contracts are reconciled. The technical dependency order below remains valid; this hold overrides immediate execution of a ready contract.
+
 Blocked by SPEC-009 and SPEC-016. It blocks SPEC-011 shadow/parity.

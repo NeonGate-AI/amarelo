@@ -134,4 +134,6 @@ Evidence will include Neo4j/SDK round-trip tests, atomic outbox tests, promotion
 
 ## Further Notes
 
+Owner execution hold (2026-09-05): do not start implementation until the SPEC-025 grill-me session reaches explicitly confirmed shared understanding and any affected contracts are reconciled. The technical dependency order below remains valid; this hold overrides immediate execution of a ready contract.
+
 Blocked by SPEC-047 and the retained SPEC-009 baseline. This phase reuses the current core rather than creating a second Memory implementation, and it blocks SPEC-012 and SPEC-011. SPEC-047 supplies authenticated text transport and observations, not durable Memory consent or the Neo4j adapter; those are proved here.

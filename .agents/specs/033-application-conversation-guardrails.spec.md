@@ -82,6 +82,10 @@ This spec uses **application** to mean the Amarelo host and composition layer. I
 
 ## Implementation Decisions
 
+### Owner-directed deferral — 2026-09-05
+
+The owner defers implementation of SPEC-033 under [SPEC-048](048-grill-me-discovery-alignment.spec.md). It remains `draft`, neither retired nor authorized for execution. Deferral preserves the requirement for these guardrails before external canary participants or the authoritative realtime bridge; it does not grant external-exposure approval. The current discovery and execution gates are owned by SPEC-048 and the spec catalog.
+
 ### Ownership and placement
 
 Reusable semantic contracts and evaluators belong under the existing `workspaces/ai/conversation/src/assurance` concern. They are exported through the Conversation package only when needed by a host composition root.
