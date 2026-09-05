@@ -16,14 +16,22 @@ import {
 } from '../model'
 import { ChatterboxObservabilityAdapter } from '../observability'
 import { createMemoryRuntimeBinding } from './memory-runtime-binding.factory'
+import { createMemoryBackgroundBinding } from './memory-background-binding.factory'
 
 export function createProviderChatterbox(
   configuration: ChatterboxEnvironment
 ): FastifyInstance {
   const memory = createMemoryRuntimeBinding(configuration)
+  const background = createMemoryBackgroundBinding(configuration)
   function compose(options: ChatterboxFactoryOptions): FastifyInstance {
-    const app = createChatterbox({ ...options, ...memory.options })
+    const app = createChatterbox({
+      ...options,
+      ...memory.options,
+      ...background.options
+    })
     app.addHook('onReady', memory.start)
+    app.addHook('onReady', background.start)
+    app.addHook('onClose', background.close)
     app.addHook('onClose', memory.close)
     return app
   }

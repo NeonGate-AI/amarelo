@@ -1,0 +1,46 @@
+# Explicit opt-in: build the image and scale to one for internal workloads.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: memory-worker
+  labels:
+    app.kubernetes.io/name: memory-worker
+    app.kubernetes.io/part-of: amarelo
+spec:
+  replicas: 0
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: memory-worker
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: memory-worker
+    spec:
+      automountServiceAccountToken: false
+      terminationGracePeriodSeconds: 90
+      containers:
+        - name: memory-worker
+          image: amarelo-memory-worker:local
+          imagePullPolicy: IfNotPresent
+          envFrom:
+            - secretRef:
+                name: amarelo-runtime-environment
+          env:
+            - name: MEMORY_BACKGROUND_ENABLED
+              value: 'true'
+            - name: MEMORY_WORKER_CONCURRENCY
+              value: '1'
+          resources:
+            requests:
+              cpu: 50m
+              memory: 128Mi
+            limits:
+              cpu: '1'
+              memory: 512Mi
+          securityContext:
+            runAsNonRoot: true
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+

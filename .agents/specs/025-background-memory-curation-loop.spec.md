@@ -2,7 +2,7 @@
 id: SPEC-012
 title: Build durable background memory curation through deterministic activation
 type: experiment
-status: ready
+status: implemented
 mode: prospective
 created: 2026-09-03
 updated: 2026-09-05
@@ -151,3 +151,7 @@ Evidence will include outbox, payload-privacy, restart, duplicate, revoke, retry
 SPEC-025 reconciliation (2026-09-05): the owner accepted the consolidated discovery and requested this contract revision. The discovery hold is resolved; this phase remains ready and unimplemented. [SPEC-025](007-plans-and-entitlements.spec.md) governs the patient-only source, Free capability distinction and cost-first objective. Preserve the one-worker topology and existing bounded engine instead of adding per-turn curation or orchestration. This revision changes contracts only.
 
 Blocked by SPEC-009 and SPEC-016. It blocks SPEC-011 shadow/parity.
+
+## Delivery decision — 2026-09-05
+
+Implemented under the owner's explicit delivery-first instruction. Completion here records implementation and integration, not passed acceptance evidence. Runtime, queue, provider attempts and deterministic activation now have executable boundaries; existing unchecked verification items remain pending. No paid provider calls, load fixture, broker restart or full validation was run for this delivery. SPEC-049 tracks deferred validation. Unknown costs keep economic/shadow maturity on hold.

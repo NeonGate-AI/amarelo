@@ -243,3 +243,10 @@ export type {
   EligibleMemorySource,
   MemoryCandidateDeliveryClient
 } from './application/contracts'
+
+export { createNeo4jMemoryBackgroundRuntime } from './infrastructure/background'
+export type { Neo4jMemoryBackgroundOptions } from './infrastructure/background'
+export { MemoryBackgroundJobSchema } from './application/background'
+export type { MemoryBackgroundJob, MemoryBackgroundProfile, MemoryBackgroundIngestResult, MemoryBackgroundProcessResult } from './application/background'
+export { startMemoryBackgroundWorker, MEMORY_BACKGROUND_QUEUE } from './infrastructure/queue'
+export type { MemoryBackgroundWorkerOptions, MemoryBackgroundWorkerRuntime } from './infrastructure/queue'

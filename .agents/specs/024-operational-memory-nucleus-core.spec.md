@@ -2,7 +2,7 @@
 id: SPEC-016
 title: Harden the Memory Nucleus as an operational core service
 type: feature
-status: in-progress
+status: implemented
 mode: prospective
 created: 2026-09-03
 updated: 2026-09-05
@@ -171,3 +171,6 @@ Evidence will include Neo4j/SDK round-trip tests, atomic outbox tests, promotion
 SPEC-025 reconciliation (2026-09-05): the owner accepted the consolidated discovery and requested this contract revision using the delivered ZIP. The discovery hold is resolved; execution was subsequently authorized and is now in progress. The initial evidence and telemetry contracts above implement the boundaries in [SPEC-025](007-plans-and-entitlements.spec.md). Remaining commercial decisions do not block this internal technical slice. This revision changes contracts only and does not claim a remote merge.
 
 Blocked by SPEC-047 and the retained SPEC-009 baseline. This phase reuses the current core rather than creating a second Memory implementation, and it blocks SPEC-012 and SPEC-011. SPEC-047 supplies authenticated text transport and observations, not durable Memory consent or the Neo4j adapter; those are proved here.
+
+
+Implementation closure: PR #87 completed the operational code and was merged to staging. On 2026-09-05 the owner explicitly deferred further validation and requested integration of the remaining specs. Existing unchecked evidence remains pending under SPEC-049.
