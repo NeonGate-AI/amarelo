@@ -153,4 +153,6 @@ Evidence will include exact context-plan diffs, additive-treatment rejection, as
 
 ## Further Notes
 
+Owner execution hold (2026-09-05): do not start implementation until the SPEC-025 grill-me session reaches explicitly confirmed shared understanding and any affected contracts are reconciled. The technical dependency order below remains valid; this hold overrides immediate execution of a ready contract.
+
 Blocked by SPEC-011 shadow go/no-go and SPEC-043 Memory integrity/poisoning assurance. External exposure additionally requires SPEC-033. It blocks SPEC-018 scale gates. Numeric advancement gates are versioned experiment inputs; improving context reduction beyond the 50–70% target is not a failure when quality and safety gates still pass.

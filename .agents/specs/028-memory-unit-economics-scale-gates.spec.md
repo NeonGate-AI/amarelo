@@ -136,4 +136,6 @@ Evidence will include deterministic economics/reconciliation fixtures, SPEC-043 
 
 ## Further Notes
 
+Owner execution hold (2026-09-05): do not start implementation until the SPEC-025 grill-me session reaches explicitly confirmed shared understanding and any affected contracts are reconciled. The technical dependency order below remains valid; this hold overrides immediate execution of a ready contract.
+
 Blocked by SPEC-017. SPEC-017 itself is blocked by SPEC-043 before canary exposure. This phase decides whether to scale; it does not assume scale is the successful outcome.

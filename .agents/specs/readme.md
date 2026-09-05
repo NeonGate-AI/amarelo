@@ -59,16 +59,21 @@ The prefix is a unique catalog rank, not the durable `SPEC-###` identity. Existi
 | 041 | SPEC-041 | implemented | [Direct cleanup of node_modules](041-cleanup-removes-node-modules.spec.md) |
 | 042 | SPEC-042 | implemented | [Layered test platform foundation](042-layered-test-platform-foundation.spec.md) |
 | 043 | SPEC-043 | ready | [Memory integrity and poisoning assurance](043-memory-integrity-and-poisoning-assurance.spec.md) |
-| 044 | SPEC-044 | in-progress | [Staging-first repository delivery flow](044-staging-delivery-flow.spec.md) |
+| 044 | SPEC-044 | implemented | [Staging-first repository delivery flow](044-staging-delivery-flow.spec.md) |
 | 045 | SPEC-045 | implemented | [Memory infrastructure runtime topology](045-memory-infrastructure-runtime.spec.md) |
 | 046 | SPEC-046 | implemented | [Saneamento canônico](046-saneamento-canonico.spec.md) |
 | 047 | SPEC-047 | implemented | [Vertical slice textual, autenticado e observável](047-vertical-slice-textual-autenticado-observavel.spec.md) |
+| 048 | SPEC-048 | implemented | [Install grill-me and align discovery gates](048-grill-me-discovery-alignment.spec.md) |
 
-The next unallocated durable delivery ID is `SPEC-048`.
+The next unallocated durable delivery ID is `SPEC-049`.
 
 SPEC-046 and SPEC-047 were implemented in the owner-authorized local ZIP branch. Their source/test acceptance does not assert live login, deployed infrastructure, browser E2E or remote CI.
 
+On 2026-09-05 the owner confirmed SPEC-046/047 completed in staging and directed closure of SPEC-044. These are owner-reported acceptance records, not new remote settings or CI verification.
+
 ## Remaining execution order
+
+**Owner execution hold (2026-09-05):** the owner has ended SPEC-025 questioning; the validation workload, Free investor proposal and Memory/telemetry distinction are consolidated in that draft for shared-understanding review. Obtain confirmation of that consolidated understanding and reconcile the affected contracts before starting any of the six specs below. Their current technical dependency order is retained; `ready` does not override this owner hold.
 
 | Order | Durable ID | Delivery boundary | Prerequisite or gate |
 |---:|---|---|---|
@@ -79,7 +84,7 @@ SPEC-046 and SPEC-047 were implemented in the owner-authorized local ZIP branch.
 | 5 | SPEC-017 | Internal canary followed by controlled A/B | SPEC-043; SPEC-033 before external participants |
 | 6 | SPEC-018 | Measured economics report and scale/hold decision | SPEC-017 |
 
-The retained drafts are SPEC-033 (application guardrails, before external exposure), SPEC-034 (lifecycle/realtime semantics, after guardrails and before the voice bridge) and SPEC-025 (commercial entitlements, blocked by explicit owner-open quotas/reset/plan decisions). They remain useful but are not implementation authorization. SPEC-044 remains in-progress because its repository-settings gate cannot be completed in a local ZIP-only delivery.
+The retained drafts are SPEC-033 (owner-deferred application guardrails, still required before external exposure), SPEC-034 (lifecycle/realtime semantics, after guardrails and before the voice bridge) and SPEC-025 (owner answers consolidated; remaining commercial decisions deferred; no entitlement implementation yet). They remain useful but are not implementation authorization. SPEC-044 is closed by explicit owner acceptance; its external enforcement was not independently reinspected here.
 
 No pending contract requests a PostgreSQL Memory implementation. SPEC-016 and SPEC-012 already target Neo4j/BullMQ. Implemented PostgreSQL reference-adapter evidence stays historical; ADR-0009 is superseded. No meaningful pending spec was retired or merged merely to make the list shorter.
 

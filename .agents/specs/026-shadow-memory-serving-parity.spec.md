@@ -128,4 +128,6 @@ Evidence will include no-effect, authorization, budget and adversarial tests; pa
 
 ## Further Notes
 
+Owner execution hold (2026-09-05): do not start implementation until the SPEC-025 grill-me session reaches explicitly confirmed shared understanding and any affected contracts are reconciled. The technical dependency order below remains valid; this hold overrides immediate execution of a ready contract.
+
 Blocked by SPEC-009, SPEC-047, SPEC-016 and SPEC-012. Its no-effect/parity evidence unlocks SPEC-043; both gates remain prerequisites of SPEC-017.

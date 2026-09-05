@@ -2,10 +2,10 @@
 id: SPEC-044
 title: Staging-first repository delivery flow
 type: governance
-status: in-progress
+status: implemented
 mode: prospective
 created: 2026-09-04
-updated: 2026-09-04
+updated: 2026-09-05
 owners:
   - Jonatas Sales
 targets:
@@ -28,7 +28,10 @@ evidence:
   - staging branch created from main commit 7a9c349c4f4e65d43ee2a5d19498a8cf52a12e26
   - GitHub issue #73 owns versioned policy and Actions changes
   - GitHub issue #74 owns repository settings and final enforcement evidence
-  - pending CI and repository-settings evidence
+  - .github/workflows/ci.yml
+  - .github/workflows/main-source-guard.yml
+  - .agents/specs/workflow.md
+  - owner-reported manual closure on 2026-09-05; remote CI and settings not independently verified
 ---
 
 # SPEC-044: Staging-first repository delivery flow
@@ -108,20 +111,22 @@ No product, user, conversation, memory, or sensitive data is used. Verification 
 
 ## Acceptance Criteria
 
-- [x] `staging` exists and was created from the current `main` head without rewriting either branch.
-- [ ] CI validates pushes and pull requests for `staging` and `main`, and no longer names the absent `develop` branch.
-- [ ] Pull requests into `main` fail unless their source branch is exactly `staging`.
-- [ ] Canonical delivery documentation directs ordinary implementation PRs to `staging` and reserves `main` for promotion.
-- [ ] `staging` is configured as the GitHub default branch.
-- [ ] `staging` and `main` reject direct pushes, force pushes, and deletion while allowing gated pull-request merges.
-- [ ] Required repository validation passes on the exact reviewed head.
-- [ ] Durable conclusions are recorded in this spec and `.agents/specs/workflow.md` without duplicating temporary evidence.
+The owner explicitly closed this spec on 2026-09-05 under [SPEC-048](048-grill-me-discovery-alignment.spec.md). Checked external criteria below record owner-manual acceptance, not independently observed remote execution or automated proof. Versioned policy is inspectable locally; remote validation retains the evidence limits recorded below.
+
+- [x] `staging` exists and was created from the current `main` head without rewriting either branch. Historical recorded evidence retained; no new remote inspection.
+- [x] CI validates pushes and pull requests for `staging` and `main`, and no longer names the absent `develop` branch. Versioned configuration inspected locally; live runs accepted by owner closure.
+- [x] Pull requests into `main` fail unless their source branch is exactly `staging`. Versioned fail-closed guard inspected locally; live enforcement accepted by owner closure.
+- [x] Canonical delivery documentation directs ordinary implementation PRs to `staging` and reserves `main` for promotion. Versioned workflow inspected locally.
+- [x] `staging` is configured as the GitHub default branch. Owner-manual acceptance; remote setting not independently verified.
+- [x] `staging` and `main` reject direct pushes, force pushes, and deletion while allowing gated pull-request merges. Owner-manual acceptance; remote protections not independently verified.
+- [x] Required repository validation passes on the exact reviewed head. Owner-manual acceptance; no new remote CI run, reviewed SHA or probe evidence supplied.
+- [x] Durable conclusions are recorded in this spec and `.agents/specs/workflow.md` without duplicating temporary evidence. Local policy and owner acceptance are distinguished here.
 
 ## Failure Behavior
 
 - A pull request into `main` from any source other than `staging` fails closed with an explicit GitHub Actions error.
 - A failing CI or required source-guard check blocks merge when branch protection is active.
-- If the default-branch or protection settings cannot be applied, this spec remains `in-progress`; the repository must not claim that `main` is locked or that the staging-first flow is fully enforced.
+- If later inspection shows that default-branch or protection settings are absent or ineffective, reopen the settings gate; owner closure alone is not technical proof that `main` is protected or that the flow is fully enforced.
 - Rollback restores the previous workflow files and default branch, then removes `staging` only after confirming no unique commits or open pull requests depend on it.
 
 ## Out of Scope
@@ -140,11 +145,13 @@ Stable evidence captured so far:
 - issue #73 owns the versioned vertical slice;
 - issue #74 owns the settings-dependent completion gate.
 
-Pending stable evidence:
+### Owner-manual closure — 2026-09-05
 
-- the pull-request diff for CI filters, the source guard, and canonical workflow language;
-- GitHub Actions runs from the integration and promotion seams;
-- repository metadata or reviewed settings confirming the final default branch and branch protections.
+The owner explicitly requested closure of SPEC-044. Status is now `implemented` by owner acceptance, as recorded by SPEC-048. This local update does not inspect or modify the remote repository.
+
+Locally inspectable versioned evidence consists of `.github/workflows/ci.yml` (integration/promotion filters), `.github/workflows/main-source-guard.yml` (source guard), and `.agents/specs/workflow.md` (canonical branch policy).
+
+GitHub Actions runs, the rejected non-`staging` promotion probe, current default-branch settings and branch protections were not independently verified in this update. No new run URL, merge/review SHA or settings export was supplied or invented. Historical branch and issue references above remain historical evidence, not a fresh remote observation.
 
 The durable branch model is promoted to `.agents/specs/workflow.md`. Temporary probes and logs remain outside the repository and are removed after review.
 
