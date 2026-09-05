@@ -82,6 +82,29 @@ export function assertRepositorySearchResult(
       'repository used vector retrieval while vectorFallback was false'
     )
   }
+  const diagnostics = result.diagnostics
+  if (
+    'fullTextCalls' in diagnostics &&
+    diagnostics.fullTextCalls !== undefined &&
+    (typeof diagnostics.fullTextCalls !== 'number' ||
+      !Number.isSafeInteger(diagnostics.fullTextCalls) ||
+      diagnostics.fullTextCalls < 0)
+  ) {
+    throw new MemoryRepositoryScopeError(
+      'repository returned invalid full-text usage'
+    )
+  }
+  if (
+    'fullTextSearchUsed' in diagnostics &&
+    diagnostics.fullTextSearchUsed !== undefined &&
+    (!('fullTextCalls' in diagnostics) ||
+      typeof diagnostics.fullTextCalls !== 'number' ||
+      diagnostics.fullTextSearchUsed !== diagnostics.fullTextCalls > 0)
+  ) {
+    throw new MemoryRepositoryScopeError(
+      'repository returned inconsistent full-text usage'
+    )
+  }
 }
 
 export function assertRepositoryCandidateLimits(

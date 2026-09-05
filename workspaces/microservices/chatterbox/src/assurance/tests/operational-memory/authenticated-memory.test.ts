@@ -22,8 +22,10 @@ const identity = {
 
 test('the development Memory seam binds authenticated WorkOS identity to canonical scope', async () => {
   const scopes: MemoryRequestScope[] = []
+  let protectedCalls = 0
   const unavailable = async (): Promise<never> => {
-    throw new Error('unused operation')
+    protectedCalls += 1
+    throw new Error('private-memory-provider-failure')
   }
   const client: MemoryClient = {
     correct: unavailable,
@@ -39,6 +41,9 @@ test('the development Memory seam binds authenticated WorkOS identity to canonic
   }
   const runtime: OperationalMemoryRuntime = {
     close: async () => {},
+    usageLedgerForRequest: () => {
+      throw new Error('unused server ledger')
+    },
     forRequest: (scope) => {
       scopes.push(scope)
       return client
@@ -75,6 +80,53 @@ test('the development Memory seam binds authenticated WorkOS identity to canonic
     expect(response.json().data.version).toBe(1)
     expect(response.headers['cache-control']).toBe('no-store')
     expect(scopes).toHaveLength(1)
+    const commands = [
+      {
+        operation: 'update-consent',
+        input: {
+          expectedVersion: 1,
+          changes: [
+            {
+              purpose: 'conversation.support',
+              policyVersion: 'v1',
+              status: 'granted'
+            }
+          ]
+        }
+      },
+      {
+        operation: 'remember',
+        input: {
+          kind: 'semantic',
+          category: 'preference',
+          purpose: 'conversation.support',
+          semanticKey: 'routine.walk',
+          statement: 'Gosto de caminhar.'
+        },
+        options: { idempotencyKey: 'synthetic-request-1' }
+      },
+      {
+        operation: 'search',
+        input: {
+          purpose: 'conversation.support',
+          query: 'caminhar',
+          asOf: '2026-09-05T00:00:00.000Z',
+          tokenBudget: 600
+        }
+      },
+      { operation: 'forget', memoryId: '11111111-1111-4111-8111-111111111111' }
+    ]
+    for (const command of commands) {
+      const result = await app.inject({
+        method: 'POST',
+        url: '/v1/development/memory',
+        headers: { origin, cookie: 'session=alice' },
+        payload: { conversationId, ...command }
+      })
+      expect(result.statusCode).toBe(500)
+      expect(result.body).not.toContain('private-memory-provider-failure')
+    }
+    expect(protectedCalls).toBe(4)
     const scope = scopes[0]
     expect(scope?.actorId).toBe(scope?.subjectId)
     expect(z.string().uuid().safeParse(scope?.subjectId).success).toBe(true)
@@ -121,7 +173,7 @@ test('the development Memory seam binds authenticated WorkOS identity to canonic
       })
       expect(rejected.statusCode).toBe(denied.status)
     }
-    expect(scopes).toHaveLength(1)
+    expect(scopes).toHaveLength(5)
   } finally {
     await app.close()
   }

@@ -14,7 +14,13 @@ import {
   type ConversationTurnResponseData
 } from '@repo/conversation-sdk'
 import { NoopObservability, type Observability } from '@repo/observability'
-import type { MemoryClient } from '@repo/memory-sdk'
+import {
+  ExplicitMemoryInputSchema,
+  ExplicitMemoryOptionsSchema,
+  MemorySearchInputSchema,
+  UpdateMemoryConsentInputSchema,
+  type MemoryClient
+} from '@repo/memory-sdk'
 import Fastify, {
   type FastifyInstance,
   type FastifyReply,
@@ -38,12 +44,43 @@ import {
 
 const CONVERSATION_BODY_LIMIT_BYTES = 512 * 1024
 const SessionRequestSchema = z.object({}).strict()
-const MemoryRequestSchema = z
-  .object({
-    conversationId: z.string().uuid(),
-    operation: z.literal('get-consent')
-  })
-  .strict()
+const MemoryRequestSchema = z.discriminatedUnion('operation', [
+  z
+    .object({
+      conversationId: z.string().uuid(),
+      operation: z.literal('get-consent')
+    })
+    .strict(),
+  z
+    .object({
+      conversationId: z.string().uuid(),
+      operation: z.literal('update-consent'),
+      input: UpdateMemoryConsentInputSchema
+    })
+    .strict(),
+  z
+    .object({
+      conversationId: z.string().uuid(),
+      operation: z.literal('remember'),
+      input: ExplicitMemoryInputSchema,
+      options: ExplicitMemoryOptionsSchema.optional()
+    })
+    .strict(),
+  z
+    .object({
+      conversationId: z.string().uuid(),
+      operation: z.literal('search'),
+      input: MemorySearchInputSchema
+    })
+    .strict(),
+  z
+    .object({
+      conversationId: z.string().uuid(),
+      operation: z.literal('forget'),
+      memoryId: z.string().uuid()
+    })
+    .strict()
+])
 
 export interface ChatterboxFactoryOptions {
   readonly allowedOrigins?: readonly string[]
@@ -236,8 +273,13 @@ export function createChatterbox(
   app.get('/health', async () => ({ status: 'ok' as const }))
   app.get('/ready', async (_request, reply) => {
     reply.header('cache-control', 'no-store')
-    if (options.memoryReadiness === undefined)
-      return { status: 'ready', memory: 'disabled' }
+    if (options.memoryReadiness === undefined) {
+      const disabled = options.createMemoryClient === undefined
+      return reply.status(disabled ? 200 : 503).send({
+        status: disabled ? 'ready' : 'not-ready',
+        memory: disabled ? 'disabled' : 'not-ready'
+      })
+    }
     let ready = false
     try {
       ready = (await options.memoryReadiness()) === true
@@ -413,7 +455,20 @@ export function createChatterbox(
               requestId: String(request.id)
             })
           )
-          const data = await client.getConsent()
+          const command = parsed.data
+          const data =
+            command.operation === 'get-consent'
+              ? await client.getConsent()
+              : command.operation === 'update-consent'
+                ? await client.updateConsent(command.input)
+                : command.operation === 'remember'
+                  ? await client.rememberExplicitly(
+                      command.input,
+                      command.options
+                    )
+                  : command.operation === 'search'
+                    ? await client.search(command.input)
+                    : await client.forget(command.memoryId)
           state.observation.outcome = 'success'
           return reply.send({ data })
         } finally {

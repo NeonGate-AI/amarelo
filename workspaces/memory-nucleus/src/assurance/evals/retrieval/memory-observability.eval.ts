@@ -134,8 +134,39 @@ const evalObserverDeadlineDoesNotBlockServing: MemoryRetrievalEvalCase =
     }
   }
 
+const evalFullTextDiagnosticsPreserveMeasuredCalls: MemoryRetrievalEvalCase =
+  async () => {
+    const repository = new InMemoryScopedMemoryRepository([])
+    const dependencies = memoryRetrievalDependencies(repository)
+    const query = authorizedMemoryQuery({
+      categories: ['collection'],
+      kinds: ['semantic'],
+      queryText: TRACE_QUERY_TEXT
+    })
+    const measured = await retrieveAuthorizedMemory(query, {
+      ...dependencies,
+      repository: {
+        async searchAuthorized(search) {
+          const result = await repository.searchAuthorized(search)
+          return {
+            ...result,
+            diagnostics: { ...result.diagnostics, fullTextCalls: 2 }
+          }
+        }
+      }
+    })
+    assert.equal(measured.items.length, 0)
+    assert.equal(Reflect.get(measured.diagnostics, 'fullTextCalls'), 2)
+    const unmeasured = await retrieveAuthorizedMemory(query, dependencies)
+    assert.equal(Reflect.get(unmeasured.diagnostics, 'fullTextCalls'), null)
+    return {
+      name: 'full-text diagnostics preserve measured zero-hit calls and unknown legacy usage'
+    }
+  }
+
 export const MEMORY_OBSERVABILITY_EVALS: readonly MemoryRetrievalEvalCase[] = [
   evalRetrievalRecordsPayloadFreeTrace,
   evalObserverFailureDoesNotBreakServing,
-  evalObserverDeadlineDoesNotBlockServing
+  evalObserverDeadlineDoesNotBlockServing,
+  evalFullTextDiagnosticsPreserveMeasuredCalls
 ]

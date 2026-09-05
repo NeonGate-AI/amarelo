@@ -95,6 +95,9 @@ export interface AuthorizedRepositorySearch {
 
 export interface RepositorySearchDiagnostics {
   readonly authorizedRowsConsidered: number
+  /** Legacy adapters may omit instrumentation; absence does not mean zero calls. */
+  readonly fullTextCalls?: number
+  readonly fullTextSearchUsed?: boolean
   readonly matchedRows: number
   readonly vectorCalls: number
 }

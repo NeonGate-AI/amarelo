@@ -2,8 +2,10 @@ import assert from 'node:assert/strict'
 
 import {
   MAX_MEMORY_SEARCH_TOKENS,
+  MEMORY_SEARCH_TOKEN_ESTIMATOR_VERSION,
   MemoryDeletionReceiptSchema,
   MemorySearchInputSchema,
+  MemorySearchResultSchema,
   createMemorySearchContextProjection,
   estimateMemorySearchContextTokens,
   type MemoryRecord
@@ -73,4 +75,73 @@ assert.equal(
   }).success,
   false
 )
+
+const emptySearch = {
+  asOf: observedAt,
+  diagnostics: {
+    candidateItems: 0,
+    eligibleItems: 0,
+    modelCalls: 0,
+    omittedByBudget: 0,
+    omittedByLimit: 0,
+    omittedByPolicy: 0,
+    rerankerUsed: false,
+    returnedItems: 0,
+    vectorCalls: 0,
+    vectorSearchUsed: false,
+    webCalls: 0
+  },
+  governance: {
+    authorizationDecisionId: 'decision-fixture',
+    consentVersion: 1,
+    purpose: input.purpose,
+    viewId: 'personal'
+  },
+  items: [],
+  policyVersion: 'memory-retrieval-v1',
+  requestId: 'request-fixture',
+  tokenBudget: {
+    effectiveTokens: 400,
+    estimatorVersion: MEMORY_SEARCH_TOKEN_ESTIMATOR_VERSION,
+    remainingTokens: 400,
+    requestedTokens: 400,
+    truncated: false,
+    usedTokens: 0
+  }
+}
+// Historical fixtures remain readable; missing instrumentation does not become zero.
+assert.equal(MemorySearchResultSchema.safeParse(emptySearch).success, true)
+const searchWithFullText = (
+  fullTextCalls: unknown,
+  fullTextSearchUsed: unknown
+) => ({
+  ...emptySearch,
+  diagnostics: { ...emptySearch.diagnostics, fullTextCalls, fullTextSearchUsed }
+})
+assert.equal(
+  MemorySearchResultSchema.safeParse(searchWithFullText(2, true)).success,
+  true,
+  'a zero-hit search must retain its two actual full-text index calls'
+)
+assert.equal(
+  MemorySearchResultSchema.safeParse(searchWithFullText(0, false)).success,
+  true
+)
+assert.equal(
+  MemorySearchResultSchema.safeParse(searchWithFullText(null, null)).success,
+  true
+)
+for (const [calls, used] of [
+  [2, false],
+  [0, true],
+  [-1, false],
+  [1.5, true],
+  [null, false],
+  [undefined, true]
+]) {
+  assert.equal(
+    MemorySearchResultSchema.safeParse(searchWithFullText(calls, used)).success,
+    false
+  )
+}
 console.log('memory-sdk eval PASS')

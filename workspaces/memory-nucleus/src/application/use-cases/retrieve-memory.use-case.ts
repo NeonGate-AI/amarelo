@@ -264,6 +264,7 @@ export async function retrieveAuthorizedMemory(
     items: Object.freeze(items),
     totalEstimatedTokens,
     diagnostics: Object.freeze({
+      fullTextCalls: repositoryResult.diagnostics.fullTextCalls ?? null,
       vectorFallbackUsed: false,
       vectorCalls: 0,
       repositoryRowsReturned: repositoryRecords.length,

@@ -53,6 +53,7 @@ export class Neo4jScopedMemoryRepository extends ScopedMemoryRepository {
         : `CALL db.index.fulltext.queryNodes($index, $lexicalQuery) YIELD node, score
        RETURN node AS v, score UNION ${exactCandidates}`
     const records = []
+    let fullTextCalls = 0
     for (const kind of search.kinds) {
       const limit =
         kind === 'semantic'
@@ -63,6 +64,7 @@ export class Neo4jScopedMemoryRepository extends ScopedMemoryRepository {
         (tokens.length === 0 && search.semanticKeys.length === 0)
       )
         continue
+      if (tokens.length > 0) fullTextCalls += 1
       const result = await this.transaction.run(
         `CALL { ${candidates} }
          MATCH (m:Memory {scopeKey: $scopeKey})-[:HAS_VERSION]->(v)
@@ -100,7 +102,7 @@ export class Neo4jScopedMemoryRepository extends ScopedMemoryRepository {
                OR (v.occurredAt IS NOT NULL AND datetime(v.occurredAt) <= datetime($asOf)
                  AND ($fromInclusive IS NULL OR datetime(v.occurredAt) >= datetime($fromInclusive))
                  AND ($toExclusive IS NULL OR datetime(v.occurredAt) < datetime($toExclusive))))
-           )
+           ))
          WITH DISTINCT v, CASE WHEN v.semanticKey IN $semanticKeys THEN 1 ELSE 0 END AS exact,
               max(score) AS score
          RETURN v.recordJson AS record
@@ -146,6 +148,8 @@ export class Neo4jScopedMemoryRepository extends ScopedMemoryRepository {
       records,
       diagnostics: {
         authorizedRowsConsidered: records.length,
+        fullTextCalls,
+        fullTextSearchUsed: fullTextCalls > 0,
         matchedRows: records.length,
         vectorCalls: 0
       }

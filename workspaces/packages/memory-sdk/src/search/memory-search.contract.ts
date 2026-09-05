@@ -156,6 +156,9 @@ export const MemorySearchDiagnosticsSchema = z
   .object({
     candidateItems: z.number().int().nonnegative(),
     eligibleItems: z.number().int().nonnegative(),
+    // Omitted legacy instrumentation and explicit null both mean unknown, never zero.
+    fullTextCalls: z.number().int().nonnegative().safe().nullable().optional(),
+    fullTextSearchUsed: z.boolean().nullable().optional(),
     modelCalls: z.literal(0),
     omittedByBudget: z.number().int().nonnegative(),
     omittedByLimit: z.number().int().nonnegative(),
@@ -168,6 +171,21 @@ export const MemorySearchDiagnosticsSchema = z
   })
   .strict()
   .superRefine((diagnostics, context) => {
+    const { fullTextCalls, fullTextSearchUsed } = diagnostics
+    if (
+      (fullTextCalls !== undefined || fullTextSearchUsed !== undefined) &&
+      (fullTextCalls === undefined ||
+        fullTextSearchUsed === undefined ||
+        fullTextSearchUsed !==
+          (fullTextCalls === null ? null : fullTextCalls > 0))
+    ) {
+      context.addIssue({
+        code: 'custom',
+        message:
+          'full-text usage must agree with its measured call count or remain unknown',
+        path: ['fullTextSearchUsed']
+      })
+    }
     if (diagnostics.eligibleItems > diagnostics.candidateItems) {
       context.addIssue({
         code: 'custom',

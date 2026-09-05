@@ -63,6 +63,8 @@ test('an authorized person can remember, retrieve and immediately suppress a mem
     const before = MemorySearchResultSchema.parse(await client.search(query))
     expect(before.items.map(({ memory }) => memory.id)).toContain(written.id)
     expect(before.diagnostics).toMatchObject({
+      fullTextCalls: 2,
+      fullTextSearchUsed: true,
       modelCalls: 0,
       vectorCalls: 0,
       webCalls: 0

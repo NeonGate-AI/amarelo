@@ -221,3 +221,17 @@ export type {
 } from './application/contracts'
 export { createNeo4jMemoryRuntime } from './infrastructure/database/neo4j'
 export type { Neo4jMemoryOptions } from './infrastructure/database/neo4j'
+export {
+  MemoryUsageEventSchema,
+  MemoryUsageLedgerEntrySchema,
+  MemoryPricingSnapshotSchema
+} from './application/contracts'
+export type {
+  MemoryUsageEvent,
+  MemoryUsageLedgerEntry,
+  MemoryPricingSnapshot,
+  MemoryUsageLedgerScope
+} from './application/contracts'
+export { createTextMemoryUsageEvent } from './application/services'
+export { MemoryUsageLedger } from './application/ports'
+export type { MemoryUsageObservationSink } from './application/ports'

@@ -181,6 +181,8 @@ export interface EffectiveMemoryRetrievalBudgets {
 }
 
 export interface AuthorizedMemoryRetrievalDiagnostics {
+  /** Null preserves missing instrumentation from a legacy repository. */
+  readonly fullTextCalls: number | null
   readonly vectorFallbackUsed: false
   readonly vectorCalls: 0
   readonly repositoryRowsReturned: number

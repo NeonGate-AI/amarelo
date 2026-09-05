@@ -94,6 +94,11 @@ export function mapOperationalMemorySearch(
     diagnostics: {
       candidateItems: result.diagnostics.repositoryRowsReturned,
       eligibleItems: result.diagnostics.eligibleMatches,
+      fullTextCalls: result.diagnostics.fullTextCalls,
+      fullTextSearchUsed:
+        result.diagnostics.fullTextCalls === null
+          ? null
+          : result.diagnostics.fullTextCalls > 0,
       modelCalls: 0,
       omittedByBudget,
       omittedByLimit,

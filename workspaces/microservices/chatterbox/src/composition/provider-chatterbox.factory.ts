@@ -15,10 +15,18 @@ import {
   LangChainAnaChatModelAdapter
 } from '../model'
 import { ChatterboxObservabilityAdapter } from '../observability'
+import { createMemoryRuntimeBinding } from './memory-runtime-binding.factory'
 
 export function createProviderChatterbox(
   configuration: ChatterboxEnvironment
 ): FastifyInstance {
+  const memory = createMemoryRuntimeBinding(configuration)
+  function compose(options: ChatterboxFactoryOptions): FastifyInstance {
+    const app = createChatterbox({ ...options, ...memory.options })
+    app.addHook('onReady', memory.start)
+    app.addHook('onClose', memory.close)
+    return app
+  }
   const options: ChatterboxFactoryOptions = {
     allowedOrigins: configuration.CHATTERBOX_ALLOWED_ORIGINS,
     authenticate: hasChatterboxAuthenticationConfiguration(configuration)
@@ -38,7 +46,7 @@ export function createProviderChatterbox(
     sessionTtlMs: configuration.CHATTERBOX_SESSION_TTL_MS
   }
   if (!hasChatterboxProviderConfiguration(configuration)) {
-    return createChatterbox(options)
+    return compose(options)
   }
 
   const model = new ChatOpenAI({
@@ -57,7 +65,7 @@ export function createProviderChatterbox(
     agents: [new AnaConversationAgent({ model: modelAdapter })]
   })
 
-  return createChatterbox({
+  return compose({
     ...options,
     createRealtimeCall: (sdp) =>
       createOpenAiRealtimeCall({

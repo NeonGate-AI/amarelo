@@ -53,6 +53,9 @@ export async function createNeo4jMemoryRuntime(
   return {
     close: () => driver.close(),
     forRequest: (scope) => new OperationalMemoryClient(scope, unitOfWork, now),
+    usageLedgerForRequest: () => {
+      throw new Error('Durable Memory usage ledger is not implemented')
+    },
     readiness: async () => {
       try {
         const ready = await isNeo4jMemorySchemaReady(driver, options.database)
