@@ -27,6 +27,11 @@ for relative_path in \
   application/ports \
   application/validation \
   infrastructure/adapters \
+  infrastructure/adapters/persistence/neo4j \
+  infrastructure/database/neo4j/neo4j-memory.factory.ts \
+  infrastructure/database/neo4j/neo4j-memory.schema.ts \
+  application/contracts/operational-memory.contract.ts \
+  application/contracts/memory-usage-ledger.contract.ts \
   infrastructure/database/schema.sql \
   assurance/evals \
   domain/value-objects/memory-judgment.vo.ts \
@@ -35,6 +40,15 @@ do
   [ -e "$SOURCE_ROOT/$relative_path" ] ||
     memory_fail "missing src/$relative_path"
 done
+
+# Structural guard only. Real graph behavior is proved by the mandatory CI suite.
+integration_root="$PROJECT_ROOT/workspaces/microservices/chatterbox/src/assurance/tests/operational-memory"
+for integration in operational-memory authority candidate-delivery readiness http-memory operational-memory-usage; do
+  [ -f "$integration_root/$integration.integration.test.ts" ] ||
+    memory_fail "missing operational Neo4j assurance seam: $integration"
+done
+grep -F 'pnpm --filter chatterbox run test:integration' "$PROJECT_ROOT/.github/workflows/ci.yml" >/dev/null 2>&1 ||
+  memory_fail "CI must run the public operational Memory integration suite"
 
 for relative_path in apps packages scripts docs db/migrations; do
   [ ! -e "$MEMORY_ROOT/$relative_path" ] ||
@@ -109,5 +123,6 @@ printf 'Memory invariants PASS\n'
 printf 'single workspace: PASS\n'
 printf 'clean layers: PASS\n'
 printf 'validation ownership: PASS\n'
-printf 'MVP database baseline: PASS\n'
+printf 'PostgreSQL reference baseline: PASS\n'
+printf 'Neo4j operational assurance structure: PASS\n'
 printf 'retrieval/token budget: PASS\n'

@@ -1,20 +1,27 @@
-import type {
-  OperationalMemoryRuntime,
-  MemoryUsageEvent
+import { randomUUID } from 'node:crypto'
+import {
+  MemoryUsageEventSchema,
+  MemoryUsageIdentifierSchema,
+  type OperationalMemoryRuntime,
+  type MemoryUsageProfile
 } from '@application/contracts'
 import type { MemoryUsageObservationSink } from '@application/ports'
 import {
   OperationalMemoryCandidateDeliveryClient,
-  OperationalMemoryClient
+  OperationalMemoryClient,
+  ObservedMemoryClient
 } from '@application/clients'
+import { MemoryUsageObservationService } from '@application/observability'
+import { createUnknownCostMemoryUsageLedgerEntry } from '@application/services'
 import {
   Neo4jOperationalMemoryUnitOfWork,
   Neo4jMemoryUsageLedger
 } from '@infrastructure/adapters/persistence/neo4j'
-import neo4j from 'neo4j-driver'
+import neo4j, { type ManagedTransaction } from 'neo4j-driver'
 import {
   initializeNeo4jMemorySchema,
   isNeo4jMemorySchemaReady,
+  isNeo4jMemoryTransactionSchemaReady,
   NEO4J_MEMORY_SCHEMA_VERSION
 } from './neo4j-memory.schema'
 
@@ -25,11 +32,7 @@ export interface Neo4jMemoryOptions {
   readonly database: string
   readonly now?: () => Date
   readonly onObservation?: MemoryUsageObservationSink
-  readonly usageProfile?: {
-    readonly workloadVersion: string
-    readonly profileVersion: string
-    readonly costClass: MemoryUsageEvent['costClass']
-  }
+  readonly usageProfile?: MemoryUsageProfile
 }
 
 /** Server composition root for the request-bound SDK and canonical graph. */
@@ -44,6 +47,29 @@ export async function createNeo4jMemoryRuntime(
     options.database.trim() !== options.database
   )
     throw new Error('Neo4j Memory configuration is incomplete')
+  const selectedProfile = options.usageProfile ?? {
+    workloadVersion: 'memory-operational-text-v1',
+    profileVersion: 'memory-neo4j-text-v1',
+    costClass: 'operational'
+  }
+  const usageProfile = Object.freeze({
+    workloadVersion: MemoryUsageIdentifierSchema.parse(
+      selectedProfile.workloadVersion
+    ),
+    profileVersion: MemoryUsageIdentifierSchema.parse(
+      selectedProfile.profileVersion
+    ),
+    costClass: MemoryUsageEventSchema.unwrap().shape.costClass.parse(
+      selectedProfile.costClass
+    )
+  })
+  const onObservation = options.onObservation
+  if (onObservation !== undefined && typeof onObservation !== 'function')
+    throw new Error('Memory usage observation configuration is invalid')
+  // One limiter belongs to the runtime, including every request-bound client.
+  const usageObserver = new MemoryUsageObservationService({
+    onObservation: onObservation ?? (() => undefined)
+  })
   const driver = neo4j.driver(
     options.uri,
     neo4j.auth.basic(options.username, options.password),
@@ -61,18 +87,48 @@ export async function createNeo4jMemoryRuntime(
     throw error
   }
   const now = options.now ?? (() => new Date())
-  const assertSchemaReady = async (): Promise<void> => {
-    if (!(await isNeo4jMemorySchemaReady(driver, options.database)))
-      throw new Error('Neo4j Memory schema is not ready')
+  const assertSchemaReady = async (
+    transaction?: ManagedTransaction
+  ): Promise<void> => {
+    const ready = transaction
+      ? await isNeo4jMemoryTransactionSchemaReady(transaction)
+      : await isNeo4jMemorySchemaReady(driver, options.database)
+    if (!ready) throw new Error('Neo4j Memory schema is not ready')
   }
   const unitOfWork = new Neo4jOperationalMemoryUnitOfWork(
     driver,
     options.database,
-    now
+    now,
+    assertSchemaReady
   )
   return {
     close: () => driver.close(),
-    forRequest: (scope) => new OperationalMemoryClient(scope, unitOfWork, now),
+    forRequest: (scope) => {
+      const client = new OperationalMemoryClient(scope, unitOfWork, now)
+      const ledger = new Neo4jMemoryUsageLedger(
+        driver,
+        options.database,
+        scope,
+        now,
+        assertSchemaReady
+      )
+      return new ObservedMemoryClient(
+        client,
+        scope,
+        {
+          observe: (event) =>
+            usageObserver.observeWithSink(event, async (safe) => {
+              await ledger.append(
+                createUnknownCostMemoryUsageLedgerEntry(safe, safe.eventId)
+              )
+              await onObservation?.(safe)
+            })
+        },
+        usageProfile,
+        now,
+        randomUUID
+      )
+    },
     candidatesForRequest: (scope) =>
       new OperationalMemoryCandidateDeliveryClient(scope, unitOfWork, now),
     usageLedgerForRequest: (scope) =>

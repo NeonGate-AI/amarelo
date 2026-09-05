@@ -1,7 +1,9 @@
-import type {
-  ExplicitMemoryInput,
-  ExplicitMemoryOptions,
-  ExplicitMemoryResult
+import {
+  ExplicitMemoryInputSchema,
+  ExplicitMemoryOptionsSchema,
+  type ExplicitMemoryInput,
+  type ExplicitMemoryOptions,
+  type ExplicitMemoryResult
 } from '@repo/memory-sdk'
 import type {
   MemoryCandidateDeliveryClient,
@@ -10,26 +12,75 @@ import type {
   TrustedMemorySource
 } from '@application/contracts'
 import type { OperationalMemoryUnitOfWork } from '@application/ports'
+import { acceptOperationalExplicitMemory } from './explicit-memory-acceptance.service'
+import { prepareEligibleMemorySource } from './memory-source.validate'
+import { OperationalMemoryRequest } from './operational-memory-request.service'
+import { OperationalMemoryError } from './operational-memory.error'
 
-/** Public behavioral-red seam for committed evidence followed by fresh-authority promotion. */
+/** Committed patient evidence followed by promotion under freshly checked authority. */
 export class OperationalMemoryCandidateDeliveryClient
   implements MemoryCandidateDeliveryClient
 {
-  constructor(
-    _scope: MemoryRequestScope,
-    _unitOfWork: OperationalMemoryUnitOfWork,
-    _now: () => Date = () => new Date()
-  ) {}
+  private readonly request: OperationalMemoryRequest
 
-  async stageExplicit(
-    _input: ExplicitMemoryInput,
-    _options: ExplicitMemoryOptions,
-    _trustedSource: TrustedMemorySource
-  ): Promise<MemoryCandidateStageResult> {
-    throw new Error('Memory candidate delivery is not implemented')
+  constructor(
+    scope: MemoryRequestScope,
+    unitOfWork: OperationalMemoryUnitOfWork,
+    private readonly now: () => Date = () => new Date()
+  ) {
+    this.request = new OperationalMemoryRequest(scope, unitOfWork, now)
   }
 
-  async promoteExplicit(_candidateId: string): Promise<ExplicitMemoryResult> {
-    throw new Error('Memory candidate delivery is not implemented')
+  async stageExplicit(
+    input: ExplicitMemoryInput,
+    options: ExplicitMemoryOptions,
+    trustedSource: TrustedMemorySource
+  ): Promise<MemoryCandidateStageResult> {
+    this.request.assertCurrent()
+    const source = prepareEligibleMemorySource(
+      trustedSource,
+      this.request.scope,
+      this.now()
+    )
+    if (source === null) {
+      return Object.freeze({ status: 'skipped', reason: 'no-subject-evidence' })
+    }
+    const parsed = ExplicitMemoryInputSchema.parse(input)
+    const parsedOptions = ExplicitMemoryOptionsSchema.parse(options)
+    this.request.assertPurpose(parsed.purpose)
+    if (source.text !== parsed.statement) {
+      throw new OperationalMemoryError('invalid-source')
+    }
+    return this.request.run('persist', async (transaction) => {
+      const staged = await transaction.stageExplicit(
+        parsed,
+        parsedOptions,
+        source
+      )
+      return Object.freeze({
+        status: 'staged',
+        candidateId: staged.candidateId
+      })
+    })
+  }
+
+  async promoteExplicit(candidateId: string): Promise<ExplicitMemoryResult> {
+    if (
+      typeof candidateId !== 'string' ||
+      !/^[A-Za-z0-9][A-Za-z0-9._:-]{0,199}$/.test(candidateId)
+    ) {
+      throw new OperationalMemoryError('invalid-request')
+    }
+    return this.request.run('persist', async (transaction) => {
+      const candidate = await transaction.loadExplicitCandidate(candidateId)
+      if (candidate.staged.candidateId !== candidateId) {
+        throw new OperationalMemoryError('invalid-result')
+      }
+      return acceptOperationalExplicitMemory(
+        transaction,
+        this.request.scope,
+        candidate
+      )
+    })
   }
 }

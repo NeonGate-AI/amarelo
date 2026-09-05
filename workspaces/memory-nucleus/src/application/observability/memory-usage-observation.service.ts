@@ -41,15 +41,21 @@ export class MemoryUsageObservationService extends MemoryUsageObserver {
     }
   }
 
-  async observe(
-    event: MemoryUsageEvent
+  observe(event: MemoryUsageEvent): Promise<MemoryUsageObservationOutcome> {
+    return this.observeWithSink(event, this.#onObservation)
+  }
+
+  /** Request closures share the runtime's delivery limit without retaining a request map. */
+  async observeWithSink(
+    event: MemoryUsageEvent,
+    sink: MemoryUsageObservationSink
   ): Promise<MemoryUsageObservationOutcome> {
     if (this.#pending >= this.#maxPending) return 'unavailable'
     const parsed = MemoryUsageEventSchema.safeParse(event)
     if (!parsed.success) return 'unavailable'
     this.#pending += 1
     const delivery = Promise.resolve()
-      .then(() => this.#onObservation(parsed.data))
+      .then(() => sink(parsed.data))
       .then(
         () => {
           this.#pending -= 1

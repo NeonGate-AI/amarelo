@@ -1,5 +1,4 @@
 import {
-  createExplicitMemoryResultSchema,
   ExplicitMemoryInputSchema,
   ExplicitMemoryOptionsSchema,
   MemoryClient,
@@ -21,35 +20,34 @@ import {
 import type { MemoryRequestScope } from '@application/contracts'
 import type {
   MemoryRetrievalTrace,
-  OperationalMemoryOperation,
-  OperationalMemoryTransaction,
   OperationalMemoryUnitOfWork
 } from '@application/ports'
 import {
-  AcceptMemoryCandidateUseCase,
   ForgetMemoryUseCase,
   retrieveAuthorizedMemory
 } from '@application/use-cases'
-import { MemoryJudgment } from '@domain/value-objects'
+import { acceptOperationalExplicitMemory } from './explicit-memory-acceptance.service'
 import { mapOperationalMemorySearch } from './operational-memory-search.map'
+import { OperationalMemoryRequest } from './operational-memory-request.service'
 import { OperationalMemoryError } from './operational-memory.error'
 
 /** Request-bound SDK composition; persistence and locking remain behind its ports. */
 export class OperationalMemoryClient extends MemoryClient {
   private readonly scope: MemoryRequestScope
+  private readonly request: OperationalMemoryRequest
 
   constructor(
     scope: MemoryRequestScope,
-    private readonly unitOfWork: OperationalMemoryUnitOfWork,
-    private readonly now: () => Date = () => new Date()
+    unitOfWork: OperationalMemoryUnitOfWork,
+    now: () => Date = () => new Date()
   ) {
     super()
-    this.scope = Object.freeze({ ...scope })
-    this.assertRequest()
+    this.request = new OperationalMemoryRequest(scope, unitOfWork, now)
+    this.scope = this.request.scope
   }
 
   async getConsent(): Promise<MemoryConsentState> {
-    return this.run('consent', async (transaction) =>
+    return this.request.run('consent', async (transaction) =>
       MemoryConsentStateSchema.parse(await transaction.getConsent())
     )
   }
@@ -61,7 +59,7 @@ export class OperationalMemoryClient extends MemoryClient {
     if (parsed.changes.some(({ purpose }) => purpose !== this.scope.purpose)) {
       throw new OperationalMemoryError('scope-mismatch')
     }
-    return this.run('consent', async (transaction) =>
+    return this.request.run('consent', async (transaction) =>
       MemoryConsentStateSchema.parse(await transaction.updateConsent(parsed))
     )
   }
@@ -72,44 +70,20 @@ export class OperationalMemoryClient extends MemoryClient {
   ): Promise<ExplicitMemoryResult> {
     const parsed = ExplicitMemoryInputSchema.parse(input)
     const parsedOptions = ExplicitMemoryOptionsSchema.parse(options)
-    this.assertPurpose(parsed.purpose)
-    return this.run('persist', async (transaction) => {
+    this.request.assertPurpose(parsed.purpose)
+    return this.request.run('persist', async (transaction) => {
       const staged = await transaction.stageExplicit(parsed, parsedOptions)
-      await transaction.assertAuthority()
-      const accepted = await new AcceptMemoryCandidateUseCase(
-        transaction.canonical
-      ).execute({
-        ...staged,
-        canonicalKey: parsed.semanticKey,
-        category: parsed.category,
-        confidence: 1,
-        judgment: MemoryJudgment.create({
-          confidence: 1,
-          decision: 'remember',
-          rationaleCode: 'explicit-subject-request'
-        }),
-        kind: parsed.kind,
-        policyVersion: 'memory-explicit-acceptance-v1',
-        viewIds: ['personal']
+      return acceptOperationalExplicitMemory(transaction, this.scope, {
+        input: parsed,
+        staged
       })
-      const result = createExplicitMemoryResultSchema(parsed).parse(
-        await transaction.readRecord(accepted.memoryId)
-      )
-      if (
-        result.provenance.authorId !== this.scope.actorId ||
-        result.id !== accepted.memoryId ||
-        result.version !== accepted.version
-      ) {
-        throw new OperationalMemoryError('scope-mismatch')
-      }
-      return result
     })
   }
 
   async search(input: MemorySearchInput): Promise<MemorySearchResult> {
     const parsed = MemorySearchInputSchema.parse(input)
-    this.assertPurpose(parsed.purpose)
-    return this.run('retrieve', async (transaction) => {
+    this.request.assertPurpose(parsed.purpose)
+    return this.request.run('retrieve', async (transaction) => {
       const authorization = await transaction.authorizeSearch(parsed)
       if (
         authorization.query.tenantId !== this.scope.tenantId ||
@@ -165,7 +139,7 @@ export class OperationalMemoryClient extends MemoryClient {
     if (!/^[A-Za-z0-9][A-Za-z0-9._:-]{0,199}$/.test(memoryId)) {
       throw new OperationalMemoryError('invalid-request')
     }
-    return this.run('delete', async (transaction) => {
+    return this.request.run('delete', async (transaction) => {
       const previous = await transaction.readDeletionReceipt(memoryId)
       if (previous !== null) return this.parseReceipt(previous, memoryId)
       await transaction.assertAuthority()
@@ -185,7 +159,7 @@ export class OperationalMemoryClient extends MemoryClient {
   async correct(
     _input: MemoryCorrectionInput
   ): Promise<MemoryCorrectionResult> {
-    this.assertRequest()
+    this.request.assertCurrent()
     throw new OperationalMemoryError('unsupported-operation')
   }
 
@@ -198,63 +172,5 @@ export class OperationalMemoryClient extends MemoryClient {
       throw new OperationalMemoryError('invalid-result')
     }
     return receipt
-  }
-
-  private assertPurpose(purpose: string): void {
-    if (purpose !== this.scope.purpose) {
-      throw new OperationalMemoryError('scope-mismatch')
-    }
-  }
-
-  private assertRequest(): void {
-    const instant = this.now().getTime()
-    if (
-      !Number.isFinite(instant) ||
-      !Number.isFinite(this.scope.expiresAtMs) ||
-      this.scope.expiresAtMs <= instant
-    ) {
-      throw new OperationalMemoryError('expired-request')
-    }
-    if (
-      this.scope.actorId !== this.scope.subjectId ||
-      this.scope.purpose !== 'conversation.support' ||
-      !['development-text', 'synthetic-transcript'].includes(
-        this.scope.sourceKind
-      ) ||
-      [
-        this.scope.tenantId,
-        this.scope.subjectId,
-        this.scope.actorId,
-        this.scope.authenticationSessionId,
-        this.scope.conversationId,
-        this.scope.requestId
-      ].some(
-        (value) =>
-          typeof value !== 'string' ||
-          !/^[A-Za-z0-9][A-Za-z0-9._:-]{0,199}$/.test(value)
-      )
-    ) {
-      throw new OperationalMemoryError('scope-mismatch')
-    }
-  }
-
-  private async run<T>(
-    operation: OperationalMemoryOperation,
-    work: (transaction: OperationalMemoryTransaction) => Promise<T>
-  ): Promise<T> {
-    this.assertRequest()
-    const result = await this.unitOfWork.run(
-      this.scope,
-      operation,
-      async (transaction) => {
-        await transaction.assertAuthority()
-        const value = await work(transaction)
-        this.assertRequest()
-        await transaction.assertAuthority()
-        return value
-      }
-    )
-    this.assertRequest()
-    return result
   }
 }
