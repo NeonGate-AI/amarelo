@@ -103,6 +103,11 @@ export interface ChatterboxFactoryOptions {
   readonly createRuntime?: (
     context: AuthenticatedConversationContext
   ) => Pick<ConversationRuntime, 'execute'>
+  readonly ingestPatientTurn?: (input: {
+    readonly context: AuthenticatedConversationContext
+    readonly message: string
+    readonly sourceTurnId: string
+  }) => Promise<'committed' | 'buffered' | 'duplicate' | 'skipped' | 'unconfirmed'>
   readonly maxConcurrentTurns?: number
   readonly maxSessions?: number
   readonly memoryReadiness?: () => Promise<boolean>
@@ -374,6 +379,22 @@ export function createChatterbox(
           purpose: context.purpose
         }
         const result = await runtime.execute(input)
+        if (options.ingestPatientTurn !== undefined) {
+          let ingestion = 'unconfirmed'
+          try {
+            ingestion = await options.ingestPatientTurn({
+              context: Object.freeze({
+                ...context,
+                requestId: String(request.id)
+              }),
+              message: parsed.data.message,
+              sourceTurnId: parsed.data.requestId
+            })
+          } catch {
+            // Memory ingestion cannot replace an otherwise successful conversation.
+          }
+          reply.header('x-chatterbox-memory-ingest', ingestion)
+        }
         const data = mapSuccess(result, Math.max(0, nowMs() - startedAt))
         state.observation = {
           inputTokens: result.modelUsage?.inputTokens ?? null,

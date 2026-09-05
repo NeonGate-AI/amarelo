@@ -63,6 +63,35 @@ const ChatterboxEnvironmentSchema = z
       .enum(['true', 'false'])
       .default('false')
       .transform((value) => value === 'true'),
+    CHATTERBOX_MEMORY_BACKGROUND_ENABLED: z
+      .enum(['true', 'false'])
+      .default('false')
+      .transform((value) => value === 'true'),
+    CHATTERBOX_MEMORY_BACKGROUND_PROFILE: z
+      .enum(['free', 'internal'])
+      .default('free'),
+    CHATTERBOX_MEMORY_INTERNAL_SUBJECT_IDS: z
+      .string()
+      .default('')
+      .transform((value) =>
+        value
+          .split(',')
+          .map((id) => id.trim().toLowerCase())
+          .filter(Boolean)
+      )
+      .pipe(z.array(z.string().uuid()).max(1_000)),
+    CHATTERBOX_MEMORY_INGEST_TIMEOUT_MS: z.coerce
+      .number()
+      .int()
+      .positive()
+      .max(5_000)
+      .default(500),
+    CHATTERBOX_MEMORY_INGEST_MAX_PENDING: z.coerce
+      .number()
+      .int()
+      .positive()
+      .max(100)
+      .default(16),
     MEMORY_NEO4J_URI: OptionalNonEmptyString,
     MEMORY_NEO4J_USERNAME: OptionalNonEmptyString,
     MEMORY_NEO4J_PASSWORD: OptionalNonEmptyString,
@@ -95,6 +124,17 @@ const ChatterboxEnvironmentSchema = z
     WORKOS_COOKIE_PASSWORD: OptionalNonEmptyString
   })
   .superRefine((configuration, context) => {
+    if (
+      configuration.CHATTERBOX_MEMORY_BACKGROUND_ENABLED &&
+      !configuration.CHATTERBOX_MEMORY_ENABLED
+    ) {
+      context.addIssue({
+        code: 'custom',
+        message:
+          'Background ingestion requires the authenticated Memory binding',
+        path: ['CHATTERBOX_MEMORY_BACKGROUND_ENABLED']
+      })
+    }
     if (!configuration.CHATTERBOX_MEMORY_ENABLED) return
     for (const key of [
       'MEMORY_NEO4J_URI',

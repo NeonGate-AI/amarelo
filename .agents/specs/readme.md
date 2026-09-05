@@ -39,8 +39,8 @@ The prefix is a unique catalog rank, not the durable `SPEC-###` identity. Existi
 | 021 | SPEC-014 | implemented | [Spec-driven pull request evidence](021-spec-driven-pull-request-evidence.spec.md) |
 | 022 | SPEC-015 | implemented | [Canonical Memory Nucleus validation roadmap](022-memory-nucleus-validation-roadmap.spec.md) |
 | 023 | SPEC-009 | implemented | [First Ana/PWA conversation and serving baseline](023-first-ana-pwa-conversation-baseline.spec.md) |
-| 024 | SPEC-016 | in-progress | [Operational Memory Nucleus core](024-operational-memory-nucleus-core.spec.md) |
-| 025 | SPEC-012 | ready | [Background memory curation loop](025-background-memory-curation-loop.spec.md) |
+| 024 | SPEC-016 | implemented | [Operational Memory Nucleus core](024-operational-memory-nucleus-core.spec.md) |
+| 025 | SPEC-012 | implemented | [Background memory curation loop](025-background-memory-curation-loop.spec.md) |
 | 026 | SPEC-011 | ready | [Shadow Memory serving and parity](026-shadow-memory-serving-parity.spec.md) |
 | 027 | SPEC-017 | ready | [Memory serving A/B and canary](027-memory-serving-ab-canary.spec.md) |
 | 028 | SPEC-018 | ready | [Memory unit economics and scale gates](028-memory-unit-economics-scale-gates.spec.md) |
@@ -65,15 +65,17 @@ The prefix is a unique catalog rank, not the durable `SPEC-###` identity. Existi
 | 047 | SPEC-047 | implemented | [Vertical slice textual, autenticado e observável](047-vertical-slice-textual-autenticado-observavel.spec.md) |
 | 048 | SPEC-048 | implemented | [Install grill-me and align discovery gates](048-grill-me-discovery-alignment.spec.md) |
 
-The next unallocated durable delivery ID is `SPEC-049`.
+| 049 | SPEC-049 | draft | [Integrated Memory validation debt](049-integrated-memory-validation-debt.spec.md) |
+
+The next unallocated durable delivery ID is `SPEC-050`.
 
 SPEC-046 and SPEC-047 were implemented in the owner-authorized local ZIP branch. Their source/test acceptance does not assert live login, deployed infrastructure, browser E2E or remote CI.
 
 On 2026-09-05 the owner confirmed SPEC-046/047 completed in staging and directed closure of SPEC-044. These are owner-reported acceptance records, not new remote settings or CI verification.
 
-## Remaining execution order
+## Delivery order and deferred validation
 
-**Discovery reconciled (2026-09-05):** the owner accepted SPEC-025's consolidated understanding and requested revisions of the six contracts below using the delivered ZIP. Their source, validation and economic-report boundaries are now reconciled and the discovery hold is resolved. All six remain `ready`, with unchecked implementation criteria and their original dependency gates. This documentation cycle does not execute them or claim the owner's pending PR/merge has completed.
+**Discovery reconciled (2026-09-05):** the owner accepted SPEC-025's consolidated understanding and requested revisions of the six contracts below using the delivered ZIP. Their source, validation and economic-report boundaries are now reconciled and the discovery hold is resolved. The owner subsequently authorized remote implementation and staging integration, then explicitly deferred new validation to prioritize delivery. The catalog above tracks implementation as each PR lands; unchecked acceptance evidence is tracked by SPEC-049. Original evidence gates still govern runtime maturity and exposure.
 
 | Order | Durable ID | Delivery boundary | Prerequisite or gate |
 |---:|---|---|---|
@@ -96,6 +98,6 @@ The executable Memory Nucleus chain is:
 
 SPEC-043 is a required assurance gate before user-visible canary exposure. It does not replace the earlier core, background or shadow phases; it converts observed integrity failures into evals and hidden holdouts before canary.
 
-Each implementation PR starts from the `staging` produced by its prerequisite. A later phase cannot merge until the preceding gate is proved on the exact reviewed head. Production promotion occurs only through a `staging -> main` pull request after the required gates pass.
+Each implementation PR starts from the `staging` produced by its prerequisite. For this owner-authorized implementation delivery, staging integration proceeds without waiting for new validation. This exception does not assert a passed evidence gate or permit external exposure. Production promotion occurs only through a `staging -> main` pull request after the required gates pass.
 
 Use `template.md` and `workflow.md` for every new numbered spec. Rules, context and ADRs remain separate sources of truth and must be referenced by their canonical numbered semantic filenames.
