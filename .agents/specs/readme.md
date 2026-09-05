@@ -66,7 +66,7 @@ The prefix is a unique catalog rank, not the durable `SPEC-###` identity. Existi
 | 048 | SPEC-048 | implemented | [Install grill-me and align discovery gates](048-grill-me-discovery-alignment.spec.md) |
 | 049 | SPEC-049 | draft | [Integrated Memory validation debt](049-integrated-memory-validation-debt.spec.md) |
 | 050 | SPEC-050 | implemented | [Local MVP environment](050-local-mvp-environment.spec.md) |
-| 051 | SPEC-051 | in-progress | [LangGraph Memory orchestration](051-langgraph-memory-orchestration.spec.md) |
+| 051 | SPEC-051 | implemented | [LangGraph Memory orchestration](051-langgraph-memory-orchestration.spec.md) |
 | 052 | SPEC-052 | in-progress | [Realtime PWA Memory bridge](052-realtime-pwa-memory-bridge.spec.md) |
 
 The next unallocated durable delivery ID is `SPEC-053`.

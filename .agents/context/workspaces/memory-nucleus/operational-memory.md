@@ -17,3 +17,7 @@ SPEC-016 records exact implementation and validation checkpoints. Passing earlie
 ## Local owner environment — SPEC-050
 
 WorkOS remains the default authentication mode. The owner-approved local mode requires development/test, a loopback listener and loopback allowed origins; it supplies a stable server-owned identity with expiring sessions. Memory consent remains explicit. The local internal owner may enqueue background curation; this does not enable Free paid background work. See [the local startup guide](../../../../workspaces/packages/runtime/mvp.md) and its central `.env.template`. Hosted or multi-user rollout is outside this mode.
+
+## LangGraph worker — SPEC-051
+
+The existing BullMQ worker now invokes a compiled LangGraph through an application orchestration port. Deterministic claim/admission, curation, completion and release branches reuse the existing use case, consent, Neo4j fences and accounting. Graph state contains only bounded outcomes; protected invocation state stays in closures. Neo4j remains durable authority, with no second checkpoint store or added routing model. Public and worker artifacts compiled; live worker scenarios remain pending.
