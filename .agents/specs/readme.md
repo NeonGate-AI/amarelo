@@ -68,8 +68,9 @@ The prefix is a unique catalog rank, not the durable `SPEC-###` identity. Existi
 | 050 | SPEC-050 | implemented | [Local MVP environment](050-local-mvp-environment.spec.md) |
 | 051 | SPEC-051 | implemented | [LangGraph Memory orchestration](051-langgraph-memory-orchestration.spec.md) |
 | 052 | SPEC-052 | implemented | [Realtime PWA Memory bridge](052-realtime-pwa-memory-bridge.spec.md) |
+| 053 | SPEC-053 | in-progress | [Commercial product README](053-commercial-readme.spec.md) |
 
-The next unallocated durable delivery ID is `SPEC-053`.
+The next unallocated durable delivery ID is `SPEC-054`.
 
 SPEC-046 and SPEC-047 were implemented in the owner-authorized local ZIP branch. Their source/test acceptance does not assert live login, deployed infrastructure, browser E2E or remote CI.
 
