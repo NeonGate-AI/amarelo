@@ -2,7 +2,7 @@
 id: SPEC-056
 title: Synchronize readiness test setup with completed consent accounting
 type: fix
-status: ready
+status: in-progress
 mode: prospective
 created: 2026-09-06
 updated: 2026-09-06

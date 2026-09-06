@@ -71,7 +71,7 @@ The prefix is a unique catalog rank, not the durable `SPEC-###` identity. Existi
 | 053 | SPEC-053 | in-progress | [Commercial product README](053-commercial-readme.spec.md) |
 | 054 | SPEC-054 | in-progress | [Shell automation entrypoints](054-shell-automation-entrypoints.spec.md) |
 | 055 | SPEC-055 | implemented | [Integrated CI recovery](055-integrated-ci-recovery.spec.md) |
-| 056 | SPEC-056 | ready | [Readiness accounting synchronization](056-readiness-accounting-synchronization.spec.md) |
+| 056 | SPEC-056 | in-progress | [Readiness accounting synchronization](056-readiness-accounting-synchronization.spec.md) |
 
 The next unallocated durable delivery ID is `SPEC-057`.
 

@@ -19,8 +19,14 @@ test('missing required schema closes readiness and rejects protected writes unti
   )
   const session = admin.session({ database: options.database })
   let runtime: Awaited<ReturnType<typeof createNeo4jMemoryRuntime>> | undefined
+  let completedConsentObservations = 0
   try {
-    runtime = await createNeo4jMemoryRuntime(options)
+    runtime = await createNeo4jMemoryRuntime({
+      ...options,
+      onObservation: (event) => {
+        if (event.operation === 'consent') completedConsentObservations += 1
+      }
+    })
     const context = {
       actorId: 'user_readiness_patient',
       asOf: new Date().toISOString(),
@@ -44,6 +50,10 @@ test('missing required schema closes readiness and rejects protected writes unti
       ],
       expectedVersion: consent.version
     })
+    // The callback acknowledges durable accounting; settle setup before counting.
+    await expect
+      .poll(() => completedConsentObservations, { timeout: 5_000 })
+      .toBe(2)
     const before = await session.run('MATCH (n) RETURN count(n) AS count')
     expect(await runtime.readiness()).toMatchObject({
       database: 'available',
