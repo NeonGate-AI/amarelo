@@ -2,7 +2,7 @@
 id: SPEC-056
 title: Synchronize readiness test setup with completed consent accounting
 type: fix
-status: in-progress
+status: implemented
 mode: prospective
 created: 2026-09-06
 updated: 2026-09-06
@@ -28,6 +28,8 @@ skills:
 evidence:
   - https://github.com/NeonGate-AI/amarelo/actions/runs/34013921865/job/101434341671
   - https://github.com/NeonGate-AI/amarelo/pull/97
+  - https://github.com/NeonGate-AI/amarelo/actions/runs/34014292131
+  - https://github.com/NeonGate-AI/amarelo/pull/97#issuecomment-5557241937
 ---
 
 # SPEC-056: Synchronize readiness test setup with completed consent accounting
@@ -96,10 +98,10 @@ must not be represented as a successful integration test.
 
 ## Acceptance Criteria
 
-- [ ] The baseline waits for both completed consent accounting deliveries.
-- [ ] The original whole-graph no-write and schema recovery assertions remain enforced.
-- [ ] The corrected readiness test and complete required CI pass remotely.
-- [ ] Both review axes pass and evidence is recorded without closing unrelated product debt.
+- [x] The baseline waits for both completed consent accounting deliveries.
+- [x] The original whole-graph no-write and schema recovery assertions remain enforced.
+- [x] The corrected readiness test and complete required CI pass remotely.
+- [x] Both review axes pass and evidence is recorded without closing unrelated product debt.
 
 ## Failure Behavior
 
@@ -118,6 +120,20 @@ runtime authorization/readiness, other product specs or merging main.
 Record the failed baseline, code-level race analysis, remote repaired runs and
 review in this spec and PR #97. The existing runtime observer contract already
 owns the asynchronous behavior; no new rule or ADR is needed.
+
+### Implementation validation — 2026-09-06
+
+Head `a5f484a7dc738b64fdcf279696d8dc2a53fd16e5` passes the linked complete CI
+run, including the corrected disposable Neo4j test, PostgreSQL, all audits,
+lint, types, tests, evaluations, build, hooks and Commitlint. The main-source
+guard and four Vercel deployments pass on the same head. The linked review
+records PASS on both independent axes against `a51711b01dbc6180f70956dadce4d0f0ce1e372a`.
+
+The original graph-count comparison and every rejection/recovery assertion are
+unchanged. A bounded five-second poll now waits for two consent acknowledgements
+before the baseline query. Production code and all other spec contracts are
+unchanged. The final documentation-only closure reruns this same test and full
+CI; PR #97 records that final-head confirmation without another source change.
 
 ## Further Notes
 
