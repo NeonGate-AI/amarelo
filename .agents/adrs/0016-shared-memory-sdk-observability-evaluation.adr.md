@@ -1,4 +1,15 @@
-# ADR 0016: Shared Memory SDK, Observability and Evaluation
+---
+id: ADR-0016
+title: Shared Memory SDK, Observability and Evaluation
+status: accepted
+date: null
+deciders:
+  - product-owner
+supersedes: []
+superseded-by: null
+---
+
+# ADR-0016: Shared Memory SDK, Observability and Evaluation
 
 ## Status
 Accepted

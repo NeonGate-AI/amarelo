@@ -39,7 +39,7 @@ Implementations must identify a shared memory contract and show that agent-speci
 
 ## Links
 
-- Product context: `.agents/PRODUCT.md`
-- Memory contract: `.agents/MEMORY.md`
-- Runtime design: `elos/memory-nucleus/docs/MEMORY.md`
-- Ownership boundary: `.agents/decisions/0012-memory-nucleus-layout.md`
+- Product context: `.agents/context/product/overview.md`
+- Memory contract: `.agents/rules/006-memory-nucleus.rule.md`
+- Runtime design: `.agents/context/workspaces/memory-nucleus/overview.md`
+- Ownership boundary: `.agents/adrs/0012-memory-nucleus-layout.adr.md`

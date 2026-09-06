@@ -72,29 +72,13 @@ writing-for-agents
 
 project_skill_inventory='
 accessibility
-agent-memory-systems
-best-practices
-context-engineering
-core-web-vitals
-deep-agents-core
-deep-agents-memory
-deep-agents-orchestration
-documentation-and-adrs
 frontend-ui-engineering
-langchain-architecture
-langchain-fundamentals
-langchain-middleware
-langchain-rag
-langchain-typescript-quickstart
-langgraph-docs
-langgraph-human-in-the-loop
-langgraph-persistence
-managed-deep-agents
-performance
 pwa-development
-seo
-spec-driven-development
-web-quality-audit
+'
+
+discovery_skill_inventory='
+grill-me
+grilling
 '
 
 removed_imported_skills='
@@ -103,9 +87,7 @@ claude-handoff
 codebase-design
 diagnosing-bugs
 git-guardrails-claude-code
-grill-me
 grill-with-docs
-grilling
 handoff
 implement-spec
 improve-codebase-architecture
@@ -152,12 +134,49 @@ for skill in $project_skill_inventory; do
   entry="$SKILL_ROOT/$skill/SKILL.md"
   [ -f "$entry" ] ||
     workflow_fail preserved-skill "$entry" \
-      "independently sourced/project skill was removed" \
-      "restore the preserved project skill"
-  grep -Fx -- "- $skill" "$SKILL_ROOT/readme.md" >/dev/null 2>&1 ||
+      "maintained project skill is missing" \
+      "restore the maintained project skill"
+  grep -F "[$skill]($skill/SKILL.md)" "$SKILL_ROOT/readme.md" >/dev/null 2>&1 ||
     workflow_fail skill-index .agents/skills/readme.md \
       "preserved project skill is absent from the inventory: $skill" \
       "record the skill in the project/domain section"
+done
+
+for skill in $discovery_skill_inventory; do
+  entry="$SKILL_ROOT/$skill/SKILL.md"
+  [ -f "$entry" ] ||
+    workflow_fail discovery-skill "$entry" \
+      "owner-approved discovery procedure is missing" \
+      "restore the local discovery entry point"
+  grep -F "[$skill]($skill/SKILL.md)" "$SKILL_ROOT/readme.md" >/dev/null 2>&1 ||
+    workflow_fail skill-index .agents/skills/readme.md \
+      "discovery skill is not indexed: $skill" \
+      "link the local discovery procedure"
+done
+
+grep -F '.agents/skills/grilling/SKILL.md' "$SKILL_ROOT/grill-me/SKILL.md" >/dev/null 2>&1 ||
+  workflow_fail discovery-dependency .agents/skills/grill-me/SKILL.md \
+    "grill-me does not resolve its local interview engine" \
+    "route to the retained grilling procedure"
+
+for entry in "$SKILL_ROOT"/*; do
+  [ -d "$entry" ] || continue
+  skill=${entry##*/}
+  if ! printf '%s\n' "$required_workflow_skills" "$project_skill_inventory" "$discovery_skill_inventory" | grep -Fx "$skill" >/dev/null 2>&1; then
+    workflow_fail skill-inventory ".agents/skills/$skill" \
+      "skill is not in the current maintained inventory" \
+      "remove dormant skills or approve and route an inventory revision"
+  fi
+done
+
+for skill in $project_skill_inventory; do
+  entry="$SKILL_ROOT/$skill/SKILL.md"
+  [ -f "$entry" ] || continue
+  if grep -Ei 'do not (add|run|introduce).*automated|automated (tests|testing|test suites).*(prohibited|forbidden|deferred)' "$entry" >/dev/null 2>&1; then
+    workflow_fail obsolete-test-policy ".agents/skills/$skill/SKILL.md" \
+      "skill still prohibits the approved automated test seams" \
+      "follow ADR-0035 and the active spec testing decisions"
+  fi
 done
 
 for skill in $removed_imported_skills; do
@@ -271,4 +290,4 @@ if [ "$failures" -gt 0 ]; then
   exit 1
 fi
 
-printf 'Workflow skills PASS - 7 workflow procedures and 24 project skills\n'
+printf 'Workflow skills PASS - 7 workflow, 2 discovery and 3 maintained project skills\n'

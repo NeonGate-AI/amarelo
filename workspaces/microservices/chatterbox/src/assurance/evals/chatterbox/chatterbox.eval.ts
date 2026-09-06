@@ -17,16 +17,16 @@ import {
   createLangChainAdapter,
   createSequenceClock,
   createTestChatterbox,
-  createUnavailableChatterbox
+  createUnavailableChatterbox,
+  createOwnedTestSession,
+  SYNTHETIC_CONVERSATION_HEADERS
 } from './chatterbox.fixtures'
 
 const REQUEST: ConversationTurnRequest = {
   agentId: 'ana',
-  asOf: '2026-09-03T12:00:00.000Z',
   conversationId: 'api-conversation-1',
   history: [],
   message: 'Oi!',
-  purpose: 'conversation.support',
   requestId: 'api-request-1'
 }
 
@@ -49,6 +49,7 @@ async function evaluateCompleteSdkTurn() {
     fetch: createInjectedFetch(app)
   })
 
+  await createOwnedTestSession(app)
   const result = await client.turn(REQUEST)
   assert.equal(result.response, 'Estou aqui para acompanhar você.')
   assert.equal(result.metrics.modelCalls, 1)
@@ -65,7 +66,10 @@ async function evaluateInvalidRequestBeforeModel() {
   const model = new RecordingAnaModel()
   const app = createTestChatterbox({ model })
   const response = await app.inject({
-    headers: { 'content-type': 'application/json' },
+    headers: {
+      'content-type': 'application/json',
+      ...SYNTHETIC_CONVERSATION_HEADERS
+    },
     method: 'POST',
     payload: JSON.stringify({
       ...REQUEST,
@@ -87,7 +91,10 @@ async function evaluateOversizedRequestBeforeModel() {
   const model = new RecordingAnaModel()
   const app = createTestChatterbox({ model })
   const response = await app.inject({
-    headers: { 'content-type': 'application/json' },
+    headers: {
+      'content-type': 'application/json',
+      ...SYNTHETIC_CONVERSATION_HEADERS
+    },
     method: 'POST',
     payload: JSON.stringify({ ...REQUEST, message: 'x'.repeat(600_000) }),
     url: '/v1/conversation/turn'
@@ -110,8 +117,12 @@ async function evaluateSafeModelFailure() {
     new Error(secretFailure)
   )
   const app = createTestChatterbox({ model })
+  await createOwnedTestSession(app)
   const response = await app.inject({
-    headers: { 'content-type': 'application/json' },
+    headers: {
+      'content-type': 'application/json',
+      ...SYNTHETIC_CONVERSATION_HEADERS
+    },
     method: 'POST',
     payload: JSON.stringify(REQUEST),
     url: '/v1/conversation/turn'
@@ -144,8 +155,12 @@ async function evaluateLangChainAdapter() {
 
 async function evaluateUnavailableProviderConfiguration() {
   const app = createUnavailableChatterbox()
+  await createOwnedTestSession(app)
   const response = await app.inject({
-    headers: { 'content-type': 'application/json' },
+    headers: {
+      'content-type': 'application/json',
+      ...SYNTHETIC_CONVERSATION_HEADERS
+    },
     method: 'POST',
     payload: JSON.stringify(REQUEST),
     url: '/v1/conversation/turn'

@@ -1,7 +1,4 @@
-import {
-  ConversationClient,
-  type ConversationTurnRequest
-} from '@repo/conversation-sdk'
+import { ConversationClient } from '@repo/conversation-sdk'
 import { AgentOrb, agentOrbPresets } from '@repo/react/ui/agent-orb'
 import { SmoothButton } from '@repo/react/ui/smooth-button'
 import { type FormEvent, useEffect, useMemo, useRef, useState } from 'react'
@@ -33,7 +30,7 @@ interface DevelopmentConversationState {
 const INITIAL_STATE: DevelopmentConversationState = Object.freeze({
   caption: Object.freeze({
     accessible:
-      'Modo de desenvolvimento: envie um turno sintético para conversar com a Ana.',
+      'Modo de desenvolvimento: entre pelo onboarding neste mesmo navegador e envie um turno sintético para a Ana.',
     lines: Object.freeze([
       'Envie um turno sintético para validar',
       'o caminho real até a Ana.'
@@ -101,9 +98,6 @@ export function DevelopmentConversationView({
   const [draft, setDraft] = useState('')
   const [state, setState] =
     useState<DevelopmentConversationState>(INITIAL_STATE)
-  const conversationId = useRef(
-    createEphemeralIdentifier('development-conversation', 1)
-  )
   const requestSequence = useRef(0)
 
   const session = useMemo(
@@ -127,18 +121,8 @@ export function DevelopmentConversationView({
       'development-request',
       requestSequence.current
     )
-    const input: ConversationTurnRequest = {
-      agentId: 'ana',
-      asOf: new Date().toISOString(),
-      conversationId: conversationId.current,
-      history: [],
-      message,
-      purpose: 'conversation.support',
-      requestId
-    }
-
     setDraft('')
-    void session.submit(input)
+    void session.submit({ agentId: 'ana', message, requestId })
   }
 
   const orbState =
@@ -210,7 +194,9 @@ export function DevelopmentConversationView({
           id="development-conversation-help"
         >
           Este campo existe somente quando o driver de desenvolvimento está
-          explicitamente habilitado.
+          explicitamente habilitado. Entre pelo onboarding usando o mesmo
+          navegador e hostname. A conversa é temporária; nenhuma memória é
+          salva.
         </p>
         <div className="flex gap-3">
           <SmoothButton

@@ -15,24 +15,12 @@ function validateBaseUrl(value: unknown): string {
       ? value.trim()
       : DEFAULT_DEVELOPMENT_API_BASE_URL
 
-  if (candidate.startsWith('/') && !candidate.startsWith('//')) {
+  if (/^\/[a-zA-Z0-9/_-]*$/u.test(candidate) && !candidate.startsWith('//')) {
     return candidate
   }
-
-  let parsed: URL
-  try {
-    parsed = new URL(candidate)
-  } catch {
-    throw new TypeError('The development conversation API URL is invalid')
-  }
-
-  if (parsed.protocol !== 'http:' && parsed.protocol !== 'https:') {
-    throw new TypeError(
-      'The development conversation API URL must use HTTP or HTTPS'
-    )
-  }
-
-  return parsed.toString().replace(/\/$/, '')
+  throw new TypeError(
+    'The authenticated development API must use a same-origin absolute path'
+  )
 }
 
 export function validateDevelopmentConversationConfiguration(

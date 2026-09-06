@@ -42,6 +42,7 @@ elo setup
 elo doctor
 elo cleanup
 elo runtime up
+elo runtime up --profile memory
 elo runtime down
 elo runtime prune
 elo runtime e2e
@@ -52,15 +53,22 @@ elo spec [lowercase-kebab-name]
 elo env setup
 elo env validate
 elo git doctor
+elo git lint-history origin/main HEAD
 elo check rules
 elo check all
 ```
 
 `pnpm elo <command>` and `./cli/elo <command>` remain compatibility and recovery entrypoints. Running Elo without arguments shows the yellow ELO wordmark and emoji command catalog without bootstrapping or installing anything. `--logs` may appear before or immediately after a command and sends additional, secret-safe diagnostics to stderr. ANSI color is limited to interactive output and is disabled by `NO_COLOR`. Unknown commands and invalid subcommands return status 2.
 
+`elo git lint-history <from> <to>` validates every commit in the Git range with
+the normal Commitlint rules. The five immutable commit objects approved in
+[SPEC-055](../.agents/specs/055-integrated-ci-recovery.spec.md) receive only a
+body-line-length exception. New commits, including copies of those messages,
+retain the 100-character limit. The local commit-msg hook remains fully strict.
+
 `elo cleanup` immediately removes eligible untracked generated outputs and `node_modules` directories. The command has no options and protects tracked paths, `.git`, and `.audit`; `--dependencies`, the former `--apply` gate, and every other option are rejected before mutation.
 
-`elo runtime` exposes exactly four Kubernetes lifecycle actions. `up` reconciles the namespace and waits for PostgreSQL, Redis, the four interface apps and Chatterbox; `down` removes transient Cypress resources, scales all base workloads to zero and waits for their pods to terminate while preserving PostgreSQL; `prune` waits for deletion of the complete `amarelo-runtime` namespace and then removes the generated runtime `.env`; `e2e` runs `up` before an in-cluster headless Cypress Job and leaves the base runtime up. Invalid or extra runtime arguments return status 2 before delegation.
+`elo runtime` exposes exactly four Kubernetes lifecycle actions. `up` starts only the four interface apps and Chatterbox by default. `up` and `e2e` accept `--profile application|memory|reference`, overriding the shell variable `AMARELO_RUNTIME_PROFILE`: Memory adds Neo4j, separate Redis Queue/Cache and MinIO; reference adds only PostgreSQL. Changing a profile stops excluded infrastructure while retaining its resources and persistent state. `down` stops all namespace workloads and waits for termination; `prune` deletes the complete `amarelo-runtime` namespace before removing the generated `.env`. Both reject profile flags. `e2e` starts and waits for the selected profile before running in-cluster headless Cypress. Invalid syntax returns status 2 before delegation. Details and safe credentials belong to `workspaces/packages/runtime/readme.md`.
 
 The artifact commands render the four canonical empty templates in `.agents/prompts/`. ADRs, rules, and specs receive their next repository number; rule numbers are stable catalog identities rather than precedence; specs also receive the next durable `SPEC-###` ID. Skills preserve `.agents/skills/<name>/SKILL.md`. Generation never overwrites an existing target or updates approval/catalog state automatically.
 

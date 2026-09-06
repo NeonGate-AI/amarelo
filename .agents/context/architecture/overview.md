@@ -5,7 +5,7 @@ Amarelo is organized around user-facing `workspaces/apps/`, bounded-context `wor
 ```text
 workspaces/
   apps/
-    user-facing products and deployable services
+    user-facing products
   microservices/
     deployable network APIs
   ai/
@@ -49,6 +49,8 @@ workspaces/
 Memory Nucleus is one workspace, not a nested mini-monorepo. Clean Architecture dependency direction is `infrastructure → application → domain`. AI consumes Memory Nucleus only through `@repo/memory-sdk`. Neo4j is the selected canonical Memory graph; BullMQ uses persistent Redis Queue, disposable cache-aside state uses a physically separate Redis Cache, and object storage holds large immutable sources. Neo4j commits Memory changes with outbox events; dispatch to BullMQ is eventual and workers are idempotent. `@repo/runtime` owns the repository-managed local Kubernetes resources and structured orchestration backend; namespace `amarelo-runtime` is its resource boundary. Elo exposes the thin `runtime up|down|prune|e2e` control-plane adapter, while the package owns readiness, termination, wipe and in-cluster Cypress semantics. Local runtime manifests do not imply a production deployment contract.
 
 ## Harness filename contract
+
+The default local runtime is the application-only profile. Memory dependencies and the historical PostgreSQL reference workload are selected explicitly; their existence is not proof of an operational Memory adapter. See `.agents/context/workspaces/packages/overview.md` for ownership and the runtime README for executable profile commands.
 
 Semantic suffixes make artifact ownership visible without opening the file:
 

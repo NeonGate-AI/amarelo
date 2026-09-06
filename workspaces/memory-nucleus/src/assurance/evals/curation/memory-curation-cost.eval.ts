@@ -1,8 +1,8 @@
 import assert from 'node:assert/strict'
 
-import { MemoryCurationUsageSchema } from '@application/contracts/memory-curation.contract'
-import type { MemoryExtractionResult } from '@application/ports/memory-extractor.port'
-import { SaveCurationRunRequestSchema } from '@application/ports/memory-curation-persistence.port'
+import { MemoryCurationUsageSchema } from '@application/contracts'
+import type { MemoryExtractionResult } from '@application/ports'
+import { SaveCurationRunRequestSchema } from '@application/ports'
 import type { MemoryCurationEvalCase } from './memory-curation-eval.contract'
 import {
   buildRequest,

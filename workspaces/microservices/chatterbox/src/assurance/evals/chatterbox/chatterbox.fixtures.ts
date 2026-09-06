@@ -14,6 +14,32 @@ import {
   type LangChainChatModelInvoker
 } from 'chatterbox'
 
+export const SYNTHETIC_CONVERSATION_HEADERS = {
+  cookie: 'wos-session=synthetic-session',
+  origin: 'http://localhost:3003'
+} as const
+
+export const SYNTHETIC_IDENTITY = Object.freeze({
+  actorId: 'user_synthetic',
+  authenticationSessionId: 'session_synthetic',
+  expiresAtMs: Date.parse('2099-01-01T00:00:00.000Z'),
+  subjectId: 'user_synthetic',
+  tenantId: 'personal:user_synthetic'
+})
+
+export async function createOwnedTestSession(
+  app: FastifyInstance
+): Promise<void> {
+  const response = await app.inject({
+    headers: SYNTHETIC_CONVERSATION_HEADERS,
+    method: 'POST',
+    payload: {},
+    url: '/v1/conversation/session'
+  })
+  if (response.statusCode !== 201)
+    throw new Error('Synthetic session setup failed')
+}
+
 export class RecordingAnaModel extends AnaChatModelPort {
   readonly requests: AnaChatModelRequest[] = []
 
@@ -65,6 +91,9 @@ export function createTestChatterbox(options: {
     agents: [new AnaConversationAgent({ model: options.model })]
   })
   return createChatterbox({
+    allowedOrigins: [SYNTHETIC_CONVERSATION_HEADERS.origin],
+    authenticate: async () => SYNTHETIC_IDENTITY,
+    createConversationId: () => 'api-conversation-1',
     createRealtimeCall: options.createRealtimeCall,
     nowMs: options.nowMs,
     runtime
@@ -72,7 +101,12 @@ export function createTestChatterbox(options: {
 }
 
 export function createUnavailableChatterbox(): FastifyInstance {
-  return createChatterbox({ runtime: undefined })
+  return createChatterbox({
+    allowedOrigins: [SYNTHETIC_CONVERSATION_HEADERS.origin],
+    authenticate: async () => SYNTHETIC_IDENTITY,
+    createConversationId: () => 'api-conversation-1',
+    runtime: undefined
+  })
 }
 
 export function createSequenceClock(...values: number[]): () => number {
@@ -110,7 +144,7 @@ export function createInjectedFetch(app: FastifyInstance): typeof fetch {
       | 'POST'
       | 'PUT'
     const injectedResponse = await app.inject({
-      headers: requestHeaders,
+      headers: { ...requestHeaders, ...SYNTHETIC_CONVERSATION_HEADERS },
       method: requestMethod,
       payload,
       url: `${url.pathname}${url.search}`

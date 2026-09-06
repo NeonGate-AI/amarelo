@@ -5,12 +5,12 @@ type: feature
 status: draft
 mode: prospective
 created: 2026-09-03
-updated: 2026-09-03
+updated: 2026-09-05
 owners:
   - Jonatas Sales
 targets:
   - workspaces/ai/conversation
-  - workspaces/apps/conversation-api
+  - workspaces/microservices/chatterbox
   - workspaces/apps/mobile
 context:
   - .agents/context/architecture/overview.md
@@ -303,7 +303,7 @@ Telemetry excludes raw audio, credentials, authorization headers, unrestricted t
 
 ### Primary seam
 
-Exercise lifecycle behavior through the Conversation runtime or a dedicated public session runtime composed by `conversation-api`. Tests submit canonical commands and observe committed lifecycle projections, hook calls, effect states, guardrail decisions, and publication eligibility.
+Exercise lifecycle behavior through the Conversation runtime or a dedicated public session runtime composed by `chatterbox`. Tests submit canonical commands and observe committed lifecycle projections, hook calls, effect states, guardrail decisions, and publication eligibility.
 
 ### Secondary seams
 
@@ -366,10 +366,12 @@ If a transport cannot cancel generation or playback, the adapter must still supp
 
 ## Evidence and Promotion
 
-Planned evidence includes deterministic lifecycle tests, race fixtures, provider-adapter contract tests, `conversation-api` integration tests, idempotency and reconciliation tests, exact-head CI, and independent review.
+Planned evidence includes deterministic lifecycle tests, race fixtures, provider-adapter contract tests, `chatterbox` integration tests, idempotency and reconciliation tests, exact-head CI, and independent review.
 
 When implemented, promote the final lifecycle vocabulary, public seams, and ownership summary to `.agents/context/workspaces/ai/conversation.md`; update the relevant application harness with transport composition details; replace `pending` evidence with stable paths and PR references; and mark the spec `implemented` only after behavior is verifiable on `main`.
 
 ## Further Notes
+
+Sequence after SPEC-033 and the SPEC-047 authenticated text seam, before connected voice/streaming exposure. Preserve the existing bounded request-response path while introducing only the lifecycle events needed by that bridge.
 
 This spec deliberately separates canonical application lifecycle from transport implementation. A future approved realtime voice spec can map WebRTC or provider events to these seams without redefining interruption, stale-result, duplicate-effect, or reconnect semantics.

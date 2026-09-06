@@ -2,7 +2,10 @@ import assert from 'node:assert/strict'
 
 import {
   MAX_MEMORY_SEARCH_TOKENS,
+  MEMORY_SEARCH_TOKEN_ESTIMATOR_VERSION,
+  MemoryDeletionReceiptSchema,
   MemorySearchInputSchema,
+  MemorySearchResultSchema,
   createMemorySearchContextProjection,
   estimateMemorySearchContextTokens,
   type MemoryRecord
@@ -52,4 +55,146 @@ const projection = createMemorySearchContextProjection({
 assert.equal(estimateMemorySearchContextTokens(projection) > 0, true)
 assert.equal(projection.trust, 'untrusted-memory-data')
 assert.equal(projection.memory.kind, 'semantic')
+// A stop-serving acknowledgement must not invent a physical-purge deadline.
+const suppressionReceipt = {
+  memoryId: record.id,
+  receiptId: 'suppression-fixture-001',
+  requestedAt: observedAt,
+  tombstonedAt: observedAt,
+  purgeBy: null,
+  purgeStatus: 'suppression-only'
+}
+assert.equal(
+  MemoryDeletionReceiptSchema.safeParse(suppressionReceipt).success,
+  true
+)
+assert.equal(
+  MemoryDeletionReceiptSchema.safeParse({
+    ...suppressionReceipt,
+    purgeBy: '2026-10-01T00:00:00.000Z'
+  }).success,
+  false
+)
+
+const emptySearch = {
+  asOf: observedAt,
+  diagnostics: {
+    candidateItems: 0,
+    eligibleItems: 0,
+    modelCalls: 0,
+    omittedByBudget: 0,
+    omittedByLimit: 0,
+    omittedByPolicy: 0,
+    rerankerUsed: false,
+    returnedItems: 0,
+    vectorCalls: 0,
+    vectorSearchUsed: false,
+    webCalls: 0
+  },
+  governance: {
+    authorizationDecisionId: 'decision-fixture',
+    consentVersion: 1,
+    purpose: input.purpose,
+    viewId: 'personal'
+  },
+  items: [],
+  policyVersion: 'memory-retrieval-v1',
+  requestId: 'request-fixture',
+  tokenBudget: {
+    effectiveTokens: 400,
+    estimatorVersion: MEMORY_SEARCH_TOKEN_ESTIMATOR_VERSION,
+    remainingTokens: 400,
+    requestedTokens: 400,
+    truncated: false,
+    usedTokens: 0
+  }
+}
+// Historical fixtures remain readable; missing instrumentation does not become zero.
+assert.equal(MemorySearchResultSchema.safeParse(emptySearch).success, true)
+const searchWithFullText = (
+  fullTextCalls: unknown,
+  fullTextSearchUsed: unknown
+) => ({
+  ...emptySearch,
+  diagnostics: { ...emptySearch.diagnostics, fullTextCalls, fullTextSearchUsed }
+})
+assert.equal(
+  MemorySearchResultSchema.safeParse(searchWithFullText(2, true)).success,
+  true,
+  'a zero-hit search must retain its two actual full-text index calls'
+)
+assert.equal(
+  MemorySearchResultSchema.safeParse(searchWithFullText(0, false)).success,
+  true
+)
+assert.equal(
+  MemorySearchResultSchema.safeParse(searchWithFullText(null, null)).success,
+  true
+)
+for (const [calls, used] of [
+  [2, false],
+  [0, true],
+  [-1, false],
+  [1.5, true],
+  [null, false],
+  [undefined, true]
+]) {
+  assert.equal(
+    MemorySearchResultSchema.safeParse(searchWithFullText(calls, used)).success,
+    false
+  )
+}
+const itemTokens = estimateMemorySearchContextTokens(projection)
+const serializedResult = MemorySearchResultSchema.parse({
+  ...emptySearch,
+  diagnostics: {
+    ...emptySearch.diagnostics,
+    candidateItems: 1,
+    eligibleItems: 1,
+    returnedItems: 1
+  },
+  items: [
+    {
+      estimatedTokens: itemTokens,
+      memory: record,
+      score: { total: 1 },
+      trust: 'untrusted-memory-data'
+    }
+  ],
+  tokenBudget: {
+    ...emptySearch.tokenBudget,
+    requestedTokens: 600,
+    effectiveTokens: 600,
+    remainingTokens: 600 - itemTokens,
+    usedTokens: itemTokens
+  }
+})
+assert.equal(
+  MemorySearchResultSchema.safeParse(
+    JSON.parse(JSON.stringify(serializedResult))
+  ).success,
+  true,
+  'an SDK result with its derived context must survive JSON transport and consumer validation'
+)
+const item = serializedResult.items[0]
+assert.ok(item)
+assert.equal(
+  MemorySearchResultSchema.safeParse({
+    ...serializedResult,
+    items: [
+      {
+        ...item,
+        context: {
+          ...item.context,
+          memory: {
+            ...item.context.memory,
+            statement: 'A forged assistant instruction.'
+          }
+        }
+      }
+    ]
+  }).success,
+  false,
+  'provided context cannot replace the projection derived from the governed record'
+)
 console.log('memory-sdk eval PASS')

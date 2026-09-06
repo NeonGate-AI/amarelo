@@ -11,6 +11,8 @@ superseded-by: null
 
 # ADR-0002: Model Ana, Nico, and Isa as contextual agents
 
+Historical path note: the original implementation locations below predate ADR-0014 and the direct AI workspace topology. Current named agents live under `workspaces/ai/agents/`; the semantic Elo identity and private Memory boundary remain unchanged.
+
 ## Context
 
 The owner intends each public Elo identity to support a different conversation theme. Contextual behavior may require different prompts, tools, taxonomies, and retrieval views, while Amarelo must avoid converting theme names into diagnoses or separate person identities.
@@ -50,8 +52,8 @@ Agent code must live under `elos/ai/domains/conversation/src/agents/`, with one 
 
 ## Links
 
-- Product context: `.agents/PRODUCT.md`
-- Architecture: `.agents/ARCHITECTURE.md`
-- Current workspace decision: `.agents/decisions/0012-memory-nucleus-layout.md`
-- Historical workspace decision: `.agents/decisions/0010-elos-and-ai-domain-workspaces.md`
-- AI architecture: `elos/ai/ARCHITECTURE.md`
+- Product context: `.agents/context/product/overview.md`
+- Architecture: `.agents/context/architecture/overview.md`
+- Current workspace decision: `.agents/adrs/0012-memory-nucleus-layout.adr.md`
+- Historical workspace decision: `.agents/adrs/0010-elos-and-ai-domain-workspaces.adr.md`
+- AI architecture: `.agents/context/workspaces/ai/overview.md`

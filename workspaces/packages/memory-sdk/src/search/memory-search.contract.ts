@@ -99,14 +99,56 @@ export const MemorySearchScoreSchema = z
   .strict()
 export type MemorySearchScore = z.infer<typeof MemorySearchScoreSchema>
 
+function matchesDerivedContext(actual: unknown, expected: unknown): boolean {
+  if (actual === expected) return true
+  if (
+    actual === null ||
+    expected === null ||
+    typeof actual !== 'object' ||
+    typeof expected !== 'object' ||
+    Array.isArray(actual)
+  )
+    return false
+  try {
+    const entries = Object.entries(expected)
+    return (
+      Object.keys(actual).length === entries.length &&
+      entries.every(
+        ([key, value]) =>
+          Object.hasOwn(actual, key) &&
+          matchesDerivedContext(Reflect.get(actual, key), value)
+      )
+    )
+  } catch {
+    return false
+  }
+}
+
 export const MemorySearchItemSchema = z
   .object({
+    context: z.unknown().optional(),
     estimatedTokens: z.number().int().positive().max(MAX_MEMORY_SEARCH_TOKENS),
     memory: MemoryRecordSchema,
     score: MemorySearchScoreSchema,
     trust: z.literal('untrusted-memory-data')
   })
   .strict()
+  .superRefine((item, context) => {
+    if (
+      item.context !== undefined &&
+      !matchesDerivedContext(
+        item.context,
+        createMemorySearchContextProjection(item)
+      )
+    ) {
+      context.addIssue({
+        code: 'custom',
+        message:
+          'provided context must match the projection derived from the governed memory',
+        path: ['context']
+      })
+    }
+  })
   .transform((item) =>
     Object.freeze({
       ...item,
@@ -156,6 +198,9 @@ export const MemorySearchDiagnosticsSchema = z
   .object({
     candidateItems: z.number().int().nonnegative(),
     eligibleItems: z.number().int().nonnegative(),
+    // Omitted legacy instrumentation and explicit null both mean unknown, never zero.
+    fullTextCalls: z.number().int().nonnegative().safe().nullable().optional(),
+    fullTextSearchUsed: z.boolean().nullable().optional(),
     modelCalls: z.literal(0),
     omittedByBudget: z.number().int().nonnegative(),
     omittedByLimit: z.number().int().nonnegative(),
@@ -168,6 +213,21 @@ export const MemorySearchDiagnosticsSchema = z
   })
   .strict()
   .superRefine((diagnostics, context) => {
+    const { fullTextCalls, fullTextSearchUsed } = diagnostics
+    if (
+      (fullTextCalls !== undefined || fullTextSearchUsed !== undefined) &&
+      (fullTextCalls === undefined ||
+        fullTextSearchUsed === undefined ||
+        fullTextSearchUsed !==
+          (fullTextCalls === null ? null : fullTextCalls > 0))
+    ) {
+      context.addIssue({
+        code: 'custom',
+        message:
+          'full-text usage must agree with its measured call count or remain unknown',
+        path: ['fullTextSearchUsed']
+      })
+    }
     if (diagnostics.eligibleItems > diagnostics.candidateItems) {
       context.addIssue({
         code: 'custom',

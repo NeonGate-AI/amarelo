@@ -1,4 +1,16 @@
-# ADR 0023: Keep Conversation directly under the AI workspace
+---
+id: ADR-0023
+title: Keep Conversation directly under the AI workspace
+status: accepted
+date: 2026-09-03
+deciders:
+  - product-owner
+supersedes:
+  - ADR-0019
+superseded-by: null
+---
+
+# ADR-0023: Keep Conversation directly under the AI workspace
 
 ## Status
 

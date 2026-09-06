@@ -11,10 +11,6 @@ const ConversationIdentifierSchema = z
   .max(200)
   .regex(/^[A-Za-z0-9][A-Za-z0-9._:-]{0,199}$/)
 
-const ConversationPurposeSchema = z
-  .string()
-  .regex(/^[a-z0-9][a-z0-9._:-]{0,79}$/)
-
 const ConversationTimestampSchema = z.string().datetime({ offset: true })
 const NullableTokenCountSchema = z.number().int().nonnegative().nullable()
 
@@ -31,14 +27,12 @@ export type ConversationSdkMessage = z.infer<
 export const ConversationTurnRequestSchema = z
   .object({
     agentId: z.literal('ana'),
-    asOf: ConversationTimestampSchema,
     conversationId: ConversationIdentifierSchema,
     history: z
       .array(ConversationSdkMessageSchema)
       .max(MAX_CONVERSATION_HISTORY_MESSAGES)
       .default([]),
     message: z.string().trim().min(1).max(MAX_CONVERSATION_MESSAGE_CHARACTERS),
-    purpose: ConversationPurposeSchema,
     requestId: ConversationIdentifierSchema
   })
   .strict()
@@ -48,6 +42,20 @@ export type ConversationTurnRequest = z.input<
 export type ValidatedConversationTurnRequest = z.output<
   typeof ConversationTurnRequestSchema
 >
+
+export const ConversationSessionResponseSchema = z
+  .object({
+    data: z
+      .object({
+        conversationId: ConversationIdentifierSchema,
+        expiresAt: ConversationTimestampSchema
+      })
+      .strict()
+  })
+  .strict()
+export type ConversationSessionResponseData = z.infer<
+  typeof ConversationSessionResponseSchema
+>['data']
 
 export const ConversationSdkModelUsageSchema = z
   .object({
@@ -140,6 +148,10 @@ export const ConversationTurnResponseSchema = z
   .strict()
 
 export const ConversationSafeErrorCodeSchema = z.enum([
+  'unauthenticated',
+  'forbidden',
+  'rate_limited',
+  'session_unavailable',
   'internal_error',
   'invalid_request',
   'model_unavailable',

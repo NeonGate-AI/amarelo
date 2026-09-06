@@ -65,25 +65,6 @@ jobs:
             exit 1
           fi
 
-      - name: Commitlint
-        shell: bash
-        env:
-          EVENT_NAME: ${{ github.event_name }}
-          PR_BASE: ${{ github.event.pull_request.base.sha }}
-          PR_HEAD: ${{ github.event.pull_request.head.sha }}
-          PUSH_BEFORE: ${{ github.event.before }}
-          HEAD_SHA: ${{ github.sha }}
-        run: |
-          if [ "$EVENT_NAME" = "pull_request" ]; then
-            pnpm exec commitlint --from "$PR_BASE" --to "$PR_HEAD" --verbose
-          else
-            base="$PUSH_BEFORE"
-            if [ -z "$base" ] || [ "$base" = "0000000000000000000000000000000000000000" ]; then
-              base="$(git rev-list --max-parents=0 HEAD)"
-            fi
-            pnpm exec commitlint --from "$base" --to "$HEAD_SHA" --verbose
-          fi
-
       - name: Lint
         run: pnpm exec biome check workspaces cli
 
@@ -93,11 +74,15 @@ jobs:
       - name: Test
         run: pnpm exec turbo run test
 
+      - name: Validate operational Memory against disposable Neo4j
+        timeout-minutes: 10
+        run: pnpm --filter chatterbox run test:integration
+
       - name: Validate current Memory PostgreSQL reference adapter
         run: pnpm --filter @nucleus/memory run test:database
 
       - name: Evaluate AI
-        run: pnpm --filter @nucleus/memory --filter @repo/memory-sdk --filter @ai/knowledge --filter @ai/ana --filter conversation-api run eval
+        run: pnpm --filter @nucleus/memory --filter @repo/memory-sdk --filter @ai/knowledge --filter @ai/ana --filter chatterbox run eval
 
       - name: Build
         run: pnpm exec turbo run build
@@ -109,3 +94,27 @@ jobs:
           printf 'chore(ci): validate commit hook\n' > .audit/commit-message.txt
           sh .husky/commit-msg .audit/commit-message.txt
           rm -f .audit/commit-message.txt
+
+      - name: Commit history regression tests
+        run: sh .audit/git-commit-history.audit.sh
+
+      # SPEC-055 permits only five exact historical body-length violations.
+      # All commits remain in the range and every other rule stays mandatory.
+      - name: Commitlint
+        shell: bash
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          PR_BASE: ${{ github.event.pull_request.base.sha }}
+          PR_HEAD: ${{ github.event.pull_request.head.sha }}
+          PUSH_BEFORE: ${{ github.event.before }}
+          HEAD_SHA: ${{ github.sha }}
+        run: |
+          if [ "$EVENT_NAME" = "pull_request" ]; then
+            ./cli/elo git lint-history "$PR_BASE" "$PR_HEAD"
+          else
+            base="$PUSH_BEFORE"
+            if [ -z "$base" ] || [ "$base" = "0000000000000000000000000000000000000000" ]; then
+              base="$(git rev-list --max-parents=0 HEAD)"
+            fi
+            ./cli/elo git lint-history "$base" "$HEAD_SHA"
+          fi

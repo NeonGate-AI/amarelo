@@ -1,4 +1,4 @@
-import type { RepositoryMemoryRecord } from '@application/ports/memory-repository.port'
+import type { RepositoryMemoryRecord } from '@application/ports'
 import { syntheticDirectReportMemoryRecord } from './memory-retrieval.fixtures.ts'
 
 /** Exact key outranks lexical results; application recency breaks lexical ties. */

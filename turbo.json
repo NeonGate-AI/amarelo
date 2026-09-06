@@ -39,12 +39,18 @@
     },
     "dev": {
       "cache": false,
-      "persistent": true
+      "persistent": true,
+      "passThroughEnv": [
+        "AI_CONVERSATION_MODEL",
+        "CHATTERBOX_*",
+        "VITE_AMARELO_REALTIME_VOICE"
+      ]
     },
     "start": {
       "dependsOn": ["build"],
       "cache": false,
-      "persistent": true
+      "persistent": true,
+      "passThroughEnv": ["AI_CONVERSATION_MODEL", "CHATTERBOX_*"]
     },
     "clean": {
       "cache": false

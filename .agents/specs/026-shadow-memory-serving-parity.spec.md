@@ -2,15 +2,15 @@
 id: SPEC-011
 title: Evaluate bounded Memory Nucleus serving in shadow mode
 type: experiment
-status: ready
+status: in-progress
 mode: prospective
 created: 2026-09-03
-updated: 2026-09-03
+updated: 2026-09-06
 owners:
   - Jonatas Sales
 targets:
   - workspaces/ai/conversation
-  - workspaces/apps/conversation-api
+  - workspaces/microservices/chatterbox
   - workspaces/packages/memory-sdk
   - Memory serving assurance
 context:
@@ -31,7 +31,7 @@ adrs:
   - .agents/adrs/0017-cognitive-routing-and-memory-boundary.adr.md
   - .agents/adrs/0023-direct-ai-conversation-topology.adr.md
 skills:
-  - .agents/skills/spec-driven-development/SKILL.md
+  - .agents/skills/to-spec/SKILL.md
   - .agents/skills/to-tickets/SKILL.md
   - .agents/skills/implement/SKILL.md
   - .agents/skills/code-review/SKILL.md
@@ -65,7 +65,7 @@ Compare the baseline and shadow candidate on identical fixtures, timestamps, mod
 - Authorized Memory retrieval through memory-sdk and existing Conversation ports.
 - Exact future treatment formatting as delimited untrusted data.
 - Strict no-effect separation from delivered serving.
-- Versioned paired comparison records correlated to SPEC-009.
+- Versioned paired comparison records using the SPEC-009 measurement protocol and current SPEC-047 authenticated transport.
 - Recall, relevance, temporal, leakage, quality, latency and cost reports.
 - Explicit go/no-go record for SPEC-017.
 
@@ -77,6 +77,10 @@ Compare the baseline and shadow candidate on identical fixtures, timestamps, mod
 - Projection remains typed, bounded and marked as untrusted Memory data.
 - Technical shadow failure is isolated from primary serving and recorded as unavailable.
 - Provider-reported and estimated usage remain separate.
+- Memory source restrictions do not remove assistant turns from the bounded temporary Conversation history. Preserve both roles where needed for immediate coherence; neither the recent buffer nor shadow artifacts become new personal-memory source evidence.
+- Keep the original SPEC-009 fixture as a historical regression reference. Freeze a paired baseline for each evaluated model/provider/configuration and workload using the same measurement contract. A model, instruction, route or workload change requires both sides to be regenerated; comparisons across different models cannot be attributed to Memory.
+- The future context candidate substitutes a bounded projection plus recent buffer for comparable longitudinal history. Do not inflate the control beyond its actual history budget to manufacture savings; short fragmented histories may correctly show little or no benefit.
+- Version the SPEC-025 60-minute weekly workload's duration basis and fragmented-turn distribution. A text-only shadow run reports observed text/Memory costs and labeled voice estimates or unknowns. It does not prove monthly voice affordability or a one-second first-audio target.
 - A blinded versioned evaluator compares answer quality; model-assisted judging is supplemental and costed.
 - Advancement requires critical-memory Recall@k above 90%, zero unauthorized leakage, zero consent violations, no quality regression and acceptable temporal/latency behavior.
 
@@ -89,6 +93,8 @@ A Conversation/Fastify shadow test captures baseline model input/result and prov
 ### Secondary seams
 
 Cross-tenant/subject/view/purpose denial, budget, prompt-injection treatment, superseded/expired/revoked/tombstoned cases, timeout isolation and economics calculations.
+
+Include recent dialogue requiring an assistant turn for interpretation, abstained ambiguous patient evidence, and repeated Ana output/inactivity that must not create new source evidence. Verify that rebaselining changes both paired records and preserves the original regression fixture.
 
 ### Fixtures and privacy
 
@@ -105,7 +111,9 @@ No-effect tests, Memory SDK/Nucleus evals, recall/irrelevance/temporal/leakage h
 - [ ] Cross-tenant, subject, view and purpose violations yield zero projection.
 - [ ] Projection remains within its explicit budget and SDK cap.
 - [ ] Normal retrieval reports zero model, vector and web calls.
-- [ ] Comparison records use the exact SPEC-009 fixture, timestamp, model, route, instruction and evaluator versions.
+- [ ] Each comparison pair has identical fixture, timestamp, model, route, instruction, workload and evaluator versions; the original SPEC-009 fixture remains a separate regression reference.
+- [ ] Patient-only formation does not strip necessary assistant roles from transient Conversation context or copy that context into source evidence.
+- [ ] Reports distinguish text/Memory observations, voice estimates and unavailable audio metrics, with explicit workload duration basis and no claim of measured monthly voice savings.
 - [ ] Critical-memory Recall@k is above 90%.
 - [ ] Unauthorized leakage and consent violations are zero.
 - [ ] Temporal cases are correct and response quality does not regress versus baseline.
@@ -128,4 +136,18 @@ Evidence will include no-effect, authorization, budget and adversarial tests; pa
 
 ## Further Notes
 
-Blocked by SPEC-009, SPEC-016 and SPEC-012. It blocks SPEC-017.
+SPEC-025 reconciliation (2026-09-05): the owner accepted the consolidated discovery and requested this contract revision. The discovery hold is resolved; this phase remains ready and unimplemented. [SPEC-025](007-plans-and-entitlements.spec.md) separates personal-memory evidence, temporary dialogue and timing telemetry. This revision keeps no-effect shadow behavior and allows properly paired model research without attributing a model-price change to Memory. It changes contracts only.
+
+Blocked by SPEC-009, SPEC-047, SPEC-016 and SPEC-012. Its no-effect/parity evidence unlocks SPEC-043; both gates remain prerequisites of SPEC-017.
+
+
+## Delivery decision — 2026-09-05
+
+Implemented and integrated under the owner's delivery-first instruction. No new validation was executed for this phase; unchecked acceptance evidence is explicitly deferred to SPEC-049. Implementation status does not certify a passed parity, integrity, canary or economics gate. Internal flags default off; missing evidence keeps control/hold.
+
+## Current validation status — SPEC-055
+
+Implementation remains delivered in staging. On 2026-09-06, SPEC-055 reconciles
+the lifecycle to `in-progress` because the existing acceptance/evidence debt is
+still open. Historical delivery notes and every unchecked criterion are retained.
+Repository CI recovery does not by itself complete this product contract.

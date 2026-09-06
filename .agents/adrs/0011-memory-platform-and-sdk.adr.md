@@ -198,9 +198,9 @@ narrow shared package outside the AI runtime.
 
 ## Links
 
-- Architecture map: `.agents/ARCHITECTURE.md`
-- Memory constitution: `.agents/MEMORY.md`
+- Architecture map: `.agents/context/architecture/overview.md`
+- Memory constitution: `.agents/rules/006-memory-nucleus.rule.md`
 - Memory behavior spec: `.agents/specs/001-memory-nucleus-product-contract.spec.md`
-- Platform architecture: `elos/memory-platform/README.md`
-- Research register: `elos/memory-platform/docs/RESEARCH.md`
-- Superseded decision: `.agents/decisions/0010-elos-and-ai-domain-workspaces.md`
+- Platform architecture: `.agents/context/workspaces/memory-nucleus/overview.md`
+- The original research register belonged to the retired physical layout and is available only through Git history.
+- Superseded decision: `.agents/adrs/0010-elos-and-ai-domain-workspaces.adr.md`

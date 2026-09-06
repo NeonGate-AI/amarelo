@@ -1,4 +1,15 @@
-# ADR 0032: Sequence automated testing with Vitest before critical Cypress scenarios
+---
+id: ADR-0032
+title: Sequence automated testing with Vitest before critical Cypress scenarios
+status: superseded
+date: 2026-09-04
+deciders:
+  - product-owner
+supersedes: []
+superseded-by: ADR-0035
+---
+
+# ADR-0032: Sequence automated testing with Vitest before critical Cypress scenarios
 
 ## Status
 

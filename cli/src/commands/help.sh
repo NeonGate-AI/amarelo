@@ -20,15 +20,17 @@ Commands:
   🩺 doctor [--ci]                         Diagnose repository prerequisites
   🧹 cleanup                               Remove generated state and dependencies
   ☸️  runtime <up|down|prune|e2e>           Manage the Kubernetes runtime
+                                             up/e2e: --profile application|memory|reference
   📝 changelog <product> [options]          Prepare a product changelog
   🧱 adr [name]                             Create the next empty ADR
   📏 rule [name]                            Create the next empty rule
   🧰 skill [name]                           Create an empty local skill
   📋 spec [name]                            Create the next empty spec
   🌱 env <setup|validate>                   Prepare or validate environment files
-  🔧 git <setup|doctor|pre-commit|commit-msg>
+  🔧 git <setup|doctor|pre-commit|commit-msg|lint-history>
                                              Manage repository Git integration
-  🧪 check <all|architecture|imports|memory|platform|rules|runtime|skills|specs>
+                                             lint-history: <from> <to>
+  🧪 check <all|architecture|canonical|imports|memory|platform|rules|runtime|skills|specs>
                                              Run invariant checkers
 
 Global flags:

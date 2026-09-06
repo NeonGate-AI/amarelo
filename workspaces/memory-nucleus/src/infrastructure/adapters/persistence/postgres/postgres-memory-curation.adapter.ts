@@ -4,11 +4,11 @@ import {
   type SaveCurationRunResult,
   type SourceClaimRequest,
   type SourceClaimResult
-} from '@application/ports/memory-curation-persistence.port'
+} from '@application/ports'
 import {
   SaveCurationRunRequestSchema,
   SourceClaimRequestSchema
-} from '@application/ports/memory-curation-persistence.port'
+} from '@application/ports'
 import type {
   PostgresExecutor,
   PostgresTransactionExecutor

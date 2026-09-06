@@ -49,7 +49,7 @@ Merging `staging` into `main` through a dedicated pull request after the integra
 - `readme.md`, `template.md` and `workflow.md` as unnumbered support files;
 - numbered specs named `001-lowercase-slug.spec.md` through `099-lowercase-slug.spec.md`.
 
-The filename prefix is a unique mutable priority rank. Reserved ranks must be named in `readme.md`. A priority or semantic-suffix change updates every repository reference atomically. Retrospective mode is metadata, not a subdirectory.
+The filename prefix is a unique mutable catalog-priority rank, not another spec ID. The dependency-ordered execution queue in `readme.md` determines which retained contract can run next; implemented history or an owner-blocked draft does not block an otherwise executable later rank. Reserved ranks must be named in `readme.md`. A priority or semantic-suffix change updates every repository reference atomically. Retrospective mode is metadata, not a subdirectory.
 
 ## Sources of truth
 
@@ -74,6 +74,8 @@ A handoff, chat, issue, branch name or temporary plan may supply evidence, but c
 Load `AGENTS.md`, every applicable `alwaysApply` rule, scoped context, current product contracts, accepted ADRs and the implementation. Use [`domain-modeling`](../skills/domain-modeling/SKILL.md) only when vocabulary or ownership itself is changing.
 
 Completion: every affected public boundary and durable constraint is identified.
+
+For an owner-requested grill-me interview, use [grill-me](../skills/grill-me/SKILL.md) and its required [grilling](../skills/grilling/SKILL.md) engine before synthesis. Follow decision-frontier rounds and obtain explicit shared-understanding confirmation before implementing the resulting decisions.
 
 ### 2. Synthesize
 

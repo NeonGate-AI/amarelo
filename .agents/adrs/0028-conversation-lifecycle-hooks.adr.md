@@ -1,4 +1,15 @@
-# ADR 0028: Model conversation lifecycle hooks as typed application seams
+---
+id: ADR-0028
+title: Model conversation lifecycle hooks as typed application seams
+status: proposed
+date: 2026-09-03
+deciders:
+  - product-owner
+supersedes: []
+superseded-by: null
+---
+
+# ADR-0028: Model conversation lifecycle hooks as typed application seams
 
 ## Status
 

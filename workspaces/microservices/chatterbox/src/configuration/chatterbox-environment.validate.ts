@@ -5,19 +5,301 @@ const OptionalNonEmptyString = z.preprocess(
     typeof value === 'string' && value.trim().length === 0 ? undefined : value,
   z.string().trim().min(1).max(200).optional()
 )
+const OptionalServerPath = z.preprocess(
+  (value) =>
+    typeof value === 'string' && value.trim().length === 0 ? undefined : value,
+  z.string().trim().min(1).max(1_024).optional()
+)
 
-const ChatterboxEnvironmentSchema = z.object({
-  AI_CONVERSATION_MODEL: OptionalNonEmptyString,
-  CHATTERBOX_HOST: z.string().trim().min(1).default('0.0.0.0'),
-  CHATTERBOX_MODEL_TIMEOUT_MS: z.coerce
-    .number()
-    .int()
-    .positive()
-    .max(120_000)
-    .default(30_000),
-  CHATTERBOX_PORT: z.coerce.number().int().positive().max(65_535).default(3004),
-  OPENAI_API_KEY: OptionalNonEmptyString
-})
+const ChatterboxEnvironmentSchema = z
+  .object({
+    NODE_ENV: z.enum(['development', 'test', 'production']).optional(),
+    AI_CONVERSATION_MODEL: OptionalNonEmptyString,
+    CHATTERBOX_AUTH_MODE: z.enum(['workos', 'local']).default('workos'),
+    CHATTERBOX_LOCAL_OWNER_ID: z
+      .string()
+      .regex(/^[A-Za-z0-9_-]{1,80}$/)
+      .default('owner'),
+    CHATTERBOX_ALLOWED_ORIGINS: z
+      .string()
+      .default('')
+      .transform((value) =>
+        value
+          .split(',')
+          .map((origin) => origin.trim())
+          .filter(Boolean)
+      )
+      .pipe(
+        z
+          .array(
+            z
+              .string()
+              .url()
+              .refine((origin) => {
+                const url = new URL(origin)
+                return (
+                  ['http:', 'https:'].includes(url.protocol) &&
+                  url.origin === origin
+                )
+              }, 'Use exact HTTP(S) origins without paths or wildcards')
+          )
+          .max(10)
+      ),
+    CHATTERBOX_AUTH_TIMEOUT_MS: z.coerce
+      .number()
+      .int()
+      .positive()
+      .max(30_000)
+      .default(5_000),
+    CHATTERBOX_HOST: z.string().trim().min(1).default('0.0.0.0'),
+    CHATTERBOX_MAX_CONCURRENT_TURNS: z.coerce
+      .number()
+      .int()
+      .positive()
+      .max(20)
+      .default(4),
+    CHATTERBOX_MAX_SESSIONS: z.coerce
+      .number()
+      .int()
+      .positive()
+      .max(10_000)
+      .default(1_000),
+    CHATTERBOX_MODEL_TIMEOUT_MS: z.coerce
+      .number()
+      .int()
+      .positive()
+      .max(120_000)
+      .default(30_000),
+    CHATTERBOX_MEMORY_ENABLED: z
+      .enum(['true', 'false'])
+      .default('false')
+      .transform((value) => value === 'true'),
+    CHATTERBOX_MEMORY_BACKGROUND_ENABLED: z
+      .enum(['true', 'false'])
+      .default('false')
+      .transform((value) => value === 'true'),
+    CHATTERBOX_MEMORY_BACKGROUND_PROFILE: z
+      .enum(['free', 'internal'])
+      .default('free'),
+    CHATTERBOX_MEMORY_SHADOW_ENABLED: z
+      .enum(['true', 'false'])
+      .default('false')
+      .transform((value) => value === 'true'),
+    CHATTERBOX_MEMORY_EXPERIMENT_ENABLED: z
+      .enum(['true', 'false'])
+      .default('false')
+      .transform((value) => value === 'true'),
+    CHATTERBOX_MEMORY_EXPERIMENT_POLICY_FILE: OptionalServerPath,
+    CHATTERBOX_MEMORY_EXPERIMENT_EVIDENCE_FILE: OptionalServerPath,
+    CHATTERBOX_MEMORY_EXPERIMENT_METRICS_FILE: OptionalServerPath,
+    CHATTERBOX_MEMORY_EVIDENCE_DIRECTORY: OptionalServerPath,
+    CHATTERBOX_MEMORY_SHADOW_TIMEOUT_MS: z.coerce
+      .number()
+      .int()
+      .positive()
+      .max(5_000)
+      .default(250),
+    CHATTERBOX_MEMORY_SHADOW_MAX_CONCURRENT: z.coerce
+      .number()
+      .int()
+      .positive()
+      .max(4)
+      .default(2),
+    CHATTERBOX_MEMORY_RECENT_BUFFER_TOKENS: z.coerce
+      .number()
+      .int()
+      .nonnegative()
+      .max(600)
+      .default(256),
+    CHATTERBOX_MEMORY_COMPARISON_METADATA_JSON: z.preprocess(
+      (value) =>
+        typeof value === 'string' && value.trim().length === 0
+          ? undefined
+          : value,
+      z.string().trim().min(1).max(8_000).optional()
+    ),
+    CHATTERBOX_MEMORY_INTERNAL_SUBJECT_IDS: z
+      .string()
+      .default('')
+      .transform((value) =>
+        value
+          .split(',')
+          .map((id) => id.trim().toLowerCase())
+          .filter(Boolean)
+      )
+      .pipe(z.array(z.string().uuid()).max(1_000)),
+    CHATTERBOX_MEMORY_INGEST_TIMEOUT_MS: z.coerce
+      .number()
+      .int()
+      .positive()
+      .max(5_000)
+      .default(500),
+    CHATTERBOX_MEMORY_INGEST_MAX_PENDING: z.coerce
+      .number()
+      .int()
+      .positive()
+      .max(100)
+      .default(16),
+    MEMORY_NEO4J_URI: OptionalNonEmptyString,
+    MEMORY_NEO4J_USERNAME: OptionalNonEmptyString,
+    MEMORY_NEO4J_PASSWORD: OptionalNonEmptyString,
+    MEMORY_NEO4J_DATABASE: OptionalNonEmptyString,
+    CHATTERBOX_PORT: z.coerce
+      .number()
+      .int()
+      .positive()
+      .max(65_535)
+      .default(3004),
+    CHATTERBOX_RATE_LIMIT_PER_MINUTE: z.coerce
+      .number()
+      .int()
+      .positive()
+      .max(100)
+      .default(20),
+    CHATTERBOX_SESSION_TTL_MS: z.coerce
+      .number()
+      .int()
+      .positive()
+      .max(3_600_000)
+      .default(900_000),
+    OPENAI_REALTIME_MODEL: z
+      .string()
+      .trim()
+      .min(1)
+      .max(200)
+      .default('gpt-realtime-2.1-mini'),
+    OPENAI_REALTIME_VOICE: z.string().trim().min(1).max(80).default('marin'),
+    OPENAI_TRANSCRIPTION_MODEL: z
+      .string()
+      .trim()
+      .min(1)
+      .max(200)
+      .default('gpt-4o-mini-transcribe'),
+    CHATTERBOX_REALTIME_MEMORY_ENABLED: z
+      .enum(['true', 'false'])
+      .default('false')
+      .transform((value) => value === 'true'),
+    OPENAI_API_KEY: z.preprocess(
+      (value) =>
+        typeof value === 'string' && value.trim().length === 0
+          ? undefined
+          : value,
+      z.string().trim().min(1).max(1_024).optional()
+    ),
+    WORKOS_API_KEY: OptionalNonEmptyString,
+    WORKOS_CLIENT_ID: OptionalNonEmptyString,
+    WORKOS_COOKIE_NAME: z
+      .string()
+      .regex(/^[A-Za-z0-9_-]{1,80}$/)
+      .default('wos-session'),
+    WORKOS_COOKIE_PASSWORD: OptionalNonEmptyString
+  })
+  .superRefine((configuration, context) => {
+    if (
+      configuration.CHATTERBOX_REALTIME_MEMORY_ENABLED &&
+      (configuration.CHATTERBOX_AUTH_MODE !== 'local' ||
+        !configuration.CHATTERBOX_MEMORY_ENABLED ||
+        !configuration.CHATTERBOX_MEMORY_BACKGROUND_ENABLED ||
+        configuration.CHATTERBOX_MEMORY_BACKGROUND_PROFILE !== 'internal')
+    ) {
+      context.addIssue({
+        code: 'custom',
+        path: ['CHATTERBOX_REALTIME_MEMORY_ENABLED'],
+        message:
+          'Realtime Memory requires the local owner profile, Memory and internal background ingestion'
+      })
+    }
+    if (configuration.CHATTERBOX_AUTH_MODE === 'local') {
+      if (!['development', 'test'].includes(configuration.NODE_ENV ?? ''))
+        context.addIssue({
+          code: 'custom',
+          message: 'Local authentication requires NODE_ENV=development or test',
+          path: ['NODE_ENV']
+        })
+      if (
+        !['127.0.0.1', '::1', 'localhost'].includes(
+          configuration.CHATTERBOX_HOST
+        )
+      )
+        context.addIssue({
+          code: 'custom',
+          message: 'Local authentication requires a loopback listen host',
+          path: ['CHATTERBOX_HOST']
+        })
+      if (
+        configuration.CHATTERBOX_ALLOWED_ORIGINS.length === 0 ||
+        configuration.CHATTERBOX_ALLOWED_ORIGINS.some(
+          (origin) =>
+            !['127.0.0.1', '[::1]', 'localhost'].includes(
+              new URL(origin).hostname
+            )
+        )
+      )
+        context.addIssue({
+          code: 'custom',
+          message:
+            'Local authentication requires exact loopback browser origins',
+          path: ['CHATTERBOX_ALLOWED_ORIGINS']
+        })
+    }
+    if (
+      configuration.CHATTERBOX_MEMORY_BACKGROUND_ENABLED &&
+      !configuration.CHATTERBOX_MEMORY_ENABLED
+    ) {
+      context.addIssue({
+        code: 'custom',
+        message:
+          'Background ingestion requires the authenticated Memory binding',
+        path: ['CHATTERBOX_MEMORY_BACKGROUND_ENABLED']
+      })
+    }
+    if (
+      configuration.CHATTERBOX_MEMORY_SHADOW_ENABLED &&
+      !configuration.CHATTERBOX_MEMORY_ENABLED
+    ) {
+      context.addIssue({
+        code: 'custom',
+        message: 'Shadow requires the authenticated Memory binding',
+        path: ['CHATTERBOX_MEMORY_SHADOW_ENABLED']
+      })
+    }
+    if (
+      configuration.CHATTERBOX_MEMORY_EXPERIMENT_ENABLED &&
+      !configuration.CHATTERBOX_MEMORY_ENABLED
+    ) {
+      context.addIssue({
+        code: 'custom',
+        message: 'Experiments require the authenticated Memory binding',
+        path: ['CHATTERBOX_MEMORY_EXPERIMENT_ENABLED']
+      })
+    }
+    if (!configuration.CHATTERBOX_MEMORY_ENABLED) return
+    for (const key of [
+      'MEMORY_NEO4J_URI',
+      'MEMORY_NEO4J_USERNAME',
+      'MEMORY_NEO4J_PASSWORD',
+      'MEMORY_NEO4J_DATABASE'
+    ] as const) {
+      if (configuration[key] === undefined)
+        context.addIssue({
+          code: 'custom',
+          message: 'Required when Memory is enabled',
+          path: [key]
+        })
+    }
+    if (
+      configuration.MEMORY_NEO4J_URI !== undefined &&
+      !/^(neo4j|bolt)(\+s|\+ssc)?:\/\/[^\s]+$/.test(
+        configuration.MEMORY_NEO4J_URI
+      )
+    ) {
+      context.addIssue({
+        code: 'custom',
+        message: 'Use a Neo4j connection URI',
+        path: ['MEMORY_NEO4J_URI']
+      })
+    }
+  })
 
 export type ChatterboxEnvironment = z.output<typeof ChatterboxEnvironmentSchema>
 
@@ -25,6 +307,22 @@ export function validateChatterboxEnvironment(
   environment: NodeJS.ProcessEnv
 ): ChatterboxEnvironment {
   return ChatterboxEnvironmentSchema.parse(environment)
+}
+
+export function hasChatterboxAuthenticationConfiguration(
+  configuration: ChatterboxEnvironment
+): configuration is ChatterboxEnvironment & {
+  readonly WORKOS_API_KEY: string
+  readonly WORKOS_CLIENT_ID: string
+  readonly WORKOS_COOKIE_PASSWORD: string
+} {
+  return (
+    configuration.WORKOS_API_KEY !== undefined &&
+    configuration.WORKOS_CLIENT_ID !== undefined &&
+    configuration.WORKOS_COOKIE_PASSWORD !== undefined &&
+    configuration.WORKOS_COOKIE_PASSWORD.length >= 32 &&
+    configuration.CHATTERBOX_ALLOWED_ORIGINS.length > 0
+  )
 }
 
 export function hasChatterboxProviderConfiguration(

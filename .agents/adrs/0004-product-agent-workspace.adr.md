@@ -39,5 +39,5 @@ The historical compliance target required `pnpm-workspace.yaml` to include `ai` 
 
 ## Links
 
-- Repository architecture: `.agents/ARCHITECTURE.md`
-- Superseding decision: `.agents/decisions/0010-elos-and-ai-domain-workspaces.md`
+- Repository architecture: `.agents/context/architecture/overview.md`
+- Superseding decision: `.agents/adrs/0010-elos-and-ai-domain-workspaces.adr.md`

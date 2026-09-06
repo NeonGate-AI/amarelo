@@ -4,27 +4,42 @@
   "private": true,
   "type": "module",
   "exports": {
-    ".": "./src/index.ts"
+    ".": {
+      "types": "./dist/index.d.mts",
+      "import": "./dist/index.mjs"
+    }
   },
   "scripts": {
-    "build": "tsc --noEmit",
+    "build": "tsdown src/index.ts --format esm --platform node --target es2022 --dts --out-dir dist --clean",
     "typecheck": "tsc --noEmit",
-    "test": "node --import tsx src/assurance/evals/curation/memory-curation.eval.ts && node --import tsx src/assurance/evals/retrieval/memory-retrieval.eval.ts && node --import tsx src/assurance/evals/economics/memory-economics.eval.ts",
+    "test": "node --import tsx src/assurance/evals/curation/memory-curation.eval.ts && node --import tsx src/assurance/evals/retrieval/memory-retrieval.eval.ts && node --import tsx src/assurance/evals/economics/memory-economics.eval.ts && pnpm run test:unit",
     "test:database": "node --import tsx src/assurance/evals/database/postgres-memory.eval.ts",
     "eval": "pnpm run eval:curation && pnpm run eval:retrieval && pnpm run eval:economics",
     "eval:curation": "node --import tsx src/assurance/evals/curation/memory-curation.eval.ts",
     "eval:retrieval": "node --import tsx src/assurance/evals/retrieval/memory-retrieval.eval.ts",
-    "eval:economics": "node --import tsx src/assurance/evals/economics/memory-economics.eval.ts"
+    "eval:economics": "node --import tsx src/assurance/evals/economics/memory-economics.eval.ts",
+    "test:unit": "vitest run --project unit",
+    "background:start": "sh src/infrastructure/worker/memory-background.sh",
+    "build:background": "tsdown src/infrastructure/worker/memory-background.cli.ts --format esm --platform node --target es2022 --out-dir dist/worker --clean",
+    "build:report": "tsdown src/infrastructure/reporting/memory-economics-report.cli.ts --format esm --platform node --target es2022 --out-dir dist/reporting --clean",
+    "report:economics": "sh src/infrastructure/reporting/memory-economics-report.sh"
   },
   "dependencies": {
     "@langchain/core": "1.2.9",
-    "zod": "4.4.3",
-    "@repo/observability": "workspace:*"
+    "@langchain/langgraph": "1.4.14",
+    "@langchain/openai": "1.5.11",
+    "@repo/memory-sdk": "workspace:*",
+    "@repo/observability": "workspace:*",
+    "bullmq": "6.3.4",
+    "neo4j-driver": "6.2.0",
+    "zod": "4.4.3"
   },
   "devDependencies": {
+    "@repo/evaluation": "workspace:*",
     "@types/node": "24.13.3",
+    "tsdown": "0.23.0",
     "tsx": "4.23.12",
     "typescript": "5.9.2",
-    "@repo/evaluation": "workspace:*"
+    "vitest": "4.1.0"
   }
 }

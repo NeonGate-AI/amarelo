@@ -1,4 +1,15 @@
-# ADR 0014: Workspaces and centralized harness
+---
+id: ADR-0014
+title: Workspaces and centralized harness
+status: accepted
+date: null
+deciders:
+  - product-owner
+supersedes: []
+superseded-by: null
+---
+
+# ADR-0014: Workspaces and centralized harness
 
 ## Status
 Accepted

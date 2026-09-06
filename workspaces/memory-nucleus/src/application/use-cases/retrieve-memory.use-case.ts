@@ -1,43 +1,47 @@
-import type { AuthorizedMemoryRetrievalDependencies } from '@application/ports/memory-authorization.port'
+import type { AuthorizedMemoryRetrievalDependencies } from '@application/ports'
 import {
   MEMORY_RETRIEVAL_POLICY_VERSION,
   type MemoryRetrievalCandidateDecision,
   type MemoryRetrievalCandidateTrace
-} from '@application/ports/memory-retrieval-observer.port'
-import { resolveMemoryAuthorization } from '@application/use-cases/resolve-memory-authorization'
+} from '@application/ports'
+import { resolveMemoryAuthorization } from './resolve-memory-authorization'
 import type {
   AuthorizedMemoryQuery,
   AuthorizedMemoryRetrievalResult,
   RetrievedMemoryData
-} from '@application/contracts/memory-retrieval.contract'
-import { MemoryRepositoryScopeError } from '@application/contracts/memory-retrieval.error'
+} from '@application/contracts'
+import { MemoryRepositoryScopeError } from '@application/contracts'
+import { excludeUnresolvedMemoryConflicts } from '@application/integrity'
 import {
   compareRankedMemoryRecords,
+  hasExactSemanticKeyMatch,
+  isMemoryRecordEligibleForRanking,
+  lexicalMemoryOverlapScore,
   lexicalMemoryTokens,
   normalizedSemanticMemoryKeySet,
   rankEligibleMemoryRecord,
   type RankedMemoryRecord
-} from '@application/use-cases/memory-ranking'
+} from './memory-ranking'
 import {
   createRetrievedMemoryContext,
   estimateRetrievedMemoryRecordTokens,
   MEMORY_RETRIEVAL_TOKEN_ESTIMATOR_VERSION
-} from '@application/use-cases/memory-projection'
-import { parseOptionalTimestamp } from '@application/validation/memory-temporal-state.validate'
+} from './memory-projection'
+import { parseOptionalTimestamp } from '@application/validation'
 import {
   assertAuthorizedMemoryQuery,
   resolveEffectiveMemoryRetrievalBudgets,
   snapshotAuthorizedMemoryQuery
-} from '@application/validation/memory-query.validate'
+} from '@application/validation'
 import {
   assertRepositoryCandidateLimits,
   assertRepositorySearchResult,
   createAuthorizedRepositorySearch
-} from '@application/services/memory-repository-search.service'
+} from '@application/services'
 import {
   recordRetrievalTrace,
   resolveObserverTimeoutMilliseconds
-} from '@application/services/memory-retrieval-observer.service'
+} from '@application/services'
 
 interface DeduplicatedMemoryRecords {
   readonly duplicateDecisions: readonly MemoryRetrievalCandidateTrace[]
@@ -135,7 +139,22 @@ export async function retrieveAuthorizedMemory(
     throw new RangeError('monotonic clock returned an invalid start value')
   }
 
-  const rankedWithPossibleDuplicates = repositoryRecords
+  // Scope, provenance, lifecycle and time eligibility precede any conflict decision.
+  // Nonmatching candidates cannot suppress a query-relevant eligible fact.
+  const eligibleMatches = repositoryRecords.filter(
+    (record) =>
+      isMemoryRecordEligibleForRanking(
+        record,
+        authorizedQuery,
+        fromInclusiveEpoch,
+        toExclusiveEpoch
+      ) &&
+      (hasExactSemanticKeyMatch(record, normalizedSemanticKeys) ||
+        lexicalMemoryOverlapScore(queryTokens, record) > 0)
+  )
+  const rankedWithPossibleDuplicates = excludeUnresolvedMemoryConflicts(
+    eligibleMatches
+  )
     .map((record) =>
       rankEligibleMemoryRecord(
         record,
@@ -264,6 +283,7 @@ export async function retrieveAuthorizedMemory(
     items: Object.freeze(items),
     totalEstimatedTokens,
     diagnostics: Object.freeze({
+      fullTextCalls: repositoryResult.diagnostics.fullTextCalls ?? null,
       vectorFallbackUsed: false,
       vectorCalls: 0,
       repositoryRowsReturned: repositoryRecords.length,

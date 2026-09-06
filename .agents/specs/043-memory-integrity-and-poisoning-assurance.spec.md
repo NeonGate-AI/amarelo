@@ -2,13 +2,15 @@
 id: SPEC-043
 title: Add Memory integrity and poisoning assurance before canary
 type: experiment
-status: ready
+status: in-progress
 mode: prospective
 created: 2026-09-04
-updated: 2026-09-04
+updated: 2026-09-06
 owners:
   - Jonatas Sales
 targets:
+  - workspaces/memory-nucleus/src/assurance/integrity
+  - workspaces/memory-nucleus/src/application/integrity
   - workspaces/memory-nucleus/src/assurance/evals
   - workspaces/packages/memory-sdk
   - Memory serving assurance
@@ -25,15 +27,18 @@ adrs:
   - .agents/adrs/0003-authorization-before-retrieval.adr.md
   - .agents/adrs/0007-memory-taxonomy-and-longitudinal-projections.adr.md
   - .agents/adrs/0008-cost-first-background-memory-curation.adr.md
-  - .agents/adrs/0009-postgresql-jsonb-fts-memory-store.adr.md
+  - .agents/adrs/0033-neo4j-canonical-memory-graph.adr.md
   - .agents/adrs/0016-shared-memory-sdk-observability-evaluation.adr.md
-  - .agents/adrs/0030-memory-eligibility-before-ranking.adr.md
+  - .agents/adrs/0036-memory-eligibility-before-ranking.adr.md
 skills:
-  - .agents/skills/spec-driven-development/SKILL.md
+  - .agents/skills/to-spec/SKILL.md
   - .agents/skills/tdd/SKILL.md
   - .agents/skills/implement/SKILL.md
   - .agents/skills/code-review/SKILL.md
 evidence:
+  - workspaces/memory-nucleus/src/assurance/integrity/memory-integrity.fixtures.ts
+  - workspaces/memory-nucleus/src/assurance/integrity/memory-integrity.runner.ts
+  - workspaces/memory-nucleus/src/application/integrity/memory-integrity-gate.policy.ts
   - pending
 ---
 
@@ -41,7 +46,7 @@ evidence:
 
 ## Problem Statement
 
-The current Memory roadmap proves authorization-before-retrieval, suppression/no-resurrection, cross-scope isolation, bounded projection, shadow parity, A/B comparability and unit economics. It does not yet prove that semantically strong but false, stale, conflicted or provenance-ineligible records cannot outrank legitimate Memory, especially when the adversarial content contains no prompt-injection instructions.
+The current Memory roadmap is designed to prove authorization-before-retrieval, suppression/no-resurrection, cross-scope isolation, bounded projection, shadow parity, A/B comparability and unit economics. Those future delivery gates are not completed evidence. The roadmap also needs to prove that semantically strong but false, stale, conflicted or provenance-ineligible records cannot outrank legitimate Memory, especially when the adversarial content contains no prompt-injection instructions.
 
 That gap matters because a retrieval system can satisfy authorization and still return the wrong memory. Similarity, recency, salience, trust weighting or model judgment can amplify a poisoned record unless policy eligibility is established before ranking. The repository also needs proof that read/write/replay/rebuild paths all resolve the same effective non-default store identity.
 
@@ -79,11 +84,12 @@ The implementation must distinguish:
 - Metrics for poison-at-1, poison-in-projection, answer corruption, utility retained, critical Recall@k, abstention, latency and cost.
 - Comparison of deterministic hard eligibility, trust-weighted ranking and optional model-assisted detection.
 - Hidden eval gate before SPEC-017 canary advancement.
+- Source-attribution assurance for patient text, assistant suggestions, ambiguous acknowledgments and content-free inactivity under SPEC-025.
 
 ## Implementation Decisions
 
 - ADR-0003 remains authoritative for authorization-before-retrieval.
-- ADR-0030 governs integrity/provenance eligibility before ranking.
+- ADR-0036 governs integrity/provenance eligibility before ranking.
 - Ineligible records are excluded, not merely down-ranked.
 - Ranking signals may order only eligible records.
 - Prompt-injection detection is not treated as a substitute for false-memory integrity testing.
@@ -92,9 +98,23 @@ The implementation must distinguish:
 - A conflict between eligible memories that cannot be deterministically resolved must preserve uncertainty; silent winner-takes-all semantic ranking is prohibited.
 - Non-default store configuration is part of the test fixture and every lifecycle operation must demonstrate the same effective tenant/schema/database identity.
 - This spec must not adopt external memory frameworks, sidecars or retrieval platforms.
-- `akitaonrails/ai-memory` remains excluded from adoption, architecture, implementation-reference and dependency consideration.
+- Include an assistant-suggested false fact followed by an ambiguous patient acknowledgment, repeated deterministic Ana replies, a forged person role and a delegate statement mislabeled as patient self-report. Ana's output, silence and unresolved attribution must not become canonical patient facts or eligible projection merely because their text is relevant.
+- Test source eligibility at persistence/formation as well as retrieval. Preserve zero-call rejection where deterministic gates can reject the input; preserve extractor abstention for unsupported eligible patient text. Conversational coherence from a temporary assistant turn is not evidence of Memory truth.
+- Report correct abstention on ambiguous evidence separately from missed recall on self-contained, eligible patient facts. Cost priority does not relax privacy, provenance, lifecycle or integrity gates; mitigations remain separately costed.
 
 ## Testing Decisions
+
+### Owner-directed validation deferral — 2026-09-05
+
+The owner authorized implementation of the ready sequence while deferring validation to conserve the remaining credit budget. This cycle writes runnable assurance and gates without executing evals, tests, reviews or new research. Implementation status must not imply that the shadow, hidden-holdout, cost or exact-head validation gates passed. SPEC-017 exposure remains held until those evidence requirements are actually satisfied.
+
+### Implementation delivery and outstanding evidence — 2026-09-05
+
+The implementation includes a versioned development corpus of 100 synthetic records with two declarative false records; public SDK formation/retrieval/lifecycle exercises; a disposable non-default Neo4j fixture adapter; content-free ranked-candidate capture; a redacted report contract; and a shared development/independent-holdout gate. Native index recreation, scoped reconstruction of derived search text, and stale-head restoration are separate fixtures. They retain canonical suppression and consent state and do not claim safety for a complete database rollback.
+
+Serving now applies existing scope/provenance/lifecycle/temporal guards before the bounded conflict filter and ranking. The filter abstains on overlapping, query-matching semantic candidates with the same normalized semantic key and different statements; it makes no inference about unrelated keys or facts outside the retrieved candidate set.
+
+The runner leaves validation pending, records unavailable answer/cost/ranking measurements as unknown, and requires independently supplied holdout fixtures. The lexical and fixed trust-weighted baselines are synthetic diagnostic comparisons, not measured production alternatives. No model-assisted detector is enabled. The required poisoned retrieval, temporal/source/lifecycle isolation results, cost attribution, quality thresholds, holdout, full CI and both reviews remain unexecuted validation debt. No passing artifact has been produced. Acceptance checkboxes remain unchecked until evidence exists; `implemented` records code delivery under the owner's deferral, not canary readiness.
 
 ### Primary seam
 
@@ -133,6 +153,8 @@ Use synthetic tenants, subjects, evidence, memories and false memories only. No 
 - [ ] Policy-ineligible records have zero ranking/projection eligibility regardless of similarity, salience, recency, decay or trust score.
 - [ ] `poison_at_1`, `poison_projection_rate`, `answer_corruption_rate`, `utility_retained_under_attack`, critical Recall@k and abstention rate are reported.
 - [ ] A conflict between unresolved eligible memories cannot silently become a single asserted fact through similarity alone.
+- [ ] Assistant suggestions/repetitions, inactivity and forged or mismatched speaker attribution cannot be laundered into patient-reported Memory through formation, replay or projection.
+- [ ] Ambiguous patient acknowledgments produce no unsupported fact; metrics distinguish correct abstention from recall failures on eligible self-contained facts.
 - [ ] Explicit non-default store configuration is honored by write, retrieve, supersede, suppress, replay, restore, reindex and rebuild paths.
 - [ ] No lifecycle path silently falls back to a default tenant/schema/database.
 - [ ] Normal deterministic retrieval remains zero-LLM.
@@ -140,7 +162,7 @@ Use synthetic tenants, subjects, evidence, memories and false memories only. No 
 - [ ] No strategy passes by improving Recall while increasing unauthorized leakage, consent violation or lifecycle resurrection above zero.
 - [ ] Hidden adversarial evals pass before SPEC-017 canary exposure can advance.
 - [ ] Full CI and both reviews pass on the exact final head.
-- [ ] Measured thresholds and implementation-specific invariants are promoted only after validation; decision-level assurance requirements remain governed by ADR-0030 and the Memory Nucleus rule.
+- [ ] Measured thresholds and implementation-specific invariants are promoted only after validation; decision-level assurance requirements remain governed by ADR-0036 and the Memory Nucleus rule.
 
 ## Failure Behavior
 
@@ -152,8 +174,17 @@ User-visible rollout, production pricing, vector activation, graph-database adop
 
 ## Evidence and Promotion
 
-This harness change promotes the durable decision-level assurance requirements in ADR-0030, the Memory Nucleus rule and workspace context. Implementation evidence will include versioned adversarial fixtures, deterministic eval artifacts, configured-store isolation results, cost/latency comparisons, hidden holdout results, exact-head CI and both reviews. Measured thresholds, mitigation mechanics and implementation-specific invariants are promoted to the harness only after those validations succeed.
+This harness change promotes the durable decision-level assurance requirements in ADR-0036, the Memory Nucleus rule and workspace context. Implementation evidence will include versioned adversarial fixtures, deterministic eval artifacts, configured-store isolation results, cost/latency comparisons, hidden holdout results, exact-head CI and both reviews. Measured thresholds, mitigation mechanics and implementation-specific invariants are promoted to the harness only after those validations succeed.
 
 ## Further Notes
 
-This assurance phase is inserted as a required gate before user-visible canary advancement. It strengthens the existing roadmap rather than replacing authorization, lifecycle, shadow, A/B or economics phases.
+SPEC-025 reconciliation (2026-09-05): the owner accepted the consolidated discovery and requested the contract revision, resolving the discovery hold. [SPEC-025](007-plans-and-entitlements.spec.md) adds source-contamination and correct-abstention cases to the existing poisoning gate. Lower cost and greater duration never waive these protections. The later owner-authorized implementation is recorded above with validation explicitly deferred.
+
+Blocked by SPEC-011's paired shadow/parity evidence over the SPEC-016/SPEC-012 path. This assurance phase is a required gate before user-visible canary advancement. It strengthens the existing roadmap rather than replacing authorization, lifecycle, shadow, A/B or economics phases.
+
+## Current validation status — SPEC-055
+
+Implementation remains delivered in staging. On 2026-09-06, SPEC-055 reconciles
+the lifecycle to `in-progress` because the existing acceptance/evidence debt is
+still open. Historical delivery notes and every unchecked criterion are retained.
+Repository CI recovery does not by itself complete this product contract.

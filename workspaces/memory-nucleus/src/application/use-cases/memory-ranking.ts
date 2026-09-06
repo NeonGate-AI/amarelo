@@ -1,9 +1,9 @@
-import type { RepositoryMemoryRecord } from '@application/ports/memory-repository.port'
+import type { RepositoryMemoryRecord } from '@application/ports'
 import type {
   AuthorizedMemoryQuery,
   MemoryMatchType,
   MemoryProvenance
-} from '@application/contracts/memory-retrieval.contract'
+} from '@application/contracts'
 import {
   cloneMemoryProvenance,
   hasBoundedSerializedSize,
@@ -13,13 +13,13 @@ import {
   isStringArray,
   MAX_CATEGORIES,
   MAX_RECORD_CHARACTERS
-} from '@application/validation/memory-record-shape.validate'
+} from '@application/validation'
 import {
   hasValidMemoryTemporalSemantics,
   isMemoryEligibleForTimeWindow,
   parseStoredTimestamp,
   resolveMemoryTemporalSortEpoch
-} from '@application/validation/memory-temporal-state.validate'
+} from '@application/validation'
 
 const LEXICAL_STOP_WORDS = new Set([
   'a',
@@ -143,14 +143,14 @@ export function normalizedSemanticMemoryKeySet(
   )
 }
 
-export function rankEligibleMemoryRecord(
+export function isMemoryRecordEligibleForRanking(
   record: RepositoryMemoryRecord,
   query: AuthorizedMemoryQuery,
   fromInclusiveEpoch: number | null,
-  toExclusiveEpoch: number | null,
-  normalizedSemanticKeys: ReadonlySet<string>,
-  queryTokens: ReadonlySet<string>
-): RankedMemoryRecord | null {
+  toExclusiveEpoch: number | null
+): record is RepositoryMemoryRecord & {
+  readonly provenance: MemoryProvenance
+} {
   if (
     !isBoundedNonEmptyString(record.id) ||
     record.tenantId !== query.tenantId ||
@@ -177,12 +177,33 @@ export function rankEligibleMemoryRecord(
     !hasValidMemoryProvenance(record.provenance) ||
     !hasValidMemoryTemporalSemantics(record)
   )
-    return null
+    return false
 
   const observedAtEpoch = parseStoredTimestamp(record.observedAt)
   if (
     observedAtEpoch === null ||
     !isMemoryEligibleForTimeWindow(record, fromInclusiveEpoch, toExclusiveEpoch)
+  )
+    return false
+
+  return true
+}
+
+export function rankEligibleMemoryRecord(
+  record: RepositoryMemoryRecord,
+  query: AuthorizedMemoryQuery,
+  fromInclusiveEpoch: number | null,
+  toExclusiveEpoch: number | null,
+  normalizedSemanticKeys: ReadonlySet<string>,
+  queryTokens: ReadonlySet<string>
+): RankedMemoryRecord | null {
+  if (
+    !isMemoryRecordEligibleForRanking(
+      record,
+      query,
+      fromInclusiveEpoch,
+      toExclusiveEpoch
+    )
   )
     return null
 

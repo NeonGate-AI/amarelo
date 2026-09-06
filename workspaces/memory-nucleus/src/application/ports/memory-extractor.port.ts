@@ -3,11 +3,11 @@ import { z } from 'zod'
 import {
   ExtractedMemoryCandidateSchema,
   type ExtractedMemoryCandidate
-} from '@domain/entities/memory-candidate.entity'
+} from '@domain/entities'
 import type {
   PreparedConversationTurn,
   PurposeCode
-} from '@application/contracts/memory-curation.contract'
+} from '@application/contracts'
 
 export interface MemoryExtraction {
   candidates: ExtractedMemoryCandidate[]

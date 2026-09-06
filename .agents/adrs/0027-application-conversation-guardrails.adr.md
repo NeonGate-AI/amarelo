@@ -1,4 +1,15 @@
-# ADR 0027: Enforce conversational guardrails at application trust boundaries
+---
+id: ADR-0027
+title: Enforce conversational guardrails at application trust boundaries
+status: proposed
+date: 2026-09-03
+deciders:
+  - product-owner
+supersedes: []
+superseded-by: null
+---
+
+# ADR-0027: Enforce conversational guardrails at application trust boundaries
 
 ## Status
 

@@ -1,4 +1,15 @@
-# ADR 0025: Keep agent artifact templates under `.agents/prompts`
+---
+id: ADR-0025
+title: Keep agent artifact templates under `.agents/prompts`
+status: accepted
+date: 2026-09-03
+deciders:
+  - product-owner
+supersedes: []
+superseded-by: null
+---
+
+# ADR-0025: Keep agent artifact templates under `.agents/prompts`
 
 ## Status
 

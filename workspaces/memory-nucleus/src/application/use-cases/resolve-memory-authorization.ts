@@ -2,22 +2,22 @@ import type {
   MemoryAuthorizationDecision,
   MemoryAuthorizationDecisionResolver,
   ResolvedMemoryAuthorization
-} from '@application/ports/memory-authorization.port'
+} from '@application/ports'
 import type {
   AuthorizedMemoryQuery,
   MemoryTimeWindow
-} from '@application/contracts/memory-retrieval.contract'
-import { MemoryAuthorizationDecisionError } from '@application/contracts/memory-retrieval.error'
+} from '@application/contracts'
+import { MemoryAuthorizationDecisionError } from '@application/contracts'
 import {
   isBoundedNonEmptyString,
   isStringArray,
   MAX_CATEGORIES
-} from '@application/validation/memory-record-shape.validate'
+} from '@application/validation'
 import {
   parseOptionalTimestamp,
   parseStoredTimestamp
-} from '@application/validation/memory-temporal-state.validate'
-import { snapshotAuthorizedMemoryQuery } from '@application/validation/memory-query.validate'
+} from '@application/validation'
+import { snapshotAuthorizedMemoryQuery } from '@application/validation'
 
 function hasUniqueValues(values: readonly string[]): boolean {
   return new Set(values).size === values.length

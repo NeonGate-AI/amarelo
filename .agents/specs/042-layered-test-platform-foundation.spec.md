@@ -37,6 +37,7 @@ evidence:
   - Docker-independent repository validation passed on 2026-09-04
   - GitHub Actions CI run 580 passed on reconciled commit 1d46fb6045e5aaa574c61c13054e050cc0595fb6
   - standards and spec-fidelity reviews passed on the reconciled tree
+  - merged to staging by PR #77 at commit 151a805886f51926c040aa5eca5ba354c82dc32c
 ---
 
 # SPEC-042: Establish the layered test platform foundation

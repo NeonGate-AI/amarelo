@@ -1,4 +1,17 @@
-# ADR 0015: Memory Nucleus MVP Clean Architecture
+---
+id: ADR-0015
+title: Memory Nucleus MVP Clean Architecture
+status: accepted
+date: null
+deciders:
+  - product-owner
+supersedes:
+  - ADR-0012
+  - ADR-0013
+superseded-by: null
+---
+
+# ADR-0015: Memory Nucleus MVP Clean Architecture
 
 ## Status
 Accepted

@@ -20,7 +20,6 @@ rules:
 adrs:
   - .agents/adrs/0018-spec-driven-delivery.adr.md
 skills:
-  - .agents/skills/spec-driven-development/SKILL.md
   - .agents/skills/to-spec/SKILL.md
   - .agents/skills/code-review/SKILL.md
 evidence:

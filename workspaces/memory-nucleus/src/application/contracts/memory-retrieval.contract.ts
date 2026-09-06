@@ -1,9 +1,6 @@
-import type {
-  MemoryKind,
-  MemoryTemporalPrecision
-} from '@domain/entities/memory-candidate.entity'
+import type { MemoryKind, MemoryTemporalPrecision } from '@domain/entities'
 
-export type { MemoryKind } from '@domain/entities/memory-candidate.entity'
+export type { MemoryKind } from '@domain/entities'
 
 export const MEMORY_AUTHOR_TYPES = Object.freeze([
   'authorized-delegate',
@@ -184,6 +181,8 @@ export interface EffectiveMemoryRetrievalBudgets {
 }
 
 export interface AuthorizedMemoryRetrievalDiagnostics {
+  /** Null preserves missing instrumentation from a legacy repository. */
+  readonly fullTextCalls: number | null
   readonly vectorFallbackUsed: false
   readonly vectorCalls: 0
   readonly repositoryRowsReturned: number

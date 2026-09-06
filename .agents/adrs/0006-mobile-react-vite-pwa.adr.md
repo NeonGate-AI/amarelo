@@ -11,6 +11,8 @@ superseded-by: null
 
 # ADR-0006: Replace the Expo mobile surface with a React Vite PWA
 
+Historical path note: the original decision below uses the former source-root name. ADR-0014 later moved it to `workspaces/apps/mobile`; use the current Mobile workflow context for active text and Realtime experiments. The PWA and private-cache boundaries remain valid.
+
 ## Context
 
 The approved mobile slice is a deterministic, one-screen presentation mock built from browser-compatible design-system components and the Orbz Web Component. The Expo and React Native implementation could not reuse Orbz or the shared browser UI directly and required a parallel native component package, static Orb image, and native-specific styling and build stack.
@@ -71,8 +73,8 @@ Automated tests remain deferred by repository policy.
 
 ## Links
 
-- Architecture: `.agents/ARCHITECTURE.md`
+- Architecture: `.agents/context/architecture/overview.md`
 - Mobile specification: `.agents/specs/003-mobile-voice-experience.spec.md`
-- Orbz decision: `.agents/decisions/0005-orbz-web-component.md`
+- Orbz decision: `.agents/adrs/0005-orbz-web-component.adr.md`
 - React and PWA rules: `.agents/rules/009-react-and-next.rule.md`
-- Mobile implementation: `elos/apps/mobile`
+- Mobile implementation: `workspaces/apps/mobile`

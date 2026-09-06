@@ -8,7 +8,8 @@ import {
 export const MemoryPurgeStatusSchema = z.enum([
   'completed',
   'not-required',
-  'pending'
+  'pending',
+  'suppression-only'
 ])
 export type MemoryPurgeStatus = z.infer<typeof MemoryPurgeStatusSchema>
 
@@ -35,6 +36,15 @@ const NotRequiredMemoryDeletionReceiptSchema = z
   })
   .strict()
 
+// Immediate non-serving acknowledgement; no physical purge implementation/deadline.
+const SuppressionOnlyMemoryDeletionReceiptSchema = z
+  .object({
+    ...MemoryDeletionReceiptBaseShape,
+    purgeBy: z.null(),
+    purgeStatus: z.literal('suppression-only')
+  })
+  .strict()
+
 const PendingMemoryDeletionReceiptSchema = z
   .object({
     ...MemoryDeletionReceiptBaseShape,
@@ -47,7 +57,8 @@ export const MemoryDeletionReceiptSchema = z
   .discriminatedUnion('purgeStatus', [
     CompletedMemoryDeletionReceiptSchema,
     NotRequiredMemoryDeletionReceiptSchema,
-    PendingMemoryDeletionReceiptSchema
+    PendingMemoryDeletionReceiptSchema,
+    SuppressionOnlyMemoryDeletionReceiptSchema
   ])
   .superRefine((receipt, context) => {
     if (Date.parse(receipt.requestedAt) > Date.parse(receipt.tombstonedAt)) {
