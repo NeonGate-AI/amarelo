@@ -2,7 +2,7 @@
 id: SPEC-055
 title: Reconcile integrated delivery evidence and recover CI
 type: fix
-status: in-progress
+status: implemented
 mode: prospective
 created: 2026-09-06
 updated: 2026-09-06
@@ -37,6 +37,8 @@ skills:
 evidence:
   - https://github.com/NeonGate-AI/amarelo/actions/runs/34010920249/job/101426478783
   - https://github.com/NeonGate-AI/amarelo/pull/97
+  - https://github.com/NeonGate-AI/amarelo/actions/runs/34013599835
+  - https://github.com/NeonGate-AI/amarelo/pull/97#issuecomment-5557171776
 ---
 
 # SPEC-055: Reconcile integrated delivery evidence and recover CI
@@ -147,10 +149,10 @@ container/Kubernetes tool is an environment limitation, not a passed real test.
 ## Acceptance Criteria
 
 - [x] Spec statuses and catalog reflect pending acceptance without losing delivered history.
-- [ ] Canonical, import, runtime and Memory audits enforce the current approved boundaries.
+- [x] Canonical, import, runtime and Memory audits enforce the current approved boundaries.
 - [x] Reported lint/type/test/build failures are repaired and changed behavior is covered.
-- [ ] Full final-head CI, main-source guard and Vercel deployments pass.
-- [ ] Standards and Spec-fidelity reviews pass on the same final head.
+- [x] Full final-head CI, main-source guard and Vercel deployments pass.
+- [x] Standards and Spec-fidelity reviews pass on the same final head.
 - [x] Remaining product, live-provider and economic validation debt stays explicit.
 - [x] Only the five approved SHAs receive the body-length exception; regressions protect all other validation.
 
@@ -222,8 +224,21 @@ Update executable checks to the approved contracts instead of duplicating rules.
   SPEC-049 retains the broader validation debt. SPEC-053/054 retain their current
   records; this repair does not claim their separate lifecycle is complete.
 
-PR #97 records the exact published head, remote results and independent review
-axes. Keep this spec in-progress while complete promotion validation is blocked.
+### Completed CI recovery — 2026-09-06
+
+The implementation head `ec7a1d95b10bf74ac6ad4d2869e821097e8e3604` passes
+[the complete CI run](https://github.com/NeonGate-AI/amarelo/actions/runs/34013599835),
+including real disposable Neo4j/PostgreSQL, all repository audits, lint, types,
+tests, AI evaluations, builds, hooks, the history regressions and Commitlint.
+The main-source guard and all four Vercel deployments pass on that same head.
+The linked PR review records passing Standards and Spec-fidelity axes, the fixed
+comparison base and the owner's authorship on both commits.
+
+This completes the bounded recovery and the approved message exception. Only
+SPEC-055 and its catalog status are closed here. SPEC-049 and the separate
+product contracts retain their open acceptance evidence. Main remains unmerged.
+The documentation-only closure must rerun CI and both review axes on its final
+head; PR #97 is the stable record for that final confirmation.
 
 ## Further Notes
 
