@@ -5,9 +5,11 @@ The CLI consumes one strict `memory-economics-report-input-v1` JSON object conta
 Run from the repository root:
 
 ```sh
-corepack pnpm --filter @nucleus/memory build:report
 corepack pnpm --filter @nucleus/memory report:economics /absolute/input.json /absolute/report.json /absolute/report.html
 ```
+
+The package command enters through the owning POSIX shell launcher and executes
+the TypeScript backend; no separate report build is required.
 
 `MemoryEconomicsReportInputSchema` in `application/reporting` is the input contract. Unavailable metrics, amounts and durations use `null`; absent execution evidence uses `hold`. Do not populate them with estimates labeled as provider measurements. The report omits tenant, subject, actor, session and conversation identifiers from its output; caller-supplied artifact/version identifiers must already be redacted.
 

@@ -2,7 +2,7 @@
 id: SPEC-054
 title: Restore shell automation entrypoints for the Memory MVP
 type: fix
-status: ready
+status: in-progress
 mode: prospective
 created: 2026-09-06
 updated: 2026-09-06
@@ -28,6 +28,9 @@ skills:
 evidence:
   - https://github.com/NeonGate-AI/amarelo/actions/runs/34008785244/job/101420762221
   - https://github.com/NeonGate-AI/amarelo/pull/97
+  - .audit/elo-platform-core.audit.sh
+  - workspaces/memory-nucleus/src/infrastructure/worker/memory-background.sh
+  - workspaces/memory-nucleus/src/infrastructure/reporting/memory-economics-report.sh
 ---
 
 # SPEC-054: Restore shell automation entrypoints for the Memory MVP
@@ -101,11 +104,11 @@ failure truthfully; a passing platform audit alone is not permission to merge.
 
 ## Acceptance Criteria
 
-- [ ] Worker and report package commands enter through owning POSIX shell files.
-- [ ] Local MVP worker dispatch uses the same shell entrypoint.
-- [ ] Shell invocation preserves workspace, arguments, exit status and signals.
-- [ ] The audit accepts exactly the approved MVP delegates and still rejects MJS automation.
-- [ ] Focused validation passes and durable command guidance matches the implementation.
+- [x] Worker and report package commands enter through owning POSIX shell files.
+- [x] Local MVP worker dispatch uses the same shell entrypoint.
+- [x] Shell invocation preserves workspace, arguments, exit status and signals.
+- [x] The audit accepts exactly the approved MVP delegates and still rejects MJS automation.
+- [x] Focused validation passes and durable command guidance matches the implementation.
 - [ ] Final-head required CI, deployments and source reviews permit the owner's merge.
 
 ## Failure Behavior
@@ -127,6 +130,22 @@ The failing PR run above is the reproduced baseline. Record focused checks and
 the final CI/review results in this spec and PR #97. The source-organization rule
 already owns the shell policy; improve its executable enforcement and owning
 command guidance without introducing a duplicate rule or ADR.
+
+On 2026-09-06 the original Elo platform failure was reproduced, then the repaired
+platform and scaffold audits passed. Architecture and rule-catalog audits passed.
+Synthetic Node-process probes from an unrelated directory verified spaces and
+apostrophes in workspace paths, empty and quoted arguments, exit status 37, and
+PID/SIGTERM preservation through `exec`. Real Node/tsx startup reached the existing
+worker opt-in and report-usage failures with no service credentials configured.
+The runtime typecheck and focused Biome check passed; the report no longer needs
+a separate bundle build before invocation.
+
+The full Elo suite advances to 23 existing spec-workflow failures across nine
+unchanged contracts: implemented status conflicts with unchecked acceptance or
+pending evidence. This correction preserves those records and the audit. Full CI
+and production promotion remain blocked until their evidence/status is reconciled.
+PR #97 records the exact published head, final CI result and both review axes for
+this bounded repair. Keep SPEC-054 in-progress while the release gate is unresolved.
 
 ## Further Notes
 

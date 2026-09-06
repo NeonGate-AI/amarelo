@@ -124,12 +124,12 @@ package_script_value() {
       sub(/".*$/, "", key)
       if (key == wanted) {
         sub(/^[[:space:]]*"[^"]+":[[:space:]]*"/, "", line)
-        sub(/",[[:space:]]*$/, "", line)
+        sub(/",?[[:space:]]*$/, "", line)
         print line
         exit
       }
     }
-  ' "$PROJECT_ROOT/package.json"
+  ' "$PROJECT_ROOT/${2:-package.json}"
 }
 
 if [ -e "$PROJECT_ROOT/elo" ]; then
@@ -176,6 +176,9 @@ postclone
 elo
 dev
 dev:text
+mvp:init
+mvp:infra
+dev:mvp
 start
 build
 typecheck
@@ -184,8 +187,14 @@ test
 is_canonical_root_script() {
   printf '%s' "$allowed_scripts" | grep -Fx "$1" >/dev/null 2>&1
 }
-if ! is_canonical_root_script dev:text || is_canonical_root_script dev:arbitrary; then
-  platform_fail .audit/elo-platform.audit.sh "root task allowlist must admit only the bounded dev:text addition"
+if ! is_canonical_root_script dev:text ||
+  ! is_canonical_root_script mvp:init ||
+  ! is_canonical_root_script mvp:infra ||
+  ! is_canonical_root_script dev:mvp ||
+  is_canonical_root_script dev:arbitrary ||
+  is_canonical_root_script mvp:arbitrary
+then
+  platform_fail .audit/elo-platform.audit.sh "root task allowlist must admit only the approved text and MVP commands"
 fi
 package_script_names >"$TMP_ROOT/scripts"
 while IFS= read -r script_name; do
@@ -205,6 +214,31 @@ done <"$TMP_ROOT/scripts"
   platform_fail package.json "pnpm elo must execute the local cli/elo binary"
 [ "$(package_script_value dev:text)" = 'turbo dev --filter=onboarding --filter=mobile --filter=chatterbox' ] ||
   platform_fail package.json "dev:text must run exactly the onboarding, mobile and Chatterbox Turbo development slice"
+
+for mvp_action in init infra start; do
+  case "$mvp_action" in
+    init|infra) mvp_script="mvp:$mvp_action" ;;
+    start) mvp_script=dev:mvp ;;
+  esac
+  [ "$(package_script_value "$mvp_script")" = "pnpm --filter @repo/runtime mvp -- $mvp_action" ] ||
+    platform_fail package.json "$mvp_script must delegate exactly to the owning runtime MVP command"
+done
+[ "$(package_script_value mvp workspaces/packages/runtime/package.json)" = 'sh src/mvp/mvp.sh' ] ||
+  platform_fail workspaces/packages/runtime/package.json "MVP automation must enter through its owning shell launcher"
+
+for memory_command in background:start report:economics; do
+  case "$memory_command" in
+    background:start) memory_launcher=src/infrastructure/worker/memory-background.sh ;;
+    report:economics) memory_launcher=src/infrastructure/reporting/memory-economics-report.sh ;;
+  esac
+  [ "$(package_script_value "$memory_command" workspaces/memory-nucleus/package.json)" = "sh $memory_launcher" ] ||
+    platform_fail workspaces/memory-nucleus/package.json "$memory_command must enter through its owning shell launcher"
+  if [ ! -f "$PROJECT_ROOT/workspaces/memory-nucleus/$memory_launcher" ]; then
+    platform_fail "workspaces/memory-nucleus/$memory_launcher" "Memory shell launcher is missing"
+  elif ! sh -n "$PROJECT_ROOT/workspaces/memory-nucleus/$memory_launcher"; then
+    platform_fail "workspaces/memory-nucleus/$memory_launcher" "Memory shell launcher must use valid POSIX syntax"
+  fi
+done
 
 for script_name in dev start build typecheck test; do
   script_value=$(package_script_value "$script_name")

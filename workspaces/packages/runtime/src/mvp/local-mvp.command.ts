@@ -386,15 +386,13 @@ export async function runLocalMvp(
     if (designSystem.code !== 0)
       throw new Error('Não foi possível compilar os tokens da interface.')
 
-    for (const script of ['build', 'build:background']) {
-      const result = await launch(`Compilando Memory: ${script}`, 'pnpm', [
-        '--filter',
-        '@nucleus/memory',
-        script
-      ]).completed
-      if (result.code !== 0)
-        throw new Error('Não foi possível compilar o runtime Memory.')
-    }
+    const memoryBuild = await launch('Compilando Memory', 'pnpm', [
+      '--filter',
+      '@nucleus/memory',
+      'build'
+    ]).completed
+    if (memoryBuild.code !== 0)
+      throw new Error('Não foi possível compilar o runtime Memory.')
 
     const services: Promise<{ code: number; output: string }>[] = []
     for (const [name, port] of [
@@ -451,8 +449,8 @@ export async function runLocalMvp(
     services.push(
       launch(
         'Iniciando curadoria Memory',
-        process.execPath,
-        ['dist/worker/memory-background.cli.mjs'],
+        'sh',
+        ['src/infrastructure/worker/memory-background.sh'],
         {
           cwd: resolve(projectRoot, 'workspaces/memory-nucleus'),
           environment: serverEnvironment
