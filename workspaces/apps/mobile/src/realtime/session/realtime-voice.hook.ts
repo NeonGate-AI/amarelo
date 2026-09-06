@@ -60,7 +60,9 @@ export function useRealtimeVoice() {
     if (active.expiryTimer !== null) clearTimeout(active.expiryTimer)
     if (active.connectionTimer !== null) clearTimeout(active.connectionTimer)
     active.channel?.close()
-    active.microphone?.getTracks().forEach((track) => track.stop())
+    active.microphone?.getTracks().forEach((track) => {
+      track.stop()
+    })
     active.peer.close()
     active.audio.pause()
     active.audio.srcObject = null
@@ -218,7 +220,9 @@ export function useRealtimeVoice() {
         }
       })
       if (!isCurrent()) {
-        microphone.getTracks().forEach((track) => track.stop())
+        microphone.getTracks().forEach((track) => {
+          track.stop()
+        })
         return
       }
       session.microphone = microphone

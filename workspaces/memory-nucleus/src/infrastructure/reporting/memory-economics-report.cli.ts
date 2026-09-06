@@ -17,8 +17,12 @@ export async function writeMemoryEconomicsReportFiles(options: {
     throw new Error('Input and output report files must be distinct')
   const inputFile = await stat(inputPath)
   if (!inputFile.isFile() || inputFile.size > 64 * 1024 * 1024)
-    throw new Error('Economics input must be a redacted JSON file within 64 MiB')
-  const report = createMemoryEconomicsReport(JSON.parse(await readFile(inputPath, 'utf8')))
+    throw new Error(
+      'Economics input must be a redacted JSON file within 64 MiB'
+    )
+  const report = createMemoryEconomicsReport(
+    JSON.parse(await readFile(inputPath, 'utf8'))
+  )
   const html = renderMemoryEconomicsReportHtml(report)
   await mkdir(dirname(jsonPath), { recursive: true })
   await mkdir(dirname(htmlPath), { recursive: true })
@@ -26,15 +30,24 @@ export async function writeMemoryEconomicsReportFiles(options: {
   await writeFile(htmlPath, html, 'utf8')
 }
 
-if (process.argv[1] !== undefined && import.meta.url === pathToFileURL(resolve(process.argv[1])).href) {
+if (
+  process.argv[1] !== undefined &&
+  import.meta.url === pathToFileURL(resolve(process.argv[1])).href
+) {
   const [inputPath, jsonPath, htmlPath, ...extra] = process.argv.slice(2)
   if (!inputPath || !jsonPath || !htmlPath || extra.length !== 0) {
-    process.stderr.write('Usage: memory-economics-report <redacted-input.json> <report.json> <report.html>\n')
+    process.stderr.write(
+      'Usage: memory-economics-report <redacted-input.json> <report.json> <report.html>\n'
+    )
     process.exitCode = 1
   } else {
-    writeMemoryEconomicsReportFiles({ inputPath, jsonPath, htmlPath }).catch(() => {
-      process.stderr.write('Economics report generation failed; check versioned redacted inputs and output access.\n')
-      process.exitCode = 1
-    })
+    writeMemoryEconomicsReportFiles({ inputPath, jsonPath, htmlPath }).catch(
+      () => {
+        process.stderr.write(
+          'Economics report generation failed; check versioned redacted inputs and output access.\n'
+        )
+        process.exitCode = 1
+      }
+    )
   }
 }

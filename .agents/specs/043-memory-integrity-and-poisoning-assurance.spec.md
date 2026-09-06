@@ -2,10 +2,10 @@
 id: SPEC-043
 title: Add Memory integrity and poisoning assurance before canary
 type: experiment
-status: implemented
+status: in-progress
 mode: prospective
 created: 2026-09-04
-updated: 2026-09-05
+updated: 2026-09-06
 owners:
   - Jonatas Sales
 targets:
@@ -181,3 +181,10 @@ This harness change promotes the durable decision-level assurance requirements i
 SPEC-025 reconciliation (2026-09-05): the owner accepted the consolidated discovery and requested the contract revision, resolving the discovery hold. [SPEC-025](007-plans-and-entitlements.spec.md) adds source-contamination and correct-abstention cases to the existing poisoning gate. Lower cost and greater duration never waive these protections. The later owner-authorized implementation is recorded above with validation explicitly deferred.
 
 Blocked by SPEC-011's paired shadow/parity evidence over the SPEC-016/SPEC-012 path. This assurance phase is a required gate before user-visible canary advancement. It strengthens the existing roadmap rather than replacing authorization, lifecycle, shadow, A/B or economics phases.
+
+## Current validation status — SPEC-055
+
+Implementation remains delivered in staging. On 2026-09-06, SPEC-055 reconciles
+the lifecycle to `in-progress` because the existing acceptance/evidence debt is
+still open. Historical delivery notes and every unchecked criterion are retained.
+Repository CI recovery does not by itself complete this product contract.

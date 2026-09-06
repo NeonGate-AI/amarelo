@@ -46,7 +46,9 @@ import {
 
 const CONVERSATION_BODY_LIMIT_BYTES = 512 * 1024
 const SessionRequestSchema = z.object({}).strict()
-const RealtimeControlSchema = z.object({ conversationId: z.string().uuid() }).strict()
+const RealtimeControlSchema = z
+  .object({ conversationId: z.string().uuid() })
+  .strict()
 const MemoryRequestSchema = z.discriminatedUnion('operation', [
   z
     .object({
@@ -100,9 +102,16 @@ export interface ChatterboxFactoryOptions {
   readonly clock?: () => Date
   readonly createConversationId?: () => string
   readonly createRealtimeCall?: (sdp: string) => Promise<string>
-  readonly createRealtimeSession?: (context: AuthenticatedConversationContext, sdp: string) => Promise<string>
-  readonly stopRealtimeSession?: (context: AuthenticatedConversationContext) => Promise<void>
-  readonly realtimeSessionStatus?: (context: AuthenticatedConversationContext) => RealtimeSessionStatus
+  readonly createRealtimeSession?: (
+    context: AuthenticatedConversationContext,
+    sdp: string
+  ) => Promise<string>
+  readonly stopRealtimeSession?: (
+    context: AuthenticatedConversationContext
+  ) => Promise<void>
+  readonly realtimeSessionStatus?: (
+    context: AuthenticatedConversationContext
+  ) => RealtimeSessionStatus
   readonly createMemoryClient?: (
     context: AuthenticatedConversationContext
   ) => MemoryClient
@@ -114,7 +123,9 @@ export interface ChatterboxFactoryOptions {
     readonly message: string
     readonly sourceTurnId: string
     readonly sourceKind?: 'development-text' | 'realtime-transcript'
-  }) => Promise<'committed' | 'buffered' | 'duplicate' | 'skipped' | 'unconfirmed'>
+  }) => Promise<
+    'committed' | 'buffered' | 'duplicate' | 'skipped' | 'unconfirmed'
+  >
   readonly maxConcurrentTurns?: number
   readonly maxSessions?: number
   readonly memoryReadiness?: () => Promise<boolean>
@@ -444,7 +455,10 @@ export function createChatterbox(
       const sdp = typeof request.body === 'string' ? request.body : ''
       if (sdp.trim().length === 0)
         return fail(request, reply, 'invalid_request')
-      if (options.createRealtimeCall === undefined && options.createRealtimeSession === undefined)
+      if (
+        options.createRealtimeCall === undefined &&
+        options.createRealtimeSession === undefined
+      )
         return fail(
           request,
           reply,
@@ -458,12 +472,25 @@ export function createChatterbox(
         let answer: string
         if (options.createRealtimeSession !== undefined) {
           const conversationId = request.headers['x-conversation-id']
-          if (typeof conversationId !== 'string' || !z.string().uuid().safeParse(conversationId).success)
+          if (
+            typeof conversationId !== 'string' ||
+            !z.string().uuid().safeParse(conversationId).success
+          )
             return fail(request, reply, 'invalid_request')
           const expiresAtMs = sessions.expiresAt(conversationId, state.identity)
           if (expiresAtMs === null) return fail(request, reply, 'forbidden')
-          answer = await options.createRealtimeSession(Object.freeze({ ...state.identity,
-            expiresAtMs, conversationId, requestId: String(request.id), asOf: clock().toISOString(), purpose: 'conversation.support', sourceKind: 'realtime-transcript' }), sdp)
+          answer = await options.createRealtimeSession(
+            Object.freeze({
+              ...state.identity,
+              expiresAtMs,
+              conversationId,
+              requestId: String(request.id),
+              asOf: clock().toISOString(),
+              purpose: 'conversation.support',
+              sourceKind: 'realtime-transcript'
+            }),
+            sdp
+          )
           reply.header('x-chatterbox-conversation-id', conversationId)
         } else {
           answer = await options.createRealtimeCall!(sdp)
@@ -479,22 +506,39 @@ export function createChatterbox(
   )
 
   for (const operation of ['status', 'stop'] as const) {
-    app.post(`/v1/realtime/${operation}`, { preHandler: authorize }, async (request, reply) => {
-      const parsed = RealtimeControlSchema.safeParse(request.body)
-      if (!parsed.success) return fail(request, reply, 'invalid_request')
-      const state = states.get(request)
-      if (state?.identity === undefined) return fail(request, reply, 'unauthenticated')
-      const expiresAtMs = sessions.expiresAt(parsed.data.conversationId, state.identity)
-      if (expiresAtMs === null) return fail(request, reply, 'forbidden')
-      const context: AuthenticatedConversationContext = Object.freeze({ ...state.identity,
-        expiresAtMs, conversationId: parsed.data.conversationId, requestId: String(request.id),
-        asOf: clock().toISOString(), purpose: 'conversation.support' })
-      if (operation === 'stop') await options.stopRealtimeSession?.(context)
-      state.observation.outcome = 'success'
-      return reply.send({ data: options.realtimeSessionStatus?.(context) ?? {
-        state: 'unavailable', memory: { status: 'unconfirmed', acceptedCount: null }, expiresAtMs
-      } })
-    })
+    app.post(
+      `/v1/realtime/${operation}`,
+      { preHandler: authorize },
+      async (request, reply) => {
+        const parsed = RealtimeControlSchema.safeParse(request.body)
+        if (!parsed.success) return fail(request, reply, 'invalid_request')
+        const state = states.get(request)
+        if (state?.identity === undefined)
+          return fail(request, reply, 'unauthenticated')
+        const expiresAtMs = sessions.expiresAt(
+          parsed.data.conversationId,
+          state.identity
+        )
+        if (expiresAtMs === null) return fail(request, reply, 'forbidden')
+        const context: AuthenticatedConversationContext = Object.freeze({
+          ...state.identity,
+          expiresAtMs,
+          conversationId: parsed.data.conversationId,
+          requestId: String(request.id),
+          asOf: clock().toISOString(),
+          purpose: 'conversation.support'
+        })
+        if (operation === 'stop') await options.stopRealtimeSession?.(context)
+        state.observation.outcome = 'success'
+        return reply.send({
+          data: options.realtimeSessionStatus?.(context) ?? {
+            state: 'unavailable',
+            memory: { status: 'unconfirmed', acceptedCount: null },
+            expiresAtMs
+          }
+        })
+      }
+    )
   }
 
   if (options.createMemoryClient !== undefined) {
@@ -536,11 +580,20 @@ export function createChatterbox(
                   : command.operation === 'search'
                     ? await client.search(command.input)
                     : await client.forget(command.memoryId)
-          if (command.operation === 'update-consent' && command.input.changes.some((change) => change.status === 'revoked')) {
+          if (
+            command.operation === 'update-consent' &&
+            command.input.changes.some((change) => change.status === 'revoked')
+          ) {
             // A provider session may already contain recalled data; revocation ends it.
-            await options.stopRealtimeSession?.(Object.freeze({ ...state.identity,
-              asOf: clock().toISOString(), conversationId: command.conversationId,
-              purpose: 'conversation.support', requestId: String(request.id) }))
+            await options.stopRealtimeSession?.(
+              Object.freeze({
+                ...state.identity,
+                asOf: clock().toISOString(),
+                conversationId: command.conversationId,
+                purpose: 'conversation.support',
+                requestId: String(request.id)
+              })
+            )
           }
           state.observation.outcome = 'success'
           return reply.send({ data })

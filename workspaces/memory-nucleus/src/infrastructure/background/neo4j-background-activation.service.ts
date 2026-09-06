@@ -170,14 +170,23 @@ export async function activateBackgroundCandidates(
          v.statement AS statement,
          EXISTS { MATCH (:MemorySuppression {canonicalIdentityKey:m.canonicalIdentityKey}) } AS suppressed
        ORDER BY m.canonicalIdentityKey`,
-      {...parameters,kind:candidate.kind,rawStatement:candidate.statement,normalizedStatement:statement}
+      {
+        ...parameters,
+        kind: candidate.kind,
+        rawStatement: candidate.statement,
+        normalizedStatement: statement
+      }
     )
-    const sameFact=aliases.records.filter((row) =>
-      normalizeNeo4jMemoryText(z.string().parse(row.get('statement'))).trim().replace(/\s+/gu,' ')===statement)
-    const existingAlias=sameFact.find((row) => row.get('suppressed')!==true)
+    const sameFact = aliases.records.filter(
+      (row) =>
+        normalizeNeo4jMemoryText(z.string().parse(row.get('statement')))
+          .trim()
+          .replace(/\s+/gu, ' ') === statement
+    )
+    const existingAlias = sameFact.find((row) => row.get('suppressed') !== true)
     if (existingAlias) {
-      canonicalKey=z.string().parse(existingAlias.get('canonicalKey'))
-      canonicalIdentityKey=z.string().parse(existingAlias.get('identityKey'))
+      canonicalKey = z.string().parse(existingAlias.get('canonicalKey'))
+      canonicalIdentityKey = z.string().parse(existingAlias.get('identityKey'))
     }
     const candidateId = neo4jMemoryFingerprint([
       scopeKey,
@@ -189,7 +198,9 @@ export async function activateBackgroundCandidates(
        RETURN s.receiptId AS receiptId`,
       { canonicalIdentityKey }
     )
-    const suppressed = suppression.records.length > 0 || sameFact.some((row) => row.get('suppressed')===true)
+    const suppressed =
+      suppression.records.length > 0 ||
+      sameFact.some((row) => row.get('suppressed') === true)
     const confidence = CONFIDENCE[candidate.confidence]
     const judgment = MemoryJudgment.create({
       decision:
@@ -289,10 +300,15 @@ export async function activateBackgroundCandidates(
       candidateParameters
     )
     const previous = existing.records[0]
-    if (existing.records.length > 1 || (previous && previous.get('state') !== 'active'))
+    if (
+      existing.records.length > 1 ||
+      (previous && previous.get('state') !== 'active')
+    )
       throw new Error('Background Memory cannot reactivate a closed identity')
     const priorRecord = previous
-      ? MemoryRecordSchema.parse(JSON.parse(z.string().parse(previous.get('recordJson'))))
+      ? MemoryRecordSchema.parse(
+          JSON.parse(z.string().parse(previous.get('recordJson')))
+        )
       : null
     if (
       priorRecord !== null &&

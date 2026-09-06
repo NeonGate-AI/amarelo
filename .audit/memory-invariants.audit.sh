@@ -71,8 +71,14 @@ package_name=$(
 [ "$package_name" = "@nucleus/memory" ] ||
   memory_fail "Memory Nucleus package must be @nucleus/memory"
 
-if grep -F '"@langchain/langgraph"' "$manifest" >/dev/null 2>&1; then
-  memory_fail "LangGraph is not required by the MVP core"
+grep -F '"@langchain/langgraph"' "$manifest" >/dev/null 2>&1 ||
+  memory_fail "the approved background orchestration requires LangGraph"
+[ -f "$SOURCE_ROOT/infrastructure/orchestration/langgraph-memory-background.adapter.ts" ] ||
+  memory_fail "LangGraph must remain behind its infrastructure orchestration adapter"
+if grep -R -n -F '@langchain/langgraph' \
+  "$SOURCE_ROOT/domain" "$SOURCE_ROOT/application"
+then
+  memory_fail "Domain and Application must not depend on LangGraph"
 fi
 
 schema="$SOURCE_ROOT/infrastructure/database/schema.sql"

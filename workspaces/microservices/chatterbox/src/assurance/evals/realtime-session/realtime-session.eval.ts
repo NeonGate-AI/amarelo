@@ -49,8 +49,24 @@ async function evaluateOpenAiMultipartContract() {
   assert.equal(typeof sdp, 'string')
   assert.equal(sdp, OFFER_SDP)
   assert.equal(typeof session, 'string')
-  assert.deepEqual(JSON.parse(String(session)), {
+  const { instructions, ...configuration } = JSON.parse(String(session))
+  assert.equal(typeof instructions, 'string')
+  assert.match(instructions, /Não afirme possuir memória persistente/u)
+  assert.equal(String(session).includes('synthetic-openai-key'), false)
+  assert.deepEqual(configuration, {
     audio: {
+      input: {
+        transcription: {
+          model: 'gpt-4o-mini-transcribe',
+          language: 'pt'
+        },
+        turn_detection: {
+          type: 'semantic_vad',
+          eagerness: 'auto',
+          create_response: true,
+          interrupt_response: true
+        }
+      },
       output: {
         voice: 'marin'
       }

@@ -2,10 +2,10 @@
 id: SPEC-017
 title: Activate Memory serving through controlled A B and canary gates
 type: experiment
-status: implemented
+status: in-progress
 mode: prospective
 created: 2026-09-03
-updated: 2026-09-05
+updated: 2026-09-06
 owners:
   - Jonatas Sales
 targets:
@@ -169,3 +169,10 @@ Blocked by SPEC-011 shadow go/no-go and SPEC-043 Memory integrity/poisoning assu
 Implemented and integrated under the owner's delivery-first instruction. No new validation was executed for this phase; unchecked acceptance evidence is explicitly deferred to SPEC-049. Implementation status does not certify a passed parity, integrity, canary or economics gate. Internal flags default off; missing evidence keeps control/hold.
 
 Canary exposure accounting is process-local in this delivery. Use a single process for any future internal canary until distributed and restart-persistent admission is implemented and verified. External exposure remains blocked on SPEC-033.
+
+## Current validation status — SPEC-055
+
+Implementation remains delivered in staging. On 2026-09-06, SPEC-055 reconciles
+the lifecycle to `in-progress` because the existing acceptance/evidence debt is
+still open. Historical delivery notes and every unchecked criterion are retained.
+Repository CI recovery does not by itself complete this product contract.

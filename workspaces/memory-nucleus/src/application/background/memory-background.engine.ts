@@ -3,6 +3,7 @@ import type { MemoryCurationResult } from '@application/contracts'
 import {
   MemoryExtractor,
   type MemoryExtractionInput,
+  type MemoryExtractionResult,
   type MemoryExtractionExecutionContext
 } from '@application/ports'
 import {
@@ -22,7 +23,10 @@ export class MemoryBackgroundEngine {
     private readonly orchestration: MemoryBackgroundOrchestrationPort
   ) {}
 
-  async process(rawJob: MemoryBackgroundJob, options: { readonly attempt: number }) {
+  async process(
+    rawJob: MemoryBackgroundJob,
+    options: { readonly attempt: number }
+  ) {
     const job = MemoryBackgroundJobSchema.parse(rawJob)
     if (!Number.isSafeInteger(options.attempt) || options.attempt < 1)
       throw new Error('Background attempt must be a positive integer')
@@ -50,13 +54,15 @@ export class MemoryBackgroundEngine {
           persistence: binding.persistence,
           extractor: this.accountedExtractor(binding),
           textNormalizer: {
-            normalize: (text) => text.normalize('NFKC').replace(/\s+/gu, ' ').trim()
+            normalize: (text) =>
+              text.normalize('NFKC').replace(/\s+/gu, ' ').trim()
           },
           now: this.now
         }).execute(binding.request)
       },
       complete: async () => {
-        if (curated === null) throw new Error('Background curation is unavailable')
+        if (curated === null)
+          throw new Error('Background curation is unavailable')
         return requireExecution().complete(curated)
       },
       release: async () => {
@@ -65,18 +71,23 @@ export class MemoryBackgroundEngine {
     })
   }
 
-  private accountedExtractor(execution: MemoryBackgroundExecution): MemoryExtractor {
+  private accountedExtractor(
+    execution: MemoryBackgroundExecution
+  ): MemoryExtractor {
     const delegate = this.extractor
-    return new class extends MemoryExtractor {
+    return new (class extends MemoryExtractor {
       readonly deadlineMilliseconds = delegate.deadlineMilliseconds
       readonly modelId = delegate.modelId
       readonly promptVersion = delegate.promptVersion
       readonly providerId = delegate.providerId
       readonly version = delegate.version
 
-      async extract(input: MemoryExtractionInput, context: MemoryExtractionExecutionContext) {
+      async extract(
+        input: MemoryExtractionInput,
+        context: MemoryExtractionExecutionContext
+      ) {
         await execution.beforeModel()
-        let result
+        let result: MemoryExtractionResult
         try {
           result = await delegate.extract(input, context)
         } catch (error) {
@@ -86,6 +97,6 @@ export class MemoryBackgroundEngine {
         await execution.afterModel(result.usage)
         return result
       }
-    }()
+    })()
   }
 }

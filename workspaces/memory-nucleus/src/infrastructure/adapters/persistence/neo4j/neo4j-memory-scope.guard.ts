@@ -12,7 +12,11 @@ const ScopeSchema = z
     conversationId: z.string().min(1).max(200),
     requestId: z.string().min(1).max(200),
     purpose: z.literal('conversation.support'),
-    sourceKind: z.enum(['development-text', 'synthetic-transcript', 'realtime-transcript'])
+    sourceKind: z.enum([
+      'development-text',
+      'synthetic-transcript',
+      'realtime-transcript'
+    ])
   })
   .strict()
 

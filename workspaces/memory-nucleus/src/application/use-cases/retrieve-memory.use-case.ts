@@ -141,11 +141,20 @@ export async function retrieveAuthorizedMemory(
 
   // Scope, provenance, lifecycle and time eligibility precede any conflict decision.
   // Nonmatching candidates cannot suppress a query-relevant eligible fact.
-  const eligibleMatches = repositoryRecords.filter((record) =>
-    isMemoryRecordEligibleForRanking(record, authorizedQuery, fromInclusiveEpoch, toExclusiveEpoch) &&
-    (hasExactSemanticKeyMatch(record, normalizedSemanticKeys) || lexicalMemoryOverlapScore(queryTokens, record) > 0)
+  const eligibleMatches = repositoryRecords.filter(
+    (record) =>
+      isMemoryRecordEligibleForRanking(
+        record,
+        authorizedQuery,
+        fromInclusiveEpoch,
+        toExclusiveEpoch
+      ) &&
+      (hasExactSemanticKeyMatch(record, normalizedSemanticKeys) ||
+        lexicalMemoryOverlapScore(queryTokens, record) > 0)
   )
-  const rankedWithPossibleDuplicates = excludeUnresolvedMemoryConflicts(eligibleMatches)
+  const rankedWithPossibleDuplicates = excludeUnresolvedMemoryConflicts(
+    eligibleMatches
+  )
     .map((record) =>
       rankEligibleMemoryRecord(
         record,

@@ -2,7 +2,7 @@
 id: SPEC-055
 title: Reconcile integrated delivery evidence and recover CI
 type: fix
-status: ready
+status: in-progress
 mode: prospective
 created: 2026-09-06
 updated: 2026-09-06
@@ -86,6 +86,9 @@ reimplement those nine product contracts or certify their unrun acceptance work.
   provider usage or deployment behavior unless a concrete CI failure requires it.
 - Use fix/spec-055-validation-recovery from staging, append the reviewed recovery
   to staging for the existing PR #97, and leave the main merge to the owner.
+- Run the unchanged commitlint gate after runtime validation so historical
+  message defects do not hide code/infrastructure results. Keep its full range,
+  rules and failure status; do not rewrite published history or add exemptions.
 
 ## Testing Decisions
 
@@ -113,12 +116,12 @@ container/Kubernetes tool is an environment limitation, not a passed real test.
 
 ## Acceptance Criteria
 
-- [ ] Spec statuses and catalog reflect pending acceptance without losing delivered history.
+- [x] Spec statuses and catalog reflect pending acceptance without losing delivered history.
 - [ ] Canonical, import, runtime and Memory audits enforce the current approved boundaries.
-- [ ] Reported lint/type/test/build failures are repaired and changed behavior is covered.
+- [x] Reported lint/type/test/build failures are repaired and changed behavior is covered.
 - [ ] Full final-head CI, main-source guard and Vercel deployments pass.
 - [ ] Standards and Spec-fidelity reviews pass on the same final head.
-- [ ] Remaining product, live-provider and economic validation debt stays explicit.
+- [x] Remaining product, live-provider and economic validation debt stays explicit.
 
 ## Failure Behavior
 
@@ -138,6 +141,37 @@ The linked failed run and local diagnostics are the baseline. Record reproduced
 failures and final verification in this spec and PR #97. Keep SPEC-049 for the
 broader experiments and acceptance evidence that repository CI does not prove.
 Update executable checks to the approved contracts instead of duplicating rules.
+
+### Recovery evidence (2026-09-06)
+
+- The unchanged spec audit now passes for 55 specs. Canonical and regression
+  audits, architecture, platform, scaffold, rules, workflow skills, import
+  boundaries and Memory invariants pass locally.
+- Biome reports zero errors, with 22 existing warnings and three informational
+  diagnostics. Formatting was limited to the 46 files with formatting errors.
+  Comparing against a formatted baseline isolates the small behavioral repair.
+- Full local typechecking passes 20 tasks, tests pass 15 tasks, builds pass 16
+  tasks, and the configured five-workspace AI evaluation command passes.
+- Three new synthetic regression tests cover import-safe worker startup,
+  disabled-worker opt-in, cleanup of every integrity scope and preservation of
+  the original failure when cleanup also fails. Updated voice evaluations check
+  the approved server-owned configuration, transcription, barge-in and absence
+  of provider credentials in browser sources or session configuration.
+- Docker and kubectl are unavailable locally. The disposable Neo4j and PostgreSQL
+  checks and real Kustomize rendering require GitHub CI; commands-only runtime
+  validation is synthetic evidence, not a replacement. Commands use pinned pnpm
+  10.32.1 through Corepack; the machine's global pnpm differs.
+- The full promotion commit range exposes five historical body-line violations
+  (`body-max-line-length`, maximum 100): `48784a5`, `19a971d`, `4694a17`,
+  `1702ed3`, `69e1418`. Their implementation is already in staging. A new commit
+  cannot repair an ancestor's message. This recovery preserves the mandatory
+  check and history; the promotion remains blocked pending an owner decision.
+- SPEC-049 and the nine in-progress product contracts retain their open runtime,
+  live-provider, load, security and measured-economics acceptance work. Passing
+  repository checks would not certify that broader work.
+
+PR #97 records the exact published head, remote results and independent review
+axes. Keep this spec in-progress while complete promotion validation is blocked.
 
 ## Further Notes
 

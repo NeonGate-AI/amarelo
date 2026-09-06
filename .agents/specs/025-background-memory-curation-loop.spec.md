@@ -2,10 +2,10 @@
 id: SPEC-012
 title: Build durable background memory curation through deterministic activation
 type: experiment
-status: implemented
+status: in-progress
 mode: prospective
 created: 2026-09-03
-updated: 2026-09-05
+updated: 2026-09-06
 owners:
   - Jonatas Sales
 targets:
@@ -160,3 +160,10 @@ Implemented under the owner's explicit delivery-first instruction. Completion he
 ### First usable voice continuation — 2026-09-05
 
 SPEC-050 prepares the local provider/runtime environment, SPEC-051 supplies actual LangGraph orchestration for this worker, and SPEC-052 connects finalized Realtime patient speech and later recall. The existing imperative engine must not be described as already using LangGraph. This continuation is owner-approved and leaves WorkOS/commercial rules deferred.
+
+## Current validation status — SPEC-055
+
+Implementation remains delivered in staging. On 2026-09-06, SPEC-055 reconciles
+the lifecycle to `in-progress` because the existing acceptance/evidence debt is
+still open. Historical delivery notes and every unchecked criterion are retained.
+Repository CI recovery does not by itself complete this product contract.

@@ -8,8 +8,17 @@ const Id = MemoryUsageIdentifierSchema
 const Amount = z.number().finite().nonnegative()
 const Count = Amount.int().safe()
 const Rate = z.number().finite().min(0).max(1)
-const Basis = z.enum(['patient-speech', 'patient-and-assistant-speech', 'session-elapsed'])
-export const MEMORY_COST_COMPONENTS = ['llm', 'speech', 'memory', 'infrastructure'] as const
+const Basis = z.enum([
+  'patient-speech',
+  'patient-and-assistant-speech',
+  'session-elapsed'
+])
+export const MEMORY_COST_COMPONENTS = [
+  'llm',
+  'speech',
+  'memory',
+  'infrastructure'
+] as const
 const Component = z.enum(MEMORY_COST_COMPONENTS)
 const Coverage = z.enum(['complete', 'partial', 'not-measured'])
 
@@ -22,8 +31,14 @@ const GateReference = z.strictObject({
   fixtureVersion: Id,
   workloadVersion: Id,
   profileVersion: Id,
-  evaluatedHead: z.string().regex(/^[a-f0-9]{40}$/).nullable(),
-  digest: z.string().regex(/^[a-f0-9]{64}$/).nullable(),
+  evaluatedHead: z
+    .string()
+    .regex(/^[a-f0-9]{40}$/)
+    .nullable(),
+  digest: z
+    .string()
+    .regex(/^[a-f0-9]{64}$/)
+    .nullable(),
   sampleSize: Count.nullable(),
   status: z.enum(['pass', 'hold', 'rollback'])
 })
@@ -58,7 +73,10 @@ export const MemoryEconomicsReportInputSchema = z.strictObject({
   schemaVersion: z.literal('memory-economics-report-input-v1'),
   reportId: Id,
   generatedAt: z.iso.datetime(),
-  evaluatedHead: z.string().regex(/^[a-f0-9]{40}$/).nullable(),
+  evaluatedHead: z
+    .string()
+    .regex(/^[a-f0-9]{40}$/)
+    .nullable(),
   cohort: z.strictObject({
     cohortId: Id,
     tenantId: Id,
@@ -95,11 +113,13 @@ export const MemoryEconomicsReportInputSchema = z.strictObject({
       formationHorizonDays: Amount.nullable(),
       reuseHorizonDays: Amount.nullable()
     }),
-    simulation: z.strictObject({
-      version: Id,
-      sourceMinutesPerFamily: Amount.positive(),
-      assumptionCodes: z.array(Id).min(1)
-    }).nullable()
+    simulation: z
+      .strictObject({
+        version: Id,
+        sourceMinutesPerFamily: Amount.positive(),
+        assumptionCodes: z.array(Id).min(1)
+      })
+      .nullable()
   }),
   voiceEvidence: z.strictObject({
     version: Id.nullable(),
@@ -112,26 +132,35 @@ export const MemoryEconomicsReportInputSchema = z.strictObject({
     experienceMeasured: z.boolean()
   }),
   allocationVersion: Id,
-  componentCoverage: z.strictObject({ llm: Coverage, speech: Coverage, memory: Coverage, infrastructure: Coverage }),
+  componentCoverage: z.strictObject({
+    llm: Coverage,
+    speech: Coverage,
+    memory: Coverage,
+    infrastructure: Coverage
+  }),
   ledger: z.array(MemoryUsageLedgerEntrySchema).max(100_000),
-  allocations: z.array(z.strictObject({
-    ledgerEntryId: Id,
-    component: Component,
-    fraction: Rate.positive(),
-    memoryProcessing: z.boolean(),
-    mitigation: z.enum(['none', 'deterministic', 'model-assisted'])
-  })),
-  comparison: z.strictObject({
-    schemaVersion: z.literal('memory-cost-comparison-v1'),
-    artifactId: Id,
-    pairingVersion: Id,
-    fixtureVersion: Id,
-    configurationVersion: Id,
-    sampleSize: Count.positive(),
-    measuredPaired: z.boolean(),
-    controlEntryIds: z.array(Id).min(1),
-    treatmentEntryIds: z.array(Id).min(1)
-  }).nullable(),
+  allocations: z.array(
+    z.strictObject({
+      ledgerEntryId: Id,
+      component: Component,
+      fraction: Rate.positive(),
+      memoryProcessing: z.boolean(),
+      mitigation: z.enum(['none', 'deterministic', 'model-assisted'])
+    })
+  ),
+  comparison: z
+    .strictObject({
+      schemaVersion: z.literal('memory-cost-comparison-v1'),
+      artifactId: Id,
+      pairingVersion: Id,
+      fixtureVersion: Id,
+      configurationVersion: Id,
+      sampleSize: Count.positive(),
+      measuredPaired: z.boolean(),
+      controlEntryIds: z.array(Id).min(1),
+      treatmentEntryIds: z.array(Id).min(1)
+    })
+    .nullable(),
   gates: z.array(GateReference).max(4),
   metrics: Metrics,
   thresholds: z.strictObject({
@@ -157,4 +186,6 @@ export const MemoryEconomicsReportInputSchema = z.strictObject({
   })
 })
 
-export type MemoryEconomicsReportInput = z.infer<typeof MemoryEconomicsReportInputSchema>
+export type MemoryEconomicsReportInput = z.infer<
+  typeof MemoryEconomicsReportInputSchema
+>

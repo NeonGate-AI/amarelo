@@ -9,21 +9,32 @@ import {
 export class MemoryIntegrityTraceCollector extends MemoryRetrievalObserver {
   private readonly ranked = new Map<string, readonly string[]>()
 
-  record(trace: MemoryRetrievalTrace, context: MemoryRetrievalObservationContext): void {
+  record(
+    trace: MemoryRetrievalTrace,
+    context: MemoryRetrievalObservationContext
+  ): void {
     if (context.signal.aborted) return
     if (this.ranked.size >= 256) this.clear()
-    this.ranked.set(trace.traceId, Object.freeze(trace.candidateDecisions
-      .filter(candidate => candidate.decision !== 'duplicate')
-      .map(candidate => candidate.memoryId)))
+    this.ranked.set(
+      trace.traceId,
+      Object.freeze(
+        trace.candidateDecisions
+          .filter((candidate) => candidate.decision !== 'duplicate')
+          .map((candidate) => candidate.memoryId)
+      )
+    )
   }
 
   readonly readRankedMemoryIds = async (input: {
-    scope: MemoryRequestScope; queryId: string
+    scope: MemoryRequestScope
+    queryId: string
   }): Promise<readonly string[] | null> => {
     const ids = this.ranked.get(input.scope.requestId) ?? null
     this.ranked.delete(input.scope.requestId)
     return ids
   }
 
-  clear(): void { this.ranked.clear() }
+  clear(): void {
+    this.ranked.clear()
+  }
 }

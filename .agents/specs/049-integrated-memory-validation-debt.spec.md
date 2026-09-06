@@ -112,3 +112,11 @@ Delivery inventory: the SPEC-012 100-job load entry/report still needs to be aut
 ## Local voice continuation — SPEC-050/051/052
 
 The owner selected Realtime speech with LangGraph Memory and deferred WorkOS. The implementation adds local startup, a real worker graph and server-sideband voice ingestion/recall. Future validation must exercise local auth rejection, fresh schema startup, actual Redis/Neo4j delivery, consent grant/revoke, later-session recall, barge-in, stop/expiry/heartbeat, provider disconnects and shutdown accounting. Replace obsolete active-calendar demo assertions with the new public voice contract. Separate input-transcription billing and final response usage lost during a crash/shutdown remain unobserved; reconcile them before any measured voice margin. No paid calls, browser/provider journey, infrastructure startup, tests or evals were run in this delivery; only integration compilation was used.
+
+## Current CI recovery — SPEC-055
+
+The owner resumed PR validation on 2026-09-06. SPEC-055 repairs the existing
+repository CI and reconciles delivered-but-unvalidated contracts to in-progress.
+This does not complete the broader experiments, live-provider measurements or
+remaining product acceptance tracked here. Historical implementation delivery
+remains recorded; unexecuted criteria are not evidence.

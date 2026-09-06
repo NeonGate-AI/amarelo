@@ -22,12 +22,20 @@ export interface RealtimeSessionStatus {
 }
 
 export interface RealtimeMemoryDependencies {
-  readonly createMemoryClient: (context: AuthenticatedConversationContext) => MemoryClient
-  readonly createScope: (context: AuthenticatedConversationContext) => MemoryRequestScope
-  readonly usageLedgerForRequest: (context: AuthenticatedConversationContext) => MemoryUsageLedger | null
+  readonly createMemoryClient: (
+    context: AuthenticatedConversationContext
+  ) => MemoryClient
+  readonly createScope: (
+    context: AuthenticatedConversationContext
+  ) => MemoryRequestScope
+  readonly usageLedgerForRequest: (
+    context: AuthenticatedConversationContext
+  ) => MemoryUsageLedger | null
   readonly ingest: (input: {
     readonly context: AuthenticatedConversationContext
     readonly message: string
     readonly sourceTurnId: string
-  }) => Promise<'committed' | 'buffered' | 'duplicate' | 'skipped' | 'unconfirmed'>
+  }) => Promise<
+    'committed' | 'buffered' | 'duplicate' | 'skipped' | 'unconfirmed'
+  >
 }

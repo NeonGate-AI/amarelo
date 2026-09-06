@@ -248,15 +248,42 @@ export type {
 export { createNeo4jMemoryBackgroundRuntime } from './infrastructure/background'
 export type { Neo4jMemoryBackgroundOptions } from './infrastructure/background'
 export { MemoryBackgroundJobSchema } from './application/background'
-export type { MemoryBackgroundJob, MemoryBackgroundProfile, MemoryBackgroundIngestResult, MemoryBackgroundProcessResult } from './application/background'
-export { startMemoryBackgroundWorker, MEMORY_BACKGROUND_QUEUE } from './infrastructure/queue'
-export type { MemoryBackgroundWorkerOptions, MemoryBackgroundWorkerRuntime } from './infrastructure/queue'
+export type {
+  MemoryBackgroundJob,
+  MemoryBackgroundProfile,
+  MemoryBackgroundIngestResult,
+  MemoryBackgroundProcessResult
+} from './application/background'
+export {
+  startMemoryBackgroundWorker,
+  MEMORY_BACKGROUND_QUEUE
+} from './infrastructure/queue'
+export type {
+  MemoryBackgroundWorkerOptions,
+  MemoryBackgroundWorkerRuntime
+} from './infrastructure/queue'
 
-export { MemoryIntegrityReportSchema, serializeMemoryIntegrityReport, evaluateMemoryIntegrityGate } from './application/integrity'
-export type { MemoryIntegrityReport, MemoryIntegrityGate } from './application/integrity'
+export {
+  MemoryIntegrityReportSchema,
+  serializeMemoryIntegrityReport,
+  evaluateMemoryIntegrityGate
+} from './application/integrity'
+export type {
+  MemoryIntegrityReport,
+  MemoryIntegrityGate
+} from './application/integrity'
 
 export { createUnknownCostMemoryUsageLedgerEntry } from './application/services'
 
-export { MemoryEconomicsReportInputSchema, createMemoryEconomicsReport } from './application/reporting'
-export type { MemoryEconomicsReportInput, MemoryEconomicsReport } from './application/reporting'
-export { renderMemoryEconomicsReportHtml, writeMemoryEconomicsReportFiles } from './infrastructure/reporting'
+export {
+  MemoryEconomicsReportInputSchema,
+  createMemoryEconomicsReport
+} from './application/reporting'
+export type {
+  MemoryEconomicsReportInput,
+  MemoryEconomicsReport
+} from './application/reporting'
+export {
+  renderMemoryEconomicsReportHtml,
+  writeMemoryEconomicsReportFiles
+} from './infrastructure/reporting'

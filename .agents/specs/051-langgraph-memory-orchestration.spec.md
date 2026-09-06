@@ -2,10 +2,10 @@
 id: SPEC-051
 title: Execute Memory orchestration with LangGraph and the existing BullMQ worker
 type: feature
-status: implemented
+status: in-progress
 mode: prospective
 created: 2026-09-05
-updated: 2026-09-05
+updated: 2026-09-06
 owners:
   - Jonatas Sales
 targets:
@@ -108,3 +108,10 @@ The owner approved Realtime speech plus LangGraph Memory orchestration by answer
 Implementation delivered on `feat/spec-051-langgraph-memory-orchestration`. Memory public exports and the worker artifact compiled with pinned @langchain/langgraph 1.4.14. No broker/database/provider scenario or tests were executed. Pending runtime acceptance remains in SPEC-049.
 
 Reference: [LangGraph graph API](https://docs.langchain.com/oss/javascript/langgraph/graph-api).
+
+## Current validation status — SPEC-055
+
+Implementation remains delivered in staging. On 2026-09-06, SPEC-055 reconciles
+the lifecycle to `in-progress` because the existing acceptance/evidence debt is
+still open. Historical delivery notes and every unchecked criterion are retained.
+Repository CI recovery does not by itself complete this product contract.

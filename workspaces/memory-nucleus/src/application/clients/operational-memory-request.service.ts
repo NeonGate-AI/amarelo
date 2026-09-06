@@ -37,9 +37,11 @@ export class OperationalMemoryRequest {
     if (
       this.scope.actorId !== this.scope.subjectId ||
       this.scope.purpose !== 'conversation.support' ||
-      !['development-text', 'synthetic-transcript', 'realtime-transcript'].includes(
-        this.scope.sourceKind
-      ) ||
+      ![
+        'development-text',
+        'synthetic-transcript',
+        'realtime-transcript'
+      ].includes(this.scope.sourceKind) ||
       [
         this.scope.tenantId,
         this.scope.subjectId,

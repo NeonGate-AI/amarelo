@@ -1,23 +1,28 @@
 import { z } from 'zod'
 import type { MemoryClient, MemorySearchInput } from '@repo/memory-sdk'
-import type { ConversationAgentInvocation, ConversationModelUsage } from '../ports'
+import type {
+  ConversationAgentInvocation,
+  ConversationModelUsage
+} from '../ports'
 
 const Version = z.string().regex(/^[A-Za-z0-9][A-Za-z0-9._:-]{0,199}$/)
-export const MemoryPairVersionsSchema = z.object({
-  fixtureVersion: Version,
-  timestamp: z.string().datetime({ offset: true }),
-  modelId: Version,
-  providerId: Version,
-  configurationVersion: Version,
-  routeVersion: Version,
-  instructionVersion: Version,
-  evaluatorVersion: Version,
-  workloadVersion: Version,
-  capabilityProfile: Version,
-  durationBasis: Version,
-  recentBufferVersion: Version,
-  spec009Reference: Version
-}).strict()
+export const MemoryPairVersionsSchema = z
+  .object({
+    fixtureVersion: Version,
+    timestamp: z.string().datetime({ offset: true }),
+    modelId: Version,
+    providerId: Version,
+    configurationVersion: Version,
+    routeVersion: Version,
+    instructionVersion: Version,
+    evaluatorVersion: Version,
+    workloadVersion: Version,
+    capabilityProfile: Version,
+    durationBasis: Version,
+    recentBufferVersion: Version,
+    spec009Reference: Version
+  })
+  .strict()
 export type MemoryPairVersions = z.infer<typeof MemoryPairVersionsSchema>
 
 export interface MemoryShadowRequest {
@@ -64,20 +69,22 @@ export interface MemoryShadowReport {
 }
 
 const NullableRate = z.number().min(0).max(1).nullable()
-export const MemoryShadowEvidenceSchema = z.object({
-  schemaVersion: z.literal('memory-shadow-evidence-v1'),
-  artifactId: Version,
-  digest: z.string().regex(/^[a-f0-9]{64}$/),
-  versions: MemoryPairVersionsSchema,
-  sampleSize: z.number().int().positive(),
-  measuredAt: z.string().datetime({ offset: true }),
-  expiresAt: z.string().datetime({ offset: true }),
-  criticalRecall: NullableRate,
-  qualityDelta: z.number().finite().nullable(),
-  temporalErrors: z.number().int().nonnegative().nullable(),
-  unauthorizedLeaks: z.number().int().nonnegative().nullable(),
-  consentViolations: z.number().int().nonnegative().nullable(),
-  latencyDeltaMs: z.number().finite().nullable(),
-  maximumLatencyDeltaMs: z.number().finite().nonnegative()
-}).strict()
+export const MemoryShadowEvidenceSchema = z
+  .object({
+    schemaVersion: z.literal('memory-shadow-evidence-v1'),
+    artifactId: Version,
+    digest: z.string().regex(/^[a-f0-9]{64}$/),
+    versions: MemoryPairVersionsSchema,
+    sampleSize: z.number().int().positive(),
+    measuredAt: z.string().datetime({ offset: true }),
+    expiresAt: z.string().datetime({ offset: true }),
+    criticalRecall: NullableRate,
+    qualityDelta: z.number().finite().nullable(),
+    temporalErrors: z.number().int().nonnegative().nullable(),
+    unauthorizedLeaks: z.number().int().nonnegative().nullable(),
+    consentViolations: z.number().int().nonnegative().nullable(),
+    latencyDeltaMs: z.number().finite().nullable(),
+    maximumLatencyDeltaMs: z.number().finite().nonnegative()
+  })
+  .strict()
 export type MemoryShadowEvidence = z.infer<typeof MemoryShadowEvidenceSchema>

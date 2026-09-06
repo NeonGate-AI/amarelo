@@ -10,10 +10,20 @@ export function parseNeo4jMemoryRecord(
     throw new Error('Memory graph record is invalid')
   const parsed: unknown = JSON.parse(value)
   const record = MemoryRecordSchema.parse(parsed)
-  const explicit = record.provenance.actorType === 'user' && record.provenance.sourceType === 'explicit_user' && record.provenance.authorId === scope.subjectId && record.provenance.transformation === null
-  const derived = record.provenance.actorType === 'agent' && record.provenance.sourceType === 'derived' && record.provenance.authorId === 'memory-curator' && record.provenance.transformation?.policyVersion === 'memory-background-acceptance-v1'
+  const explicit =
+    record.provenance.actorType === 'user' &&
+    record.provenance.sourceType === 'explicit_user' &&
+    record.provenance.authorId === scope.subjectId &&
+    record.provenance.transformation === null
+  const derived =
+    record.provenance.actorType === 'agent' &&
+    record.provenance.sourceType === 'derived' &&
+    record.provenance.authorId === 'memory-curator' &&
+    record.provenance.transformation?.policyVersion ===
+      'memory-background-acceptance-v1'
   if (
-    (!explicit && !derived) || record.state !== 'active' ||
+    (!explicit && !derived) ||
+    record.state !== 'active' ||
     record.purposeIds[0] !== scope.purpose
   ) {
     throw new Error('Memory graph record provenance does not match its scope')
@@ -39,7 +49,10 @@ export function toNeo4jRepositoryMemoryRecord(
     provenance: {
       sourceArtifactIds: [...record.provenance.sourceArtifactIds],
       authorId: record.provenance.authorId,
-      authorType: record.provenance.actorType === 'user' ? 'subject' as const : 'service' as const,
+      authorType:
+        record.provenance.actorType === 'user'
+          ? ('subject' as const)
+          : ('service' as const),
       createdAt: record.provenance.observedAt,
       transformationId: record.provenance.transformation?.id ?? null
     },

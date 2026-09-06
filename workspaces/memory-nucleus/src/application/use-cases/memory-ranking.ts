@@ -148,7 +148,9 @@ export function isMemoryRecordEligibleForRanking(
   query: AuthorizedMemoryQuery,
   fromInclusiveEpoch: number | null,
   toExclusiveEpoch: number | null
-): record is RepositoryMemoryRecord & { readonly provenance: MemoryProvenance } {
+): record is RepositoryMemoryRecord & {
+  readonly provenance: MemoryProvenance
+} {
   if (
     !isBoundedNonEmptyString(record.id) ||
     record.tenantId !== query.tenantId ||
@@ -195,7 +197,15 @@ export function rankEligibleMemoryRecord(
   normalizedSemanticKeys: ReadonlySet<string>,
   queryTokens: ReadonlySet<string>
 ): RankedMemoryRecord | null {
-  if (!isMemoryRecordEligibleForRanking(record, query, fromInclusiveEpoch, toExclusiveEpoch)) return null
+  if (
+    !isMemoryRecordEligibleForRanking(
+      record,
+      query,
+      fromInclusiveEpoch,
+      toExclusiveEpoch
+    )
+  )
+    return null
 
   const exactSemanticKey = hasExactSemanticKeyMatch(
     record,

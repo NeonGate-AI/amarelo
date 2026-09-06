@@ -39,11 +39,11 @@ The prefix is a unique catalog rank, not the durable `SPEC-###` identity. Existi
 | 021 | SPEC-014 | implemented | [Spec-driven pull request evidence](021-spec-driven-pull-request-evidence.spec.md) |
 | 022 | SPEC-015 | implemented | [Canonical Memory Nucleus validation roadmap](022-memory-nucleus-validation-roadmap.spec.md) |
 | 023 | SPEC-009 | implemented | [First Ana/PWA conversation and serving baseline](023-first-ana-pwa-conversation-baseline.spec.md) |
-| 024 | SPEC-016 | implemented | [Operational Memory Nucleus core](024-operational-memory-nucleus-core.spec.md) |
-| 025 | SPEC-012 | implemented | [Background memory curation loop](025-background-memory-curation-loop.spec.md) |
-| 026 | SPEC-011 | implemented | [Shadow Memory serving and parity](026-shadow-memory-serving-parity.spec.md) |
-| 027 | SPEC-017 | implemented | [Memory serving A/B and canary](027-memory-serving-ab-canary.spec.md) |
-| 028 | SPEC-018 | implemented | [Memory unit economics and scale gates](028-memory-unit-economics-scale-gates.spec.md) |
+| 024 | SPEC-016 | in-progress | [Operational Memory Nucleus core](024-operational-memory-nucleus-core.spec.md) |
+| 025 | SPEC-012 | in-progress | [Background memory curation loop](025-background-memory-curation-loop.spec.md) |
+| 026 | SPEC-011 | in-progress | [Shadow Memory serving and parity](026-shadow-memory-serving-parity.spec.md) |
+| 027 | SPEC-017 | in-progress | [Memory serving A/B and canary](027-memory-serving-ab-canary.spec.md) |
+| 028 | SPEC-018 | in-progress | [Memory unit economics and scale gates](028-memory-unit-economics-scale-gates.spec.md) |
 | 029 | SPEC-029 | implemented | [Canonical local engineering workflow skills](029-canonical-local-workflow-skills.spec.md) |
 | 030 | SPEC-030 | implemented | [Agent artifact scaffolding](030-agent-artifact-scaffolding.spec.md) |
 | 031 | SPEC-031 | implemented | [Numbered canonical rule catalog](031-numbered-rule-catalog.spec.md) |
@@ -58,21 +58,23 @@ The prefix is a unique catalog rank, not the durable `SPEC-###` identity. Existi
 | 040 | SPEC-040 | implemented | [Project-owned runtime application containers](040-project-owned-container-images.spec.md) |
 | 041 | SPEC-041 | implemented | [Direct cleanup of node_modules](041-cleanup-removes-node-modules.spec.md) |
 | 042 | SPEC-042 | implemented | [Layered test platform foundation](042-layered-test-platform-foundation.spec.md) |
-| 043 | SPEC-043 | implemented | [Memory integrity and poisoning assurance](043-memory-integrity-and-poisoning-assurance.spec.md) |
+| 043 | SPEC-043 | in-progress | [Memory integrity and poisoning assurance](043-memory-integrity-and-poisoning-assurance.spec.md) |
 | 044 | SPEC-044 | implemented | [Staging-first repository delivery flow](044-staging-delivery-flow.spec.md) |
 | 045 | SPEC-045 | implemented | [Memory infrastructure runtime topology](045-memory-infrastructure-runtime.spec.md) |
 | 046 | SPEC-046 | implemented | [Saneamento canônico](046-saneamento-canonico.spec.md) |
 | 047 | SPEC-047 | implemented | [Vertical slice textual, autenticado e observável](047-vertical-slice-textual-autenticado-observavel.spec.md) |
 | 048 | SPEC-048 | implemented | [Install grill-me and align discovery gates](048-grill-me-discovery-alignment.spec.md) |
 | 049 | SPEC-049 | draft | [Integrated Memory validation debt](049-integrated-memory-validation-debt.spec.md) |
-| 050 | SPEC-050 | implemented | [Local MVP environment](050-local-mvp-environment.spec.md) |
-| 051 | SPEC-051 | implemented | [LangGraph Memory orchestration](051-langgraph-memory-orchestration.spec.md) |
-| 052 | SPEC-052 | implemented | [Realtime PWA Memory bridge](052-realtime-pwa-memory-bridge.spec.md) |
+| 050 | SPEC-050 | in-progress | [Local MVP environment](050-local-mvp-environment.spec.md) |
+| 051 | SPEC-051 | in-progress | [LangGraph Memory orchestration](051-langgraph-memory-orchestration.spec.md) |
+| 052 | SPEC-052 | in-progress | [Realtime PWA Memory bridge](052-realtime-pwa-memory-bridge.spec.md) |
 | 053 | SPEC-053 | in-progress | [Commercial product README](053-commercial-readme.spec.md) |
 | 054 | SPEC-054 | in-progress | [Shell automation entrypoints](054-shell-automation-entrypoints.spec.md) |
-| 055 | SPEC-055 | ready | [Integrated CI recovery](055-integrated-ci-recovery.spec.md) |
+| 055 | SPEC-055 | in-progress | [Integrated CI recovery](055-integrated-ci-recovery.spec.md) |
 
 The next unallocated durable delivery ID is `SPEC-056`.
+
+**Current validation status (2026-09-06, SPEC-055):** SPEC-016/012/011/017/018/043/050/051/052 retain their delivered code and history, but are `in-progress` until their open acceptance evidence is resolved. The implementation-first records below describe the earlier delivery phase. No criterion was checked to repair the metadata audit.
 
 SPEC-046 and SPEC-047 were implemented in the owner-authorized local ZIP branch. Their source/test acceptance does not assert live login, deployed infrastructure, browser E2E or remote CI.
 

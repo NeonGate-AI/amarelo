@@ -2,10 +2,10 @@
 id: SPEC-018
 title: Establish Memory unit economics dashboard and scale gates
 type: experiment
-status: implemented
+status: in-progress
 mode: prospective
 created: 2026-09-03
-updated: 2026-09-05
+updated: 2026-09-06
 owners:
   - Jonatas Sales
 targets:
@@ -170,3 +170,10 @@ The implementation separates operational and experiment allocations, reconciles 
 Versioned SPEC-011/SPEC-017/SPEC-043/SPEC-012 gate references and configured quality/privacy/integrity/queue thresholds produce scale, hold or rollback. The report consumes supplied gate evidence and does not execute, fabricate or certify upstream results. Numeric ROI and COGS outputs are scenario diagnostics, not approved plans, quotas or exposure changes.
 
 No tests, evaluations, report snapshots, CI runs or reviews were executed for this implementation slice. No measured cost/rate/result artifact was invented. Required validation and evidence-based acceptance remain deferred, so this delivery note does not mark those criteria complete or authorize scale.
+
+## Current validation status — SPEC-055
+
+Implementation remains delivered in staging. On 2026-09-06, SPEC-055 reconciles
+the lifecycle to `in-progress` because the existing acceptance/evidence debt is
+still open. Historical delivery notes and every unchecked criterion are retained.
+Repository CI recovery does not by itself complete this product contract.

@@ -2,10 +2,10 @@
 id: SPEC-016
 title: Harden the Memory Nucleus as an operational core service
 type: feature
-status: implemented
+status: in-progress
 mode: prospective
 created: 2026-09-03
-updated: 2026-09-05
+updated: 2026-09-06
 owners:
   - Jonatas Sales
 targets:
@@ -174,3 +174,10 @@ Blocked by SPEC-047 and the retained SPEC-009 baseline. This phase reuses the cu
 
 
 Implementation closure: PR #87 completed the operational code and was merged to staging. On 2026-09-05 the owner explicitly deferred further validation and requested integration of the remaining specs. Existing unchecked evidence remains pending under SPEC-049.
+
+## Current validation status — SPEC-055
+
+Implementation remains delivered in staging. On 2026-09-06, SPEC-055 reconciles
+the lifecycle to `in-progress` because the existing acceptance/evidence debt is
+still open. Historical delivery notes and every unchecked criterion are retained.
+Repository CI recovery does not by itself complete this product contract.

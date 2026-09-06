@@ -2,10 +2,10 @@
 id: SPEC-011
 title: Evaluate bounded Memory Nucleus serving in shadow mode
 type: experiment
-status: implemented
+status: in-progress
 mode: prospective
 created: 2026-09-03
-updated: 2026-09-05
+updated: 2026-09-06
 owners:
   - Jonatas Sales
 targets:
@@ -144,3 +144,10 @@ Blocked by SPEC-009, SPEC-047, SPEC-016 and SPEC-012. Its no-effect/parity evide
 ## Delivery decision — 2026-09-05
 
 Implemented and integrated under the owner's delivery-first instruction. No new validation was executed for this phase; unchecked acceptance evidence is explicitly deferred to SPEC-049. Implementation status does not certify a passed parity, integrity, canary or economics gate. Internal flags default off; missing evidence keeps control/hold.
+
+## Current validation status — SPEC-055
+
+Implementation remains delivered in staging. On 2026-09-06, SPEC-055 reconciles
+the lifecycle to `in-progress` because the existing acceptance/evidence debt is
+still open. Historical delivery notes and every unchecked criterion are retained.
+Repository CI recovery does not by itself complete this product contract.

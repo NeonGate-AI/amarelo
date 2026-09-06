@@ -11,8 +11,12 @@ const BackgroundState = Annotation.Root({
 })
 
 /** Neo4j owns durability; the graph contains only transient, bounded outcomes. */
-export class LangGraphMemoryBackgroundAdapter implements MemoryBackgroundOrchestrationPort {
-  async run(stages: MemoryBackgroundStages): Promise<MemoryBackgroundProcessResult> {
+export class LangGraphMemoryBackgroundAdapter
+  implements MemoryBackgroundOrchestrationPort
+{
+  async run(
+    stages: MemoryBackgroundStages
+  ): Promise<MemoryBackgroundProcessResult> {
     const errors: unknown[] = []
     let released = false
     const release = async () => {
@@ -27,7 +31,11 @@ export class LangGraphMemoryBackgroundAdapter implements MemoryBackgroundOrchest
       .addNode('claim_and_admit', async () => {
         try {
           const outcome = await stages.claimAndAdmit()
-          return { route: outcome === null ? 'curate' as const : 'terminal' as const, outcome }
+          return {
+            route:
+              outcome === null ? ('curate' as const) : ('terminal' as const),
+            outcome
+          }
         } catch (error) {
           errors.push(error)
           return { route: 'release' as const }
@@ -78,7 +86,8 @@ export class LangGraphMemoryBackgroundAdapter implements MemoryBackgroundOrchest
         { recursionLimit: 8, callbacks: [], runName: 'memory-background-v1' }
       )
       if (errors.length > 0) throw errors[0]
-      if (output.outcome === null) throw new Error('Background graph produced no outcome')
+      if (output.outcome === null)
+        throw new Error('Background graph produced no outcome')
       return output.outcome
     } catch (error) {
       await release()

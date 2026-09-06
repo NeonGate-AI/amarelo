@@ -2,10 +2,10 @@
 id: SPEC-050
 title: Prepare the local voice MVP environment without WorkOS
 type: feature
-status: implemented
+status: in-progress
 mode: prospective
 created: 2026-09-05
-updated: 2026-09-05
+updated: 2026-09-06
 owners:
   - Jonatas Sales
 targets:
@@ -106,3 +106,10 @@ The owner approved Realtime speech plus LangGraph Memory orchestration by answer
 
 
 Implementation delivered on `feat/spec-050-local-mvp-environment`. The assembled local MVP runtime and Chatterbox passed integration compilation; infrastructure startup and live acceptance remain unexecuted under the owner waiver and SPEC-049. Unchecked criteria represent pending execution evidence.
+
+## Current validation status — SPEC-055
+
+Implementation remains delivered in staging. On 2026-09-06, SPEC-055 reconciles
+the lifecycle to `in-progress` because the existing acceptance/evidence debt is
+still open. Historical delivery notes and every unchecked criterion are retained.
+Repository CI recovery does not by itself complete this product contract.
