@@ -71,8 +71,9 @@ The prefix is a unique catalog rank, not the durable `SPEC-###` identity. Existi
 | 053 | SPEC-053 | in-progress | [Commercial product README](053-commercial-readme.spec.md) |
 | 054 | SPEC-054 | in-progress | [Shell automation entrypoints](054-shell-automation-entrypoints.spec.md) |
 | 055 | SPEC-055 | implemented | [Integrated CI recovery](055-integrated-ci-recovery.spec.md) |
+| 056 | SPEC-056 | ready | [Readiness accounting synchronization](056-readiness-accounting-synchronization.spec.md) |
 
-The next unallocated durable delivery ID is `SPEC-056`.
+The next unallocated durable delivery ID is `SPEC-057`.
 
 **Current validation status (2026-09-06, SPEC-055):** SPEC-016/012/011/017/018/043/050/051/052 retain their delivered code and history, but are `in-progress` until their open acceptance evidence is resolved. The implementation-first records below describe the earlier delivery phase. No criterion was checked to repair the metadata audit.
 
