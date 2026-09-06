@@ -95,8 +95,11 @@ jobs:
           sh .husky/commit-msg .audit/commit-message.txt
           rm -f .audit/commit-message.txt
 
-      # Preserve the full mandatory gate after runtime checks so inherited
-      # message failures do not conceal independent implementation failures.
+      - name: Commit history regression tests
+        run: sh .audit/git-commit-history.audit.sh
+
+      # SPEC-055 permits only five exact historical body-length violations.
+      # All commits remain in the range and every other rule stays mandatory.
       - name: Commitlint
         shell: bash
         env:
@@ -107,11 +110,11 @@ jobs:
           HEAD_SHA: ${{ github.sha }}
         run: |
           if [ "$EVENT_NAME" = "pull_request" ]; then
-            pnpm exec commitlint --from "$PR_BASE" --to "$PR_HEAD" --verbose
+            ./cli/elo git lint-history "$PR_BASE" "$PR_HEAD"
           else
             base="$PUSH_BEFORE"
             if [ -z "$base" ] || [ "$base" = "0000000000000000000000000000000000000000" ]; then
               base="$(git rev-list --max-parents=0 HEAD)"
             fi
-            pnpm exec commitlint --from "$base" --to "$HEAD_SHA" --verbose
+            ./cli/elo git lint-history "$base" "$HEAD_SHA"
           fi

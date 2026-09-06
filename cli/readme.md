@@ -53,11 +53,18 @@ elo spec [lowercase-kebab-name]
 elo env setup
 elo env validate
 elo git doctor
+elo git lint-history origin/main HEAD
 elo check rules
 elo check all
 ```
 
 `pnpm elo <command>` and `./cli/elo <command>` remain compatibility and recovery entrypoints. Running Elo without arguments shows the yellow ELO wordmark and emoji command catalog without bootstrapping or installing anything. `--logs` may appear before or immediately after a command and sends additional, secret-safe diagnostics to stderr. ANSI color is limited to interactive output and is disabled by `NO_COLOR`. Unknown commands and invalid subcommands return status 2.
+
+`elo git lint-history <from> <to>` validates every commit in the Git range with
+the normal Commitlint rules. The five immutable commit objects approved in
+[SPEC-055](../.agents/specs/055-integrated-ci-recovery.spec.md) receive only a
+body-line-length exception. New commits, including copies of those messages,
+retain the 100-character limit. The local commit-msg hook remains fully strict.
 
 `elo cleanup` immediately removes eligible untracked generated outputs and `node_modules` directories. The command has no options and protects tracked paths, `.git`, and `.audit`; `--dependencies`, the former `--apply` gate, and every other option are rejected before mutation.
 

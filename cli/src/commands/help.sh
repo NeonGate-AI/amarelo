@@ -27,8 +27,9 @@ Commands:
   🧰 skill [name]                           Create an empty local skill
   📋 spec [name]                            Create the next empty spec
   🌱 env <setup|validate>                   Prepare or validate environment files
-  🔧 git <setup|doctor|pre-commit|commit-msg>
+  🔧 git <setup|doctor|pre-commit|commit-msg|lint-history>
                                              Manage repository Git integration
+                                             lint-history: <from> <to>
   🧪 check <all|architecture|canonical|imports|memory|platform|rules|runtime|skills|specs>
                                              Run invariant checkers
 

@@ -101,7 +101,8 @@ case "$elo_command" in
       doctor) exec "$CLI_DIR/commands/git-doctor.sh" "$@" ;;
       pre-commit) exec "$CLI_DIR/commands/git-pre-commit.sh" "$@" ;;
       commit-msg) exec "$CLI_DIR/commands/git-commit-msg.sh" "$@" ;;
-      *) elo_usage_error "Usage: elo git <setup|doctor|pre-commit|commit-msg>" ;;
+      lint-history) exec "$CLI_DIR/commands/git-lint-history.sh" "$@" ;;
+      *) elo_usage_error "Usage: elo git <setup|doctor|pre-commit|commit-msg|lint-history>" ;;
     esac
     ;;
   check)

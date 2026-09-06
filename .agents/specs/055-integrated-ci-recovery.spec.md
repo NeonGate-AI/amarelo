@@ -152,7 +152,7 @@ container/Kubernetes tool is an environment limitation, not a passed real test.
 - [ ] Full final-head CI, main-source guard and Vercel deployments pass.
 - [ ] Standards and Spec-fidelity reviews pass on the same final head.
 - [x] Remaining product, live-provider and economic validation debt stays explicit.
-- [ ] Only the five approved SHAs receive the body-length exception; regressions protect all other validation.
+- [x] Only the five approved SHAs receive the body-length exception; regressions protect all other validation.
 
 ## Failure Behavior
 
@@ -195,11 +195,32 @@ Update executable checks to the approved contracts instead of duplicating rules.
 - The full promotion commit range exposes five historical body-line violations
   (`body-max-line-length`, maximum 100): `48784a5`, `19a971d`, `4694a17`,
   `1702ed3`, `69e1418`. Their implementation is already in staging. A new commit
-  cannot repair an ancestor's message. This recovery preserves the mandatory
-  check and history; the promotion remains blocked pending an owner decision.
+  cannot repair an ancestor's message. The initial recovery preserved the full
+  check and history while awaiting the subsequently recorded owner decision.
 - SPEC-049 and the nine in-progress product contracts retain their open runtime,
   live-provider, load, security and measured-economics acceptance work. Passing
   repository checks would not certify that broader work.
+
+### Historical exception regression evidence (2026-09-06)
+
+- Remote CI run 34012543818 on `eb9a1b2df0580a5da2778c89d30848fc05ed5bf3`
+  passed the audits, lint, types, tests, disposable Neo4j and PostgreSQL checks,
+  evaluations, build and hooks. Only the old Commitlint messages failed. The
+  separate main-source guard passed on that head.
+- The new `.audit/git-commit-history.audit.sh` first failed because the required
+  Elo command did not exist. It now passes through real Git objects and the
+  installed Commitlint: all five allowed SHAs, valid new messages, empty ranges,
+  invalid arguments/refs, overlong new bodies, copied old messages, invalid new
+  types, an invalid merged side branch, the strict local hook and another rule
+  applied to an allowed object.
+- The complete promotion range from `1cd3350ee0e6ca20e1972a11b06cd35bec3a1eb9`
+  through the approved spec revision passes locally. Shell syntax, the new JSON
+  configuration and the local platform, architecture, rules, specs, canonical
+  and workflow-skill audits pass. The full local audit stops at missing kubectl;
+  current-head rendering and full infrastructure checks still require remote CI.
+- SPEC-011/012/017/018/043 have no code or contract edits in this exception.
+  SPEC-049 retains the broader validation debt. SPEC-053/054 retain their current
+  records; this repair does not claim their separate lifecycle is complete.
 
 PR #97 records the exact published head, remote results and independent review
 axes. Keep this spec in-progress while complete promotion validation is blocked.
