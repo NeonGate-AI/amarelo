@@ -33,3 +33,7 @@ No new build, test, evaluation, load, CI/deployment validation or rollout was ex
 
 SPEC-025 retains open commercial decisions. SPEC-033 is owner-deferred and still required before external exposure; SPEC-034 owns later voice lifecycle semantics. Full voice-to-voice cost and naturalness are not measured by this textual Memory implementation. Unknown audio cost cannot become a claimed plan margin.
 
+
+## Local voice follow-up
+
+SPEC-050/051/052 extend the previous textual delivery with local startup, real LangGraph worker orchestration and direct WebRTC voice with a Memory sideband. The assembled packages compiled; this does not change the earlier delivery evidence or assert a live voice journey. [Current voice context](local-voice-mvp.md) describes the implemented path and remaining SPEC-049 measurement debt.

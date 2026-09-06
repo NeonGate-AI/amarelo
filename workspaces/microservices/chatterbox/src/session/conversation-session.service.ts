@@ -77,6 +77,11 @@ export class ConversationSessionService {
     )
   }
 
+  expiresAt(conversationId: string, identity: AuthenticatedIdentity): number | null {
+    if (!this.owns(conversationId, identity)) return null
+    return this.#sessions.get(conversationId)?.expiresAtMs ?? null
+  }
+
   takeRequest(identity: AuthenticatedIdentity): boolean {
     this.#purge()
     const owner = ownerKey(identity)

@@ -89,7 +89,7 @@ export class Neo4jScopedMemoryRepository extends ScopedMemoryRepository {
              WHERE e.tenantId = $tenantId AND e.subjectId = $subjectId AND e.actorId = $actorId
                AND e.eligible = true AND e.contentHash = v.evidenceHash
                AND e.evidenceId = v.sourceArtifactId
-               AND e.sourceKind IN ['development-text', 'synthetic-transcript']
+               AND e.sourceKind IN ['development-text', 'synthetic-transcript', 'realtime-transcript']
            }
            AND (
              (v.kind = 'semantic'

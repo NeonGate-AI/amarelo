@@ -95,7 +95,7 @@ Keep serving on control and scale on hold when evidence is missing. Roll back tr
 
 ## Out of Scope
 
-Main promotion, external participant rollout, commercial pricing decisions, full voice bridge and physical-purge commitments.
+Main promotion, external participant rollout, commercial pricing decisions, implementation of the voice bridge and physical-purge commitments.
 
 ## Evidence and Promotion
 
@@ -108,3 +108,7 @@ This draft organizes future work and does not restart validation during the curr
 
 
 Delivery inventory: the SPEC-012 100-job load entry/report still needs to be authored as well as run. SPEC-017 admission requires distributed/restart-persistent accounting before multiple processes are permitted. Builds, tests, evals and deployment validation for this implementation delivery were not run; resolve resulting integration failures in this future cycle. These are disclosed remaining work, not measured passes.
+
+## Local voice continuation — SPEC-050/051/052
+
+The owner selected Realtime speech with LangGraph Memory and deferred WorkOS. The implementation adds local startup, a real worker graph and server-sideband voice ingestion/recall. Future validation must exercise local auth rejection, fresh schema startup, actual Redis/Neo4j delivery, consent grant/revoke, later-session recall, barge-in, stop/expiry/heartbeat, provider disconnects and shutdown accounting. Replace obsolete active-calendar demo assertions with the new public voice contract. Separate input-transcription billing and final response usage lost during a crash/shutdown remain unobserved; reconcile them before any measured voice margin. No paid calls, browser/provider journey, infrastructure startup, tests or evals were run in this delivery; only integration compilation was used.

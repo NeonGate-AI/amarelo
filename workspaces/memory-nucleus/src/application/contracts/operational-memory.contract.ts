@@ -12,7 +12,7 @@ export interface MemoryRequestScope {
   readonly conversationId: string
   readonly requestId: string
   readonly purpose: 'conversation.support'
-  readonly sourceKind: 'development-text' | 'synthetic-transcript'
+  readonly sourceKind: 'development-text' | 'synthetic-transcript' | 'realtime-transcript'
 }
 
 export interface OperationalMemoryReadiness {

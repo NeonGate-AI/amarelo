@@ -2,7 +2,7 @@
 id: SPEC-052
 title: Connect PWA Realtime speech to longitudinal Memory
 type: feature
-status: in-progress
+status: implemented
 mode: prospective
 created: 2026-09-05
 updated: 2026-09-05
@@ -30,7 +30,9 @@ skills:
   - .agents/skills/grilling/SKILL.md
   - .agents/skills/grill-me/SKILL.md
 evidence:
-  - pending
+  - workspaces/microservices/chatterbox/src/realtime/openai-realtime-session.service.ts
+  - workspaces/apps/mobile/src/realtime/session/realtime-session.client.ts
+  - .agents/context/workspaces/memory-nucleus/local-voice-mvp.md
 ---
 
 # SPEC-052: Connect PWA Realtime speech to longitudinal Memory
@@ -112,3 +114,5 @@ The owner approved Realtime speech plus LangGraph Memory orchestration by answer
 
 
 Provider reference: [OpenAI WebRTC](https://developers.openai.com/api/docs/guides/realtime-webrtc) and [server sideband controls](https://developers.openai.com/api/docs/guides/realtime-server-controls).
+
+Implementation delivered on `feat/spec-052-realtime-pwa-memory-bridge`. Memory exports, Chatterbox, PWA and runtime integration compilation passed. The first PWA bundle needed generated @repo/ds tokens; the launcher now builds them. No tests, provider calls, browser journey, infrastructure start or CI/deployment validation ran. All live criteria remain unchecked execution evidence under SPEC-049. The Orbs connection prop is an explicitly future component evolution; current direct WebRTC lives in the PWA controller.

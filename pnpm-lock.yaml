@@ -299,13 +299,13 @@ importers:
     dependencies:
       '@langchain/core':
         specifier: 1.2.9
-        version: 1.2.9(openai@7.10.0(undici@8.10.2)(zod@4.4.3))
+        version: 1.2.9(openai@7.10.0(undici@8.10.2)(ws@8.21.3)(zod@4.4.3))(ws@8.21.3)
       '@langchain/langgraph':
         specifier: 1.4.14
-        version: 1.4.14(@langchain/core@1.2.9(openai@7.10.0(undici@8.10.2)(zod@4.4.3)))(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(zod@4.4.3)
+        version: 1.4.14(@langchain/core@1.2.9(openai@7.10.0(undici@8.10.2)(ws@8.21.3)(zod@4.4.3))(ws@8.21.3))(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(zod@4.4.3)
       '@langchain/openai':
         specifier: 1.5.11
-        version: 1.5.11(@langchain/core@1.2.9(openai@7.10.0(undici@8.10.2)(zod@4.4.3)))(undici@8.10.2)
+        version: 1.5.11(@langchain/core@1.2.9(openai@7.10.0(undici@8.10.2)(ws@8.21.3)(zod@4.4.3))(ws@8.21.3))(undici@8.10.2)(ws@8.21.3)
       '@repo/memory-sdk':
         specifier: workspace:*
         version: link:../packages/memory-sdk
@@ -351,10 +351,10 @@ importers:
         version: link:../../ai/conversation
       '@langchain/core':
         specifier: 1.2.9
-        version: 1.2.9(openai@7.10.0(undici@8.10.2)(zod@4.4.3))
+        version: 1.2.9(openai@7.10.0(undici@8.10.2)(ws@8.21.3)(zod@4.4.3))(ws@8.21.3)
       '@langchain/openai':
         specifier: 1.5.11
-        version: 1.5.11(@langchain/core@1.2.9(openai@7.10.0(undici@8.10.2)(zod@4.4.3)))(undici@8.10.2)
+        version: 1.5.11(@langchain/core@1.2.9(openai@7.10.0(undici@8.10.2)(ws@8.21.3)(zod@4.4.3))(ws@8.21.3))(undici@8.10.2)(ws@8.21.3)
       '@nucleus/memory':
         specifier: workspace:*
         version: link:../../memory-nucleus
@@ -373,6 +373,9 @@ importers:
       fastify:
         specifier: 5.12.1
         version: 5.12.1
+      ws:
+        specifier: 8.21.3
+        version: 8.21.3
       zod:
         specifier: 4.4.3
         version: 4.4.3
@@ -383,6 +386,9 @@ importers:
       '@types/node':
         specifier: 24.13.3
         version: 24.13.3
+      '@types/ws':
+        specifier: 8.18.1
+        version: 8.18.1
       neo4j-driver:
         specifier: 6.2.0
         version: 6.2.0
@@ -2443,6 +2449,9 @@ packages:
 
   '@types/use-sync-external-store@0.0.6':
     resolution: {integrity: sha512-zFDAD+tlpf2r4asuHEj0XH6pY6i0g5NeAHPn+15wk3BV6JA69eERFXC1gyGThDkVa1zCyKr5jox1+2LbV/AMLg==}
+
+  '@types/ws@8.18.1':
+    resolution: {integrity: sha512-ThVF6DCVhA8kUGy+aazFQ4kXQ7E1Ty7A3ypFOe0IcJV8O/M511G99AW24irKrW56Wt44yG9+ij8FaqoBGkuBXg==}
 
   '@vercel/analytics@2.0.1':
     resolution: {integrity: sha512-MTQG6V9qQrt1tsDeF+2Uoo5aPjqbVPys1xvnIftXSJYG2SrwXRHnqEvVoYID7BTruDz4lCd2Z7rM1BdkUehk2g==}
@@ -5201,6 +5210,18 @@ packages:
   wrappy@1.0.2:
     resolution: {integrity: sha512-l4Sp/DRseor9wL6EvV2+TuQn63dMkPjZ/sp9XkghTEbV9KlPS1xUsZ3u7/IQO4wxtcFB4bgpQPRcR3QCvezPcQ==}
 
+  ws@8.21.3:
+    resolution: {integrity: sha512-201TZ/kPWxoPr/OKWjquZR1SWKXcvxdH+e1xrx89b3YbmzLMFCLfnaG1HFIgWzJOEWZ7MvpK++odZufgYR50Rw==}
+    engines: {node: '>=10.0.0'}
+    peerDependencies:
+      bufferutil: ^4.0.1
+      utf-8-validate: '>=5.0.2'
+    peerDependenciesMeta:
+      bufferutil:
+        optional: true
+      utf-8-validate:
+        optional: true
+
   y18n@5.0.8:
     resolution: {integrity: sha512-0pfFzegeDWJHJIAmTLRP2DwHjdF5s7jo9tuztdQxAhINCdvS+3nGINqPd00AphqJR/0LhANUS6/+7SCb98YOfA==}
     engines: {node: '>=10'}
@@ -6358,12 +6379,12 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@langchain/core@1.2.9(openai@7.10.0(undici@8.10.2)(zod@4.4.3))':
+  '@langchain/core@1.2.9(openai@7.10.0(undici@8.10.2)(ws@8.21.3)(zod@4.4.3))(ws@8.21.3)':
     dependencies:
       '@cfworker/json-schema': 4.1.1
       '@standard-schema/spec': 1.1.0
       js-tiktoken: 1.0.21
-      langsmith: 0.10.1(openai@7.10.0(undici@8.10.2)(zod@4.4.3))
+      langsmith: 0.10.1(openai@7.10.0(undici@8.10.2)(ws@8.21.3)(zod@4.4.3))(ws@8.21.3)
       mustache: 4.2.0
       p-queue: 6.6.2
       zod: 4.4.3
@@ -6374,13 +6395,13 @@ snapshots:
       - openai
       - ws
 
-  '@langchain/langgraph-checkpoint@1.1.5(@langchain/core@1.2.9(openai@7.10.0(undici@8.10.2)(zod@4.4.3)))':
+  '@langchain/langgraph-checkpoint@1.1.5(@langchain/core@1.2.9(openai@7.10.0(undici@8.10.2)(ws@8.21.3)(zod@4.4.3))(ws@8.21.3))':
     dependencies:
-      '@langchain/core': 1.2.9(openai@7.10.0(undici@8.10.2)(zod@4.4.3))
+      '@langchain/core': 1.2.9(openai@7.10.0(undici@8.10.2)(ws@8.21.3)(zod@4.4.3))(ws@8.21.3)
 
-  '@langchain/langgraph-sdk@1.10.2(@langchain/core@1.2.9(openai@7.10.0(undici@8.10.2)(zod@4.4.3)))(react-dom@19.2.4(react@19.2.4))(react@19.2.4)':
+  '@langchain/langgraph-sdk@1.10.2(@langchain/core@1.2.9(openai@7.10.0(undici@8.10.2)(ws@8.21.3)(zod@4.4.3))(ws@8.21.3))(react-dom@19.2.4(react@19.2.4))(react@19.2.4)':
     dependencies:
-      '@langchain/core': 1.2.9(openai@7.10.0(undici@8.10.2)(zod@4.4.3))
+      '@langchain/core': 1.2.9(openai@7.10.0(undici@8.10.2)(ws@8.21.3)(zod@4.4.3))(ws@8.21.3)
       '@langchain/protocol': 0.0.19
       '@types/json-schema': 7.0.15
       p-queue: 9.3.3
@@ -6389,11 +6410,11 @@ snapshots:
       react: 19.2.4
       react-dom: 19.2.4(react@19.2.4)
 
-  '@langchain/langgraph@1.4.14(@langchain/core@1.2.9(openai@7.10.0(undici@8.10.2)(zod@4.4.3)))(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(zod@4.4.3)':
+  '@langchain/langgraph@1.4.14(@langchain/core@1.2.9(openai@7.10.0(undici@8.10.2)(ws@8.21.3)(zod@4.4.3))(ws@8.21.3))(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(zod@4.4.3)':
     dependencies:
-      '@langchain/core': 1.2.9(openai@7.10.0(undici@8.10.2)(zod@4.4.3))
-      '@langchain/langgraph-checkpoint': 1.1.5(@langchain/core@1.2.9(openai@7.10.0(undici@8.10.2)(zod@4.4.3)))
-      '@langchain/langgraph-sdk': 1.10.2(@langchain/core@1.2.9(openai@7.10.0(undici@8.10.2)(zod@4.4.3)))(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
+      '@langchain/core': 1.2.9(openai@7.10.0(undici@8.10.2)(ws@8.21.3)(zod@4.4.3))(ws@8.21.3)
+      '@langchain/langgraph-checkpoint': 1.1.5(@langchain/core@1.2.9(openai@7.10.0(undici@8.10.2)(ws@8.21.3)(zod@4.4.3))(ws@8.21.3))
+      '@langchain/langgraph-sdk': 1.10.2(@langchain/core@1.2.9(openai@7.10.0(undici@8.10.2)(ws@8.21.3)(zod@4.4.3))(ws@8.21.3))(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
       '@langchain/protocol': 0.0.19
       '@standard-schema/spec': 1.1.0
       zod: 4.4.3
@@ -6401,11 +6422,11 @@ snapshots:
       - react
       - react-dom
 
-  '@langchain/openai@1.5.11(@langchain/core@1.2.9(openai@7.10.0(undici@8.10.2)(zod@4.4.3)))(undici@8.10.2)':
+  '@langchain/openai@1.5.11(@langchain/core@1.2.9(openai@7.10.0(undici@8.10.2)(ws@8.21.3)(zod@4.4.3))(ws@8.21.3))(undici@8.10.2)(ws@8.21.3)':
     dependencies:
-      '@langchain/core': 1.2.9(openai@7.10.0(undici@8.10.2)(zod@4.4.3))
+      '@langchain/core': 1.2.9(openai@7.10.0(undici@8.10.2)(ws@8.21.3)(zod@4.4.3))(ws@8.21.3)
       js-tiktoken: 1.0.21
-      openai: 7.10.0(undici@8.10.2)(zod@4.4.3)
+      openai: 7.10.0(undici@8.10.2)(ws@8.21.3)(zod@4.4.3)
       zod: 4.4.3
     transitivePeerDependencies:
       - '@aws-sdk/credential-provider-node'
@@ -7025,6 +7046,10 @@ snapshots:
   '@types/trusted-types@2.0.7': {}
 
   '@types/use-sync-external-store@0.0.6': {}
+
+  '@types/ws@8.18.1':
+    dependencies:
+      '@types/node': 24.13.3
 
   '@vercel/analytics@2.0.1(next@16.2.11(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(react@19.2.4)':
     optionalDependencies:
@@ -8328,11 +8353,12 @@ snapshots:
 
   jsonpointer@5.0.1: {}
 
-  langsmith@0.10.1(openai@7.10.0(undici@8.10.2)(zod@4.4.3)):
+  langsmith@0.10.1(openai@7.10.0(undici@8.10.2)(ws@8.21.3)(zod@4.4.3))(ws@8.21.3):
     dependencies:
       p-queue: 6.6.2
     optionalDependencies:
-      openai: 7.10.0(undici@8.10.2)(zod@4.4.3)
+      openai: 7.10.0(undici@8.10.2)(ws@8.21.3)(zod@4.4.3)
+      ws: 8.21.3
 
   lazystream@1.0.1:
     dependencies:
@@ -8605,9 +8631,10 @@ snapshots:
     dependencies:
       mimic-function: 5.0.1
 
-  openai@7.10.0(undici@8.10.2)(zod@4.4.3):
+  openai@7.10.0(undici@8.10.2)(ws@8.21.3)(zod@4.4.3):
     optionalDependencies:
       undici: 8.10.2
+      ws: 8.21.3
       zod: 4.4.3
 
   own-keys@1.0.2:
@@ -9838,6 +9865,8 @@ snapshots:
       strip-ansi: 7.2.0
 
   wrappy@1.0.2: {}
+
+  ws@8.21.3: {}
 
   y18n@5.0.8: {}
 
