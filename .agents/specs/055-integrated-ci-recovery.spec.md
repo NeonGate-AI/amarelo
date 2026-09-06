@@ -12,6 +12,7 @@ targets:
   - .agents/specs
   - .audit
   - .github
+  - cli
   - workspaces/memory-nucleus
   - workspaces/ai/conversation
   - workspaces/microservices/chatterbox
@@ -74,8 +75,9 @@ reimplement those nine product contracts or certify their unrun acceptance work.
 
 - Keep implemented code and historical delivery notes. In-progress means the
   acceptance lifecycle remains open; it does not mean implementation was removed.
-- Never check an acceptance item without the evidence it requires, relax a
-  quality gate, or introduce a skip to make the promotion green.
+- Never check an acceptance item without the evidence it requires. Keep runtime
+  quality gates mandatory; the owner-approved historical message exception
+  below is the only permitted Commitlint relaxation.
 - Replace the obsolete dependency rejection with enforcement of the approved
   infrastructure-owned LangGraph boundary. Domain/Application stay independent.
 - Restore leaf exports without starting the worker merely by importing a barrel.
@@ -86,9 +88,31 @@ reimplement those nine product contracts or certify their unrun acceptance work.
   provider usage or deployment behavior unless a concrete CI failure requires it.
 - Use fix/spec-055-validation-recovery from staging, append the reviewed recovery
   to staging for the existing PR #97, and leave the main merge to the owner.
-- Run the unchanged commitlint gate after runtime validation so historical
-  message defects do not hide code/infrastructure results. Keep its full range,
-  rules and failure status; do not rewrite published history or add exemptions.
+- Run Commitlint after runtime validation over the complete existing range.
+  The owner approved a body-max-line-length exception for exactly five existing
+  commit objects on 2026-09-06. Identify them by full SHA, preserve every other
+  rule, and keep ordinary commits and the commit-msg hook fully strict. Do not
+  rewrite history or exempt messages by text, author, date, branch or spec ID.
+
+### Approved historical message exception — 2026-09-06
+
+This revision follows the owner's explicit approval after the complete remote
+runtime checks passed and Commitlint remained the only failure. It supersedes
+the earlier prohibition on all exemptions solely for the five immutable objects
+below. The product specs retain their code, acceptance criteria and open evidence.
+
+| Commit SHA | Originating spec |
+| --- | --- |
+| `1702ed337d74c4baf6439a10c11d89abdbcc78e1` | SPEC-011 |
+| `69e14180645e8a00b9fd3dc7b7c208b51d8160b8` | SPEC-012 |
+| `19a971d13c62cb5b196b29b2cdac02b77a9eeadd` | SPEC-017 |
+| `48784a556d2c9d14e414da595eaf045d4b349967` | SPEC-018 |
+| `4694a176df803657b7b515f5772875b2e1321968` | SPEC-043 |
+
+Expose history validation through an owning POSIX Elo command. Keep the default
+Commitlint configuration unchanged and select a tool-owned exception config only
+for these exact SHAs. Invalid refs and command failures remain nonzero. Removing
+the allowance after promotion is a normal follow-up once no validated range needs it.
 
 ## Testing Decisions
 
@@ -102,6 +126,12 @@ disposable Neo4j integration, reference-adapter checks, evaluations and builds.
 Focused tests for any changed executable behavior, including import-safe worker
 startup and cleanup failure semantics. Existing failing checks supply the red
 baseline for metadata, structure, formatting and type repairs.
+
+For the approved message exception, test the real Elo/Commitlint seam using the
+five recorded objects and isolated synthetic commits. Prove a copied old message
+in a new commit still fails, a new overlong body fails, another rule on an exempt
+object still fails, invalid refs fail, and valid new commits pass. Keep the local
+commit-msg hook strict and run these regressions in CI.
 
 ### Fixtures and privacy
 
@@ -122,6 +152,7 @@ container/Kubernetes tool is an environment limitation, not a passed real test.
 - [ ] Full final-head CI, main-source guard and Vercel deployments pass.
 - [ ] Standards and Spec-fidelity reviews pass on the same final head.
 - [x] Remaining product, live-provider and economic validation debt stays explicit.
+- [ ] Only the five approved SHAs receive the body-length exception; regressions protect all other validation.
 
 ## Failure Behavior
 
