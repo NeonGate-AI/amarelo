@@ -9,106 +9,52 @@
 <p align="center">
   <a href="https://amarelo.life">Website</a> ·
   <a href="#the-product">The product</a> ·
-  <a href="#memory-nucleus">Memory Nucleus</a> ·
-  <a href="#build-locally">Build locally</a>
+  <a href="#continuity">Continuity</a> ·
+  <a href="#try-the-preview">Try the preview</a>
 </p>
 
 ## The product
 
-Amarelo is a voice-first mental health support product being built around **continuity, personal memory and human connection**. It is designed to help people talk through everyday experiences, keep useful context over time and decide what to share with the people who support them.
+Amarelo is a voice-first mental health support product in development. It is designed to help people talk about everyday experiences, carry meaningful memories forward and strengthen their connection with the people who support them.
 
-A difficult week, a change in routine or something that helped yesterday can matter again tomorrow. Amarelo's goal is to make that context available when it is useful, without asking someone to retell their whole story at every conversation.
+A difficult week, a change in routine or something that helped yesterday can matter again tomorrow. Amarelo's ambition is to make conversations feel less like starting over and more like being understood over time.
 
-The person stays at the center. AI helps organize and contextualize; the human support network remains essential.
+The person stays at the center. AI supports expression and reflection; human connection remains essential.
 
-> **In development.** The repository includes a PWA, authenticated conversation experiments and an internal Memory integration. The complete voice-and-memory experience is still being developed and validated. See [current status](#current-status).
+### The experience we are building
 
-### A voice, a memory, a connection
-
-The intended experience brings three things together:
-
-| Experience | What it means for the person |
+| Experience | Value for the person |
 | --- | --- |
-| **Talk naturally** | An installable PWA centered on voice, with a visible listening/speaking presence, readable captions and accessible controls. |
-| **Carry context forward** | Relevant experiences and preferences can inform later conversations, with their source and uncertainty preserved. |
-| **Choose what to share** | A memory review surface and explicit permissions are designed to help someone communicate with trusted people on their own terms. |
+| **Talk naturally** | A voice-centered experience with readable captions, accessible controls and an installable app. |
+| **Carry memories forward** | Continuity between conversations, without needing to repeat the whole story. |
+| **Stay in control** | The ability to review memories and choose what to share with trusted people. |
+| **Strengthen human support** | Help communicating experiences to friends, family or qualified professionals when the person chooses to involve them. |
 
-Amarelo calls its AI companions **Elos**—Portuguese for links. Ana is the first implemented agent; Ana, Nico and Isa appear in the product experience. Choosing an Elo is a personal preference and does not identify a diagnosis or grant anyone access to a conversation.
+Amarelo calls its AI companions **Elos**, Portuguese for links. Ana is the first agent being developed; Ana, Nico and Isa appear in the product experience. Choosing an Elo is a personal preference, not a diagnosis.
 
-### Human support, with the person in control
+## Continuity
 
-The product is designed for adults seeking support in everyday life, their trusted support network and qualified professionals when the person chooses to involve them. Each participant has a private account. Being a relative, supporter or professional does not automatically confer access to another person's information.
+Longitudinal memory is the product's approach to preserving meaningful experiences across time. A conversation can build on what came before while leaving room for a person's routines, preferences and circumstances to change.
 
-The product contract calls for inspectable, limited and revocable sharing, with a distinction between what someone said and what a model inferred. Review, correction and sharing workflows are part of that direction; their interfaces and backend capabilities are at different stages of implementation.
+The goal is a more personal experience, with the person deciding which memories remain useful and what they want others to know.
 
-Amarelo is not therapy, diagnosis, treatment or a crisis service, and does not replace qualified care. Read the [product and privacy boundaries](./.agents/rules/008-product-safety-and-privacy.rule.md).
+## Human support, on your terms
 
-## Memory Nucleus
+Amarelo is designed for adults and their support networks. Privacy and personal agency guide the product: being a relative, supporter or professional must never automatically grant access to someone else's conversations. Sharing is intended to be explicit and under the person's control.
 
-**Memory Nucleus is the continuity layer behind Amarelo.** It separates conversation evidence from accepted memory, then selects useful context for a later interaction.
+Amarelo is not therapy, diagnosis, treatment or a crisis service, and does not replace qualified care.
 
-Longitudinal memory means understanding records **across time**. An episodic record describes an experience; a semantic assertion captures a fact or preference with its provenance and validity. The longitudinal view connects those records over time, rather than treating the latest conversation as a complete or permanent picture of a person.
+## Project status
 
-For example, a person might say that evening walks helped during one week and later describe a different routine. A useful memory system preserves that chronology and context. It should not turn a past observation into an unconditional fact about the person.
+**Amarelo is an MVP in development.** The repository includes a public landing page, onboarding, a PWA and an early memory review interface. The default local conversation preview uses synthetic data.
 
-<p align="center">
-  <a href="./assets/images/memory-nucleus-diagram.png">
-    <img src="./assets/images/memory-nucleus-diagram.png" alt="Memory Nucleus architecture: the PWA feeds scoped evidence into Neo4j; BullMQ workers curate candidates under deterministic policy, while eligible memories are projected into bounded conversation context." width="900">
-  </a>
-</p>
+The complete voice-and-memory experience, review and sharing journeys are still being developed and validated. This is a portfolio and development preview, not a production-ready service or a claim of clinical effectiveness.
 
-*Conceptual architecture. The local voice bridge is implemented through SPEC-052: audio flows directly between the PWA and OpenAI over WebRTC, with Chatterbox handling session setup and Memory in parallel. Redis cache-aside serving remains planned; current retrieval queries Neo4j directly. Live validation and complete cost measurement remain pending.*
+## Try the preview
 
-### How continuity becomes context
+Visit [amarelo.life](https://amarelo.life) for the product introduction.
 
-1. **Capture evidence within scope.** The text integration captures the person's current message; the local voice bridge accepts finalized provider input transcriptions through the server sideband. Both use a server-owned identity and explicit consent. A transcript is evidence; an assistant's response does not become evidence about the person.
-2. **Curate in the background.** Neo4j commits protected changes and an outbox event together. A dispatcher publishes reference-only jobs to BullMQ on a dedicated Redis Queue service; LangGraph orchestrates the worker's curation flow. Delivery is at least once, so processing is idempotent and protected effects recheck current authority.
-3. **Let models propose; let policy decide.** Signal, duplicate and budget checks can skip or defer extraction. When extraction runs, the model produces candidates. Deterministic acceptance rules control which candidates become canonical memory.
-4. **Retrieve eligible records.** Permission, provenance, lifecycle and integrity checks come before ranking. Conflicting eligible records preserve uncertainty; similarity alone cannot turn an ineligible record into context.
-5. **Project a bounded context.** Relevant records are selected within a hard token budget. The textual Conversation runtime assembles context; Realtime requests bounded Memory through its server-owned `memory_search` tool when needed. Memory retrieval is not a mandatory HTTP round trip for every audio turn.
-
-### Spend reasoning where it helps
-
-The engineering thesis is **memory → context → quality → cost**: keep useful continuity while limiting repeated history and unnecessary inference.
-
-Normal structured/full-text memory retrieval uses no LLM. Background work can also finish with zero model calls when deterministic gates skip or defer it. The diagram's **“0 LLM calls”** refers to that skipped work; generating a conversation response still requires its own model work.
-
-Serving and curation attempts feed a usage ledger. Missing usage or cost stays unknown. These mechanisms are implemented in source, but measured savings, voice costs and quality improvements remain to be validated.
-
-<details>
-<summary><strong>Explore the architecture</strong></summary>
-
-| Boundary | Responsibility |
-| --- | --- |
-| [Mobile PWA](./workspaces/apps/mobile/readme.md) | The person's conversation surface, captions and voice presence, using [Orbz](https://github.com/NeonGate-AI/orbz). |
-| [Chatterbox](./workspaces/microservices/chatterbox/readme.md) | Fastify transport, server-side identity and provider composition; WorkOS and an explicit local development mode. |
-| [Conversation](./.agents/context/workspaces/ai/conversation.md) | Framework-neutral interaction, cognitive routing and final context assembly for Ana. |
-| [Memory SDK](./workspaces/packages/memory-sdk/readme.md) | The approved public boundary through which AI consumes personal memory. |
-| [Memory Nucleus](./.agents/context/workspaces/memory-nucleus/overview.md) | Memory formation, lifecycle, retrieval, projection and economics; Neo4j is its canonical graph. |
-| [Runtime](./workspaces/packages/runtime/readme.md) | Local Kubernetes profiles, including Neo4j, persistent Redis Queue, a physically separate disposable Redis Cache and object storage. |
-
-Memory Nucleus is one workspace with dependency direction **Infrastructure → Application → Domain**. General knowledge retrieval belongs to [Knowledge](./.agents/context/workspaces/ai/knowledge.md); personal memory has its own governed boundary. Queues, caches and indexes do not become independent sources of memory truth.
-
-See the [architecture overview](./.agents/context/architecture/overview.md), [memory taxonomy](./.agents/adrs/0007-memory-taxonomy-and-longitudinal-projections.adr.md) and [integrated delivery record](./.agents/context/workspaces/memory-nucleus/integrated-delivery.md) for the detailed contracts and evidence limits.
-
-</details>
-
-## Current status
-
-This snapshot covers source integrated into staging through [SPEC-052](https://github.com/NeonGate-AI/amarelo/blob/staging/.agents/specs/052-realtime-pwa-memory-bridge.spec.md). Implementation and validation are tracked separately.
-
-| Area | What is in this repository |
-| --- | --- |
-| **Product surfaces** | Public landing page, onboarding, an installable PWA and a memory console. The default voice interface and console use synthetic data. |
-| **Conversation** | Development text with Ana, local single-owner and WorkOS identity modes, plus an opt-in direct Realtime WebRTC voice path with server-side Memory ingestion and recall. These are bounded development paths. |
-| **Memory** | Neo4j integration, LangGraph/BullMQ curation, shadow comparisons, an internal canary and economics reporting are integrated in source. The local MVP explicitly enables ingestion/curation; shadow and canary remain off by default. |
-| **Next proof point** | Exercise the configured voice-to-Memory journey, measure total voice cost and quality, and complete guardrails before external exposure. |
-
-The latest Memory delivery prioritized source integration and explicitly deferred validation. It is not evidence of a working deployment, measured ROI or production readiness. [SPEC-049](./.agents/specs/049-integrated-memory-validation-debt.spec.md) tracks that validation debt; the [spec catalog](./.agents/specs/readme.md) records the delivery sequence.
-
-## Build locally
-
-Use **Node.js 24**, **pnpm 10.32.1** and a POSIX shell.
+To explore the interface locally, use **Node.js 24**, **pnpm 10.32.1** and a POSIX shell:
 
 ```sh
 git clone https://github.com/NeonGate-AI/amarelo.git
@@ -118,18 +64,10 @@ pnpm install --frozen-lockfile
 pnpm dev
 ```
 
-`pnpm dev` starts the four interface applications: landing, console, onboarding and mobile. Open the PWA at `http://localhost:3003` to explore its default synthetic voice interface.
+Open the PWA at `http://localhost:3003`. This preview demonstrates the interface with synthetic conversation content; it does not establish a working live voice service.
 
-The [local MVP guide](./workspaces/packages/runtime/mvp.md) covers the owner-only environment, `.env.template` configuration and launcher commands with OpenAI, Neo4j and separate Redis services. This path defers WorkOS and keeps credentials server-side. Its Realtime-to-Memory bridge is implemented in [SPEC-052](https://github.com/NeonGate-AI/amarelo/blob/staging/.agents/specs/052-realtime-pwa-memory-bridge.spec.md); compilation passed, while setup instructions are not proof of live operation.
+## The work behind Amarelo
 
-The [development text guide](./workspaces/apps/mobile/readme.md#run-the-authenticated-text-slice) also documents the earlier WorkOS flow and `pnpm dev:text`; select the matching server authentication mode explicitly.
+Created by [Jonatas Sales](https://github.com/neonjonatas), Amarelo brings together product design, accessible web interfaces and AI voice engineering. It is built with TypeScript, React and Next.js, with [Orbz](https://github.com/NeonGate-AI/orbz) providing the visual voice presence.
 
-For the local infrastructure profiles, use the [runtime guide](./workspaces/packages/runtime/readme.md). The [Elo CLI guide](./cli/readme.md) covers environment setup, diagnostics and repository checks.
-
-Orbz currently supplies the visual component while the PWA owns its direct voice connection. Selectable model properties, reusable Realtime connection adapters and canonical JSON configuration are being prepared as separate Orbz review PRs. Their eventual adoption by Amarelo remains a follow-up integration; no permanent provider key belongs in browser-delivered configuration.
-
-## Contributing
-
-Amarelo uses spec-driven development: product contracts, architecture decisions and delivery evidence live alongside the code. Start with [AGENTS.md](./AGENTS.md) and the [delivery workflow](./.agents/specs/workflow.md). Ordinary work branches from and opens pull requests into `staging`; `main` receives reviewed promotions from `staging`.
-
-Useful entry points: [product context](./.agents/context/product/overview.md) · [spec catalog](./.agents/specs/readme.md) · [Elo CLI](./cli/readme.md) · [GitHub issues](https://github.com/NeonGate-AI/amarelo/issues).
+The project reflects an emphasis on thoughtful user experience, responsible product boundaries and spec-driven development. Feedback is welcome through [GitHub issues](https://github.com/NeonGate-AI/amarelo/issues).

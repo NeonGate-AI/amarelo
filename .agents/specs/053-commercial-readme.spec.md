@@ -2,7 +2,7 @@
 id: SPEC-053
 title: Present Amarelo through its product value
 type: chore
-status: ready
+status: in-progress
 mode: prospective
 created: 2026-09-06
 updated: 2026-09-06
@@ -24,7 +24,10 @@ skills:
   - .agents/skills/implement/SKILL.md
   - .agents/skills/code-review/SKILL.md
 evidence:
-  - pending
+  - readme.md
+  - assets/images/amarelo-banner.png
+  - .audit/canonical.audit.sh
+  - https://github.com/NeonGate-AI/amarelo/pull/95
 ---
 
 # SPEC-053: Present Amarelo through its product value
@@ -102,14 +105,14 @@ introducing tests that duplicate its wording.
 
 ## Acceptance Criteria
 
-- [ ] README leads with the product, its intended audience and user benefits.
-- [ ] Continuity is explained without an internal architecture walkthrough.
-- [ ] The architecture image is absent from the README and current tree.
-- [ ] The existing banner is unchanged and all remaining local links resolve.
-- [ ] Copy preserves development status, agency and qualified-care boundaries.
-- [ ] Spec/catalog agree and the required content checks pass.
+- [x] README leads with the product, its intended audience and user benefits.
+- [x] Continuity is explained without an internal architecture walkthrough.
+- [x] The architecture image is absent from the README and current tree.
+- [x] The existing banner is unchanged and all remaining local links resolve.
+- [x] Copy preserves development status, agency and qualified-care boundaries.
+- [x] Spec/catalog agree and the required content checks pass.
 - [ ] Required final-head CI, Vercel and both review axes permit staging merge.
-- [ ] Promotion instructions reserve the staging-to-main merge for the owner.
+- [x] Promotion instructions reserve the staging-to-main merge for the owner.
 
 ## Failure Behavior
 
@@ -131,6 +134,20 @@ Record source checks and final review/CI references in this spec and PR #95.
 Merge to staging only on a reviewed green head, then open a separate PR whose
 head is staging and base is main. The owner performs the main merge. No new ADR
 is required because the product architecture and access boundaries do not change.
+
+Content verification on 2026-09-06: the README was reduced from approximately
+1,529 to 557 whitespace-delimited words. Its nine Markdown/HTML references were
+checked; local files and fragments resolve, image alt text is present and code
+fences are balanced. The banner is byte-identical to the supplied PR asset;
+the architecture PNG and its README reference are absent. Canonical audit and
+git diff --check pass. Independent content review found no blocking claims.
+
+The separate spec workflow audit reports 23 historical acceptance/evidence
+metadata failures in unchanged specs; none refers to SPEC-053. Existing staging
+CI also fails in the Elo audit suite before later validation runs. This change
+does not rewrite historical evidence or waive those failures. Final-head CI
+and review links are recorded in PR #95. Keep this spec in-progress while its
+merge gate is unresolved; promotion remains conditional on green validation.
 
 ## Further Notes
 

@@ -68,7 +68,7 @@ The prefix is a unique catalog rank, not the durable `SPEC-###` identity. Existi
 | 050 | SPEC-050 | implemented | [Local MVP environment](050-local-mvp-environment.spec.md) |
 | 051 | SPEC-051 | implemented | [LangGraph Memory orchestration](051-langgraph-memory-orchestration.spec.md) |
 | 052 | SPEC-052 | implemented | [Realtime PWA Memory bridge](052-realtime-pwa-memory-bridge.spec.md) |
-| 053 | SPEC-053 | ready | [Commercial product README](053-commercial-readme.spec.md) |
+| 053 | SPEC-053 | in-progress | [Commercial product README](053-commercial-readme.spec.md) |
 
 The next unallocated durable delivery ID is `SPEC-054`.
 
